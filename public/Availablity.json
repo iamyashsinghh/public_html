@@ -1,0 +1,33 @@
+[
+    {
+        "area_name": "Ground Floor | Lunch",
+        "event_details": {
+            "01-01-2023": {
+                "Ground Floor | Lunch": {
+                    "selected": false,
+                    "pax": 100
+                },
+                "Ground Floor | Dinner": {
+                    "selected": false,
+                    "pax": 100
+                },
+                "First Floor | Lunch": {
+                    "selected": false,
+                    "pax": 100
+                },
+                "First Floor | Dinner": {
+                    "selected": false,
+                    "pax": 100
+                },
+                "Second Floor | Lunch": {
+                    "selected": false,
+                    "pax": 100
+                },
+                "Second Floor | Dinner": {
+                    "selected": false,
+                    "pax": 100
+                }
+            }
+        }
+    }
+]

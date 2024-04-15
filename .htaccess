@@ -1,0 +1,29 @@
+<IfModule mod_rewrite.c>
+<IfModule mod_negotiation.c>
+    Options -MultiViews
+</IfModule>
+
+RewriteEngine On
+
+# for redirect to https;
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://wbcrm.in/$1 [R,L]
+# for redirect to https;
+
+#   Header always set Access-Control-Allow-Origin "https://weddingbanquets.in"
+  Header always set Access-Control-Allow-Origin "*"
+   Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT"
+   Header always set Access-Control-Max-Age "1000"
+   Header always set Access-Control-Allow-Headers "x-requested-with, Content-Type, origin, authorization, accept, client-security-token, bearer"
+
+RewriteCond %{REQUEST_FILENAME} -d [OR]
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ ^$1 [N]
+
+RewriteCond %{REQUEST_URI} (\.\w+$) [NC]
+RewriteRule ^(.*)$ public/$1
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ server.php
+</IfModule>

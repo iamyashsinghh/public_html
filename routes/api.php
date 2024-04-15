@@ -1,0 +1,588 @@
+<?php
+
+use App\Models\CrmMeta;
+use App\Models\Lead;
+use App\Models\nvLead;
+use App\Models\nvrmLeadForward;
+use App\Models\LeadForward;
+use App\Models\BlockedIp;
+use App\Models\whatsappMessages;
+use App\Models\TeamMember;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
+use GuzzleHttp\Client;
+use GuzzleHttp\Promise;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
+use App\Models\Vendor;
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
+|
+*/
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+if (!function_exists('getAssigningRm')) {
+    function getAssigningRm()
+    {
+        DB::beginTransaction();
+        try {
+            $firstRmWithIsNext = TeamMember::where(['role_id' => 4, 'status' => 1, 'is_next' => 1])
+                ->orderBy('id', 'asc')
+                ->first();
+            if ($firstRmWithIsNext) {
+                TeamMember::where(['role_id' => 4, 'status' => 1])
+                    ->where('id', '!=', $firstRmWithIsNext->id)
+                    ->update(['is_next' => 0]);
+            }
+            if (!$firstRmWithIsNext) {
+                $firstRmWithIsNext = TeamMember::where(['role_id' => 4, 'status' => 1])
+                    ->orderBy('id', 'asc')
+                    ->first();
+                if (!$firstRmWithIsNext) {
+                    throw new Exception('No RM available');
+                }
+                $firstRmWithIsNext->is_next = 1;
+                $firstRmWithIsNext->save();
+                DB::commit();
+                return $firstRmWithIsNext;
+            } else {
+                $firstRmWithIsNext->is_next = 0;
+                $firstRmWithIsNext->save();
+                $nextRm = TeamMember::where(['role_id' => 4, 'status' => 1])
+                    ->where('id', '>', $firstRmWithIsNext->id)
+                    ->orderBy('id', 'asc')
+                    ->first();
+
+                if (!$nextRm) {
+                    $nextRm = TeamMember::where(['role_id' => 4, 'status' => 1])
+                        ->orderBy('id', 'asc')
+                        ->first();
+                }
+                $nextRm->is_next = 1;
+                $nextRm->save();
+            }
+            DB::commit();
+            return $firstRmWithIsNext;
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            DB::rollback();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+}
+
+if (!function_exists('assignLeadsToRMs')) {
+    function assignLeadsToRMs()
+    {
+        set_time_limit(300);
+        $leads = Lead::select('lead_id')->whereNull('deleted_at')->get();
+        DB::beginTransaction();
+        try {
+            foreach ($leads as $lead) {
+                $get_rm = getAssigningRm();
+                if (!$get_rm) {
+                    throw new Exception('No RM available for assignment.');
+                }
+                Lead::where('lead_id', $lead->lead_id)->update([
+                    'assign_to' => $get_rm->name,
+                    'assign_id' => $get_rm->id,
+                ]);
+            }
+            DB::commit();
+            return "Successfully assigned leads to RMs.";
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error('Failed to assign leads to RMs: ' . $e->getMessage());
+            return "Error during lead assignment: " . $e->getMessage();
+        }
+    }
+}
+
+Route::get('/re_assign_leads_to_rms', function () {
+    $yash = assignLeadsToRMs();
+    return $yash;
+});
+
+Route::get('/getlol', function () {
+    $oneYearAgo = Carbon::now()->subYear();
+    $oneYearAgo0 = Carbon::now()->subMonth();
+
+        // Query to find leads updated before one month ago
+
+$uniqueLeadsCount = Lead::join('events', 'leads.lead_id', '=', 'events.lead_id')
+                            ->where('leads.lead_datetime', '<', $oneYearAgo)
+                            ->where('events.event_datetime', '<', $oneYearAgo0)
+                            ->groupBy('leads.lead_id')
+                            ->get()
+                            ->count();  // Counting distinct lead IDs
+
+
+
+    // Return the count of unique leads
+    return $uniqueLeadsCount;
+    // return Lead::withTrashed()->where('mobile', '7827066945')->get();
+        // Return the count
+});
+
+Route::post('/save_wa', function (Request $request) {
+    $name = $request['contacts'][0]['profile']['name'];
+    $number = $request['messages']['from'];
+    $timestamp = $request['messages']['timestamp'];
+    $type = $request['messages']['type'];
+    $textMsg = '';
+    $id = "";
+    $current_timestamp = date('Y-m-d H:i:s', $timestamp);
+    if (strlen($number) > 10) {
+        if (substr($number, 0, 2) == '91') {
+            $number = substr($number, 2);
+        }
+    }
+    $newWaMsg = new whatsappMessages();
+    $newWaMsg->msg_id = $request['id'];
+    $newWaMsg->msg_from = $number;
+    $newWaMsg->time = $current_timestamp;
+    $newWaMsg->type = $type;
+    $newWaMsg->is_sent = "0";
+    if ($type == 'text') {
+        $textMsg = $request['messages'][$type]['body'];
+        $newWaMsg->body = $textMsg;
+    } elseif ($type == 'document') {
+        $id = $request['messages'][$type]['id'];
+        $newWaMsg->doc = $id;
+    } elseif ($type == "audio") {
+        $id = $request['messages'][$type]['id'];
+        $newWaMsg->doc = $id;
+    } elseif ($type == "video") {
+        $id = $request['messages'][$type]['id'];
+        $newWaMsg->doc = $id;
+    } elseif ($type == "image") {
+        $id = $request['messages'][$type]['id'];
+        $newWaMsg->doc = $id;
+    } elseif ($type == "button") {
+        $textMsg = $request['messages'][$type]['text'];
+        $newWaMsg->body = $textMsg;
+    } elseif ($type == "contacts") {
+        $contact_name = $request['messages'][$type][0]['name']['formatted_name'];
+        $contact_number = $request['messages'][$type][0]['phones'][0]['phone'];
+        $data = json_encode([
+            'name' => $contact_name,
+            'mobile' => $contact_number,
+        ]);
+        $newWaMsg->doc = $data;
+    } elseif ($type == "location") {
+        $latitude = $request['messages'][$type]['latitude'];
+        $longitude = $request['messages'][$type]['longitude'];
+        $locationurl = "https://www.google.com/maps/@$latitude,$longitude,12z";
+        $newWaMsg->doc = $locationurl;
+    } else {
+    }
+    $newmsg_saved = true;
+    if ($newmsg_saved) {
+        $lastMessage = WhatsappMessages::where('msg_from', $number)->latest()->first();
+        $newWaMsg->save();
+        $sentAutoMsg = 0;
+        if ($lastMessage) {
+            $now = Carbon::now();
+            $created_at = Carbon::parse($lastMessage->created_at);
+            if ($now->diffInHours($created_at) > 24) {
+                $sentAutoMsg = 1;
+            }
+        } else {
+            $sentAutoMsg = 1;
+        }
+        if ($sentAutoMsg === 1) {
+            if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+                return false;
+            }
+            $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+            $authKey = env('TATA_AUTH_KEY');
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer $authKey",
+                'Content-Type' => 'application/json'
+            ])->post($url, [
+                        "messaging_product" => "whatsapp",
+                        "recipient_type" => "individual",
+                        "to" => "91$number",
+                        "type" => "text",
+                        "text" => [
+                            "body" => "Thanks for reaching out to us. We are glad to have you with us and committed to delivering a superior customer experience. \n \n *Have a great day!*"
+                        ]
+                    ]);
+            if ($response->successful()) {
+                $current_timestamp = date('Y-m-d H:i:s');
+                $newWaMsgSave = new whatsappMessages();
+                $newWaMsgSave->msg_id = "$number";
+                $newWaMsgSave->msg_from = "$number";
+                $newWaMsgSave->time = $current_timestamp;
+                $newWaMsgSave->type = 'text';
+                $newWaMsgSave->is_sent = "1";
+                $newWaMsgSave->body = "Thanks for reaching out to us. We are glad to have you with us and committed to delivering a superior customer experience. \n \n *Have a great day!*";
+                $newWaMsgSave->save();
+            }
+        }
+    }
+
+    $getlead = Lead::where('mobile', $number)->first();
+    $getlead2 = nvrmLeadForward::where('mobile', $number)->first();
+    $getlead3 = nvLead::where('mobile', $number)->first();
+    $getlead4 = Vendor::where('mobile', $number)->first();
+    $getlead5 = Vendor::where('alt_mobile_number', $number)->first();
+    if ($getlead) {
+        $getlead->is_whatsapp_msg = 1;
+        $getlead->whatsapp_msg_time = $current_timestamp;
+        $getlead->save();
+    }
+    if ($getlead2) {
+        $getlead2->is_whatsapp_msg = 1;
+        $getlead2->whatsapp_msg_time = $current_timestamp;
+        $getlead2->save();
+    }
+    if ($getlead3) {
+        $getlead3->is_whatsapp_msg = 1;
+        $getlead3->save();
+    }
+    if ($getlead4) {
+        $getlead4->is_whatsapp_msg = 1;
+        $getlead4->whatsapp_msg_time = $current_timestamp;
+        $getlead4->save();
+    }
+
+    if ($getlead5) {
+        $getlead5->is_whatsapp_msg = 1;
+        $getlead5->whatsapp_msg_time = $current_timestamp;
+        $getlead5->save();
+    }
+
+    if (!$getlead && !$getlead2 && !$getlead3 && !$getlead4 && !$getlead5) {
+        $current_timestamp = date('Y-m-d H:i:s');
+        $lead = new Lead();
+        $lead->name = $name;
+        $lead->email = 'wbdelhileads@gmail.com';
+        $lead->mobile = $number;
+        $lead->lead_datetime = $current_timestamp;
+        $lead->source = "WB|WhatsApp";
+        $lead->preference = 'whatsapp';
+        $lead->locality = null;
+        $lead->lead_status = "Super Hot Lead";
+        $lead->read_status = false;
+        $lead->service_status = false;
+        $lead->done_title = null;
+        $lead->done_message = null;
+        $lead->lead_color = "#4bff0033";
+        $lead->virtual_number = null;
+        $lead->is_whatsapp_msg = 1;
+        $lead->whatsapp_msg_time = $current_timestamp;
+        $get_rm = getAssigningRm();
+        $lead->assign_to = $get_rm->name;
+        $lead->assign_id = $get_rm->id;
+        $lead->save();
+    }
+
+    if ($newmsg_saved) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Message saved successfully',
+        ], 200);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to save the message',
+        ], 500);
+    }
+});
+
+Route::get('/manupulate_csrf', function () {
+    $randomValue = Str::random(10);
+    DB::connection('mysql')->table('randomnes')->updateOrInsert(
+        ['id' => 1],
+        ['random_pass' => $randomValue]
+    );
+});
+
+Route::get('/csrf-token', function () {
+    $randompassvalue = DB::connection('mysql')->table('randomnes')->where('id', 1)->value('random_pass');
+    $yash = md5(sha1(md5($randompassvalue)));
+    $randomnum = rand(74365874, 74365874);
+    $randomnum2 = rand(1, 19);
+    $maincode = "$randomnum2-546674$yash@$randomnum";
+    $out = base64_encode(base64_encode($maincode));
+    return json_encode(['csrfToken' => $out]);
+
+});
+if (!function_exists('simpleDecrypt')) {
+
+    function simpleDecrypt($encoded)
+    {
+        $encoded = base64_decode($encoded);
+        $decoded = "";
+        for ($i = 0; $i < strlen($encoded); $i++) {
+            $b = ord($encoded[$i]);
+            $a = $b ^ 10;
+            $decoded .= chr($a);
+        }
+        return base64_decode(base64_decode($decoded));
+    }
+}
+if (!function_exists('notify_users_about_lead_interakt_async')) {
+    function notify_users_about_lead_interakt_async($mobile, $name)
+    {
+        if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+            return false;
+        }
+        $client = new Client();
+
+        if (empty($name)) {
+            $name = "Sir/Mam";
+        }
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $token = env("TATA_AUTH_KEY");
+        $authToken = "Bearer $token";
+        $response = Http::withHeaders([
+            'Authorization' => $authToken,
+            'Content-Type' => 'application/json',
+        ])->post($url, [
+                    "to" => "91{$mobile}",
+                    "type" => "template",
+                    "template" => [
+                        "name" => "notify_users_about_lead",
+                        "language" => [
+                            "code" => "en"
+                        ],
+                        "components" => [
+                            [
+                                "type" => "header",
+                                "parameters" => [
+                                    [
+                                        "type" => "text",
+                                        "text" => "$name",
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]);
+        return $response;
+    }
+}
+
+Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
+    Log::info($request);
+    try {
+        $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
+        $is_email_valid = $request->post('email') != null ? "required|email" : "";
+        $is_preference_valid = $request->post('preference') != null ? "required|string|max:255" : "";
+        $mobile = $request->post('mobile');
+        $validate = Validator::make($request->all(), [
+            'name' => $is_name_valid,
+            'email' => $is_email_valid,
+            'preference' => $is_preference_valid,
+        ]);
+        if ($validate->fails()) {
+            return response()->json(['status' => false, 'msg' => $validate->errors()->first()]);
+        }
+        $mobile = $request->post('mobile') ?: $request->post('caller_id_number');
+        $pattern = "/^\d{10}$/";
+        if (!preg_match($pattern, $mobile)) {
+            return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
+        }
+        $current_timestamp = date('Y-m-d H:i:s');
+        if ($request->post('call_to_number')) {
+            $call_to_wb_api_virtual_number = $request->post('call_to_number');
+            $lead_source = "WB|Call";
+            $crm_meta = CrmMeta::find(1);
+            $preference = $crm_meta->meta_value;
+        } else {
+            $call_to_wb_api_virtual_number = null;
+            $lead_source = "WB|Call";
+            $preference = $request->post('preference');
+        }
+        $lead_cat_data = "Venue";
+        $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
+        if (!$listing_data) {
+            $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
+            $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
+            $lead_cat_data = $cat_data_cms->name;
+        }
+        $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data ? $listing_data->location_id : 0)->first();
+        $lead = Lead::where('mobile', $mobile)->first();
+        if ($lead) {
+            $lead->enquiry_count = $lead->enquiry_count + 1;
+        } else {
+            $lead = new Lead();
+            $lead->name = $request->post('name');
+            $lead->email = $request->post('email');
+            $lead->mobile = $mobile;
+        }
+        $lead->lead_datetime = $current_timestamp;
+        $lead->source = $lead_source;
+        $lead->lead_catagory = $lead_cat_data;
+        $lead->preference = $preference;
+        $lead->locality = $locality ? $locality->name : null;
+        $lead->lead_status = "Super Hot Lead";
+        $lead->read_status = false;
+        $lead->service_status = false;
+        $lead->done_title = null;
+        $lead->done_message = null;
+        $lead->lead_color = "#4bff0033"; //green color
+        $lead->virtual_number = $call_to_wb_api_virtual_number;
+        $lead->whatsapp_msg_time = $current_timestamp;
+        $get_rm = getAssigningRm();
+        $lead->assign_to = $get_rm->name;
+        $lead->assign_id = $get_rm->id;
+        $lead->save();
+        $promise = notify_users_about_lead_interakt_async($mobile, $request->post('name'));
+        $promise->then(
+            function ($response) {
+            },
+            function ($exception) {
+            }
+        )->wait();
+        return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
+    } catch (\Throwable $th) {
+        return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
+    }
+});
+
+
+
+Route::post('/new_lead', function (Request $request) {
+    $startSubstring = "-546674";
+    $endSubstring = "@";
+    $encoded = $request->post('token');
+    $extractedValue = $encoded;
+    $string = base64_decode(base64_decode($extractedValue));
+    $startPos = strpos($string, $startSubstring);
+    $endPos = strpos($string, $endSubstring, $startPos);
+    $finalValue = substr($string, $startPos + strlen($startSubstring), $endPos - $startPos - strlen($startSubstring));
+    $randompassvalue = DB::connection('mysql')->table('randomnes')->where('id', 1)->value('random_pass');
+    $yash = md5(sha1(md5($randompassvalue)));
+
+    if ($finalValue == $yash) {
+        try {
+            $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
+            $is_email_valid = $request->post('email') != null ? "required|email" : "";
+            $is_preference_valid = $request->post('preference') != null ? "required|string|max:255" : "";
+            $mobile = $request->post('mobile');
+            $validate = Validator::make($request->all(), [
+                'name' => $is_name_valid,
+                'email' => $is_email_valid,
+                'preference' => $is_preference_valid,
+            ]);
+            if ($validate->fails()) {
+                return response()->json(['status' => false, 'msg' => $validate->errors()->first()]);
+            }
+            $mobile = $request->post('mobile') ?: $request->post('caller_id_number');
+            $pattern = "/^\d{10}$/";
+            if (!preg_match($pattern, $mobile)) {
+                return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
+            } elseif ($mobile <= 6000000000) {
+                return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
+            }
+            $current_timestamp = date('Y-m-d H:i:s');
+            if ($request->post('call_to_number')) {
+                $call_to_wb_api_virtual_number = $request->post('call_to_number');
+                $lead_source = "WB|Call";
+                $crm_meta = CrmMeta::find(1);
+                $preference = $crm_meta->meta_value;
+            } else {
+                $call_to_wb_api_virtual_number = null;
+                $lead_source = "WB|Form";
+                $preference = $request->post('preference');
+            }
+            $lead_cat_data = "Venue";  // Default category name
+            $listing_data = null;
+
+            $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
+            if (!$listing_data) {
+                $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
+                if ($listing_data && isset ($listing_data->vendor_category_id)) {
+                    $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
+                    if ($cat_data_cms && isset ($cat_data_cms->name)) {
+                        $lead_cat_data = $cat_data_cms->name;
+                    }
+                }
+            }
+            $locality = null;
+            if ($listing_data && isset ($listing_data->location_id)) {
+                $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data->location_id)->first();
+            } else {
+                $lead_cat_data = "Phone Nav";
+            }
+
+            $lead = Lead::where('mobile', $mobile)->first();
+            if ($lead) {
+                $lead->enquiry_count = $lead->enquiry_count + 1;
+            } else {
+                $lead = new Lead();
+                $lead->name = $request->post('name');
+                $lead->email = $request->post('email');
+                $lead->mobile = $mobile;
+            }
+            $lead->lead_datetime = $current_timestamp;
+            $lead->source = $lead_source;
+            $lead->lead_catagory = $lead_cat_data;
+            $lead->preference = $preference;
+            $lead->locality = $locality ? $locality->name : null;
+            $lead->lead_status = "Super Hot Lead";
+            $lead->read_status = false;
+            $lead->service_status = false;
+            $lead->done_title = null;
+            $lead->done_message = null;
+            $lead->whatsapp_msg_time = $current_timestamp;
+            $lead->lead_color = "#4bff0033"; //green color
+            $lead->virtual_number = $call_to_wb_api_virtual_number;
+            $get_rm = getAssigningRm();
+            $lead->assign_to = $get_rm->name;
+            $lead->assign_id = $get_rm->id;
+            $lead->save();
+            $promise = notify_users_about_lead_interakt_async($request->post('mobile'), $request->post('name'));
+            $promise->then(
+                function ($response) {
+                },
+                function ($exception) {
+                }
+            )->wait();
+            return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
+        }
+        // }
+
+    } else {
+        return response()->json(['status' => false, 'msg' => 'Something went wrong.'], 500);
+    }
+});
+
+Route::post('handle_calling_request', function (Request $request) {
+    $validate = Validator::make($request->all(), [
+        'slug' => 'required|string|max:255',
+    ]);
+    if ($validate->fails()) {
+        return response()->json(['success' => false, 'message' => $validate->errors()->first()]);
+    }
+
+    try {
+        $crm_meta = CrmMeta::find(1);
+        $crm_meta->meta_value = $request->slug;
+        $crm_meta->save();
+        return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Data stored successfully.']);
+    } catch (\Throwable $th) {
+        return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Somethin went wrong, please try again later.']);
+    }
+});
