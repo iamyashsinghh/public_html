@@ -121,13 +121,16 @@ class MeetingController extends Controller
         }
         $auth_user = Auth::guard('bdm')->user();
         $exist_meeting = BdmMeeting::where(['lead_id' => $request->lead_id, 'created_by' => $auth_user->id, 'done_datetime' => null])->first();
-        
+
         session(['next_modal_to_open' => null]);
 
         if ($exist_meeting) {
             session()->flash('status', ['success' => false, 'alert_type' => 'warning', 'message' => 'This lead has an active Meeting, please complete it first.']);
             return redirect()->back();
         }
+        $getBdmLead = BdmLead::select('lead_id', 'read_status')->where('lead_id', $request->lead_id)->first();
+        $getBdmLead->read_status = true;
+        $getBdmLead->save();
 
         $meeting = new BdmMeeting();
         $meeting->lead_id = $request->lead_id;

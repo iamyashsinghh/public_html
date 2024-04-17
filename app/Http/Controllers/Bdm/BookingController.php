@@ -24,7 +24,7 @@ class BookingController extends Controller
         if ($request->booking_date_from != null) {
             $filter_params = ['booking_date_from' => $request->booking_date_from, 'booking_date_to' => $request->booking_date_to];
         }
-        
+
         $page_heading = $filter_params ? "Bookings - Filtered" : "Bookings";
 
         if ($dashboard_filters !== null) {
@@ -79,6 +79,9 @@ class BookingController extends Controller
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
             return redirect()->back();
         }
+
+        session(['next_modal_to_open' => null]);
+
         $auth_user = Auth::guard('bdm')->user();
 
         $bookingData = new BdmBooking();
@@ -89,6 +92,10 @@ class BookingController extends Controller
         $bookingData->price = $request->price;
         $bookingData->payment_method = $request->payment_method;
         $bookingData->save();
+        
+        $getBdmLead = BdmLead::select('lead_id', 'read_status')->where('lead_id', $request->lead_id)->first();
+        $getBdmLead->read_status = true;
+        $getBdmLead->save();
 
         session()->flash('status', ['sueccess' => true, 'alert_type' => 'success', 'message' => 'Booking Done Successfully.']);
         return redirect()->back();
@@ -96,7 +103,7 @@ class BookingController extends Controller
 
     public function edit_process(Request $request , $booking_id) {
         $auth_user = Auth::guard('bdm')->user();
-        
+        session(['next_modal_to_open' => null]);
         $bookingData = BdmBooking::where(['id'=> $booking_id, 'created_by' => $auth_user->id,])->first();
         if(!$bookingData){
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Booking does not exist.']);
@@ -199,9 +206,9 @@ class BookingController extends Controller
         $request_image_index = array_search($request->image_name, $images_arr);
         if ($request_image_index !== false) {
             unset($images_arr[$request_image_index]);
-            $images_arr = array_values($images_arr); 
+            $images_arr = array_values($images_arr);
         }
-        $booking->order_agreement_farm_image = implode(",", $images_arr); 
+        $booking->order_agreement_farm_image = implode(",", $images_arr);
         $booking->save();
 
         if (Storage::exists("public/uploads/{$request->image_name}")) {

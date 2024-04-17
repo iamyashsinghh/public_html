@@ -125,6 +125,7 @@ class TaskController extends Controller {
             'task_schedule_datetime' => 'required|date',
         ]);
 
+
         if ($validate->fails()) {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
             return redirect()->back();
@@ -132,13 +133,16 @@ class TaskController extends Controller {
 
         $auth_user = Auth::guard('bdm')->user();
 
-
         $exist_task = BdmTask::where(['lead_id' => $request->lead_id, 'created_by' => $auth_user->id, 'done_datetime' => null])->first();
 
         if ($exist_task) {
             session()->flash('status', ['success' => false, 'alert_type' => 'warning', 'message' => 'This lead has an active task, please complete it first.']);
             return redirect()->back();
         }
+        $getBdmLead = BdmLead::select('lead_id', 'read_status')->where('lead_id', $request->lead_id)->first();
+        $getBdmLead->read_status = true;
+        $getBdmLead->save();
+        
         $task = new BdmTask();
         $task->lead_id = $request->lead_id;
         $task->created_by = $auth_user->id;
