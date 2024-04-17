@@ -175,16 +175,8 @@ $uri = end($uri_arr);
                         <li class="nav-item">
                             <span class="nav-link d-flex justify-content-between align-items-center {{ Route::currentRouteName() == 'admin.bdm.lead.list' ? 'active' : '' }}">
                                 <a href="{{route('admin.bdm.lead.list')}}" class="link_prop w-100 bdm-lead_link">
-                                    <i class="fa fa-paperclip nav-icon"></i>
-                                    <p>Leads</p>
-                                </a>
-                            </span>
-                        </li>
-                        <li class="nav-item">
-                            <span class="nav-link d-flex justify-content-between align-items-center">
-                                <a href="{{route('admin.nvlead.list')}}" class="link_prop w-100 nv-leads_link">
                                     <i class="fa fa-star nav-icon"></i>
-                                    <p>NV Leads</p>
+                                    <p>Leads</p>
                                 </a>
                             </span>
                         </li>
