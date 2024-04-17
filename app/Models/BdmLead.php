@@ -17,7 +17,6 @@ class BdmLead extends Model
     protected $guarded = [];
     protected $primaryKey = 'lead_id';
 
-
     public function getActivitylogOptions(): LogOptions
     {
         $userId = $this->getAuthenticatedUserId();
@@ -32,7 +31,11 @@ class BdmLead extends Model
         $category = $this->hasOne(VendorCategory::class, "id","business_cat");
         return $category;
     }
-    
+    public function get_lead_booking() {
+        $bdmBooking = $this->hasMany(BdmBooking::class, "lead_id", "lead_id");
+        return $bdmBooking;
+    }
+
     public function get_created_by() {
         return $this->hasOne(TeamMember::class, 'id', 'created_by');
     }
@@ -51,5 +54,20 @@ class BdmLead extends Model
         return $this->hasMany(BdmTask::class, 'lead_id', 'lead_id');
     }
 
-
+    public function get_bdm_notes() {
+        return BdmNote::select(
+            'bdm_notes.id',
+            'bdm_notes.created_by',
+            'bdm_notes.message',
+            'bdm_notes.created_at',
+        )->join('team_members as tm', ['tm.id' => 'bdm_notes.created_by'])->where(['bdm_notes.lead_id' => $this->lead_id])->get();
+    }
+    public function get_notes() {
+        return BdmNote::select(
+            'bdm_notes.id',
+            'bdm_notes.created_by',
+            'bdm_notes.message',
+            'bdm_notes.created_at',
+        )->where(['bdm_notes.lead_id' => $this->lead_id])->get();
+    }
 }

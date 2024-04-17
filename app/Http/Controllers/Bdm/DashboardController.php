@@ -83,10 +83,10 @@ class DashboardController extends Controller
             ->whereNull('bdm_meetings.done_datetime')
             ->whereNull('bdm_leads.deleted_at')
             ->whereNull('bdm_meetings.deleted_at')
-            ->where('bdm_tasks.created_by', $auth_user->id)
+            ->where('bdm_meetings.created_by', $auth_user->id)
             ->count();
         $bdm_month_meeting_leads = BdmLead::join('bdm_meetings', 'bdm_leads.lead_id', '=', 'bdm_meetings.lead_id')
-            ->whereBetween('bdm_tasks.meeting_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
+            ->whereBetween('bdm_meetings.meeting_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
             ->whereNull('bdm_leads.deleted_at')
             ->whereNull('bdm_meetings.deleted_at')
             ->where('bdm_meetings.created_by', $auth_user->id)
@@ -96,7 +96,7 @@ class DashboardController extends Controller
         $total_leads_received_today = BdmLead::where('lead_datetime', 'like', "%$current_date%")->where('assign_id', $auth_user->id)->count();
         $unread_leads_this_month = BdmLead::where('lead_datetime', 'like', "%$current_month%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
         $unread_leads_today = BdmLead::where('lead_datetime', 'like', "%$current_date%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
-        $total_unread_leads_overdue = BdmLead::where('lead_datetime', '<', Carbon::today())->where('read_status', false)->where('assign_id', $auth_user->id)->count();
+        $total_unread_leads_overdue = BdmLead::where('read_status', false)->where('assign_id', $auth_user->id)->count();
 
 
         return view("bdm.dashboard", compact('bdm_unfollowed_leads',

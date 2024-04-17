@@ -4,15 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Traits\HasAuthenticatedUser;
 
-class BdmMeeting extends Model
+class BdmNote extends Model
 {
-    use HasFactory, HasAuthenticatedUser,SoftDeletes,LogsActivity;
-    protected $table = 'bdm_meetings';
+    use HasFactory, HasAuthenticatedUser,LogsActivity;
+    protected $table = 'bdm_notes';
     protected $guarded = [];
 
     public function getActivitylogOptions(): LogOptions
@@ -28,5 +27,4 @@ class BdmMeeting extends Model
     public function get_created_by() {
         return $this->hasOne(TeamMember::class, 'id', 'created_by');
     }
-    
 }

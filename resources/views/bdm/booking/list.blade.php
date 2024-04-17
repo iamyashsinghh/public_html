@@ -35,15 +35,16 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                         <tr>
                             <th class="text-nowrap">Lead ID</th>
                             <th class="text-nowrap">Lead Date</th>
-                            <th class="text-nowrap">Business Name</th>
-                            <th class="text-nowrap">Business Category</th>
+                            <th class="">Business Name</th>
+                            <th class="">Business Category</th>
                             <th class="text-nowrap">Vendor Name</th>
                             <th class="text-nowrap">Mobile</th>
                             <th class="text-nowrap">Lead Status</th>
-                            <th class="text-nowrap">Task Schedule Date</th>
-                            <th class="text-nowrap">Task Status</th>
-                            <th class="text-nowrap">Task Created Date</th>
-                            <th class="text-nowrap">Task Done Date</th>
+                            <th class="text-nowrap">Package Name</th>
+                            <th class="text-nowrap">Booking Date</th>
+                            <th class="">Payment Method</th>
+                            <th class="">Amount</th>
+                            <th class="text-nowrap">Created At</th>
                         </tr>
                     </thead>
                 </table>
@@ -51,85 +52,71 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
         </div>
     </section>
     <aside class="control-sidebar control-sidebar-dark" style="display: none;">
-        {{-- filter sidebar for task list page --}}
         <div class="p-3 control-sidebar-content">
             <h5>Task Filters</h5>
             <hr class="mb-2">
-            <form action="{{route('bdm.task.list')}}" method="post" id="filters-form">
+            <form action="{{route('bdm.booking.list')}}" method="post" id="filters-form">
                 @csrf
                 <div class="accordion text-sm" id="accordionExample">
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">Task Status</button>
+                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">Package Name</button>
                         </h2>
-                        <div id="collapse1" class="accordion-collapse collapse {{isset($filter_params['task_status']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                        <div id="collapse1" class="accordion-collapse collapse {{isset($filter_params['package_name']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
                             <div class="accordion-body pl-2 pb-4">
                                 <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="task_status_upcoming_radio" name="task_status" value="Upcoming" {{isset($filter_params['task_status']) && $filter_params['task_status'] == 'Upcoming'  ? 'checked' : ''}}>
-                                    <label for="task_status_upcoming_radio" class="custom-control-label">Upcoming</label>
+                                    <input class="custom-control-input" type="radio" id="package_name_elite" name="package_name" value="Elite Package" {{isset($filter_params['package_name']) && $filter_params['package_name'] == 'Elite Package'  ? 'checked' : ''}}>
+                                    <label for="package_name_elite" class="custom-control-label">Elite Package</label>
                                 </div>
                                 <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="task_status_today_radio" name="task_status" value="Today" {{isset($filter_params['task_status']) && $filter_params['task_status'] == 'Today'  ? 'checked' : ''}}>
-                                    <label for="task_status_today_radio" class="custom-control-label">Today</label>
+                                    <input class="custom-control-input" type="radio" id="package_name_gold" name="package_name" value="Gold Package" {{isset($filter_params['package_name']) && $filter_params['package_name'] == 'Gold Package'  ? 'checked' : ''}}>
+                                    <label for="package_name_gold" class="custom-control-label">Gold Package</label>
                                 </div>
                                 <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="task_status_overdue_radio" name="task_status" value="Overdue" {{isset($filter_params['task_status']) && $filter_params['task_status'] == 'Overdue'  ? 'checked' : ''}}>
-                                    <label for="task_status_overdue_radio" class="custom-control-label">Overdue</label>
-                                </div>
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="task_status_done_radio" name="task_status" value="Done" {{isset($filter_params['task_status']) && $filter_params['task_status'] == 'Done'  ? 'checked' : ''}}>
-                                    <label for="task_status_done_radio" class="custom-control-label">Done</label>
+                                    <input class="custom-control-input" type="radio" id="package_name_premium" name="package_name" value="Premium Listing" {{isset($filter_params['package_name']) && $filter_params['package_name'] == 'Premium Listing'  ? 'checked' : ''}}>
+                                    <label for="package_name_premium" class="custom-control-label">Premium Listing</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">Task Created Date</button>
+                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">Booking Date</button>
                         </h2>
-                        <div id="collapse2" class="accordion-collapse collapse {{isset($filter_params['task_created_from_date']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                        <div id="collapse2" class="accordion-collapse collapse {{isset($filter_params['booking_date_from']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
                             <div class="accordion-body pl-2 pb-4">
                                 <div class="form-group">
-                                    <label for="task_created_from_date_inp">From</label>
-                                    <input type="date" class="form-control" id="task_created_from_date_inp" name="task_created_from_date" value="{{isset($filter_params['task_created_from_date']) ? $filter_params['task_created_from_date'] : ''}}">
+                                    <label for="booking_date_from_inp">From</label>
+                                    <input type="date" class="form-control" id="booking_date_from_inp" name="booking_date_from" value="{{isset($filter_params['booking_date_from']) ? $filter_params['booking_date_from'] : ''}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="task_created_to_date_inp">To</label>
-                                    <input type="date" class="form-control" id="task_created_to_date_inp" name="task_created_to_date" value="{{isset($filter_params['task_created_to_date']) ? $filter_params['task_created_to_date'] : ''}}">
+                                    <label for="booking_date_to_inp">To</label>
+                                    <input type="date" class="form-control" id="booking_date_to_inp" name="booking_date_to" value="{{isset($filter_params['booking_date_to']) ? $filter_params['booking_date_to'] : ''}}">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">Task Done Date</button>
+                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">Payment Method</button>
                         </h2>
-                        <div id="collapse3" class="accordion-collapse collapse {{isset($filter_params['task_done_from_date']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                        <div id="collapse5" class="accordion-collapse collapse {{isset($filter_params['payment_method']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
                             <div class="accordion-body pl-2 pb-4">
-                                <div class="form-group">
-                                    <label for="task_done_from_date_inp">From</label>
-                                    <input type="date" class="form-control" id="task_done_from_date_inp" name="task_done_from_date" value="{{isset($filter_params['task_done_from_date']) ? $filter_params['task_done_from_date'] : ''}}">
+                                <div class="custom-control custom-radio my-1">
+                                    <input class="custom-control-input" type="radio" id="payment_method_card" name="payment_method" value="Card" {{isset($filter_params['payment_method']) && $filter_params['package_name'] == 'Card'  ? 'checked' : ''}}>
+                                    <label for="payment_method_card" class="custom-control-label">Card</label>
                                 </div>
-                                <div class="form-group">
-                                    <label for="task_done_to_date_inp">To</label>
-                                    <input type="date" class="form-control" id="task_done_to_date_inp" name="task_done_to_date" value="{{isset($filter_params['task_done_to_date']) ? $filter_params['task_done_to_date'] : ''}}">
+                                <div class="custom-control custom-radio my-1">
+                                    <input class="custom-control-input" type="radio" id="payment_method_Cash" name="payment_method" value="Cash" {{isset($filter_params['payment_method']) && $filter_params['package_name'] == 'Cash'  ? 'checked' : ''}}>
+                                    <label for="payment_method_Cash" class="custom-control-label">Cash</label>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="true" aria-controls="collapse3">Task Schedule Date</button>
-                        </h2>
-                        <div id="collapse4" class="accordion-collapse collapse {{isset($filter_params['task_schedule_from_date']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
-                            <div class="accordion-body pl-2 pb-4">
-                                <div class="form-group">
-                                    <label for="task_schedule_from_date_inp">From</label>
-                                    <input type="date" class="form-control" id="task_schedule_from_date_inp" name="task_schedule_from_date" value="{{isset($filter_params['task_schedule_from_date']) ? $filter_params['task_schedule_from_date'] : ''}}">
+                                <div class="custom-control custom-radio my-1">
+                                    <input class="custom-control-input" type="radio" id="payment_method_Cheque" name="payment_method" value="Cheque" {{isset($filter_params['payment_method']) && $filter_params['package_name'] == 'Cheque'  ? 'checked' : ''}}>
+                                    <label for="payment_method_Cheque" class="custom-control-label">Cheque</label>
                                 </div>
-                                <div class="form-group">
-                                    <label for="task_schedule_to_date">To</label>
-                                    <input type="date" class="form-control" id="task_schedule_to_date_inp" name="task_schedule_to_date" value="{{isset($filter_params['task_schedule_to_date']) ? $filter_params['task_schedule_to_date'] : ''}}">
+                                <div class="custom-control custom-radio my-1">
+                                    <input class="custom-control-input" type="radio" id="payment_method_qrcode" name="payment_method" value="QR-Code" {{isset($filter_params['payment_method']) && $filter_params['package_name'] == 'QR-Code'  ? 'checked' : ''}}>
+                                    <label for="payment_method_qrcode" class="custom-control-label">QR-Code</label>
                                 </div>
                             </div>
                         </div>
@@ -137,7 +124,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                 </div>
                 <div class="my-5">
                     <button type="submit" class="btn btn-sm text-light btn-block" style="background-color: var(--wb-renosand);">Apply</button>
-                    <a href="{{route('bdm.task.list')}}" type="submit" class="btn btn-sm btn-secondary btn-block">Reset</a>
+                    <a href="{{route('bdm.booking.list')}}" type="submit" class="btn btn-sm btn-secondary btn-block">Reset</a>
                 </div>
             </form>
         </div>
@@ -155,7 +142,7 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
 <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script src="{{asset('plugins/moment/moment.min.js')}}"></script>
 <script>
-    const data_url = `{{route('bdm.task.list.ajax')}}?{!!$filter!!}`;
+    const data_url = `{{route('bdm.booking.list.ajax')}}?{!!$filter!!}`;
     var dashfilters = @json($dashfilters);
     $(document).ready(function() {
         var dataTable;
@@ -215,32 +202,37 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 },
                 {
                     targets: 7,
-                    name: "task_schedule_datetime",
-                    data: "task_schedule_datetime",
+                    name: "package_name",
+                    data: "package_name",
                 },
                 {
                     targets: 8,
-                    name: "lead_id",
-                    data: "lead_id",
+                    name: "booking_date",
+                    data: "booking_date",
                 },
                 {
                     targets: 9,
-                    name: "task_created_datetime",
-                    data: "task_created_datetime",
+                    name: "payment_method",
+                    data: "payment_method",
                 },
                 {
                     targets: 10,
-                    name: "task_done_datetime",
-                    data: "task_done_datetime",
+                    name: "price",
+                    data: "price",
+                },
+                {
+                    targets: 11,
+                    name: "created_at",
+                    data: "created_at",
                 },
             ],
             order: [
-                [7, 'asc']
+                [11, 'asc']
             ],
             rowCallback: function(row, data, index) {
                 row.style.cursor = "pointer";
                 row.setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
-                
+
                 const td_elements = row.querySelectorAll('td');
                 td_elements[1].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
                 td_elements[1].classList.add('text-nowrap');
@@ -249,29 +241,10 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 }else{
                     td_elements[6].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
+                td_elements[8].innerHTML = moment(data.booking_date).format("DD-MMM-YYYY hh:mm a");
+                td_elements[11].innerText = moment(data.booking_date).format("DD-MMM-YYYY hh:mm a");
 
-                td_elements[7].innerHTML = moment(data.task_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
 
-                const task_schedule_date = moment(data.task_schedule_datetime).format("YYYY-MM-DD");
-                const current_date = moment().format("YYYY-MM-DD");
-                if (data.task_done_datetime != null) {
-                    elem_class = "secondary";
-                    elem_text = "Done";
-                } else if (task_schedule_date > current_date) {
-                    elem_class = "info";
-                    elem_text = "Upcoming";
-                } else if (task_schedule_date == current_date) {
-                    elem_class = "warning";
-                    elem_text = "Today";
-                } else if (task_schedule_date < current_date) {
-                    elem_class = "danger";
-                    elem_text = "Overdue";
-                }
-                td_elements[8].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
-
-                // td_elements[7].innerText = moment(data.event_datetime).format("DD-MMM-YYYY");
-                td_elements[9].innerText = moment(data.task_created_datetime).format("DD-MMM-YYYY hh:mm a");
-                td_elements[10].innerText = data.task_done_datetime ? moment(data.task_done_datetime).format("DD-MMM-YYYY hh:mm a") : 'N/A';
             }
         });
     }else{
@@ -285,7 +258,7 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
             serverSide: true,
             loading: true,
             ajax: {
-                url: "{{ route('bdm.task.list.ajax') }}",
+                url: "{{ route('bdm.booking.list.ajax') }}",
                 data: function(d) {
                             var formData = $('#filters-form').serializeArray();
                             formData.forEach(function(item) {
@@ -336,32 +309,37 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 },
                 {
                     targets: 7,
-                    name: "task_schedule_datetime",
-                    data: "task_schedule_datetime",
+                    name: "package_name",
+                    data: "package_name",
                 },
                 {
                     targets: 8,
-                    name: "lead_id",
-                    data: "lead_id",
+                    name: "booking_date",
+                    data: "booking_date",
                 },
                 {
                     targets: 9,
-                    name: "task_created_datetime",
-                    data: "task_created_datetime",
+                    name: "payment_method",
+                    data: "payment_method",
                 },
                 {
                     targets: 10,
-                    name: "task_done_datetime",
-                    data: "task_done_datetime",
+                    name: "price",
+                    data: "price",
+                },
+                {
+                    targets: 11,
+                    name: "created_at",
+                    data: "created_at",
                 },
             ],
             order: [
-                [7, 'asc']
+                [11, 'asc']
             ],
             rowCallback: function(row, data, index) {
                 row.style.cursor = "pointer";
                 row.setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
-                
+
                 const td_elements = row.querySelectorAll('td');
                 td_elements[1].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
                 td_elements[1].classList.add('text-nowrap');
@@ -370,29 +348,8 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 }else{
                     td_elements[6].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
-
-                td_elements[7].innerHTML = moment(data.task_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
-
-                const task_schedule_date = moment(data.task_schedule_datetime).format("YYYY-MM-DD");
-                const current_date = moment().format("YYYY-MM-DD");
-                if (data.task_done_datetime != null) {
-                    elem_class = "secondary";
-                    elem_text = "Done";
-                } else if (task_schedule_date > current_date) {
-                    elem_class = "info";
-                    elem_text = "Upcoming";
-                } else if (task_schedule_date == current_date) {
-                    elem_class = "warning";
-                    elem_text = "Today";
-                } else if (task_schedule_date < current_date) {
-                    elem_class = "danger";
-                    elem_text = "Overdue";
-                }
-                td_elements[8].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
-
-                // td_elements[7].innerText = moment(data.event_datetime).format("DD-MMM-YYYY");
-                td_elements[9].innerText = moment(data.task_created_datetime).format("DD-MMM-YYYY hh:mm a");
-                td_elements[10].innerText = data.task_done_datetime ? moment(data.task_done_datetime).format("DD-MMM-YYYY hh:mm a") : 'N/A';
+                td_elements[8].innerHTML = moment(data.booking_date).format("DD-MMM-YYYY hh:mm a");
+                td_elements[11].innerText = moment(data.booking_date).format("DD-MMM-YYYY hh:mm a");
             }
         });
     }
@@ -404,9 +361,7 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
     });
 
     function handle_view_lead(forward_id) {
-        window.open(`{{route('bdm.lead.view')}}/${forward_id}#task_card_container`);
+        window.open(`{{route('bdm.lead.view')}}/${forward_id}#booking_card_container`);
     }
-
-
 </script>
 @endsection

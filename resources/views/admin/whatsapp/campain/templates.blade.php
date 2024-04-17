@@ -157,11 +157,11 @@
                     console.error('Error fetching the image:', error);
                 });
         }
-        function handle_set_image(image_url, tempName) {
+function handle_set_image(image_url, tempName) {
     const existingModal = document.getElementById('viewImageModal');
     if (existingModal) {
         existingModal.remove();
-    } 
+    }
     var image_change_request_url = "{{ route('set.whatsapp.temp.img') }}";
     const defaultImageUrl = "{{ asset('images/default-user.png') }}";
     if(!image_url) {

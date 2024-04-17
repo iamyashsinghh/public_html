@@ -9,16 +9,16 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Traits\HasAuthenticatedUser;
 
-class BdmMeeting extends Model
+class BdmBooking extends Model
 {
-    use HasFactory, HasAuthenticatedUser,SoftDeletes,LogsActivity;
-    protected $table = 'bdm_meetings';
+    use HasFactory, HasAuthenticatedUser, SoftDeletes, LogsActivity;
+    protected $table = 'bdm_bookings';
     protected $guarded = [];
 
     public function getActivitylogOptions(): LogOptions
     {
         $userId = $this->getAuthenticatedUserId();
-
+        
         return LogOptions::defaults()
             ->logOnly(['*'])
             ->setDescriptionForEvent(function (string $eventName) use ($userId) {
@@ -28,5 +28,4 @@ class BdmMeeting extends Model
     public function get_created_by() {
         return $this->hasOne(TeamMember::class, 'id', 'created_by');
     }
-    
 }

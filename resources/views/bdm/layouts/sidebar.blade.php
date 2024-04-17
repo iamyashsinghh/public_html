@@ -30,20 +30,26 @@ $uri = Route::currentRouteName();
                 </li>
                 <li class="nav-item">
                     <a href="{{route('bdm.lead.list')}}" class="nav-link w-100 {{$uri == "bdm.lead.list" ? 'active' : ''}}">
-                        <i class="nav-icon fas fa-home"></i>
+                        <i class="fas fa-star nav-icon"></i>
                         <p>Leads</p>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="{{route('bdm.meeting.list')}}" class="nav-link w-100 {{$uri == "bdm.meeting.list" ? 'active' : ''}}">
-                        <i class="nav-icon fas fa-home"></i>
+                        <i class="fas fa-business-time nav-icon"></i>
                         <p>Meetings</p>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="{{route('bdm.task.list')}}" class="nav-link w-100 {{$uri == "bdm.task.list" ? 'active' : ''}}">
-                        <i class="nav-icon fas fa-home"></i>
+                        <i class="fas fa-list nav-icon"></i>
                         <p>Tasks</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('bdm.booking.list')}}" class="nav-link w-100 {{$uri == "bdm.booking.list" ? 'active' : ''}}">
+                        <i class="fas fa-bookmark nav-icon"></i>
+                        <p>Booking</p>
                     </a>
                 </li>
 

@@ -166,7 +166,6 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/nv-leads/delete/{lead_id?}', [Controllers\Admin\NvLeadController::class, 'delete'])->name('admin.nvlead.delete');
             Route::post('/nv-leads/forward', [Controllers\Admin\NvLeadController::class, 'lead_forward'])->name('admin.nvlead.forward');
             Route::get('/nv-leads/get_forward_info/{lead_id?}', [Controllers\Admin\NvLeadController::class, 'get_forward_info'])->name('admin.nvlead.getForwardInfo');
-
             //Bypass login: Via admin to vendor crm
             Route::get('/vendor/bypass-login/{team_id?}', [AuthController::class, 'vendor_login_via_admin'])->name('admin.vendor.bypass.login');
         });
@@ -197,7 +196,28 @@ Route::middleware('verify_token')->group(function () {
         Route::get('/admin/edit-env', [Controllers\Admin\EnvController::class, 'editEnv'])->name('admin.editEnv');
         Route::post('/admin/update-env', [Controllers\Admin\EnvController::class, 'updateEnv'])->name('admin.updateEnv');
 
-        // Optimize crm
+        // Bdm Crm
+        Route::prefix('bdm-crm')->group(function () {
+            Route::match(['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Admin\BdmLeadController::class, 'list'])->name('admin.bdm.lead.list');
+            Route::get('/leads/ajax_list/', [Controllers\Admin\BdmLeadController::class, 'ajax_list'])->name('admin.bdm.lead.list.ajax');
+            Route::get('/leads/view/{lead_id?}', [Controllers\Admin\BdmLeadController::class, 'view'])->name('admin.bdm.lead.view');
+            Route::post('/leads/edit-process/{lead_id}', [Controllers\Admin\BdmLeadController::class, 'edit_process'])->name('admin.bdm.lead.edit.process');
+            Route::post('/leads/add-process', [Controllers\Admin\BdmLeadController::class, 'add_process'])->name('admin.bdm.lead.add.process');
+            Route::get('/delete_lead/{lead_id?}', [Controllers\Admin\BdmLeadController::class, 'delete'])->name('admin.bdm.lead.delete');
+            Route::post('/assign_to_bdm_lead', [Controllers\Admin\BdmLeadController::class, 'lead_forward'])->name('admin.bdm.lead.forward');
+
+
+            Route::match(['get', 'post'], '/leads/status-update/{lead_id}/{status?}', [Controllers\Admin\BdmLeadController::class, 'status_update'])->name('admin.bdm.lead.status.update');
+
+            // bdm booking routes
+            Route::get('/get_booking/{booking_id?}', [Controllers\Admin\BdmBookingController::class, 'get_booking'])->name('admin.bdm.booking.get');
+            Route::post('/edit_booking/{booking_id?}', [Controllers\Admin\BdmBookingController::class, 'edit_process'])->name('admin.bdm.booking.edit');
+            Route::get('/delete_booking/{booking_id?}', [Controllers\Admin\BdmBookingController::class, 'delete'])->name('admin.bdm.booking.delete');
+            Route::post('/update_payment_img/update', [Controllers\Admin\BdmBookingController::class, 'update_payment_image'])->name('admin.bdm.update.bookingPayment.img');
+            Route::get('/images/manage/{bdm_booking_id?}', [Controllers\Admin\BdmBookingController::class, 'manage_agreement_image'])->name('admin.bdm.aggrement.manage_images');
+            Route::post('/images/manage_process/{bdm_booking_id}', [Controllers\Admin\BdmBookingController::class, 'manage_agreement_image_process'])->name('admin.bdm.aggrement_images.manage_process');
+            Route::post('/images/delete/{booking_id?}', [Controllers\Admin\BdmBookingController::class, 'agreement_image_delete'])->name('admin.bdm.agreement_images.delete');
+        });
     });
 
     /*
@@ -368,10 +388,10 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/leads/service-status-update/{lead_id}/{status?}', [Controllers\Bdm\LeadController::class, 'service_status_update'])->name('bdm.lead.serviceStatus.update');
             Route::match(['get', 'post'], '/leads/status-update/{lead_id}/{status?}', [Controllers\Bdm\LeadController::class, 'status_update'])->name('bdm.lead.status.update');
 
-            // //Note Routes
-            // Route::get('/notes/manage_ajax/{note_id?}', [Controllers\Team\NoteController::class, 'manage_ajax'])->name('team.note.edit');
-            // Route::post('/notes/manage-process/{note_id?}', [Controllers\Team\NoteController::class, 'manage_process'])->name('team.note.manage.process');
-            // Route::get('/notes/delete/{note_id}', [Controllers\Team\NoteController::class, 'delete'])->name('team.note.delete');
+            //Note Routes
+            Route::get('/notes/manage_ajax/{note_id?}', [Controllers\Bdm\NoteController::class, 'manage_ajax'])->name('bdm.note.edit');
+            Route::post('/notes/manage-process/{note_id?}', [Controllers\Bdm\NoteController::class, 'manage_process'])->name('bdm.note.manage.process');
+            Route::get('/notes/delete/{note_id}', [Controllers\Bdm\NoteController::class, 'delete'])->name('bdm.note.delete');
 
             // //Task Routes
             Route::match(['get', 'post'], '/tasks/list/{dashboard_filters?}', [Controllers\Bdm\TaskController::class, 'list'])->name('bdm.task.list');
@@ -386,6 +406,18 @@ Route::middleware('verify_token')->group(function () {
             Route::post('/meeting/add-process/', [Controllers\Bdm\MeetingController::class, 'add_process'])->name('bdm.meeting.add.process');
             Route::post('/meeting/status-update/{meeting_id?}', [Controllers\Bdm\MeetingController::class, 'status_update'])->name('bdm.meeting.status.update');
             Route::get('/meeting/delete/{meeting_id}', [Controllers\Bdm\MeetingController::class, 'delete'])->name('bdm.meeting.delete');
+
+            // booking route
+            Route::match(['get', 'post'], '/booking/list/{dashboard_filters?}', [Controllers\Bdm\BookingController::class, 'list'])->name('bdm.booking.list');
+            Route::get('/booking/ajax_list/', [Controllers\Bdm\BookingController::class, 'ajax_list'])->name('bdm.booking.list.ajax');
+            Route::post('/add_booking', [Controllers\Bdm\BookingController::class, 'add_process'])->name('bdm.booking.add');
+            Route::get('/get_booking/{booking_id?}', [Controllers\Bdm\BookingController::class, 'get_booking'])->name('bdm.booking.get');
+            Route::post('/edit_booking/{booking_id?}', [Controllers\Bdm\BookingController::class, 'edit_process'])->name('bdm.booking.edit');
+            Route::get('/delete_booking/{booking_id?}', [Controllers\Bdm\BookingController::class, 'delete'])->name('bdm.booking.delete');
+            Route::post('/update_payment_img/update', [Controllers\Bdm\BookingController::class, 'update_payment_image'])->name('bdm.update.bookingPayment.img');
+            Route::get('/images/manage/{bdm_booking_id?}', [Controllers\Bdm\BookingController::class, 'manage_agreement_image'])->name('bdm.aggrement.manage_images');
+            Route::post('/images/manage_process/{bdm_booking_id}', [Controllers\Bdm\BookingController::class, 'manage_agreement_image_process'])->name('bdm.aggrement_images.manage_process');
+            Route::post('/images/delete/{booking_id?}', [Controllers\Bdm\BookingController::class, 'agreement_image_delete'])->name('bdm.agreement_images.delete');
         });
     });
 });

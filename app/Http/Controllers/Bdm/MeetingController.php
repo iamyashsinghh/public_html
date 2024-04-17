@@ -45,10 +45,14 @@ class MeetingController extends Controller
             'bdm_leads.name',
             'bdm_leads.mobile',
             'bdm_leads.lead_status',
+            'bdm_leads.business_name',
+            'vc.name as business_cat',
             'bdm_meetings.meeting_schedule_datetime',
             'bdm_meetings.created_at as meeting_created_datetime',
             'bdm_meetings.done_datetime as meeting_done_datetime',
-        )->join('bdm_meetings', ['bdm_leads.lead_id' => 'bdm_meetings.lead_id'])->where(['bdm_meetings.created_by' => $auth_user->id, 'bdm_meetings.deleted_at' => null]);
+        )->join('bdm_meetings', ['bdm_leads.lead_id' => 'bdm_meetings.lead_id'])
+        ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat')
+        ->where(['bdm_meetings.created_by' => $auth_user->id, 'bdm_meetings.deleted_at' => null]);
 
         $current_date = date('Y-m-d');
         if ($request->meeting_status == "Upcoming") {
@@ -60,7 +64,7 @@ class MeetingController extends Controller
             // return $meetings->toSql();
         } elseif ($request->meeting_status == "Done") {
             $meetings->whereNotNull('bdm_meetings.done_datetime');
-        } 
+        }
         if ($request->meeting_created_from_date) {
             $from = Carbon::make($request->meeting_created_from_date);
             if ($request->meeting_created_to_date != null) {
@@ -69,7 +73,7 @@ class MeetingController extends Controller
                 $to = Carbon::make($request->meeting_created_from_date)->endOfDay();
             }
             $meetings->whereBetween('bdm_meetings.created_at', [$from, $to]);
-        } 
+        }
         if ($request->meeting_done_from_date) {
             $from = Carbon::make($request->meeting_done_from_date);
             if ($request->meeting_done_to_date != null) {
@@ -78,7 +82,7 @@ class MeetingController extends Controller
                 $to = Carbon::make($request->meeting_done_from_date)->endOfDay();
             }
             $meetings->whereBetween('bdm_meetings.done_datetime', [$from, $to]);
-        } 
+        }
         if ($request->meeting_schedule_from_date) {
             $from = Carbon::make($request->meeting_schedule_from_date);
             if ($request->meeting_schedule_to_date != null) {
@@ -87,7 +91,7 @@ class MeetingController extends Controller
                 $to = Carbon::make($request->meeting_schedule_from_date)->endOfDay();
             }
             $meetings->whereBetween('bdm_meetings.meeting_schedule_datetime', [$from, $to])->whereNull('bdm_meetings.done_datetime');
-        } 
+        }
         if ($request->dashboard_filters != null) {
             if ($request->dashboard_filters == "meeting_schedule_this_month") {
                 $from =  Carbon::today()->startOfMonth();
@@ -115,15 +119,16 @@ class MeetingController extends Controller
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
             return redirect()->back();
         }
-
         $auth_user = Auth::guard('bdm')->user();
-
         $exist_meeting = BdmMeeting::where(['lead_id' => $request->lead_id, 'created_by' => $auth_user->id, 'done_datetime' => null])->first();
+        
+        session(['next_modal_to_open' => null]);
 
         if ($exist_meeting) {
             session()->flash('status', ['success' => false, 'alert_type' => 'warning', 'message' => 'This lead has an active Meeting, please complete it first.']);
             return redirect()->back();
         }
+
         $meeting = new BdmMeeting();
         $meeting->lead_id = $request->lead_id;
         $meeting->created_by = $auth_user->id;
@@ -148,16 +153,18 @@ class MeetingController extends Controller
         }
 
         $auth_user = Auth::guard('bdm')->user();
-        
+
         $meeting = BdmMeeting::where(['id' => $meeting_id, 'created_by' => $auth_user->id])->first();
 
         if (!$meeting) {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong, please try again later.']);
             return redirect()->back();
         }
+        session(['next_modal_to_open' => $request->meeting_done_status]);
 
         $meeting->done_with = $request->meeting_done_with;
         $meeting->done_message = $request->meeting_done_message;
+        $meeting->meeting_done_status = $request->meeting_done_status;
         $meeting->done_datetime = date('Y-m-d H:i:s');
         $meeting->save();
 

@@ -164,6 +164,32 @@ $uri = end($uri_arr);
                         </li>
                     </ul>
                 </li> --}}
+                <li class="nav-item">
+                    <a href="javascript:void(0);" class="nav-link bdm-crm_collapse_link">
+                        <i class="nav-icon fab fa-slack"></i>
+                        <p>BDM CRM
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <span class="nav-link d-flex justify-content-between align-items-center {{ Route::currentRouteName() == 'admin.bdm.lead.list' ? 'active' : '' }}">
+                                <a href="{{route('admin.bdm.lead.list')}}" class="link_prop w-100 bdm-lead_link">
+                                    <i class="fa fa-paperclip nav-icon"></i>
+                                    <p>Leads</p>
+                                </a>
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <span class="nav-link d-flex justify-content-between align-items-center">
+                                <a href="{{route('admin.nvlead.list')}}" class="link_prop w-100 nv-leads_link">
+                                    <i class="fa fa-star nav-icon"></i>
+                                    <p>NV Leads</p>
+                                </a>
+                            </span>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item has-treeview {{ Route::currentRouteName() == 'whatsapp.campain.list' ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link whatsapp-collapse_link {{ Route::is('whatsapp.*') ? 'active' : '' }}">
                         <i class="nav-icon fab fa-whatsapp"></i>

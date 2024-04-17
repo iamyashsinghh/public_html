@@ -83,6 +83,7 @@ class BookingController extends Controller {
                 $bookings->whereBetween('bookings.created_at', [$from, $to]);
             }
         }
+        $bookings = $bookings->get();
         return datatables($bookings)->make(false);
     }
 

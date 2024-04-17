@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\BdmLead;
 use App\Models\CrmMeta;
 use App\Models\Lead;
 use App\Models\nvLead;
@@ -86,6 +87,54 @@ if (!function_exists('getAssigningRm')) {
         }
     }
 }
+if (!function_exists('getAssigningBdm')) {
+    function getAssigningBdm()
+    {
+        DB::beginTransaction();
+        try {
+            $firstRmWithIsNext = TeamMember::where(['role_id' => 6, 'status' => 1, 'is_next' => 1])
+                ->orderBy('id', 'asc')
+                ->first();
+            if ($firstRmWithIsNext) {
+                TeamMember::where(['role_id' => 6, 'status' => 1])
+                    ->where('id', '!=', $firstRmWithIsNext->id)
+                    ->update(['is_next' => 0]);
+            }
+            if (!$firstRmWithIsNext) {
+                $firstRmWithIsNext = TeamMember::where(['role_id' => 6, 'status' => 1])
+                    ->orderBy('id', 'asc')
+                    ->first();
+                if (!$firstRmWithIsNext) {
+                    throw new Exception('No RM available');
+                }
+                $firstRmWithIsNext->is_next = 1;
+                $firstRmWithIsNext->save();
+                DB::commit();
+                return $firstRmWithIsNext;
+            } else {
+                $firstRmWithIsNext->is_next = 0;
+                $firstRmWithIsNext->save();
+                $nextRm = TeamMember::where(['role_id' => 6, 'status' => 1])
+                    ->where('id', '>', $firstRmWithIsNext->id)
+                    ->orderBy('id', 'asc')
+                    ->first();
+                if (!$nextRm) {
+                    $nextRm = TeamMember::where(['role_id' => 6, 'status' => 1])
+                        ->orderBy('id', 'asc')
+                        ->first();
+                }
+                $nextRm->is_next = 1;
+                $nextRm->save();
+            }
+            DB::commit();
+            return $firstRmWithIsNext;
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            DB::rollback();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+}
 
 if (!function_exists('assignLeadsToRMs')) {
     function assignLeadsToRMs()
@@ -114,10 +163,6 @@ if (!function_exists('assignLeadsToRMs')) {
     }
 }
 
-Route::get('/re_assign_leads_to_rms', function () {
-    $yash = assignLeadsToRMs();
-    return $yash;
-});
 
 Route::get('/getlol', function () {
     $oneYearAgo = Carbon::now()->subYear();
@@ -243,11 +288,14 @@ Route::post('/save_wa', function (Request $request) {
     $getlead3 = nvLead::where('mobile', $number)->first();
     $getlead4 = Vendor::where('mobile', $number)->first();
     $getlead5 = Vendor::where('alt_mobile_number', $number)->first();
+    $getlead6 = BdmLead::where('mobile', $number)->first();
+
     if ($getlead) {
         $getlead->is_whatsapp_msg = 1;
         $getlead->whatsapp_msg_time = $current_timestamp;
         $getlead->save();
     }
+
     if ($getlead2) {
         $getlead2->is_whatsapp_msg = 1;
         $getlead2->whatsapp_msg_time = $current_timestamp;
@@ -257,19 +305,24 @@ Route::post('/save_wa', function (Request $request) {
         $getlead3->is_whatsapp_msg = 1;
         $getlead3->save();
     }
+
     if ($getlead4) {
         $getlead4->is_whatsapp_msg = 1;
         $getlead4->whatsapp_msg_time = $current_timestamp;
         $getlead4->save();
     }
-
     if ($getlead5) {
         $getlead5->is_whatsapp_msg = 1;
         $getlead5->whatsapp_msg_time = $current_timestamp;
         $getlead5->save();
     }
+    if ($getlead6) {
+        $getlead6->is_whatsapp_msg = 1;
+        $getlead6->whatsapp_msg_time = $current_timestamp;
+        $getlead6->save();
+    }
 
-    if (!$getlead && !$getlead2 && !$getlead3 && !$getlead4 && !$getlead5) {
+    if (!$getlead && !$getlead2 && !$getlead3 && !$getlead4 && !$getlead5 && !$getlead6) {
         $current_timestamp = date('Y-m-d H:i:s');
         $lead = new Lead();
         $lead->name = $name;

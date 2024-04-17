@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Bdm;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BdmLead;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use App\Models\TeamMember;
-use App\Models\WhatsappCampain;
 use App\Models\VendorCategory;
+use App\Models\WhatsappCampain;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class LeadController extends Controller
+class BdmLeadController extends Controller
 {
     private $current_timestamp;
     public function __construct()
@@ -56,16 +56,15 @@ class LeadController extends Controller
             $filter_params = ['dashboard_filters' => $dashboard_filters];
             $page_heading = ucwords(str_replace("_", " ", $dashboard_filters));
         }
-        $auth_user = Auth::guard('bdm')->user();
+        $auth_user = Auth::guard('admin')->user();
         $vendor_categories = VendorCategory::select('id', 'name')->get();
-        $whatsapp_campaigns = WhatsappCampain::select('id', 'name')->where('status', 1)->where('assign_to', $auth_user->id)->get();
-
-        return view('bdm.lead.list', compact('page_heading', 'filter_params', 'getBdm', 'whatsapp_campaigns', 'vendor_categories'));
+        $whatsapp_campaigns = WhatsappCampain::select('id', 'name')->get();
+        return view('admin.bdmCrm.lead.list', compact('page_heading', 'filter_params', 'getBdm', 'whatsapp_campaigns', 'vendor_categories'));
     }
 
     public function ajax_list(Request $request)
     {
-        $auth_user = Auth::guard('bdm')->user();
+        $auth_user = Auth::guard('admin')->user();
             $leads = DB::table('bdm_leads')->select(
                 'bdm_leads.lead_id as lead_id',
                 'bdm_leads.lead_datetime',
@@ -85,15 +84,17 @@ class LeadController extends Controller
                 'bdm_leads.enquiry_count',
                 'bdm_leads.is_whatsapp_msg',
             )->leftJoin('team_members as tm', 'tm.id', 'bdm_leads.created_by')
-            ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat');
-            $leads->where('bdm_leads.deleted_at', null)->groupBy('bdm_leads.mobile');
+            ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat')->groupBy('bdm_leads.mobile');
+            $leads->where('bdm_leads.deleted_at', null);
 
             if ($request->has('lead_status') && $request->lead_status != '') {
                 $leads->where('bdm_leads.lead_status', $request->lead_status);
             }
+
             if ($request->has('business_cat') && $request->business_cat != '') {
                 $leads->where('bdm_leads.business_cat', $request->business_cat);
             }
+
             if ($request->has('lead_source') && $request->lead_source != '') {
                 $leads->where('bdm_leads.source', $request->lead_source);
             }
@@ -125,55 +126,6 @@ class LeadController extends Controller
             if ($request->team_members != null) {
                 $leads->where('bdm_leads.assign_id', $request->team_members);
             }
-
-            if ($request->dashboard_filters != null) {
-                $current_month = date('Y-m');
-                $current_date = date('Y-m-d');
-                $currentDateTime = Carbon::today();
-                if ($request->dashboard_filters == "total_leads_received_this_month") {
-                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_month%")->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
-                } elseif ($request->dashboard_filters == "total_leads_received_today") {
-                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_date%")->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
-                } elseif ($request->dashboard_filters == "bdm_unfollowed_leads") {
-                    $currentDateTime = Carbon::now();
-                    $leads = DB::table('bdm_leads')->select(
-                        'bdm_leads.lead_id as lead_id',
-                        'bdm_leads.lead_datetime',
-                        'bdm_leads.name',
-                        'bdm_leads.mobile',
-                        'bdm_leads.lead_status',
-                        'bdm_leads.service_status',
-                        'bdm_leads.read_status',
-                        'bdm_leads.assign_to',
-                        'bdm_leads.assign_id',
-                        'bdm_leads.source',
-                        'bdm_leads.business_name',
-                        'vc.name as business_cat',
-                        'tm.name as created_by',
-                        'bdm_leads.whatsapp_msg_time',
-                        'bdm_leads.enquiry_count',
-                        'bdm_leads.is_whatsapp_msg',
-                    )->leftJoin('team_members as tm', 'tm.id', 'bdm_leads.created_by')
-                    ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat')
-                    ->leftJoin(DB::raw("
-                        (SELECT bdm_tasks.lead_id
-                        FROM bdm_tasks
-                        WHERE bdm_tasks.deleted_at IS NULL
-                        AND bdm_tasks.created_by = $auth_user->id
-                        GROUP BY bdm_tasks.lead_id
-                        HAVING COUNT(CASE WHEN bdm_tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
-                    "), 'completed_tasks.lead_id', '=', 'bdm_leads.lead_id')
-                    ->whereNotNull('completed_tasks.lead_id')
-                    ->where('bdm_leads.lead_status', '!=', 'Done');
-                }elseif($request->dashboard_filters == "unread_leads_this_month"){
-                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_month%")->whereNull('bdm_leads.deleted_at')->where(['bdm_leads.read_status' => false])->where('bdm_leads.assign_id', $auth_user->id);
-                }elseif($request->dashboard_filters == "unread_leads_today"){
-                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_date%")->where(['bdm_leads.read_status' => false])->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
-                }elseif($request->dashboard_filters == "total_unread_leads_overdue"){
-                    $leads->where('bdm_leads.read_status', false)
-                    ->where('bdm_leads.assign_id', $auth_user->id);
-                }
-            }
         return datatables($leads)->toJson();
     }
 
@@ -192,7 +144,6 @@ class LeadController extends Controller
         $lead->business_name = $request->business_name;
         $lead->business_cat = $request->business_cat;
         $lead->save();
-        Log::info($request);
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead updated successfully.']);
         return redirect()->back();
     }
@@ -217,7 +168,7 @@ class LeadController extends Controller
             return redirect()->back();
         }
 
-        $auth_user = Auth::guard('bdm')->user();
+        $auth_user = Auth::guard('admin')->user();
         $exist_lead = BdmLead::where('mobile', $request->mobile_number)->first();
         if ($exist_lead) {
             session()->flash('status', ['success' => true, 'alert_type' => 'warning', 'message' => "Lead is already exist with this mobile number, Please contact to the management."]);
@@ -246,6 +197,8 @@ class LeadController extends Controller
         return redirect()->back();
     }
 
+
+
     public function view($lead_id)
     {
         $lead = BdmLead::where('lead_id',$lead_id)->first();
@@ -253,7 +206,7 @@ class LeadController extends Controller
             abort(404);
         }
         $vendor_categories = VendorCategory::get();
-        return view('bdm.lead.view', compact('lead', 'vendor_categories'));
+        return view('admin.bdmCrm.lead.view', compact('lead', 'vendor_categories'));
     }
 
     public function service_status_update($lead_id, $status)
@@ -271,7 +224,7 @@ class LeadController extends Controller
 
     public function status_update(Request $request, $lead_id, $status = "Done")
     {
-        $auth_user = Auth::guard('bdm')->user();
+        $auth_user = Auth::guard('admin')->user();
             $lead = BdmLead::find($lead_id);
 
         if (!$lead) {
@@ -280,7 +233,6 @@ class LeadController extends Controller
         }
 
         if ($status == "Active") {
-            // $lead->lead_datetime = $this->current_timestamp;
             $lead->lead_status = "Active";
             $lead->read_status = false;
             $lead->service_status = false;
@@ -307,6 +259,35 @@ class LeadController extends Controller
         }
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Lead status updated."]);
+        return redirect()->back();
+    }
+    public function delete($lead_id){
+        $bookingData = BdmLead::where(['lead_id'=> $lead_id])->first();
+        $bookingData->delete();
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead Deleted.']);
+        return redirect()->back();
+    }
+
+    public function lead_forward(Request $request)
+    {
+        $validate = Validator::make($request->all(), [
+            'forward_leads_id' => 'required',
+            'forward_bdm_id' => 'required',
+        ]);
+        if ($validate->fails()) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
+            return redirect()->back();
+        }
+        $leads_id = explode(',', $request->forward_leads_id);
+        $leads = BdmLead::whereIn('lead_id', $leads_id)->get();
+        $auth_user = Auth::guard('admin')->user();
+        $TeamMember = TeamMember::where('id', $request->forward_bdm_id)->first();
+        foreach ($leads as $lead) {
+            $lead->assign_to = $TeamMember->name;
+            $lead->assign_id = $request->forward_bdm_id;
+            $lead->save();
+        }
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Lead's Forwarded successfully."]);
         return redirect()->back();
     }
 }

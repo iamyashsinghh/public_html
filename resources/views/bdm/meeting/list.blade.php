@@ -35,7 +35,9 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                         <tr>
                             <th class="text-nowrap">Lead ID</th>
                             <th class="text-nowrap">Lead Date</th>
-                            <th class="text-nowrap">Name</th>
+                            <th class="text-nowrap">Business Name</th>
+                            <th class="text-nowrap">Business Category</th>
+                            <th class="text-nowrap">Vendor Name</th>
                             <th class="text-nowrap">Mobile</th>
                             <th class="text-nowrap">Lead Status</th>
                             <th class="text-nowrap">Meeting Schedule Date</th>
@@ -187,42 +189,52 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 },
                 {
                     targets: 2,
+                    name: "business_name",
+                    data: "business_name",
+                },
+                {
+                    targets: 3,
+                    name: "business_cat",
+                    data: "business_cat",
+                },
+                {
+                    targets: 4,
                     name: "name",
                     data: "name",
                 },
                 {
-                    targets: 3,
+                    targets: 5,
                     name: "mobile",
                     data: "mobile",
                 },
                 {
-                    targets: 4,
+                    targets: 6,
                     name: "lead_status",
                     data: "lead_status",
                 },
                 {
-                    targets: 5,
+                    targets: 7,
                     name: "meeting_schedule_datetime",
                     data: "meeting_schedule_datetime",
                 },
                 {
-                    targets: 6,
+                    targets: 8,
                     name: "lead_id",
                     data: "lead_id",
                 },
                 {
-                    targets: 7,
+                    targets: 9,
                     name: "meeting_created_datetime",
                     data: "meeting_created_datetime",
                 },
                 {
-                    targets: 8,
+                    targets: 10,
                     name: "meeting_done_datetime",
                     data: "meeting_done_datetime",
                 },
             ],
             order: [
-                [5, 'asc']
+                [7, 'asc']
             ],
             rowCallback: function(row, data, index) {
                 row.style.cursor = "pointer";
@@ -231,12 +243,12 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 td_elements[1].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
                 td_elements[1].classList.add('text-nowrap');
                 if(data.lead_status == "Done"){
-                    td_elements[4].innerHTML = `<span class="badge badge-secondary">Done</span>`;
+                    td_elements[6].innerHTML = `<span class="badge badge-secondary">Done</span>`;
                 }else{
-                    td_elements[4].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
+                    td_elements[6].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
 
-                td_elements[5].innerHTML = moment(data.meeting_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
+                td_elements[7].innerHTML = moment(data.meeting_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
 
                 const meeting_schedule_date = moment(data.meeting_schedule_datetime).format("YYYY-MM-DD");
                 const current_date = moment().format("YYYY-MM-DD");
@@ -253,10 +265,10 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                     elem_class = "danger";
                     elem_text = "Overdue";
                 }
-                td_elements[6].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
+                td_elements[8].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
 
-                td_elements[7].innerText = moment(data.meeting_created_datetime).format("DD-MMM-YYYY hh:mm a");
-                td_elements[8].innerText = data.meeting_done_datetime ? moment(data.meeting_done_datetime).format("DD-MMM-YYYY hh:mm a") : 'N/A';
+                td_elements[9].innerText = moment(data.meeting_created_datetime).format("DD-MMM-YYYY hh:mm a");
+                td_elements[10].innerText = data.meeting_done_datetime ? moment(data.meeting_done_datetime).format("DD-MMM-YYYY hh:mm a") : 'N/A';
             }
         });
     }else{
@@ -296,42 +308,52 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 },
                 {
                     targets: 2,
+                    name: "business_name",
+                    data: "business_name",
+                },
+                {
+                    targets: 3,
+                    name: "business_cat",
+                    data: "business_cat",
+                },
+                {
+                    targets: 4,
                     name: "name",
                     data: "name",
                 },
                 {
-                    targets: 3,
+                    targets: 5,
                     name: "mobile",
                     data: "mobile",
                 },
                 {
-                    targets: 4,
+                    targets: 6,
                     name: "lead_status",
                     data: "lead_status",
                 },
                 {
-                    targets: 5,
+                    targets: 7,
                     name: "meeting_schedule_datetime",
                     data: "meeting_schedule_datetime",
                 },
                 {
-                    targets: 6,
+                    targets: 8,
                     name: "lead_id",
                     data: "lead_id",
                 },
                 {
-                    targets: 7,
+                    targets: 9,
                     name: "meeting_created_datetime",
                     data: "meeting_created_datetime",
                 },
                 {
-                    targets: 8,
+                    targets: 10,
                     name: "meeting_done_datetime",
                     data: "meeting_done_datetime",
                 },
             ],
             order: [
-                [5, 'asc']
+                [7, 'asc']
             ],
             rowCallback: function(row, data, index) {
                 row.style.cursor = "pointer";
@@ -340,12 +362,12 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 td_elements[1].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
                 td_elements[1].classList.add('text-nowrap');
                 if(data.lead_status == "Done"){
-                    td_elements[4].innerHTML = `<span class="badge badge-secondary">Done</span>`;
+                    td_elements[6].innerHTML = `<span class="badge badge-secondary">Done</span>`;
                 }else{
-                    td_elements[4].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
+                    td_elements[6].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
 
-                td_elements[5].innerHTML = moment(data.meeting_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
+                td_elements[7].innerHTML = moment(data.meeting_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
 
                 const meeting_schedule_date = moment(data.meeting_schedule_datetime).format("YYYY-MM-DD");
                 const current_date = moment().format("YYYY-MM-DD");
@@ -362,10 +384,10 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                     elem_class = "danger";
                     elem_text = "Overdue";
                 }
-                td_elements[6].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
+                td_elements[8].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
 
-                td_elements[7].innerText = moment(data.meeting_created_datetime).format("DD-MMM-YYYY hh:mm a");
-                td_elements[8].innerText = data.meeting_done_datetime ? moment(data.meeting_done_datetime).format("DD-MMM-YYYY hh:mm a") : 'N/A';
+                td_elements[9].innerText = moment(data.meeting_created_datetime).format("DD-MMM-YYYY hh:mm a");
+                td_elements[10].innerText = data.meeting_done_datetime ? moment(data.meeting_done_datetime).format("DD-MMM-YYYY hh:mm a") : 'N/A';
             }
         });
     }

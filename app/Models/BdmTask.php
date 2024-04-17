@@ -25,4 +25,7 @@ class BdmTask extends Model
                 return "This model has been {$eventName} by User ID: {$userId}";
             });
     }
+    public function get_created_by() {
+        return $this->hasOne(TeamMember::class, 'id', 'created_by');
+    }
 }

@@ -1,4 +1,4 @@
-@extends('bdm.layouts.app')
+@extends('admin.layouts.app')
 @section('header-css')
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
 @endsection
@@ -11,21 +11,24 @@
             </a>
         </li>
 @endsection
-@section('navbar-left-links')
-<li class="nav-item">
-    <a href="javascript:void(0);" class="nav-link" onclick="handle_create_lead()">Create New Lead</a>
-</li>
-@endsection
 @section('main')
     @php
-        $auth_user = Auth::guard('bdm')->user();
+        $auth_user = Auth::guard('admin')->user();
     @endphp
     <div class="content-wrapper pb-5">
         <section class="content-header">
             <div class="container-fluid">
                 <div class="d-flex justify-content-between mb-2">
                     <h1 class="m-0">{{ $page_heading }}</h1>
-                    <a href="{{ route('bdm.lead.list') }}" class="btn btn-secondary btn-sm">Refresh</a>
+                    <a href="{{ route('admin.bdm.lead.list') }}" class="btn btn-secondary btn-sm">Refresh</a>
+                </div>
+                <div class="d-flex">
+                <div class="button-group my-4">
+                    <button class="btn btn-sm text-light buttons-print" onclick="handle_create_bdm_lead()" style="background-color: var(--wb-renosand)"><i class="fa fa-plus"></i> Create Lead</a>
+                </div>
+                <a href="javascript:void(0);" class="btn my-4 text-light btn-sm buttons-print mx-1"
+                        onclick="handle_forward_leads_to_bdm(this)" style="background-color: var(--wb-dark-red)"><i
+                            class="fa fa-paper-plane"></i> Assign to Bdm</a>
                 </div>
             </div>
         </section>
@@ -59,7 +62,7 @@
             <div class="p-3 control-sidebar-content">
                 <h5>Lead Filters</h5>
                 <hr class="mb-2">
-                <form action="{{ route('bdm.lead.list') }}" method="post" id="filters-form">
+                <form action="{{ route('admin.bdm.lead.list') }}" method="post" id="filters-form">
                     @csrf
                     <div class="accordion text-sm" id="accordionExample">
                             <div class="accordion-item">
@@ -80,6 +83,29 @@
                                                     {{ isset($filter_params['team_members']) && $filter_params['team_members'] == $rm->id ? 'checked' : '' }}>
                                                 <label for="team_member_{{ $bdm->id }}"
                                                     class="custom-control-label">{{ $bdm->name }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse941"
+                                        aria-expanded="true" aria-controls="collapse41">Lead Business Category</button>
+                                </h2>
+                                <div id="collapse941"
+                                    class="accordion-collapse collapse {{ isset($filter_params['business_cat']) ? 'show' : '' }}"
+                                    data-bs-parent="#accordionExample">
+                                    <div class="accordion-body pl-2 pb-4">
+                                        @foreach ($vendor_categories as $vendor)
+                                            <div class="custom-control custom-radio my-1">
+                                                <input class="custom-control-input" type="radio"
+                                                    id="team_member_{{ $vendor->id }}" name="business_cat"
+                                                    value="{{ $vendor->id }}"
+                                                    {{ isset($filter_params['business_cat']) && $filter_params['business_cat'] == $vendor->id ? 'checked' : '' }}>
+                                                <label for="team_member_{{ $vendor->id }}"
+                                                    class="custom-control-label">{{ $vendor->name }}</label>
                                             </div>
                                         @endforeach
                                     </div>
@@ -127,29 +153,6 @@
                                                 <label for="lead_source_Api"
                                                     class="custom-control-label">WB|Api</label>
                                             </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse941"
-                                        aria-expanded="true" aria-controls="collapse41">Lead Business Category</button>
-                                </h2>
-                                <div id="collapse941"
-                                    class="accordion-collapse collapse {{ isset($filter_params['business_cat']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        @foreach ($vendor_categories as $vendor)
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
-                                                    id="team_member_{{ $vendor->id }}" name="business_cat"
-                                                    value="{{ $vendor->id }}"
-                                                    {{ isset($filter_params['business_cat']) && $filter_params['business_cat'] == $vendor->id ? 'checked' : '' }}>
-                                                <label for="team_member_{{ $vendor->id }}"
-                                                    class="custom-control-label">{{ $vendor->name }}</label>
-                                            </div>
-                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -298,7 +301,7 @@
                     <div class="my-5">
                         <button type="submit" class="btn btn-sm text-light btn-block"
                             style="background-color: var(--wb-renosand);">Apply</button>
-                        <a href="{{ route('team.lead.list') }}" type="submit"
+                        <a href="{{ route('admin.bdm.lead.list') }}" type="submit"
                             class="btn btn-sm btn-secondary btn-block">Reset</a>
                     </div>
                 </form>
@@ -309,7 +312,9 @@
 @section('footer-script')
     @include('whatsapp.chat');
     @include('whatsapp.multiplemsg');
-    @include('bdm.lead.manage_lead_modal');
+    @include('admin.bdmCrm.lead.manage_lead_modal');
+    @include('admin.bdmCrm.lead.forward_leads_modal');
+
     @php
         $filter = '';
         if (isset($filter_params['dashboard_filters'])) {
@@ -352,7 +357,7 @@
             manageLeadModal.show();
         }
         var dashfilters = @json($dashfilters);
-        const data_url = `{{ route('bdm.lead.list.ajax') }}?{!! $filter !!}`;
+        const data_url = `{{ route('admin.bdm.lead.list.ajax') }}?{!! $filter !!}`;
         $(document).ready(function() {
             var dataTable;
             if (dashfilters) {
@@ -467,7 +472,8 @@
                                     `<span class="badge badge-danger">Not-Contacted</span>`;
                             }
                         const action_btns =
-                        `<a href="{{ route('bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>`;
+                        `<a href="{{ route('admin.bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
+                        <a href="{{ route('admin.bdm.lead.delete') }}/${data.lead_id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>`;
                     td_elements[13].classList.add('text-nowrap');
                     td_elements[13].innerHTML = action_btns;
                     }
@@ -480,11 +486,10 @@
                     language: {
                         search: "_INPUT_", // Removes the 'Search' field label
                         searchPlaceholder: "Type here to search..", // Placeholder for the search box
-                        // processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
                     },
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('bdm.lead.list.ajax') }}",
+                        url: "{{ route('admin.bdm.lead.list.ajax') }}",
                         data: function(d) {
                             var formData = $('#filters-form').serializeArray();
                             formData.forEach(function(item) {
@@ -589,8 +594,9 @@
                                 td_elements[10].innerHTML =
                                     `<span class="badge badge-danger">Not-Contacted</span>`;
                             }
-                        const action_btns =
-                        `<a href="{{ route('bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>`;
+                            const action_btns =
+                        `<a href="{{ route('admin.bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
+                        <a href="{{ route('admin.bdm.lead.delete') }}/${data.lead_id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>`;
                     td_elements[13].classList.add('text-nowrap');
                     td_elements[13].innerHTML = action_btns;
                     }
@@ -603,6 +609,7 @@
                 document.querySelector('[data-widget="control-sidebar"]').click();
             });
         });
+
 
         $('#select-all-checkbox').on('change', function() {
             var isChecked = $(this).prop('checked');
@@ -619,7 +626,6 @@
             $('.forward_lead_checkbox:checked').each(function() {
                 selectedValues.push($(this).val());
             });
-            console.log(selectedValues);
             let phonenum = document.getElementById('phone_inp_id_m');
             phonenum.value = selectedValues;
             if (selectedValues.length > 0) {
@@ -630,38 +636,21 @@
         }
 
         function handle_view_lead(lead_id) {
-            window.open(`{{ route('bdm.lead.view') }}/${lead_id}`);
+            window.open(`{{ route('admin.bdm.lead.view') }}/${lead_id}`);
         }
-
-        function handle_get_forward_info(lead_id) {
-            fetch(`{{ route('team.lead.getForwardInfo') }}/${lead_id}`).then(response => response.json()).then(data => {
-                const forward_info_table_body = document.getElementById('forward_info_table_body');
-                const modal = new bootstrap.Modal("#leadForwardedMemberInfo")
-                forward_info_table_body.innerHTML = "";
-                if (data.success == true) {
-                    last_forwarded_info_paragraph.innerText = data.last_forwarded_info;
-                    if (data.lead_forwards.length > 0) {
-                        let i = 1;
-                        for (let item of data.lead_forwards) {
-                            let tr = document.createElement('tr');
-                            let tds = `<td>${i}</td>
-                        <td>${item.name}</td>
-                        <td>${item.venue_name}</td>
-                        <td>${moment(item.lead_forwarded_at).format("DD-MMM-YYYY hh:mm a")}</td>`;
-                            tr.innerHTML = tds;
-                            forward_info_table_body.appendChild(tr);
-                            i++;
-                        }
-                    } else {
-                        forward_info_table_body.innerHTML = `<tr>
-                        <td colspan="5">No data available in table</td>
-                    </tr>`
-                    }
-                    modal.show();
-                } else {
-                    toastr[data.alert_type](data.message);
-                }
-            })
+        function handle_forward_leads_to_bdm(elem) {
+            var selectedValues = [];
+            $('.forward_lead_checkbox:checked').each(function() {
+                selectedValues.push($(this).val());
+            });
+            if (selectedValues.length > 0) {
+                document.querySelector('input[name="forward_leads_id"]').value = selectedValues;
+                const forward_rms_chekbox = document.querySelectorAll(`input[name="forward_bdm_id"]`);
+                const modal = new bootstrap.Modal("#forwardLeadModal");
+                modal.show();
+            } else {
+                toastr.info("Select the lead's which you want to forward.");
+            }
         }
     </script>
 @endsection

@@ -44,10 +44,14 @@ class TaskController extends Controller {
             'bdm_leads.name',
             'bdm_leads.mobile',
             'bdm_leads.lead_status',
+            'bdm_leads.business_name',
+            'vc.name as business_cat',
             'bdm_tasks.task_schedule_datetime',
             'bdm_tasks.created_at as task_created_datetime',
             'bdm_tasks.done_datetime as task_done_datetime',
-        )->join('bdm_tasks', ['bdm_leads.lead_id' => 'bdm_tasks.lead_id'])->where(['bdm_tasks.created_by' => $auth_user->id, 'bdm_tasks.deleted_at' => null]);
+        )->join('bdm_tasks', ['bdm_leads.lead_id' => 'bdm_tasks.lead_id'])
+        ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat')
+        ->where(['bdm_tasks.created_by' => $auth_user->id, 'bdm_tasks.deleted_at' => null]);
 
         $current_date = date('Y-m-d');
         if ($request->task_status == "Upcoming") {
@@ -58,7 +62,7 @@ class TaskController extends Controller {
             $tasks->where('bdm_tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('bdm_tasks.done_datetime');
         } elseif ($request->task_status == "Done") {
             $tasks->whereNotNull('bdm_tasks.done_datetime');
-        } 
+        }
         if ($request->task_created_from_date) {
             $from = Carbon::make($request->task_created_from_date);
             if ($request->task_created_to_date != null) {
@@ -77,7 +81,7 @@ class TaskController extends Controller {
                 $to = Carbon::make($request->task_done_from_date)->endOfDay();
             }
             $tasks->whereBetween('bdm_tasks.done_datetime', [$from, $to]);
-        } 
+        }
         if ($request->task_schedule_from_date) {
             $from = Carbon::make($request->task_schedule_from_date);
             if ($request->task_schedule_to_date != null) {
@@ -100,6 +104,7 @@ class TaskController extends Controller {
                 $tasks->where('bdm_tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('bdm_tasks.done_datetime');
             }
         }
+
 
         $tasks = $tasks->get();
         return datatables($tasks)->toJson();
