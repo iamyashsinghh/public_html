@@ -168,21 +168,21 @@ Route::get('/getlol', function () {
     $oneYearAgo = Carbon::now()->subYear();
     $oneYearAgo0 = Carbon::now()->subMonth();
 
-        // Query to find leads updated before one month ago
+    // Query to find leads updated before one month ago
 
-$uniqueLeadsCount = Lead::join('events', 'leads.lead_id', '=', 'events.lead_id')
-                            ->where('leads.lead_datetime', '<', $oneYearAgo)
-                            ->where('events.event_datetime', '<', $oneYearAgo0)
-                            ->groupBy('leads.lead_id')
-                            ->get()
-                            ->count();  // Counting distinct lead IDs
+    $uniqueLeadsCount = Lead::join('events', 'leads.lead_id', '=', 'events.lead_id')
+        ->where('leads.lead_datetime', '<', $oneYearAgo)
+        ->where('events.event_datetime', '<', $oneYearAgo0)
+        ->groupBy('leads.lead_id')
+        ->get()
+        ->count();  // Counting distinct lead IDs
 
 
 
     // Return the count of unique leads
     return $uniqueLeadsCount;
     // return Lead::withTrashed()->where('mobile', '7827066945')->get();
-        // Return the count
+    // Return the count
 });
 
 Route::post('/save_wa', function (Request $request) {
@@ -434,6 +434,26 @@ if (!function_exists('notify_users_about_lead_interakt_async')) {
     }
 }
 
+if (!function_exists('get_bussiness_cat')) {
+    function get_business_cat($value)
+    {
+        $data = collect([
+            ['data' => 'best-wedding-photographers', 'value' => 1],
+            ['data' => 'top-makeup-artists', 'value' => 2],
+            ['data' => 'best-mehndi-artists', 'value' => 3],
+            ['data' => 'band-baja-ghodiwala', 'value' => 5],
+            ['data' => 'best-choreographers', 'value' => 6],
+            ['data' => 'best-decorators', 'value' => 7],
+            ['data' => 'bridal-wear', 'value' => 8],
+            ['data' => 'groom-wear', 'value' => 9],
+            ['data' => 'wedding-transportation-and-vintage-cars', 'value' => 10],
+            ['data' => 'invitation-cards', 'value' => 11]
+        ]);
+        $matchedItem = $data->firstWhere('data', $value);
+        return $matchedItem ? $matchedItem['value'] : null;
+    }
+}
+
 Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
     Log::info($request);
     try {
@@ -624,40 +644,45 @@ Route::post('/new_lead', function (Request $request) {
 
 Route::post('/business_lead', function (Request $request) {
     Log::info($request);
-     try {
-           $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
-           $validate = Validator::make($request->all(), [
-                 'name' => $is_name_valid,
-            ]);
+    try {
+        $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
+        $validate = Validator::make($request->all(), [
+            'name' => $is_name_valid,
+        ]);
 
-            $name = $request->post('name');
-            $mobile = $request->post('phone');
-            $current_timestamp = date('Y-m-d H:i:s');
-            $source = "WB|Site";
-            $lead = BdmLead::where('mobile', $mobile)->first();
-            if($lead){
-                $lead->enquiry_count = $lead->enquiry_count + 1;
-            }else{
-                $lead = new BdmLead();
-                $lead->name = $name;
-                $lead->mobile = $mobile;
-                $lead->business_cat = $request->post('business_category');
-                $lead->business_name = $request->post('business_name');
-            }
-            $lead->lead_datetime = $current_timestamp;
-            $lead->email = $request->post('email');
-            $lead->source = $source;
-            $lead->lead_status = 'Hot';
-            $lead->city = $request->post('city');
-            $get_bdm = getAssigningBdm();
-            $lead->assign_to = $get_bdm->name;
-            $lead->assign_id = $get_bdm->id;
-            $lead->whatsapp_msg_time = $current_timestamp;
-            $lead->lead_color = "#0066ff33";
-            $lead->save();
-            return response()->json(['status' => true, 'msg' => 'Thank you for SignUp. Our team will reach you soon with best price..!'], 200);
-     }catch (\Throwable $th) {
-            return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
+        $name = $request->post('name');
+        $mobile = $request->post('phone');
+        $current_timestamp = date('Y-m-d H:i:s');
+        $source = "WB|Site";
+        $lead = BdmLead::where('mobile', $mobile)->first();
+
+        $bussinesCatId = 4;
+        if($request->post('business_type') == '2'){
+            $bussinesCatId = get_business_cat($request->post('business_category'));
+        }
+        if ($lead) {
+            $lead->enquiry_count = $lead->enquiry_count + 1;
+        } else {
+            $lead = new BdmLead();
+            $lead->name = $name;
+            $lead->mobile = $mobile;
+            $lead->business_cat = $bussinesCatId;
+            $lead->business_name = $request->post('business_name');
+        }
+        $lead->lead_datetime = $current_timestamp;
+        $lead->email = $request->post('email');
+        $lead->source = $source;
+        $lead->lead_status = 'Hot';
+        $lead->city = $request->post('city');
+        $get_bdm = getAssigningBdm();
+        $lead->assign_to = $get_bdm->name;
+        $lead->assign_id = $get_bdm->id;
+        $lead->whatsapp_msg_time = $current_timestamp;
+        $lead->lead_color = "#0066ff33";
+        $lead->save();
+        return response()->json(['status' => true, 'msg' => 'Thank you for SignUp. Our team will reach you soon with best price..!'], 200);
+    } catch (\Throwable $th) {
+        return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
     }
 });
 
