@@ -553,7 +553,7 @@
                         },
                     });
                 }).catch(function(error) {
-                    alert(error);
+                    // alert(error);
                 });
         }
         startFCM();
