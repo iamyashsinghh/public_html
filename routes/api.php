@@ -135,6 +135,49 @@ if (!function_exists('getAssigningBdm')) {
         }
     }
 }
+if (!function_exists('sendNotification')) {
+
+ function sendNotification($title, $body, $userid)
+    {
+        $token = TeamMember::where('id',$userid)->first();
+        if(empty($token->device_token)){
+            return 'done';
+        }
+        $msg = "Hey $token->name, you have recived a new lead. Mobile No: $body";
+        $url = 'https://fcm.googleapis.com/fcm/send';
+        $serverKey = env('FCM_MSG_SERVER_KEY');
+        $data = [
+            "registration_ids" => [$token->device_token],
+            "notification" => [
+                "title" => $title,
+                "body" => $msg,
+                "icon" => "https://wbcrm.in/favicon.jpg",
+                "click_action" => "https://wbcrm.in/team/venue-crm/leads/list"
+            ]
+        ];
+        $encodedData = json_encode($data);
+        $headers = [
+            'Authorization:key=' . $serverKey,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+        $result = curl_exec($ch);
+        if ($result === FALSE) {
+            die('Curl failed: ' . curl_error($ch));
+        }
+        curl_close($ch);
+        return true;
+    }
+}
 
 if (!function_exists('assignLeadsToRMs')) {
     function assignLeadsToRMs()
@@ -434,7 +477,7 @@ if (!function_exists('notify_users_about_lead_interakt_async')) {
     }
 }
 
-if (!function_exists('get_bussiness_cat')) {
+if (!function_exists('get_business_cat')) {
     function get_business_cat($value)
     {
         $data = collect([
@@ -631,6 +674,9 @@ Route::post('/new_lead', function (Request $request) {
                 function ($exception) {
                 }
             )->wait();
+
+            $notifyRm = sendNotification('WB | Notification', $mobile,  $get_rm->id);
+
             return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);

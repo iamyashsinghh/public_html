@@ -9,7 +9,7 @@ return new class extends Migration {
      * Run the migrations.
      *
      * @return void
-     * This table is using as users. team member login by otp which we will be send on their whatsapp number and on email. 
+     * This table is using as users. team member login by otp which we will be send on their whatsapp number and on email.
      */
     public function up() {
         Schema::create('team_members', function (Blueprint $table) {
@@ -24,6 +24,7 @@ return new class extends Migration {
             $table->string("venue_name")->nullable();
             $table->boolean("status")->default(true)->comment("0=deactive, 1=active");
             $table->string('profile_image')->nullable();
+            $table->text('device_token')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

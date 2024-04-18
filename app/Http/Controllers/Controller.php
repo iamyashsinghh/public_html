@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BdmLead;
 use App\Models\Lead;
 use App\Models\nvLead;
+use App\Models\TeamMember;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -72,6 +73,7 @@ class Controller extends BaseController {
             return $response;
 
     }
+
 
     function notify_vendor_lead_using_interakt($phone, $name, $message, $lead_id) {
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
@@ -216,7 +218,7 @@ class Controller extends BaseController {
                 return $response;
 
     }
-    
+
     public function validate_venue_lead_phone_number($phone_number) {
         $pattern = "/^\d{10}$/";
         try {
@@ -234,6 +236,49 @@ class Controller extends BaseController {
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => "Something went wrong."]);
         }
     }
+
+    public function sendNotification($title = 'hello', $body= '9565676128', $userid)
+    {
+
+        $token = TeamMember::where('id',$userid)->first();
+        if(empty($token->device_token)){
+            return 'done';
+        }
+        $msg = "Hey $token->name, you have recived a new lead. Mobile No: $body";
+        $url = 'https://fcm.googleapis.com/fcm/send';
+        $serverKey = env('FCM_MSG_SERVER_KEY');
+        $data = [
+            "registration_ids" => [$token->device_token],
+            "notification" => [
+                "title" => $title,
+                "body" => $msg,
+                "icon" => "https://wbcrm.in/favicon.jpg",
+                "click_action" => "https://wbcrm.in/team/venue-crm/leads/list"
+            ]
+        ];
+        $encodedData = json_encode($data);
+        $headers = [
+            'Authorization:key=' . $serverKey,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+        $result = curl_exec($ch);
+        if ($result === FALSE) {
+            die('Curl failed: ' . curl_error($ch));
+        }
+        curl_close($ch);
+        dd($result);
+    }
+
     public function validate_nonvenue_lead_phone_number($phone_number) {
         $pattern = "/^\d{10}$/";
         try {
@@ -251,7 +296,7 @@ class Controller extends BaseController {
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => "Something went wrong."]);
         }
     }
-    
+
     public function validate_bdm_lead_phone_number($phone_number) {
         $pattern = "/^\d{10}$/";
         try {

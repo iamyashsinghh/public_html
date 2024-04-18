@@ -340,5 +340,59 @@
     }, 2000);
 
 </script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyB4GRKlQxStAeS69WuMlDQcdPP6mCSBsaw",
+            authDomain: "weddingbanquetsfcm.firebaseapp.com",
+            projectId: "weddingbanquetsfcm",
+            storageBucket: "weddingbanquetsfcm.appspot.com",
+            messagingSenderId: "1058988997700",
+            appId: "1:1058988997700:web:5d21d9cc1610a9314a9011",
+            measurementId: "G-NXRL2FM5W2"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
 
+        function startFCM() {
+            messaging
+                .requestPermission()
+                .then(function() {
+                    return messaging.getToken()
+                })
+                .then(function(response) {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': `{{ csrf_token() }}`,
+                        }
+                    });
+                    $.ajax({
+                        url: `{{ route('store.token') }}`,
+                        type: 'POST',
+                        data: {
+                            token: response
+                        },
+                        dataType: 'JSON',
+                        success: function(response) {
+                            // alert('Token stored.');
+                        },
+                        error: function(error) {
+                            // alert(error);
+                        },
+                    });
+                }).catch(function(error) {
+                    alert(error);
+                });
+        }
+        startFCM();
+        messaging.onMessage(function(payload) {
+            const title = payload.notification.title;
+            const options = {
+                body: payload.notification.body,
+                icon: payload.notification.icon,
+            };
+            new Notification(title, options);
+        });
+    </script>
 @endsection

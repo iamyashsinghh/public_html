@@ -10,6 +10,9 @@ Route::view('/', 'admin.login');
 Route::get('/fool', function () {
     Artisan::call('storage:link');
 });
+Route::post('/store-token', [Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
+Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->name('send.token');
+
 Route::get('/optimize', function () {
             Artisan::call('cache:clear');
             Artisan::call('route:clear');
