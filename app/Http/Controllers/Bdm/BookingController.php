@@ -92,7 +92,7 @@ class BookingController extends Controller
         $bookingData->price = $request->price;
         $bookingData->payment_method = $request->payment_method;
         $bookingData->save();
-        
+
         $getBdmLead = BdmLead::select('lead_id', 'read_status')->where('lead_id', $request->lead_id)->first();
         $getBdmLead->read_status = true;
         $getBdmLead->save();

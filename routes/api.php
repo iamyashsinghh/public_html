@@ -622,6 +622,45 @@ Route::post('/new_lead', function (Request $request) {
     }
 });
 
+Route::post('/business_lead', function (Request $request) {
+    Log::info($request);
+     try {
+           $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
+           $validate = Validator::make($request->all(), [
+                 'name' => $is_name_valid,
+            ]);
+
+            $name = $request->post('name');
+            $mobile = $request->post('phone');
+            $current_timestamp = date('Y-m-d H:i:s');
+            $source = "WB|Site";
+            $lead = BdmLead::where('mobile', $mobile)->first();
+            if($lead){
+                $lead->enquiry_count = $lead->enquiry_count + 1;
+            }else{
+                $lead = new BdmLead();
+                $lead->name = $name;
+                $lead->mobile = $mobile;
+                $lead->business_cat = $request->post('business_category');
+                $lead->business_name = $request->post('business_name');
+            }
+            $lead->lead_datetime = $current_timestamp;
+            $lead->email = $request->post('email');
+            $lead->source = $source;
+            $lead->lead_status = 'Hot';
+            $lead->city = $request->post('city');
+            $get_bdm = getAssigningBdm();
+            $lead->assign_to = $get_bdm->name;
+            $lead->assign_id = $get_bdm->id;
+            $lead->whatsapp_msg_time = $current_timestamp;
+            $lead->lead_color = "#0066ff33";
+            $lead->save();
+            return response()->json(['status' => true, 'msg' => 'Thank you for SignUp. Our team will reach you soon with best price..!'], 200);
+     }catch (\Throwable $th) {
+            return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
+    }
+});
+
 Route::post('handle_calling_request', function (Request $request) {
     $validate = Validator::make($request->all(), [
         'slug' => 'required|string|max:255',
