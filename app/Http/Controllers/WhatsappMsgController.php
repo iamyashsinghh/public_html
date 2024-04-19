@@ -73,7 +73,7 @@ class WhatsappMsgController extends Controller
         $newtask->template_name = $WhatsappCampain->template_name;
         $newtask->is_rm_name = $WhatsappCampain->is_rm_name;
         $newtask->team_name = $WhatsappCampain->team_name;
-        $newtask->lead_id_type = $request->input('lead_id_type');
+        $newtask->lead_id_type = $request->post('lead_id_type');
         $newtask->status = "0";
         if ($newtask->save()) {
             return response()->json([
@@ -311,7 +311,7 @@ class WhatsappMsgController extends Controller
                 } else {
                 }
             }
-        }elseif ($WhatsappBulkMsgTask->lead_id_type == '3') {
+        } elseif ($WhatsappBulkMsgTask->lead_id_type == '3') {
             $leadIds = explode(',', $WhatsappBulkMsgTask->lead_ids);
             foreach ($leadIds as $leadid) {
                 $lead = BdmLead::select('mobile')->where('lead_id', $leadid)->first();
@@ -341,10 +341,15 @@ class WhatsappMsgController extends Controller
             }
             $messagesSent++;
             $phoneNumber = trim($phoneNumber);
-            $getname = Lead::select('name')->where('mobile', $phoneNumber)->first();
-            if (!$getname) {
-                $getname = nvLead::select('name')->where('mobile', $phoneNumber)->first();
+            if ($WhatsappBulkMsgTask->lead_id_type == '3') {
+                $getname = BdmLead::select('name')->where('mobile', $phoneNumber)->first();
+            } else {
+                $getname = Lead::select('name')->where('mobile', $phoneNumber)->first();
+                if (!$getname) {
+                    $getname = nvLead::select('name')->where('mobile', $phoneNumber)->first();
+                }
             }
+
             if (empty($getname->name)) {
                 $getname->name = "sir/mam";
             }
@@ -484,7 +489,7 @@ class WhatsappMsgController extends Controller
                         "components" => [],
                     ]
                 ]);
-                Log::info($response);
+        Log::info($response);
         if ($response->successful()) {
             Log::info($response);
             $currentTimestamp = Carbon::now();
@@ -522,7 +527,7 @@ class WhatsappMsgController extends Controller
                         "components" => [],
                     ]
                 ]);
-                Log::info($response);
+        Log::info($response);
         if ($response->successful()) {
             Log::info($response);
             $currentTimestamp = Carbon::now();
@@ -545,7 +550,7 @@ class WhatsappMsgController extends Controller
             return false;
         }
         $nameOfLead = Lead::where('mobile', $request->recipient)->first();
-        if(!$nameOfLead){
+        if (!$nameOfLead) {
             $nameOfLead = nvLead::where('mobile', $request->recipient)->first();
         }
         $nameOfRecipient = $nameOfLead ? $nameOfLead->name : 'Sir/Madam';
@@ -591,7 +596,7 @@ class WhatsappMsgController extends Controller
                         ],
                     ]
                 ]);
-                Log::info($response);
+        Log::info($response);
         if ($response->successful()) {
             Log::info($response);
             $currentTimestamp = Carbon::now();
