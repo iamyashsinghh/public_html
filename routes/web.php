@@ -214,6 +214,7 @@ Route::middleware('verify_token')->group(function () {
 
             // bdm booking routes
             Route::get('/get_booking/{booking_id?}', [Controllers\Admin\BdmBookingController::class, 'get_booking'])->name('admin.bdm.booking.get');
+            Route::post('/add_booking', [Controllers\Admin\BdmBookingController::class, 'add_process'])->name('admin.bdm.booking.add');
             Route::post('/edit_booking/{booking_id?}', [Controllers\Admin\BdmBookingController::class, 'edit_process'])->name('admin.bdm.booking.edit');
             Route::get('/delete_booking/{booking_id?}', [Controllers\Admin\BdmBookingController::class, 'delete'])->name('admin.bdm.booking.delete');
             Route::post('/update_payment_img/update', [Controllers\Admin\BdmBookingController::class, 'update_payment_image'])->name('admin.bdm.update.bookingPayment.img');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Bdm;
 
 use App\Http\Controllers\Controller;
+use App\Models\BdmBooking;
 use Illuminate\Http\Request;
 use App\Models\BdmLead;
 use App\Models\BdmMeeting;
@@ -92,11 +93,45 @@ class DashboardController extends Controller
             ->where('bdm_meetings.created_by', $auth_user->id)
             ->count();
 
+        $meeting_done_this_month = BdmLead::join('bdm_meetings', 'bdm_leads.lead_id', '=', 'bdm_meetings.lead_id')
+        ->whereBetween('bdm_meetings.done_datetime', [$currentMonthStart, $currentMonthEnd])
+        ->whereNull('bdm_leads.deleted_at')
+        ->whereNull('bdm_meetings.deleted_at')
+        ->whereNotNull('bdm_meetings.done_with')
+        ->where('bdm_meetings.created_by', $auth_user->id)
+        ->count();
+
+        $order_signed_this_month = BdmLead::join('bdm_bookings', 'bdm_leads.lead_id', '=', 'bdm_bookings.lead_id')
+        ->whereBetween('bdm_bookings.booking_date', [$currentMonthStart, $currentMonthEnd])
+        ->whereNull('bdm_leads.deleted_at')
+        ->whereNull('bdm_bookings.deleted_at')
+        ->where('bdm_bookings.created_by', $auth_user->id)
+        ->get(['bdm_bookings.*'])
+        ->count();
+
         $total_leads_received_this_month = BdmLead::where('lead_datetime', 'like', "%$current_month%")->where('assign_id', $auth_user->id)->count();
         $total_leads_received_today = BdmLead::where('lead_datetime', 'like', "%$current_date%")->where('assign_id', $auth_user->id)->count();
         $unread_leads_this_month = BdmLead::where('lead_datetime', 'like', "%$current_month%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
         $unread_leads_today = BdmLead::where('lead_datetime', 'like', "%$current_date%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
         $total_unread_leads_overdue = BdmLead::where('read_status', false)->where('assign_id', $auth_user->id)->count();
+
+        $l = (int) $total_leads_received_this_month;
+            $r = (int) $meeting_done_this_month;
+            if ($r > 0 && $l > 0) {
+                $l2m = ($r * 100) / $l;
+            } else {
+                $l2m = 0;
+            }
+        $l2m = number_format($l2m, 1);
+
+        $m = (int) $meeting_done_this_month;
+            $o = (int) $order_signed_this_month;
+            if ($m > 0 && $o > 0) {
+                $m2o = ($o * 100) / $m;
+            } else {
+                $m2o = 0;
+            }
+        $m2o = number_format($m2o, 1);
 
 
         return view("bdm.dashboard", compact('bdm_unfollowed_leads',
@@ -110,7 +145,11 @@ class DashboardController extends Controller
         'total_leads_received_today',
         'unread_leads_this_month',
         'unread_leads_today',
-        'total_unread_leads_overdue'
+        'total_unread_leads_overdue',
+        'meeting_done_this_month',
+        'order_signed_this_month',
+        'l2m',
+        'm2o'
     ));
     }
     public function update_profile_image(Request $request)

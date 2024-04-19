@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\BdmLead;
 use App\Models\Lead;
 use App\Models\nvLead;
 use App\Models\nvrmLeadForward;
@@ -305,6 +306,15 @@ class WhatsappMsgController extends Controller
             $leadIds = explode(',', $WhatsappBulkMsgTask->lead_ids);
             foreach ($leadIds as $leadid) {
                 $lead = nvLead::select('mobile')->where('id', $leadid)->first();
+                if ($lead !== null && !in_array($lead->mobile, $loggedNumbers)) {
+                    $phoneNumbers[] = $lead->mobile;
+                } else {
+                }
+            }
+        }elseif ($WhatsappBulkMsgTask->lead_id_type == '3') {
+            $leadIds = explode(',', $WhatsappBulkMsgTask->lead_ids);
+            foreach ($leadIds as $leadid) {
+                $lead = BdmLead::select('mobile')->where('lead_id', $leadid)->first();
                 if ($lead !== null && !in_array($lead->mobile, $loggedNumbers)) {
                     $phoneNumbers[] = $lead->mobile;
                 } else {

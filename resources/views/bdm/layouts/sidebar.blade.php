@@ -49,7 +49,7 @@ $uri = Route::currentRouteName();
                 <li class="nav-item">
                     <a href="{{route('bdm.booking.list')}}" class="nav-link w-100 {{$uri == "bdm.booking.list" ? 'active' : ''}}">
                         <i class="fas fa-bookmark nav-icon"></i>
-                        <p>Booking</p>
+                        <p>Signed Order</p>
                     </a>
                 </li>
 

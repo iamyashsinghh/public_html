@@ -199,6 +199,39 @@
                             </div>
                         </a>
                     </div>
+                    <div class="col-lg-3 col-6">
+                        <a target="_blank" href="{{ route('bdm.meeting.list', 'meeting_done_this_month') }}"
+                            class="text-light">
+                            <div class="small-box text-sm bg-success">
+                                <div class="inner">
+                                    <h3>{{$meeting_done_this_month}}</h3>
+                                    <p style="font-size: 14px;">Meeting Done this Month / L2M -- {{$l2m}}%</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-bag"></i>
+                                </div>
+                                <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-12 mt-3">
+                        <h3>Order Signed</h3>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <a target="_blank" href="{{ route('bdm.meeting.list', 'order_signed_this_month') }}"
+                            class="text-light">
+                            <div class="small-box text-sm bg-info">
+                                <div class="inner">
+                                    <h3>{{$order_signed_this_month}}</h3>
+                                    <p style="font-size: 14px;">Order Signed this Month / M2O -- {{$m2o}}%</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-bag"></i>
+                                </div>
+                                <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>

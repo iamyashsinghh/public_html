@@ -20,7 +20,11 @@
             <div class="container-fluid">
                 <div class="d-flex justify-content-between mb-2">
                     <h1 class="m-0">{{ $page_heading }}</h1>
-                    <a href="{{ route('admin.bdm.lead.list') }}" class="btn btn-secondary btn-sm">Refresh</a>
+                    <div class="d-flex">
+                    <a href="{{ route('admin.bdm.lead.list') }}" class="btn btn-secondary btn-sm mx-2">Refresh</a>
+                        <button class="btn btn-sm text-light" onclick="send_what_msg_multiple()"
+                            style="background-color: var(--wb-renosand);">Whatsapp</button>
+                    </div>
                 </div>
                 <div class="d-flex">
                 <div class="button-group my-4">
@@ -69,7 +73,7 @@
                                 <h2 class="accordion-header">
                                     <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
                                         type="button" data-bs-toggle="collapse" data-bs-target="#collapse41"
-                                        aria-expanded="true" aria-controls="collapse41">Lead assigned to Bdm</button>
+                                        aria-expanded="true" aria-controls="collapse41">Lead assigned to BDM</button>
                                 </h2>
                                 <div id="collapse41"
                                     class="accordion-collapse collapse {{ isset($filter_params['team_members']) ? 'show' : '' }}"
@@ -121,38 +125,30 @@
                                     class="accordion-collapse collapse {{ isset($filter_params['lead_source']) ? 'show' : '' }}"
                                     data-bs-parent="#accordionExample">
                                     <div class="accordion-body pl-2 pb-4">
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
-                                                    id="lead_source_sheet" name="lead_source"
-                                                    value="WB|Sheet"
-                                                    {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Sheet' ? 'WB|Sheet' : '' }}>
-                                                <label for="lead_source_sheet"
-                                                    class="custom-control-label">WB|Sheet</label>
-                                            </div>
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
-                                                    id="lead_source_Team" name="lead_source"
-                                                    value="WB|Team"
-                                                    {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Team' ? 'WB|Team' : '' }}>
-                                                <label for="lead_source_Team"
-                                                    class="custom-control-label">WB|Team</label>
-                                            </div>
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
-                                                    id="lead_source_Site" name="lead_source"
-                                                    value="WB|Site"
-                                                    {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Site' ? 'WB|Site' : '' }}>
-                                                <label for="lead_source_Site"
-                                                    class="custom-control-label">WB|Site</label>
-                                            </div>
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
-                                                    id="lead_source_Api" name="lead_source"
-                                                    value="WB|Api"
-                                                    {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Api' ? 'WB|Api' : '' }}>
-                                                <label for="lead_source_Api"
-                                                    class="custom-control-label">WB|Api</label>
-                                            </div>
+                                        <div class="custom-control custom-radio my-1">
+                                            <input class="custom-control-input" type="radio"
+                                                id="lead_source_Team" name="lead_source"
+                                                value="WB|Team"
+                                                {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Team' ? 'WB|Team' : '' }}>
+                                            <label for="lead_source_Team"
+                                                class="custom-control-label">WB|Team</label>
+                                        </div>
+                                        <div class="custom-control custom-radio my-1">
+                                            <input class="custom-control-input" type="radio"
+                                                id="lead_source_Site" name="lead_source"
+                                                value="WB|Site"
+                                                {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Site' ? 'WB|Site' : '' }}>
+                                            <label for="lead_source_Site"
+                                                class="custom-control-label">WB|Site</label>
+                                        </div>
+                                        <div class="custom-control custom-radio my-1">
+                                            <input class="custom-control-input" type="radio"
+                                                id="lead_source_FBCampaign" name="lead_source"
+                                                value="WB|FBCampaign"
+                                                {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|FBCampaign' ? 'WB|FBCampaign' : '' }}>
+                                            <label for="lead_source_FBCampaign"
+                                                class="custom-control-label">WB|FBCampaign</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -311,10 +307,9 @@
 @endsection
 @section('footer-script')
     @include('whatsapp.chat');
-    @include('whatsapp.multiplemsg');
+    @include('whatsapp.bdm_wa_multi_msg');
     @include('admin.bdmCrm.lead.manage_lead_modal');
     @include('admin.bdmCrm.lead.forward_leads_modal');
-
     @php
         $filter = '';
         if (isset($filter_params['dashboard_filters'])) {
@@ -325,6 +320,22 @@
     <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
     <script>
+        function send_what_msg_multiple() {
+            const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg_multiple'));
+
+            var selectedValues = [];
+            $('.forward_lead_checkbox:checked').each(function() {
+                selectedValues.push($(this).val());
+            });
+            console.log(selectedValues);
+            let phonenum = document.getElementById('phone_inp_id_m');
+            phonenum.value = selectedValues;
+            if(selectedValues.length > 0){
+                manageWhatsappChatModal.show();
+            }else{
+                toastr.info("Select the lead's which you want to send messages.");
+            }
+        }
         function handle_whatsapp_msg(id) {
             const elementToUpdate = document.querySelector(`#what_id-${id}`);
             if (elementToUpdate) {

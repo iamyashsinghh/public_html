@@ -139,9 +139,9 @@ class BdmBookingController extends Controller
         $request_image_index = array_search($request->image_name, $images_arr);
         if ($request_image_index !== false) {
             unset($images_arr[$request_image_index]);
-            $images_arr = array_values($images_arr); 
+            $images_arr = array_values($images_arr);
         }
-        $booking->order_agreement_farm_image = implode(",", $images_arr); 
+        $booking->order_agreement_farm_image = implode(",", $images_arr);
         $booking->save();
 
         if (Storage::exists("public/uploads/{$request->image_name}")) {

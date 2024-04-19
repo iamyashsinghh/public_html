@@ -58,7 +58,7 @@ class BdmLeadController extends Controller
         }
         $auth_user = Auth::guard('admin')->user();
         $vendor_categories = VendorCategory::select('id', 'name')->get();
-        $whatsapp_campaigns = WhatsappCampain::select('id', 'name')->get();
+        $whatsapp_campaigns = WhatsappCampain::where('status', 1)->get();
         return view('admin.bdmCrm.lead.list', compact('page_heading', 'filter_params', 'getBdm', 'whatsapp_campaigns', 'vendor_categories'));
     }
 

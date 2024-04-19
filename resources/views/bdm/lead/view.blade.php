@@ -413,7 +413,7 @@
                         </div>
                         <div id="booking_card_container" class="card mb-5">
                             <div class="card-header text-light" style="background-color: var(--wb-renosand);">
-                                <h3 class="card-title">Booking Details</h3>
+                                <h3 class="card-title">Order Sign Details</h3>
                                 <button data-bs-toggle="modal" data-bs-target="#manageBookingModal"
                                     class="btn p-0 text-light float-right" title="Add Task."><i
                                         class="fa fa-plus"></i></button>
@@ -424,7 +424,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="text-nowrap">S.No.</th>
-                                                <th class="text-nowrap">Booking Date</th>
+                                                <th class="text-nowrap">Order Sign Date</th>
                                                 <th class="text-nowrap">Package Name</th>
                                                 <th class="">Amount</th>
                                                 <th class="text-nowrap">Payment Method</th>
@@ -471,10 +471,6 @@
                                                                 <i class="fa fa-edit text-success"
                                                                     onclick="edit_booking({{ $list->id }})"
                                                                     style="cursor: pointer"></i>
-                                                                    <a class="mx-3" href="{{route('bdm.booking.delete')}}/{{ $list->id }}">
-                                                                <i class="fa fa-trash text-danger"
-                                                                    style="cursor: pointer"></i>
-                                                                </a>
                                                                 <div class="dropdown d-inline-block mx-2">
                                                                     <a href="javascript:void(0);"
                                                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -937,7 +933,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="bookingmodaltitle">Add New Booking</h4>
+                        <h4 class="modal-title" id="bookingmodaltitle">Sign New Order</h4>
                         <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
                                 class="fa fa-times"></i></button>
                     </div>
@@ -945,7 +941,7 @@
                         <div class="modal-body text-sm">
                             <div class="form-group mb-3">
                                 @csrf
-                                <label for="booking_done_date">Booked Date<span class="text-danger">*</span></label>
+                                <label for="booking_done_date">Order Sign Date<span class="text-danger">*</span></label>
                                 <input type="datetime-local" id="booking_done_date" class="form-control"
                                     name="booking_date">
                                 <input type="hidden" value="{{ $lead->lead_id }}" name="lead_id">
@@ -962,7 +958,7 @@
                                 </select>
                             </div>
                             <div class="form-group mb-3">
-                                <label for="booking_done_price">Booking Price<span class="text-danger">*</span></label>
+                                <label for="booking_done_price">Order Sign Price<span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="price" id="booking_done_price">
                             </div>
                             <div class="form-group mb-3">
@@ -1136,7 +1132,7 @@ function handle_note_information(url_for_submit, url_for_fetch = null) {
                 })
                 .then(data => {
                 const manageBookingModal = new bootstrap.Modal(document.getElementById('manageBookingModal'));
-                bookingmodaltitle.innerHTML = 'Update Booking';
+                bookingmodaltitle.innerHTML = 'Update Order Sign';
                 booking_status_update_form.action = `{{route('bdm.booking.edit')}}/${data.id}`;
                 booking_done_date.value = data.booking_date;
                 booking_package_with_select.querySelector(`option[value="${data.package_name}"]`).selected = true;

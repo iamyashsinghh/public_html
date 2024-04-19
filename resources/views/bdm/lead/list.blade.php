@@ -66,7 +66,7 @@
                                 <h2 class="accordion-header">
                                     <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
                                         type="button" data-bs-toggle="collapse" data-bs-target="#collapse41"
-                                        aria-expanded="true" aria-controls="collapse41">Lead assigned to Bdm</button>
+                                        aria-expanded="true" aria-controls="collapse41">Lead assigned to BDM</button>
                                 </h2>
                                 <div id="collapse41"
                                     class="accordion-collapse collapse {{ isset($filter_params['team_members']) ? 'show' : '' }}"
@@ -97,14 +97,6 @@
                                     <div class="accordion-body pl-2 pb-4">
                                             <div class="custom-control custom-radio my-1">
                                                 <input class="custom-control-input" type="radio"
-                                                    id="lead_source_sheet" name="lead_source"
-                                                    value="WB|Sheet"
-                                                    {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Sheet' ? 'WB|Sheet' : '' }}>
-                                                <label for="lead_source_sheet"
-                                                    class="custom-control-label">WB|Sheet</label>
-                                            </div>
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
                                                     id="lead_source_Team" name="lead_source"
                                                     value="WB|Team"
                                                     {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Team' ? 'WB|Team' : '' }}>
@@ -121,11 +113,11 @@
                                             </div>
                                             <div class="custom-control custom-radio my-1">
                                                 <input class="custom-control-input" type="radio"
-                                                    id="lead_source_Api" name="lead_source"
-                                                    value="WB|Api"
-                                                    {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Api' ? 'WB|Api' : '' }}>
-                                                <label for="lead_source_Api"
-                                                    class="custom-control-label">WB|Api</label>
+                                                    id="lead_source_FBCampaign" name="lead_source"
+                                                    value="WB|FBCampaign"
+                                                    {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|FBCampaign' ? 'WB|FBCampaign' : '' }}>
+                                                <label for="lead_source_FBCampaign"
+                                                    class="custom-control-label">WB|FBCampaign</label>
                                             </div>
                                     </div>
                                 </div>
