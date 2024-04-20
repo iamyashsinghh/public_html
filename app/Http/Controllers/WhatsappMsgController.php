@@ -427,7 +427,6 @@ class WhatsappMsgController extends Controller
                 break;
             }
         }
-
         if ($auth_user) {
             $getlead = Lead::where('mobile', $request->mobile)->first();
 
@@ -465,6 +464,38 @@ class WhatsappMsgController extends Controller
         if ($getlead) {
             $getlead->is_whatsapp_msg = 0;
             $getlead->save();
+        }
+    }
+
+    public function whatsapp_msg_status_bdm(Request $request)
+    {
+        $guards = ['bdm'];
+        $auth_user = null;
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                $auth_user = Auth::guard($guard)->user();
+                break;
+            }
+        }
+        if ($auth_user) {
+            $getlead = BdmLead::where('mobile', $request->mobile)->first();
+
+            if (!$getlead) {
+                return response()->json(['message' => 'Lead not found.'], 404);
+            }
+            
+            if ($getlead->assign_id == $auth_user->id) {
+                $getlead->is_whatsapp_msg = 0;
+                if ($getlead->save()) {
+                    return response()->json(['message' => 'WhatsApp message status updated successfully.'], 200);
+                } else {
+                    return response()->json(['message' => 'Failed to update the WhatsApp message status.'], 500);
+                }
+            } else {
+                return response()->json(['message' => 'Unauthorized to update this lead.'], 403);
+            }
+        } else {
+            return response()->json(['message' => 'Unauthorized access. No authenticated user found.'], 403);
         }
     }
 

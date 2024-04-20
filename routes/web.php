@@ -43,6 +43,8 @@ Route::post('whatsapp_msg_send_greet_btn', [Controllers\WhatsappMsgController::c
 Route::post('whatsapp_msg_status', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status'])->name('whatsapp_chat.status');
 Route::post('whatsapp_msg_status_vendor', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status_vendor'])->name('whatsapp_chat.status_nv');
 Route::post('whatsapp_msg_status_nv_team', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status_nv_team'])->name('whatsapp_chat.status_nv_team');
+Route::post('whatsapp_msg_status_bdm', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status_bdm'])->name('whatsapp_chat.status.bdm');
+
 
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');

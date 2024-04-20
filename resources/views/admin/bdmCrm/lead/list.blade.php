@@ -381,6 +381,7 @@
                         searchPlaceholder: "Type here to search..",
                         processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
                     },
+                    lengthMenu: [ [10, 25, 50, 100, 200, 500, 1000], [10, 25, 50, 100, 200, 500, 1000] ],
                     serverSide: true,
                     ajax: {
                         url: data_url,
@@ -498,6 +499,7 @@
                         search: "_INPUT_", // Removes the 'Search' field label
                         searchPlaceholder: "Type here to search..", // Placeholder for the search box
                     },
+                    lengthMenu: [ [10, 25, 50, 100, 200, 500, 1000], [10, 25, 50, 100, 200, 500, 1000] ],
                     serverSide: true,
                     ajax: {
                         url: "{{ route('admin.bdm.lead.list.ajax') }}",
@@ -613,7 +615,6 @@
                     }
                 });
             }
-
             $('#filters-form').on('submit', function(e) {
                 e.preventDefault();
                 dataTable.ajax.reload();

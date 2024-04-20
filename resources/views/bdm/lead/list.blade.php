@@ -323,7 +323,7 @@
             const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg'));
             wamsg(id);
             manageWhatsappChatModal.show();
-            const wa_status_url = `{{ route('whatsapp_chat.status') }}`;
+            const wa_status_url = `{{ route('whatsapp_chat.status.bdm') }}`;
             const wa_status_data = {
                 mobile: id
             };
@@ -625,35 +625,5 @@
             window.open(`{{ route('bdm.lead.view') }}/${lead_id}`);
         }
 
-        function handle_get_forward_info(lead_id) {
-            fetch(`{{ route('team.lead.getForwardInfo') }}/${lead_id}`).then(response => response.json()).then(data => {
-                const forward_info_table_body = document.getElementById('forward_info_table_body');
-                const modal = new bootstrap.Modal("#leadForwardedMemberInfo")
-                forward_info_table_body.innerHTML = "";
-                if (data.success == true) {
-                    last_forwarded_info_paragraph.innerText = data.last_forwarded_info;
-                    if (data.lead_forwards.length > 0) {
-                        let i = 1;
-                        for (let item of data.lead_forwards) {
-                            let tr = document.createElement('tr');
-                            let tds = `<td>${i}</td>
-                        <td>${item.name}</td>
-                        <td>${item.venue_name}</td>
-                        <td>${moment(item.lead_forwarded_at).format("DD-MMM-YYYY hh:mm a")}</td>`;
-                            tr.innerHTML = tds;
-                            forward_info_table_body.appendChild(tr);
-                            i++;
-                        }
-                    } else {
-                        forward_info_table_body.innerHTML = `<tr>
-                        <td colspan="5">No data available in table</td>
-                    </tr>`
-                    }
-                    modal.show();
-                } else {
-                    toastr[data.alert_type](data.message);
-                }
-            })
-        }
     </script>
 @endsection
