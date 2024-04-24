@@ -55,6 +55,10 @@ return [
             'driver' => 'session',
             'provider' => 'teamMembers',
         ],
+        'vendormanager' => [
+            'driver' => 'session',
+            'provider' => 'teamMembers',
+        ],
         'vendor' => [
             'driver' => 'session',
             'provider' => 'vendors',

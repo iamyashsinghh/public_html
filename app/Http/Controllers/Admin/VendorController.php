@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\TeamMember;
 use App\Models\Vendor;
 use App\Models\VendorCategory;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ class VendorController extends Controller
         $page_heading = "Vendors";
         $vendor_categories = VendorCategory::select('id', 'name')->get();
         $localities = VendorLocalities::all();
-        return view('admin.nonVenueCrm.vendor.list', compact('page_heading', 'vendor_categories', 'localities'));
+        $team_members = TeamMember::where('role_id', '7')->get();
+        return view('admin.nonVenueCrm.vendor.list', compact('page_heading', 'vendor_categories', 'localities', 'team_members'));
     }
     public function listedit()
     {
@@ -167,6 +169,7 @@ class VendorController extends Controller
         $vendor->end_date = $request->end_date;
         $vendor->group_name = $request->group_name;
         $vendor->alt_mobile_number = $request->alt_mobile_number;
+        $vendor->parent_id = $request->parent_id;
         $vendor->save();
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $msg]);
         return redirect()->back();

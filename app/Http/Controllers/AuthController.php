@@ -44,7 +44,7 @@ class AuthController extends Controller
 
         try {
             $verification_code = rand(111111, 999999);
-            
+
             $agent = new Agent();
             $browser_name = $agent->browser();
             $browser_version = $agent->version($browser_name);
@@ -162,14 +162,18 @@ class AuthController extends Controller
             } else if ($user->role_id == 3) {
                 Auth::guard('nonvenue')->login($user);
                 return redirect()->route('nonvenue.dashboard');
-            } else if ($user->role_id == 6){
+            } else if ($user->role_id == 6) {
                 Auth::guard('bdm')->login($user);
                 return redirect()->route('bdm.dashboard');
+            } else if ($user->role_id == 7) {
+                Auth::guard('vendormanager')->login($user);
+                return redirect()->route('vendormanager.dashboard');
             } else {
                 Auth::guard('team')->login($user);
                 return redirect()->route('team.dashboard');
             }
         } else {
+
             Auth::guard('vendor')->login($user);
             return redirect()->route('vendor.dashboard');
         }
@@ -186,10 +190,11 @@ class AuthController extends Controller
             $guard_authenticated = Auth::guard('nonvenue');
         } else if (Auth::guard('team')->check()) {
             $guard_authenticated = Auth::guard('team');
-        } else if (Auth::guard('bdm')->check()){
+        } else if (Auth::guard('bdm')->check()) {
             $guard_authenticated = Auth::guard('bdm');
-        }
-        else {
+        } else if (Auth::guard('vendormanager')->check()) {
+            $guard_authenticated = Auth::guard('vendormanager');
+        } else {
             $guard_authenticated = Auth::guard('vendor');
             $login_route_name = "vendor.login";
         }
@@ -228,6 +233,9 @@ class AuthController extends Controller
                 } else if ($member->role_id == 3) {
                     Auth::guard('nonvenue')->login($member);
                     return redirect()->route('nonvenue.dashboard');
+                } else if ($member->role_id == 7) {
+                    Auth::guard('vendormanager')->login($member);
+                    return redirect()->route('vendormanager.dashboard');
                 } else if ($member->role_id == 6) {
                     Auth::guard('bdm')->login($member);
                     return redirect()->route('bdm.dashboard');
@@ -266,6 +274,22 @@ class AuthController extends Controller
                     Auth::guard('team')->login($member);
                     return redirect()->route('team.dashboard');
                 }
+            }
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
+            return redirect()->back();
+        } catch (\Throwable $th) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
+            return redirect()->back();
+        }
+    }
+
+    public function vendor_login_via_vendormanager($team_id)
+    {
+        try {
+            if (Auth::guard('vendormanager')->hasUser()) {
+                $member = Vendor::find($team_id);
+                    Auth::guard('vendor')->login($member);
+                    return redirect()->route('vendor.dashboard');
             }
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
             return redirect()->back();

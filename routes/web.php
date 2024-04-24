@@ -261,6 +261,32 @@ Route::middleware('verify_token')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | For Vendor Manager Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('/vendormanager')->middleware('vendormanager')->group(function () {
+        Route::get('/dashboard', [Controllers\VendorManager\DashboardController::class, 'index'])->name('vendormanager.dashboard');
+        Route::post('/update-profile-image', [Controllers\VendorManager\DashboardController::class, 'update_profile_image'])->name('vendormanager.updateProfileImage');
+
+        Route::prefix('/venue-crm')->group(function () {
+            //Team member Routes
+            Route::get('/my-team', [Controllers\VendorManager\TeamMemberController::class, 'list'])->name('vendormanager.team.list');
+            Route::get('/my-team/ajax_list', [Controllers\VendorManager\TeamMemberController::class, 'ajax_list'])->name('vendormanager.team.list.ajax');
+
+            //Lead Routes
+            Route::match(['get', 'post'], '/leads', [Controllers\VendorManager\LeadController::class, 'list'])->name('vendormanager.lead.list');
+            Route::get('/leads/ajax_list', [Controllers\VendorManager\LeadController::class, 'ajax_list'])->name('vendormanager.lead.list.ajax');
+            Route::get('/leads/get_forward_info/{lead_id?}', [Controllers\VendorManager\LeadController::class, 'get_forward_info'])->name('vendormanager.lead.getForwardInfo');
+            Route::get('/leads/view/{lead_id?}', [Controllers\VendorManager\LeadController::class, 'view'])->name('vendormanager.lead.view');
+            Route::post('/leads/forward', [Controllers\VendorManager\LeadController::class, 'lead_forward'])->name('vendormanager.lead.forward');
+
+            //Bypass login: Via vendormanager to vm crm
+            Route::get('/bypass-login/{team_id?}', [AuthController::class, 'vendor_login_via_vendormanager'])->name('vendormanager.bypass.login');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | For Team Routes
     |--------------------------------------------------------------------------
     */

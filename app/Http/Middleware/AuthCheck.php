@@ -25,6 +25,8 @@ class AuthCheck {
             return redirect()->route('team.dashboard');
         } else if (Auth::guard('vendor')->check()) {
             return redirect()->route('vendor.dashboard');
+        }else if(Auth::guard('vendormanager')->check()){
+            return redirect()->route('vendormanager.dashboard');
         }
         return $next($request);
     }

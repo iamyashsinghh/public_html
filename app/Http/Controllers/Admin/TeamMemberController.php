@@ -15,6 +15,7 @@ class TeamMemberController extends Controller {
     public function list() {
         $page_heading = "Team Members";
         $roles = Role::get();
+        
         return view('admin.venueCrm.team.list', compact('page_heading', 'roles'));
     }
 

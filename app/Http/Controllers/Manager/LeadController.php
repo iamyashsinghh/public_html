@@ -7,6 +7,7 @@ use App\Models\Lead;
 use App\Models\LeadForward;
 use App\Models\LeadForwardInfo;
 use App\Models\TeamMember;
+use App\Models\VmEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -212,8 +213,8 @@ class LeadController extends Controller {
         $leads_id = explode(',', $request->forward_leads_id);
         $leads = Lead::whereIn('lead_id', $leads_id)->get();
         $auth_user = Auth::guard('manager')->user();
-
         foreach ($leads as $lead) {
+            $primary_events = $lead->get_primary_events();
             foreach ($request->forward_vms_id as $vm_id) {
                 $exist_lead_forward = LeadForward::where(['lead_id' => $lead->lead_id, 'forward_to' => $vm_id])->first();
                 if ($exist_lead_forward) {
@@ -237,6 +238,23 @@ class LeadController extends Controller {
                 $lead_forward->done_message = null;
                 $lead_forward->event_datetime = $lead->event_datetime;
                 $lead_forward->save();
+
+                foreach ($primary_events as $main_event) {
+                    $vm_events = VmEvent::where(['event_id' => $main_event->id, 'created_by' => $vm_id])->first();
+                    if (!$vm_events) {
+                        $vm_events = new VmEvent();
+                    }
+                    $vm_events->lead_id = $lead->lead_id;
+                    $vm_events->created_by = $vm_id;
+                    $vm_events->event_name = $main_event->event_name;
+                    $vm_events->event_datetime = $main_event->event_datetime;
+                    $vm_events->pax = $main_event->pax;
+                    $vm_events->budget = $main_event->budget;
+                    $vm_events->food_preference = $main_event->food_preference;
+                    $vm_events->event_slot = $main_event->event_slot;
+                    $vm_events->event_id = $main_event->id;
+                    $vm_events->save();
+                }
 
                 //update or insert lead_forward_info table
                 $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead->lead_id, 'forward_from' => $auth_user->id, 'forward_to' => $vm_id])->first();

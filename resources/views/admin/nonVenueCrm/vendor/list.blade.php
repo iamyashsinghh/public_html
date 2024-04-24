@@ -156,6 +156,17 @@
                                 </div>
                                 <div class="col-sm-4 mb-3">
                                     <div class="form-group">
+                                        <label for="parent_member_select">Parent Member <i>(Vendor Manager)</i><span class="text-danger">*</span></label>
+                                        <select class="form-control" id="parent_member_select" name="parent_id" required>
+                                            <option value="" disabled selected>Select Parent Member</option>
+                                            @foreach ($team_members as $list)
+                                                <option value="{{ $list->id }}">{{ $list->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
                                         <label>Profile Image</label>
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input" id="vendor_profile_inp"
@@ -367,6 +378,9 @@
                         group_name_select.value = data.vendor.group_name;
                         vendor_altmobile_inp.value = data.vendor.alt_mobile_number;
                         category_select.querySelector(`option[value="${data.vendor.category_id}"]`).selected = true;
+                        if(data.vendor.parent_id){
+                            parent_member_select.querySelector(`option[value="${data.vendor.parent_id}"]`).selected = true;
+                        }
                         manageVendorModalHeading.innerText = "Edit Vendor";
                         modal.show();
                     } else {

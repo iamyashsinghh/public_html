@@ -13,7 +13,7 @@ trait HasAuthenticatedUser
      */
     public function getAuthenticatedUser()
     {
-        $guards = ['admin', 'team', 'vendor', 'manager', 'nonvenue', 'bdm']; // List all your guards
+        $guards = ['admin', 'team', 'vendor', 'manager', 'nonvenue', 'bdm', 'vendormanager']; // List all your guards
 
         foreach ($guards as $guard) {
             if ($user = Auth::guard($guard)->user()) {

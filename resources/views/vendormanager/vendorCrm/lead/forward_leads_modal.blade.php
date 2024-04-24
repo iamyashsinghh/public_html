@@ -1,0 +1,31 @@
+<div class="modal fade" id="forwardLeadModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header modal-xl">
+                <h4 class="modal-title">Forward Lead's to VM's</h4>
+                <input class="form-check-input position-static" id="select_all_vms" onclick="handle_select_all(this, '.checkbox_for_vm')" style="height: 1.5rem; width: 1.5rem;" type="checkbox">
+                <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i></button>
+            </div>
+            <form action="{{route('vendormanager.lead.forward')}}" method="post">
+                <div class="modal-body text-sm">
+                    @csrf
+                    <input type="hidden" name="forward_id" value="{{$lead->id}}" >
+                    <div class="row">
+                        @foreach ($v_members as $list)
+                        <div class="col-sm-4 mb-3">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input checkbox_for_vm" id="forward_vms_id_checkbox{{$list->id}}" type="checkbox" name="forward_vendors_id[]" value="{{$list->id}}">
+                                <label class="form-check-label" for="forward_vms_id_checkbox{{$list->id}}">{{$list->name}} ({{$list->business_name}})</label>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{route('vendormanager.lead.list')}}" class="btn btn-sm bg-secondary m-1" data-bs-dismiss="modal">Cancel</a>
+                    <button type="submit" onclick="btn_preloader(this)" class="btn btn-sm text-light m-1" style="background-color: var(--wb-dark-red);">Forward</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
