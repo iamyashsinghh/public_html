@@ -462,6 +462,12 @@
                         `<a href="{{ route('bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>`;
                     td_elements[13].classList.add('text-nowrap');
                     td_elements[13].innerHTML = action_btns;
+                    for (let i = 1; i < 12; i++) {
+                            if (i !== 7 && td_elements[i]) {
+                                td_elements[i].style.cursor = "pointer";
+                                td_elements[i].setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
+                            }
+                        }
                     }
                 });
             } else {
@@ -585,6 +591,12 @@
                         `<a href="{{ route('bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>`;
                     td_elements[13].classList.add('text-nowrap');
                     td_elements[13].innerHTML = action_btns;
+                    for (let i = 1; i < 12; i++) {
+                            if (i !== 7 && td_elements[i]) {
+                                td_elements[i].style.cursor = "pointer";
+                                td_elements[i].setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
+                            }
+                        }
                     }
                 });
             }
