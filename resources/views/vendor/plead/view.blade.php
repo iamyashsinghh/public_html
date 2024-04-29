@@ -30,10 +30,6 @@
                     <button class="btn btn-xs text-light px-2 m-1" style="background-color: var(--wb-dark-red)"
                         onclick="handle_event_information(`{{ route('pvendor.event.add.process') }}`)"><i
                             class="fa fa-plus"></i> Add Event</button>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#congratulationsModal">
-                        Open Congratulations Modal
-                    </button>
                     <div class="dropdown d-inline-block">
                         <a href="javascript:void(0);"
                             class="btn dropdown-toggle text-light btn-xs px-2 mx-1 {{ $lead_forward->lead_status == 'Done' ? 'bg-secondary' : '' }}"
