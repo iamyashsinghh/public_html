@@ -19,20 +19,29 @@ class TeamMemberController extends Controller {
         return view('admin.venueCrm.team.list', compact('page_heading', 'roles'));
     }
 
-    public function ajax_list() {
-        $members = TeamMember::select(
+    public function ajax_list(Request $request) {
+        $role_id = $request->input('role_id');
+    
+        $membersQuery = TeamMember::select(
             'team_members.id',
             'team_members.profile_image',
             'team_members.name',
             'team_members.mobile',
             'team_members.email',
             'team_members.venue_name',
+            'team_members.role_id',
             'r.name as role_name',
             'team_members.status',
             'team_members.created_at',
-        )->leftJoin("roles as r", 'team_members.role_id', '=', 'r.id')->get();
+        )->leftJoin("roles as r", 'team_members.role_id', '=', 'r.id');
+    
+        if ($role_id) {
+            $membersQuery->where('team_members.role_id', $role_id);
+        }
+        $members = $membersQuery->get();
         return datatables($members)->toJson();
     }
+    
 
     public function manage($id = 0) {
         $roles = Role::select('id', 'name')->get();

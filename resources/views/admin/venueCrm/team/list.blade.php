@@ -18,7 +18,7 @@
             <div class="button-group vendor-categories my-4">
                 @foreach ($roles as $role)
                     <button class="btn btn-secondary btn-sm filter-btn"
-                        data-role-name="{{ $role->id }}">{{ $role->name }}</button>
+                        data-role-id="{{ $role->id }}">{{ $role->name }}</button>
                 @endforeach
             </div>
         </div>
@@ -79,7 +79,10 @@
                 .catch((error) => {});
         }
     $(document).ready(function() {
-        $('#serverTable').DataTable({
+        var table;
+
+    function initializeDataTable(url) {
+        table = $('#serverTable').DataTable({
             pageLength: 10,
             language: {
                 "search": "_INPUT_", // Removes the 'Search' field label
@@ -89,7 +92,7 @@
             serverSide: true,
             loading: true,
             ajax: {
-                url: "{{route('admin.team.list.ajax')}}",
+                url: url,
                 headers: {
                     'X-CSRF-TOKEN': "{{csrf_token()}}",
                 },
@@ -190,6 +193,17 @@
                 td_elements[8].innerHTML = action_btns;
             }
         });
+    }
+    initializeDataTable("{{ route('admin.team.list.ajax', ['role_id' => 0]) }}");
+    
+    $('.filter-btn').on('click', function() {
+        var role_id = $(this).data('role-id'); // Corrected to 'role-id'
+        var url = "{{ route('admin.team.list.ajax') }}?role_id=" + role_id;
+                if ($.fn.DataTable.isDataTable('#serverTable')) {
+            $('#serverTable').DataTable().destroy();
+        }
+        initializeDataTable(url);
+    });
     });
 
     function handle_change_status(elem, member_id) {
