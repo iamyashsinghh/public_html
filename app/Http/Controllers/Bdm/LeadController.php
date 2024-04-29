@@ -147,6 +147,7 @@ class LeadController extends Controller
                         'bdm_leads.assign_to',
                         'bdm_leads.assign_id',
                         'bdm_leads.source',
+                        'bdm_leads.city',
                         'bdm_leads.business_name',
                         'vc.name as business_cat',
                         'tm.name as created_by',
