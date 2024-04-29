@@ -21,4 +21,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           port: ${{ secrets.PORT }}
           key: ${{ secrets.SSHKEY }}
-          script: "cd domains/wbcrm.in/public_html && ./.scripts/deploy.sh"
+          script: "cd /var/www/crm/public_html && ./.scripts/deploy.sh"
