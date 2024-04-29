@@ -23,14 +23,14 @@
             </div>
             @if (!isset($filter_params['dashboard_filters']))
                 <div class="filter-container text-center d-none">
-                    <form action="{{route('vendor.lead.list')}}" method="post">
+                    <form action="{{route('pvendor.lead.list')}}" method="post">
                         @csrf
                         <label for="">Filter by lead date</label>
                         <input type="date" name="lead_from_date" value="{{isset($filter_params['lead_from_date']) ? $filter_params['lead_from_date'] : ''}}" class="form-control form-control-sm d-inline-block" style="width: unset;" required>
                         <span class="">To:</span>
                         <input type="date" name="lead_to_date" value="{{isset($filter_params['lead_to_date']) ? $filter_params['lead_to_date'] : ''}}" class="form-control form-control-sm d-inline-block" style="width: unset;">
                         <button type="submit" class="btn text-light btn-sm" style="background-color: var(--wb-dark-red)">Submit</button>
-                        <a href="{{route('vendor.lead.list')}}" class="btn btn-secondary btn-sm">Reset</a>
+                        <a href="{{route('pvendor.lead.list')}}" class="btn btn-secondary btn-sm">Reset</a>
                     </form>
                 </div>
             @endif
@@ -46,7 +46,6 @@
                             <th class="text-nowrap">Lead Date</th>
                             <th class="">Name</th>
                             <th class="text-nowrap">Mobile</th>
-                            <th class="">Pax</th>
                             <th class="">Lead Status</th>
                             <th class="text-nowrap">Event Date</th>
                         </tr>
@@ -59,7 +58,7 @@
         <div class="p-3 control-sidebar-content">
             <h5>Lead Filters</h5>
             <hr class="mb-2">
-            <form action="{{route('vendor.lead.list')}}" method="post">
+            <form action="{{route('pvendor.lead.list')}}" method="post">
                 @csrf
                 <div class="accordion text-sm" id="accordionExample">
                     <div class="accordion-item">
@@ -168,7 +167,7 @@
                 </div>
                 <div class="my-5">
                     <button type="submit" class="btn btn-sm text-light btn-block" style="background-color: var(--wb-renosand);">Apply</button>
-                    <a href="{{route('vendor.lead.list')}}" type="submit" class="btn btn-sm btn-secondary btn-block">Reset</a>
+                    <a href="{{route('pvendor.lead.list')}}" type="submit" class="btn btn-sm btn-secondary btn-block">Reset</a>
                 </div>
             </form>
         </div>
@@ -197,7 +196,7 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
 <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script src="{{asset('plugins/moment/moment.min.js')}}"></script>
 <script>
-    const data_url = `{{route('vendor.lead.list.ajax')}}?{!!$filter!!}`;
+    const data_url = `{{route('pvendor.lead.list.ajax')}}?{!!$filter!!}`;
 
     $(document).ready(function() {
         $('#serverTable').DataTable({
@@ -220,8 +219,8 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
 
             columns: [{
                     targets: 0,
-                    name: "lead_id",
-                    data: "lead_id",
+                    name: "id",
+                    data: "id",
                 },
                 {
                     targets: 1,
@@ -240,16 +239,11 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
                 },
                 {
                     targets: 4,
-                    name: "pax",
-                    data: "pax",
-                },
-                {
-                    targets: 5,
                     name: "lead_status",
                     data: "lead_status",
                 },
                 {
-                    targets: 6,
+                    targets: 5,
                     name: "event_date",
                     data: "event_date",
                 },
@@ -264,21 +258,21 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
                 }
                 const td_elements = row.querySelectorAll('td');
                 row.style.cursor = "pointer";
-                row.setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
+                row.setAttribute('onclick', `handle_view_lead(${data.id})`);
 
                 td_elements[1].innerText = moment(data.lead_date).format("DD-MMM-YYYY hh:mm a");
                 if (data.lead_status == "Done") {
-                    td_elements[5].innerHTML = `<span class="badge badge-secondary">Done</span>`;
+                    td_elements[4].innerHTML = `<span class="badge badge-secondary">Done</span>`;
                 } else {
-                    td_elements[5].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
+                    td_elements[4].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
-                td_elements[6].innerText = data.event_date ? moment(data.event_date).format("DD-MMM-YYYY") : 'N/A';
+                td_elements[5].innerText = data.event_date ? moment(data.event_date).format("DD-MMM-YYYY") : 'N/A';
             }
         });
     });
 
-    function handle_view_lead(lead_id) {
-        window.open(`{{route('vendor.lead.view')}}/${lead_id}`);
+    function handle_view_lead(id) {
+        window.open(`{{route('pvendor.lead.view')}}/${id}`);
     }
 </script>
 @endsection

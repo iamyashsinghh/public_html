@@ -33,8 +33,9 @@ class DashboardController extends Controller {
 
         $schedule_tasks = nvTask::where(['created_by' => $auth_user->id, 'done_datetime' => null])->count();
         $schedule_meetings = nvMeeting::where(['created_by' => $auth_user->id, 'done_datetime' => null])->count();
-
-        return view('vendor.dashboard', compact('total_leads', 'leads_of_the_month', 'leads_of_the_day', 'unreaded_leads', 'schedule_tasks', 'schedule_meetings'));
+        
+        $leads_booked = nvLeadForward::where('forward_to', $auth_user->id)->where('lead_status', 'Booked')->count();
+        return view('vendor.dashboard', compact('total_leads', 'leads_of_the_month', 'leads_of_the_day', 'unreaded_leads', 'schedule_tasks', 'schedule_meetings', 'leads_booked'));
     }
 
     public function update_profile_image(Request $request) {

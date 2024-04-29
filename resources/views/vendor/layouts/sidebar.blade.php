@@ -35,6 +35,12 @@ $uri = Route::currentRouteName();
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{route('pvendor.lead.list')}}" class="nav-link w-100 {{$uri == "pvendor.lead.list" ? 'active' : ''}}">
+                        <i class="nav-icon fas fa-star"></i>
+                        <p>My Leads</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{route('vendor.task.list')}}" class="nav-link w-100 {{$uri == "vendor.task.list" ? 'active' : ''}}">
                         <i class="fas fa-list nav-icon"></i>
                         <p>Tasks</p>

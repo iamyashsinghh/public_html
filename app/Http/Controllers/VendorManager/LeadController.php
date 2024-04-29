@@ -11,6 +11,7 @@ use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LeadController extends Controller {
     private $current_timestamp;
@@ -57,7 +58,12 @@ class LeadController extends Controller {
             'nv_lead_forwards.lead_status',
             'nv_lead_forwards.event_datetime as event_date',
             'nv_lead_forwards.read_status',
-        )->whereIn('forward_to', $vs_id);
+            'ne.pax as pax',
+            DB::raw("(SELECT COUNT(*) FROM nv_lead_forwards AS sub WHERE sub.lead_id = nv_lead_forwards.lead_id) as forwarded_count")
+        )
+        ->leftJoin('nv_events as ne', 'ne.lead_id', '=', 'nv_lead_forwards.lead_id')
+        ->whereIn('nv_lead_forwards.forward_to', $vs_id)
+        ->groupBy('nv_lead_forwards.lead_id');
 
         if ($request->lead_status != null) {
             $leads->where('lead_status', $request->lead_status);
@@ -123,9 +129,8 @@ class LeadController extends Controller {
         foreach ($v_members as $list) {
             array_push($vs_id, $list->id);
         }
-        $nvrm_forwarded_count = nvrmLeadForward::where('lead_id', $lead_id)->count();
         $nv_forwarded_count = nvLeadForward::where('lead_id', $lead_id)->count();
-        $forwarded_count = $nvrm_forwarded_count + $nv_forwarded_count;
+        $forwarded_count = $nv_forwarded_count;
         return view('vendormanager.vendorCrm.lead.view', compact('lead', 'forwarded_count','v_members'));
     }
 
@@ -178,12 +183,12 @@ class LeadController extends Controller {
 
     public function get_forward_info($lead_id = 0) {
         try {
-            $nvrm_forwards = nvrmLeadForward::select(
-                'tm.name',
-                'r.name as role_name',
-                'nvrm_lead_forwards.read_status'
-            )->leftJoin('team_members as tm', 'nvrm_lead_forwards.forward_to', '=', 'tm.id')->leftJoin('roles as r', 'tm.role_id', '=', 'r.id')
-                ->where(['nvrm_lead_forwards.lead_id' => $lead_id])->groupBy('nvrm_lead_forwards.forward_to')->orderBy('nvrm_lead_forwards.lead_datetime', 'desc')->get()->toArray();
+            // $nvrm_forwards = nvrmLeadForward::select(
+            //     'tm.name',
+            //     'r.name as role_name',
+            //     'nvrm_lead_forwards.read_status'
+            // )->leftJoin('team_members as tm', 'nvrm_lead_forwards.forward_to', '=', 'tm.id')->leftJoin('roles as r', 'tm.role_id', '=', 'r.id')
+            //     ->where(['nvrm_lead_forwards.lead_id' => $lead_id])->groupBy('nvrm_lead_forwards.forward_to')->orderBy('nvrm_lead_forwards.lead_datetime', 'desc')->get()->toArray();
 
             $nv_forwards = nvLeadForward::select(
                 'v.name',
@@ -192,7 +197,7 @@ class LeadController extends Controller {
             )->leftJoin('vendors as v', 'nv_lead_forwards.forward_to', '=', 'v.id')
                 ->where(['nv_lead_forwards.lead_id' => $lead_id])->groupBy('nv_lead_forwards.forward_to')->orderBy('nv_lead_forwards.lead_datetime', 'desc')->get()->toArray();
 
-            $lead_forwards = array_merge($nvrm_forwards, $nv_forwards);
+            $lead_forwards = array_merge($nv_forwards);
             rsort($lead_forwards);
 
             $lead_forward_info = nvLeadForwardInfo::where(['lead_id' => $lead_id])->orderBy('updated_at', 'desc')->first();

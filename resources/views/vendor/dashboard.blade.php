@@ -107,6 +107,23 @@
                         </div>
                     </a>
                 </div>
+                <div class="col-lg-12 mt-3">
+                    <h3>Tasks</h3>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <a target="_blank" href="{{route('vendor.lead.list')}}" class="text-light">
+                        <div class="small-box text-sm" style="background: var(--wb-dark-red);">
+                            <div class="inner">
+                                <h3>{{$leads_booked}}</h3>
+                                <p>Booked Leads</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                            <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </section>

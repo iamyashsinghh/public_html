@@ -28,8 +28,12 @@
                         data-bs-toggle="modal" data-bs-target="#manageMeetingModal"><i class="fa fa-plus"></i> Add
                         Meeting</button>
                     <button class="btn btn-xs text-light px-2 m-1" style="background-color: var(--wb-dark-red)"
-                        onclick="handle_note_information(`{{ route('vendor.note.manage.process') }}`)"><i
-                            class="fa fa-plus"></i> Add Note</button>
+                        onclick="handle_event_information(`{{ route('pvendor.event.add.process') }}`)"><i
+                            class="fa fa-plus"></i> Add Event</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#congratulationsModal">
+                        Open Congratulations Modal
+                    </button>
                     <div class="dropdown d-inline-block">
                         <a href="javascript:void(0);"
                             class="btn dropdown-toggle text-light btn-xs px-2 mx-1 {{ $lead_forward->lead_status == 'Done' ? 'bg-secondary' : '' }}"
@@ -37,11 +41,11 @@
                                 class="fa fa-chart-line"></i> Lead: Active</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" onclick="return confirm('Are you sure want to active this lead?')"
-                                    href="{{ route('vendor.lead.status.update', $lead_forward->id) }}/Active">Active</a>
+                                    href="{{ route('pvendor.lead.status.update', $lead_forward->id) }}/Active">Active</a>
                             </li>
                             <li><a class="dropdown-item" onclick="return confirm('Update this lead as Booked ?')"
-                                href="{{ route('vendor.lead.status.update', $lead_forward->id) }}/Booked">Booked</a>
-                        </li>
+                                    href="{{ route('pvendor.lead.status.update', $lead_forward->id) }}/Booked">Booked</a>
+                            </li>
                             <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
                                     data-bs-target="#manageLeadStatusModal">Done</a></li>
                         </ul>
@@ -51,54 +55,10 @@
                     <div class="container-fluid">
                         <div class="card mb-5">
                             <div class="card-header text-light" style="background-color: var(--wb-renosand);">
-                                <h3 class="card-title">RM Message's</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="serverTable" class="table mb-0" style="background-color: #fdfd7b5c">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-nowrap">S.No.</th>
-                                                <th class="text-nowrap">Created At</th>
-                                                <th class="">RM Name</th>
-                                                <th class="text-nowrap">Title</th>
-                                                <th class="">Message</th>
-                                                <th class="">Tentative Budget</th>
-                                            </tr>
-                                        </thead>
-
-                                        <body>
-                                            @if (sizeof($lead_forward->get_rm_messages) > 0)
-                                                @foreach ($lead_forward->get_rm_messages as $key => $list)
-                                                    <tr>
-                                                        <td>{{ $key + 1 }}</td>
-                                                        <td>{{ date('d-M-Y h:i a', strtotime($list->created_at)) }}</td>
-                                                        <td>{{ $list->get_created_by->name ?? '' }}</td>
-                                                        <td>{{ $list->title }}</td>
-                                                        <td>
-                                                            <button class="btn"
-                                                                onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)"><i
-                                                                    class="fa fa-comment-dots"
-                                                                    style="color: var(--wb-renosand);"></i></button>
-                                                        </td>
-                                                        <td>{{ $list->budget ? '₹ ' . number_format($list->budget) : 'N/A' }}
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td class="text-center text-muted" colspan="5">No data available in
-                                                        table</td>
-                                                </tr>
-                                            @endif
-                                        </body>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card mb-5">
-                            <div class="card-header text-light" style="background-color: var(--wb-renosand);">
                                 <h3 class="card-title">Lead Information</h3>
+                                <button class="btn p-0 text-light float-right" title="Edit" data-bs-toggle="modal"
+                                    data-bs-target="#editLeadModal"><i class="fa fa-edit"
+                                        style="font-size: 15px;"></i></button>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -109,7 +69,7 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <span class="text-bold mx-1" style="color: var(--wb-wood)">Lead ID: </span>
-                                        <span class="mx-1">{{ $lead_forward->lead_id }}</span>
+                                        <span class="mx-1">{{ $lead_forward->id }}</span>
                                     </div>
                                     <div class="col-sm-6">
                                         <span class="text-bold mx-1" style="color: var(--wb-wood)">Name: </span>
@@ -159,6 +119,9 @@
                         <div class="card mb-5">
                             <div class="card-header text-light" style="background-color: var(--wb-renosand);">
                                 <h3 class="card-title">Events</h3>
+                                <button class="btn p-0 text-light float-right" title="Add Event."
+                                    onclick="handle_event_information(`{{ route('pvendor.event.add.process') }}`)"><i
+                                        class="fa fa-plus" style="font-size: 15px;"></i></button>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -171,8 +134,11 @@
                                                 <th class="text-nowrap">Pax</th>
                                                 <th class="">Slot</th>
                                                 <th class="">Venue Name</th>
+                                                <th class="">Action</th>
+
                                             </tr>
                                         </thead>
+
                                         <body>
                                             @if (sizeof($lead_forward->get_events) > 0)
                                                 @foreach ($lead_forward->get_events as $key => $list)
@@ -188,6 +154,12 @@
                                                         @else
                                                             <td>{{ optional($list)->venue_name ?? 'N/A' }}</td>
                                                         @endif
+                                                        <td>
+                                                            <button
+                                                                onclick="handle_event_information(`{{ route('pvendor.event.edit.process', $list->id) }}`, `{{ route('pvendor.event.edit', $list->id) }}`)"
+                                                                class="btn p-0 text-success" title="Edit Event."><i
+                                                                    class="fa fa-edit"></i></button>
+                                                        </td>
 
                                                     </tr>
                                                 @endforeach
@@ -290,7 +262,7 @@
                                                         </td>
                                                         <td class="text-nowrap">
                                                             @if ($list->done_datetime == null)
-                                                                <a href="{{ route('vendor.task.delete', $list->id) }}"
+                                                                <a href="{{ route('pvendor.task.delete', $list->id) }}"
                                                                     onclick="return confirm('Are you sure want to delete the task?')"
                                                                     class="text-danger mx-2"><i
                                                                         class="fa fa-trash-alt"></i></a>
@@ -398,7 +370,7 @@
                                                         </td>
                                                         <td class="text-nowrap text-center">
                                                             @if ($list->done_datetime == null)
-                                                                <a href="{{ route('vendor.meeting.delete', $list->id) }}"
+                                                                <a href="{{ route('pvendor.meeting.delete', $list->id) }}"
                                                                     onclick="return confirm('Are you sure want to delete the meeting?')"
                                                                     class="text-danger mx-2"><i
                                                                         class="fa fa-trash-alt"></i></a>
@@ -421,76 +393,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card mb-5" id="get_nvrm_help_messages_card">
-                            <div class="card-header text-light" style="background-color: var(--wb-renosand);">
-                                <h3 class="card-title">RM Help Support</h3>
-                                <button onclick="handle_note_information(`{{ route('vendor.note.manage.process') }}`)"
-                                    class="btn p-0 text-light float-right" title="Add Note."><i
-                                        class="fa fa-plus"></i></button>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="serverTable" class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-nowrap">S.No.</th>
-                                                <th class="">Created At</th>
-                                                <th class="">Message</th>
-                                                <th class="">Status</th>
-                                                <th class="">Responsed At</th>
-                                                <th class="">Responsed Message</th>
-                                                <th class="">Responsed By</th>
-                                            </tr>
-                                        </thead>
-
-                                        <body>
-                                            @if (sizeof($lead_forward->get_notes()) > 0)
-                                                @foreach ($lead_forward->get_notes() as $key => $list)
-                                                    <tr>
-                                                        <td>{{ $key + 1 }}</td>
-                                                        <td class="text-nowrap">
-                                                            {{ date('d-M-Y h:i a', strtotime($list->created_at)) }}</td>
-                                                        <td>
-                                                            <button class="btn"
-                                                                onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)"><i
-                                                                    class="fa fa-comment-dots"
-                                                                    style="color: var(--wb-renosand);"></i></button>
-                                                        </td>
-                                                        <td>
-                                                            @if ($list->status != '1')
-                                                                <span class="badge badge-danger">Waiting For
-                                                                    Response</span>
-                                                            @else
-                                                                <span class="badge badge-success">Responsed</span>
-                                                            @endif
-                                                        </td>
-                                                        <td class="text-nowrap">
-                                                            @if ($list->done_datetime)
-                                                                {{ date('d-M-Y h:i a', strtotime($list->done_datetime)) }}
-                                                            @else
-                                                                N/A
-                                                            @endif
-                                                        </td>
-                                                        <td>
-                                                            <button class="btn"
-                                                                onclick="handle_view_message(`{{ $list->nvrm_msg ?: 'N/A' }}`)"><i
-                                                                    class="fa fa-comment-dots"
-                                                                    style="color: var(--wb-renosand);"></i></button>
-                                                        </td>
-                                                        <td class="text-nowrap">{{ $list->done_by_name ?? 'N/A' }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td class="text-center text-muted" colspan="5">No data available in
-                                                        table</td>
-                                                </tr>
-                                            @endif
-                                        </body>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -504,7 +406,7 @@
                         <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
                                 class="fa fa-times"></i></button>
                     </div>
-                    <form action="{{ route('vendor.lead.status.update', $lead_forward->id) }}" method="post">
+                    <form action="{{ route('pvendor.lead.status.update', $lead_forward->id) }}" method="post">
                         <div class="modal-body text-sm">
                             @csrf
                             <div class="form-group">
@@ -549,34 +451,6 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="manageNoteModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Add Note</h4>
-                        <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
-                                class="fa fa-times"></i></button>
-                    </div>
-                    <form id="manage_note_form" method="post">
-                        <div class="modal-body text-sm">
-                            @csrf
-                            <div class="form-group">
-                                <input type="hidden" name="lead_id" value="{{ $lead_forward->lead_id }}">
-                                <label for="note_message_textarea">Message</label>
-                                <textarea type="text" class="form-control" id="note_message_textarea" placeholder="Type message"
-                                    name="note_message" required></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-sm btn-secondary"
-                                data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-sm text-light"
-                                style="background-color: var(--wb-dark-red);">Submit</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 
         <div class="modal fade" id="manageTaskModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -586,13 +460,13 @@
                         <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
                                 class="fa fa-times"></i></button>
                     </div>
-                    <form action="{{ route('vendor.task.add.process') }}" method="post">
+                    <form action="{{ route('pvendor.task.add.process') }}" method="post">
                         <div class="modal-body text-sm">
                             @csrf
                             <div class="row">
                                 <div class="col-sm-6 mb-3">
                                     <div class="form-group">
-                                        <input type="hidden" name="lead_id" value="{{ $lead_forward->lead_id }}">
+                                        <input type="hidden" name="lead_id" value="{{ $lead_forward->id }}">
                                         <label for="task_schedule_datetime_inp">Task Schedule Date Time <span
                                                 class="text-danger">*</span></label>
                                         <input type="datetime-local" id="task_schedule_datetime_inp"
@@ -679,6 +553,69 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="editLeadModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit NV Lead</h4>
+                        <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
+                                class="fa fa-times"></i></button>
+                    </div>
+                    <form action="{{ route('pvendor.lead.edit.process', $lead_forward->id) }}" method="post">
+                        <div class="modal-body text-sm">
+                            @csrf
+                            <div class="row">
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="nv_lead_name_inp">Name</label>
+                                        <input type="text" class="form-control" id="nv_lead_name_inp"
+                                            placeholder="Enter name" name="name" value="{{ $lead_forward->name }}">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="nv_lead_email_inp">Email</label>
+                                        <input type="email" class="form-control" id="nv_lead_email_inp"
+                                            placeholder="Enter email" name="email" value="{{ $lead_forward->email }}">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="nv_lead_mobile_inp">Mobile No. <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="nv_lead_mobile_inp"
+                                            placeholder="Enter mobile no." name="mobile_number"
+                                            value="{{ $lead_forward->mobile }}" disabled
+                                            title="Primary phone number cannot be edit.">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-">
+                                    <div class="form-group">
+                                        <label for="nv_lead_alt_mobile_inp">Alternate Mobile No.</label>
+                                        <input type="text" class="form-control" id="nv_lead_alt_mobile_inp"
+                                            placeholder="Enter alternate mobile no." name="alternate_mobile_number"
+                                            value="{{ $lead_forward->alternate_mobile }}">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 mb-">
+                                    <div class="form-group">
+                                        <label for="nv_lead_alt_address_inp">Address</label>
+                                        <textarea type="text" class="form-control" id="nv_lead_alt_address_inp" placeholder="Enter address."
+                                            name="address">{{ $lead_forward->address }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer text-sm">
+                            <button type="button" class="btn btn-sm bg-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-sm text-light"
+                                style="background-color: var(--wb-dark-red);">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="manageMeetingModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -687,13 +624,13 @@
                         <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
                                 class="fa fa-times"></i></button>
                     </div>
-                    <form action="{{ route('vendor.meeting.add.process') }}" method="post">
+                    <form action="{{ route('pvendor.meeting.add.process') }}" method="post">
                         <div class="modal-body text-sm">
                             @csrf
                             <div class="row">
                                 <div class="col-sm-6 mb-3">
                                     <div class="form-group">
-                                        <input type="hidden" name="lead_id" value="{{ $lead_forward->lead_id }}">
+                                        <input type="hidden" name="lead_id" value="{{ $lead_forward->id }}">
                                         <label for="meeting_schedule_datetime_inp">Meeting Schedule Date Time <span
                                                 class="text-danger">*</span></label>
                                         <input type="datetime-local" id="meeting_schedule_datetime_inp"
@@ -731,6 +668,70 @@
                                     Fields are required.
                                 </p>
                             </div>
+                            <button type="button" class="btn btn-sm bg-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-sm text-light"
+                                style="background-color: var(--wb-dark-red);">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="manageEventModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Create Event</h4>
+                        <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
+                                class="fa fa-times"></i></button>
+                    </div>
+                    <form id="manage_event_form" method="post">
+                        <div class="modal-body text-sm">
+                            @csrf
+                            <div class="row">
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="event_name_inp">Event Name</label>
+                                        <input type="hidden" name="lead_id" value="{{ $lead_forward->id }}">
+                                        <input type="text" class="form-control" id="event_name_inp"
+                                            placeholder="Enter event name" name="event_name">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="event_date_inp">Event Date</label>
+                                        <input type="date" min="{{ date('Y-m-d') }}" class="form-control"
+                                            id="event_date_inp" name="event_date">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="event_slot_select">Event Slot</label>
+                                        <select class="form-control" id="event_slot_select" name="event_slot">
+                                            <option value="" selected disabled>Select event slot</option>
+                                            <option value="Morning">Morning</option>
+                                            <option value="Evening">Evening</option>
+                                            <option value="Full Day">Full Day</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="venue_name">Venue Name</label>
+                                        <input type="text" class="form-control" id="venue_name"
+                                            placeholder="Enter venue name" name="venue_name">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="number_of_guest_inp">Number of Guest</label>
+                                        <input type="text" class="form-control" id="number_of_guest_inp"
+                                            placeholder="Enter number of guest" name="number_of_guest">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer text-sm">
                             <button type="button" class="btn btn-sm bg-secondary"
                                 data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-sm text-light"
@@ -806,7 +807,7 @@
                         <img src="{{ asset('wb-logo2.webp') }}" alt="AdminLTE Logo" style="width: 100% !important;">
                         <p class="text-center mt-5"><b>Congratulations You have Booked a lead. Keep it Up!</b></p>
                         <p class="text-center mt-2"><a class="btn  text-light p-2 m-1" style="background-color: var(--wb-dark-red)"
-                            href="{{ route('vendor.lead.status.update', $lead_forward->id) }}/Active"><i>Not Booked Click to Re-active</i></a></p>
+                            href="{{ route('pvendor.lead.status.update', $lead_forward->id) }}/Active"><i>Not Booked Click to Re-active</i></a></p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -827,12 +828,13 @@
                     item.disabled = true;
                     item.removeAttribute('data-bs-toggle');
                 }
-            }else if ("{{ $lead_forward->lead_status }}" == "Booked") {
+            } else if ("{{ $lead_forward->lead_status }}" == "Booked") {
                 const congratulationsModal = document.getElementById('congratulationsModal');
                 const modal = new bootstrap.Modal(congratulationsModal);
-                // modal.show();
+                modal.show();
             }
         })
+
 
         function handle_event_information(url_for_submit, url_for_fetch = null) {
             const manageEventModal = document.getElementById('manageEventModal');
@@ -849,16 +851,15 @@
                 modal.show();
             } else {
                 fetch(url_for_fetch).then(response => response.json()).then(data => {
+                    console.log(data.event.event_name);
                     if (data.success == true) {
                         modalHeading.innerText = "Edit Event";
                         manageEventModal.querySelector('#event_name_inp').value = data.event.event_name;
                         manageEventModal.querySelector('#event_date_inp').value = data.event.event_date;
                         manageEventModal.querySelector('#number_of_guest_inp').value = data.event.pax;
-                        manageEventModal.querySelector('#budget_inp').value = data.event.budget;
-
+                        manageEventModal.querySelector('#venue_name').value = data.event.venue_name;
                         manageEventModal.querySelector(`option[value="${data.event.event_slot}"]`).selected = true;
-                        manageEventModal.querySelector(`option[value="${data.event.food_preference}"]`).selected =
-                            true;
+                        true;
                         modal.show();
                     } else {
                         toastr[data.alert_type](data.message)
@@ -894,14 +895,14 @@
         }
 
         function handle_task_status_update(task_id) {
-            const url = `{{ route('vendor.task.status.update') }}/${task_id}`;
+            const url = `{{ route('pvendor.task.status.update') }}/${task_id}`;
             const modal = new bootstrap.Modal('#manageTaskStatusModal');
             task_status_update_form.action = url;
             modal.show();
         }
 
         function handle_meeting_status_update(meeting_id) {
-            const url = `{{ route('vendor.meeting.status.update') }}/${meeting_id}`;
+            const url = `{{ route('pvendor.meeting.status.update') }}/${meeting_id}`;
             const modal = new bootstrap.Modal('#manageMeetingStatusModal');
             meeting_status_update_form.action = url;
             modal.show();

@@ -57,6 +57,7 @@
                                 <thead>
                                     <tr class="text-center">
                                         <th class="p-1">Vendor Name</th>
+                                        <th class="p-1">Total Leads Recieved</th>
                                         <th class="p-1">Leads Recieved this Month</th>
                                         <th class="p-1">Leads Recieved Today</th>
                                         <th class="p-1">Unread Leads this Month</th>
@@ -65,11 +66,16 @@
                                         <th class="p-1">Schedule Task this Month</th>
                                         <th class="p-1">Schedule Task Today</th>
                                         <th class="p-1">Task Overdue</th>
+                                        <th class="p-1">Schedule Meeting this Month</th>
+                                        <th class="p-1">Schedule Meeting Today</th>
+                                        <th class="p-1">Meeting Overdue</th>
+                                        <th class="p-1">Lead Created</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr style="font-weight: bold;" class="text-center">
                                         <td class="p-1">{{$v->name}}</td>
+                                        <td class="p-1">{{$v->total_leads_received}}</td>
                                         <td class="p-1">{{$v->leads_received_this_month}}</td>
                                         <td class="p-1">{{$v->leads_received_today}}</td>
                                         <td class="p-1">{{$v->unread_leads_this_month}}</td>
@@ -78,6 +84,10 @@
                                         <td class="p-1">{{$v->task_schedule_this_month}}</td>
                                         <td class="p-1">{{$v->task_schedule_today}}</td>
                                         <td class="p-1">{{$v->task_overdue}}</td>
+                                        <td class="p-1">{{$v->meeting_schedule_this_month}}</td>
+                                        <td class="p-1">{{$v->meeting_schedule_today}}</td>
+                                        <td class="p-1">{{$v->meeting_overdue}}</td>
+                                        <td class="p-1">{{$v->created_lead}}</td>
                                     </tr>
                                 </tbody>
                             </table>

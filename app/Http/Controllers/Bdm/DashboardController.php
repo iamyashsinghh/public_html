@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Bdm;
 
 use App\Http\Controllers\Controller;
 use App\Models\BdmBooking;
+use App\Models\VendorCategory;
 use Illuminate\Http\Request;
 use App\Models\BdmLead;
 use App\Models\BdmMeeting;
@@ -132,6 +133,8 @@ class DashboardController extends Controller
                 $m2o = 0;
             }
         $m2o = number_format($m2o, 1);
+        $vendor_categories = VendorCategory::select('id', 'name')->get();
+
 
 
         return view("bdm.dashboard", compact('bdm_unfollowed_leads',
@@ -149,7 +152,8 @@ class DashboardController extends Controller
         'meeting_done_this_month',
         'order_signed_this_month',
         'l2m',
-        'm2o'
+        'm2o',
+        'vendor_categories'
     ));
     }
     public function update_profile_image(Request $request)

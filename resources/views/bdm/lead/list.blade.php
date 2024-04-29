@@ -339,10 +339,7 @@
                 .catch((error) => {});
         }
 
-        function handle_create_lead() {
-            const manageLeadModal = new bootstrap.Modal(document.getElementById('manageLeadModal'));
-            manageLeadModal.show();
-        }
+        
         var dashfilters = @json($dashfilters);
         const data_url = `{{ route('bdm.lead.list.ajax') }}?{!! $filter !!}`;
         $(document).ready(function() {

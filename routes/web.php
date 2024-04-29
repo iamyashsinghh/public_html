@@ -14,12 +14,12 @@ Route::post('/store-token', [Controllers\NotificationSendController::class, 'upd
 Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->name('send.token');
 
 Route::get('/optimize', function () {
-            Artisan::call('cache:clear');
-            Artisan::call('route:clear');
-            Artisan::call('config:clear');
-            Artisan::call('view:clear');
-            return redirect()->route('admin.editEnv');
-        })->name('admin.optimize.crm');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('config:clear');
+    Artisan::call('view:clear');
+    return redirect()->route('admin.editEnv');
+})->name('admin.optimize.crm');
 
 // send and get
 Route::get('admin/ajax_tasks', [Controllers\WhatsappMsgController::class, 'ajax_tasks'])->name('whatsapp_chat.ajax');
@@ -104,7 +104,7 @@ Route::middleware('verify_token')->group(function () {
             Route::post('/roles/manage-process/{role_id?}', [Controllers\Admin\RoleController::class, 'manage_process'])->name('admin.role.manage.process');
 
             //Lead Routes
-            Route::match(['get', 'post'], '/leads', [Controllers\Admin\LeadController::class, 'list'])->name('admin.lead.list');
+            Route::match (['get', 'post'], '/leads', [Controllers\Admin\LeadController::class, 'list'])->name('admin.lead.list');
             Route::get('/leads/ajax_list', [Controllers\Admin\LeadController::class, 'ajax_list'])->name('admin.lead.list.ajax');
             Route::get('/leads/get_forward_info/{lead_id?}', [Controllers\Admin\LeadController::class, 'get_forward_info'])->name('admin.lead.getForwardInfo');
             Route::get('/leads/view/{lead_id?}', [Controllers\Admin\LeadController::class, 'view'])->name('admin.lead.view');
@@ -132,7 +132,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/availability/list', [Controllers\Admin\AvailabilityController::class, 'list'])->name('admin.availability.list');
 
             //Booking routes
-            Route::match(['get', 'post'], '/bookings/list/{dashboard_filters?}', [Controllers\Admin\BookingController::class, 'list'])->name('admin.bookings.list');
+            Route::match (['get', 'post'], '/bookings/list/{dashboard_filters?}', [Controllers\Admin\BookingController::class, 'list'])->name('admin.bookings.list');
             Route::get('/bookings/ajax_list/', [Controllers\Admin\BookingController::class, 'ajax_list'])->name('admin.bookings.list.ajax');
             Route::get('booking/delete/{booking_id}', [Controllers\Admin\BookingController::class, 'delete'])->name('booking.delete');
 
@@ -162,7 +162,7 @@ Route::middleware('verify_token')->group(function () {
             Route::post('/vendor-localities/manage-process/{id?}', [Controllers\Admin\VendorLocalityController::class, 'manage_process'])->name('admin.vendorLocality.manage.process');
 
             //NvLead Routes
-            Route::match(['get', 'post'], '/nv-leads', [Controllers\Admin\NvLeadController::class, 'list'])->name('admin.nvlead.list');
+            Route::match (['get', 'post'], '/nv-leads', [Controllers\Admin\NvLeadController::class, 'list'])->name('admin.nvlead.list');
             Route::get('/nv-leads/ajax_list', [Controllers\Admin\NvLeadController::class, 'ajax_list'])->name('admin.nvlead.list.ajax');
             // Route::get('/nv-leads/manage_ajax/{id}', [Controllers\Admin\NvLeadController::class, 'ajax_list'])->name('admin.nvlead.list.ajax');
             Route::post('/nv-leads/add-process', [Controllers\Admin\NvLeadController::class, 'add_process'])->name('admin.nvlead.add.process');
@@ -203,7 +203,7 @@ Route::middleware('verify_token')->group(function () {
 
         // Bdm Crm
         Route::prefix('bdm-crm')->group(function () {
-            Route::match(['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Admin\BdmLeadController::class, 'list'])->name('admin.bdm.lead.list');
+            Route::match (['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Admin\BdmLeadController::class, 'list'])->name('admin.bdm.lead.list');
             Route::get('/leads/ajax_list/', [Controllers\Admin\BdmLeadController::class, 'ajax_list'])->name('admin.bdm.lead.list.ajax');
             Route::get('/leads/view/{lead_id?}', [Controllers\Admin\BdmLeadController::class, 'view'])->name('admin.bdm.lead.view');
             Route::post('/leads/edit-process/{lead_id}', [Controllers\Admin\BdmLeadController::class, 'edit_process'])->name('admin.bdm.lead.edit.process');
@@ -212,7 +212,7 @@ Route::middleware('verify_token')->group(function () {
             Route::post('/assign_to_bdm_lead', [Controllers\Admin\BdmLeadController::class, 'lead_forward'])->name('admin.bdm.lead.forward');
 
 
-            Route::match(['get', 'post'], '/leads/status-update/{lead_id}/{status?}', [Controllers\Admin\BdmLeadController::class, 'status_update'])->name('admin.bdm.lead.status.update');
+            Route::match (['get', 'post'], '/leads/status-update/{lead_id}/{status?}', [Controllers\Admin\BdmLeadController::class, 'status_update'])->name('admin.bdm.lead.status.update');
 
             // bdm booking routes
             Route::get('/get_booking/{booking_id?}', [Controllers\Admin\BdmBookingController::class, 'get_booking'])->name('admin.bdm.booking.get');
@@ -241,7 +241,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/my-team/ajax_list', [Controllers\Manager\TeamMemberController::class, 'ajax_list'])->name('manager.team.list.ajax');
 
             //Lead Routes
-            Route::match(['get', 'post'], '/leads', [Controllers\Manager\LeadController::class, 'list'])->name('manager.lead.list');
+            Route::match (['get', 'post'], '/leads', [Controllers\Manager\LeadController::class, 'list'])->name('manager.lead.list');
             Route::get('/leads/ajax_list', [Controllers\Manager\LeadController::class, 'ajax_list'])->name('manager.lead.list.ajax');
             Route::get('/leads/get_forward_info/{lead_id?}', [Controllers\Manager\LeadController::class, 'get_forward_info'])->name('manager.lead.getForwardInfo');
             Route::get('/leads/view/{lead_id?}', [Controllers\Manager\LeadController::class, 'view'])->name('manager.lead.view');
@@ -254,7 +254,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/availability/list', [Controllers\Manager\AvailabilityController::class, 'list'])->name('manager.availability.list');
 
             //Booking routes
-            Route::match(['get', 'post'], '/bookings/list/{dashboard_filters?}', [Controllers\Manager\BookingController::class, 'list'])->name('manager.bookings.list');
+            Route::match (['get', 'post'], '/bookings/list/{dashboard_filters?}', [Controllers\Manager\BookingController::class, 'list'])->name('manager.bookings.list');
             Route::get('/bookings/ajax_list/', [Controllers\Manager\BookingController::class, 'ajax_list'])->name('manager.bookings.list.ajax');
         });
     });
@@ -274,7 +274,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/my-team/ajax_list', [Controllers\VendorManager\TeamMemberController::class, 'ajax_list'])->name('vendormanager.team.list.ajax');
 
             //Lead Routes
-            Route::match(['get', 'post'], '/leads', [Controllers\VendorManager\LeadController::class, 'list'])->name('vendormanager.lead.list');
+            Route::match (['get', 'post'], '/leads', [Controllers\VendorManager\LeadController::class, 'list'])->name('vendormanager.lead.list');
             Route::get('/leads/ajax_list', [Controllers\VendorManager\LeadController::class, 'ajax_list'])->name('vendormanager.lead.list.ajax');
             Route::get('/leads/get_forward_info/{lead_id?}', [Controllers\VendorManager\LeadController::class, 'get_forward_info'])->name('vendormanager.lead.getForwardInfo');
             Route::get('/leads/view/{lead_id?}', [Controllers\VendorManager\LeadController::class, 'view'])->name('vendormanager.lead.view');
@@ -296,14 +296,14 @@ Route::middleware('verify_token')->group(function () {
 
         Route::prefix('venue-crm')->group(function () {
             //Lead Routes
-            Route::match(['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Team\LeadController::class, 'list'])->name('team.lead.list');
+            Route::match (['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Team\LeadController::class, 'list'])->name('team.lead.list');
             Route::get('/leads/ajax_list/', [Controllers\Team\LeadController::class, 'ajax_list'])->name('team.lead.list.ajax');
             Route::get('/leads/view/{lead_id?}', [Controllers\Team\LeadController::class, 'view'])->name('team.lead.view');
             Route::post('/leads/edit-process/{forward_id}', [Controllers\Team\LeadController::class, 'edit_process'])->name('team.lead.edit.process');
             Route::post('/leads/add-process', [Controllers\Team\LeadController::class, 'add_process'])->name('team.lead.add.process');
             Route::get('/leads/get-forward-info/{lead_id?}', [Controllers\Team\LeadController::class, 'get_forward_info'])->name('team.lead.getForwardInfo');
             Route::get('/leads/service-status-update/{forward_id}/{status?}', [Controllers\Team\LeadController::class, 'service_status_update'])->name('team.lead.serviceStatus.update');
-            Route::match(['get', 'post'], '/leads/status-update/{forward_id}/{status?}', [Controllers\Team\LeadController::class, 'status_update'])->name('team.lead.status.update');
+            Route::match (['get', 'post'], '/leads/status-update/{forward_id}/{status?}', [Controllers\Team\LeadController::class, 'status_update'])->name('team.lead.status.update');
             Route::post('/leads/forward', [Controllers\Team\LeadController::class, 'lead_forward'])->name('team.lead.forward');
             Route::post('/leads/nvrmforward', [Controllers\Team\LeadController::class, 'lead_forward_nvrm'])->name('team.lead.forwardnvrm');
 
@@ -321,14 +321,14 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/notes/delete/{note_id}', [Controllers\Team\NoteController::class, 'delete'])->name('team.note.delete');
 
             //Task Routes
-            Route::match(['get', 'post'], '/tasks/list/{dashboard_filters?}', [Controllers\Team\TaskController::class, 'list'])->name('team.task.list');
+            Route::match (['get', 'post'], '/tasks/list/{dashboard_filters?}', [Controllers\Team\TaskController::class, 'list'])->name('team.task.list');
             Route::get('/tasks/ajax_list/', [Controllers\Team\TaskController::class, 'ajax_list'])->name('team.task.list.ajax');
             Route::post('/tasks/add-process/', [Controllers\Team\TaskController::class, 'add_process'])->name('team.task.add.process');
             Route::post('/tasks/status-update/{task_id?}', [Controllers\Team\TaskController::class, 'status_update'])->name('team.task.status.update');
             Route::get('/tasks/delete/{task_id}', [Controllers\Team\TaskController::class, 'delete'])->name('team.task.delete');
 
             //Visit Routes
-            Route::match(['get', 'post'], '/visits/list/{dashboard_filters?}', [Controllers\Team\VisitController::class, 'list'])->name('team.visit.list');
+            Route::match (['get', 'post'], '/visits/list/{dashboard_filters?}', [Controllers\Team\VisitController::class, 'list'])->name('team.visit.list');
             Route::get('/visits/ajax_list', [Controllers\Team\VisitController::class, 'ajax_list'])->name('team.visit.list.ajax');
             Route::post('/visits/add-process/', [Controllers\Team\VisitController::class, 'add_process'])->name('team.visit.add.process');
             // Route::get('/visits/manage_ajax/{visit_id?}', [Controllers\Team\VisitController::class, 'manage_ajax'])->name('team.visit.edit');
@@ -343,7 +343,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/availability/reset-calendar/{datetime}', [Controllers\Team\AvailabilityController::class, 'reset_calendar'])->name('team.availability.reset_calendar');
 
             //Booking routes
-            Route::match(['get', 'post'], '/bookings/list/{dashboard_filters?}', [Controllers\Team\BookingController::class, 'list'])->name('team.bookings.list');
+            Route::match (['get', 'post'], '/bookings/list/{dashboard_filters?}', [Controllers\Team\BookingController::class, 'list'])->name('team.bookings.list');
             Route::get('/bookings/ajax_list/', [Controllers\Team\BookingController::class, 'ajax_list'])->name('team.bookings.list.ajax');
             Route::post('/bookings/add-process', [Controllers\Team\BookingController::class, 'add_process'])->name('team.booking.add_process');
             Route::post('/bookings/add-more-advance-amount/{booking_id?}', [Controllers\Team\BookingController::class, 'add_more_advance_amount'])->name('team.booking.add_more_advance_amount');
@@ -361,7 +361,7 @@ Route::middleware('verify_token')->group(function () {
 
         Route::prefix('nonvenue-crm')->group(function () {
             //Lead Routes
-            Route::match(['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\NonVenue\NvLeadController::class, 'list'])->name('nonvenue.lead.list');
+            Route::match (['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\NonVenue\NvLeadController::class, 'list'])->name('nonvenue.lead.list');
             Route::get('/leads/ajax_list', [Controllers\NonVenue\NvLeadController::class, 'ajax_list'])->name('nonvenue.lead.list.ajax');
             Route::post('/leads/add-process', [Controllers\NonVenue\NvLeadController::class, 'add_process'])->name('nonvenue.lead.add.process');
             Route::post('/leads/edit-process/{lead_id}', [Controllers\NonVenue\NvLeadController::class, 'edit_process'])->name('nonvenue.lead.edit.process');
@@ -369,7 +369,7 @@ Route::middleware('verify_token')->group(function () {
             Route::post('/leads/forward', [Controllers\NonVenue\NvLeadController::class, 'lead_forward'])->name('nonvenue.lead.forward');
             Route::get('/leads/service-status-update/{forward_id}/{status?}', [Controllers\NonVenue\NvLeadController::class, 'service_status_update'])->name('nonvenue.lead.serviceStatus.update');
             Route::get('/leads/get-forward-info/{lead_id?}', [Controllers\NonVenue\NvLeadController::class, 'get_forward_info'])->name('nonvenue.lead.getForwardInfo');
-            Route::match(['get', 'post'],'/leads/status-update/{forward_id}/{status?}', [Controllers\NonVenue\NvLeadController::class, 'status_update'])->name('nonvenue.lead.status.update');
+            Route::match (['get', 'post'], '/leads/status-update/{forward_id}/{status?}', [Controllers\NonVenue\NvLeadController::class, 'status_update'])->name('nonvenue.lead.status.update');
 
             //RM message Routes
             Route::post('/rm_messages/manage-process', [Controllers\NonVenue\NvrmMessageController::class, 'manage_process'])->name('nonvenue.rm_message.manage.process');
@@ -383,7 +383,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/vendors/get-by-category/{category_id?}', [Controllers\NonVenue\NvLeadController::class, 'get_vendor_by_category'])->name('nonvenue.getVendorsByCategory');
 
             //Task Routes
-            Route::match(['get', 'post'], '/tasks/list/{dashboard_filters?}', [Controllers\NonVenue\TaskController::class, 'list'])->name('nonvenue.task.list');
+            Route::match (['get', 'post'], '/tasks/list/{dashboard_filters?}', [Controllers\NonVenue\TaskController::class, 'list'])->name('nonvenue.task.list');
             Route::get('/tasks/ajax_list/', [Controllers\NonVenue\TaskController::class, 'ajax_list'])->name('nonvenue.task.list.ajax');
             Route::post('/tasks/add-process/', [Controllers\NonVenue\TaskController::class, 'add_process'])->name('nonvenue.task.add.process');
             Route::post('/tasks/status-update/{task_id?}', [Controllers\NonVenue\TaskController::class, 'status_update'])->name('nonvenue.task.status.update');
@@ -397,7 +397,7 @@ Route::middleware('verify_token')->group(function () {
             // vendor help response routes
             Route::post('/vendors/help_update/{vendor_help_id?}', [Controllers\NonVenue\NvNotesController::class, 'vendor_update_help'])->name('nonvenue.vendor.help.update');
             Route::get('/vendors/help/ajax', [Controllers\NonVenue\NvNotesController::class, 'ajax_list'])->name('nonvenue.vendor.help.ajax');
-            Route::match(['get', 'post'], '/vendors/help/list/{dashboard_filters?}', [Controllers\NonVenue\NvNotesController::class, 'list'])->name('nonvenue.vendor.help.list');
+            Route::match (['get', 'post'], '/vendors/help/list/{dashboard_filters?}', [Controllers\NonVenue\NvNotesController::class, 'list'])->name('nonvenue.vendor.help.list');
         });
     });
 
@@ -412,13 +412,13 @@ Route::middleware('verify_token')->group(function () {
 
         Route::prefix('bdm-crm')->group(function () {
             //Lead Routes
-            Route::match(['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Bdm\LeadController::class, 'list'])->name('bdm.lead.list');
+            Route::match (['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Bdm\LeadController::class, 'list'])->name('bdm.lead.list');
             Route::get('/leads/ajax_list/', [Controllers\Bdm\LeadController::class, 'ajax_list'])->name('bdm.lead.list.ajax');
             Route::get('/leads/view/{lead_id?}', [Controllers\Bdm\LeadController::class, 'view'])->name('bdm.lead.view');
             Route::post('/leads/edit-process/{lead_id}', [Controllers\Bdm\LeadController::class, 'edit_process'])->name('bdm.lead.edit.process');
             Route::post('/leads/add-process', [Controllers\Bdm\LeadController::class, 'add_process'])->name('bdm.lead.add.process');
             Route::get('/leads/service-status-update/{lead_id}/{status?}', [Controllers\Bdm\LeadController::class, 'service_status_update'])->name('bdm.lead.serviceStatus.update');
-            Route::match(['get', 'post'], '/leads/status-update/{lead_id}/{status?}', [Controllers\Bdm\LeadController::class, 'status_update'])->name('bdm.lead.status.update');
+            Route::match (['get', 'post'], '/leads/status-update/{lead_id}/{status?}', [Controllers\Bdm\LeadController::class, 'status_update'])->name('bdm.lead.status.update');
 
             //Note Routes
             Route::get('/notes/manage_ajax/{note_id?}', [Controllers\Bdm\NoteController::class, 'manage_ajax'])->name('bdm.note.edit');
@@ -426,21 +426,21 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/notes/delete/{note_id}', [Controllers\Bdm\NoteController::class, 'delete'])->name('bdm.note.delete');
 
             // //Task Routes
-            Route::match(['get', 'post'], '/tasks/list/{dashboard_filters?}', [Controllers\Bdm\TaskController::class, 'list'])->name('bdm.task.list');
+            Route::match (['get', 'post'], '/tasks/list/{dashboard_filters?}', [Controllers\Bdm\TaskController::class, 'list'])->name('bdm.task.list');
             Route::get('/tasks/ajax_list/', [Controllers\Bdm\TaskController::class, 'ajax_list'])->name('bdm.task.list.ajax');
             Route::post('/tasks/add-process/', [Controllers\Bdm\TaskController::class, 'add_process'])->name('bdm.task.add.process');
             Route::post('/tasks/status-update/{task_id?}', [Controllers\Bdm\TaskController::class, 'status_update'])->name('bdm.task.status.update');
             Route::get('/tasks/delete/{task_id}', [Controllers\Bdm\TaskController::class, 'delete'])->name('bdm.task.delete');
 
-             // Meeting Routes
-            Route::match(['get', 'post'], '/meeting/list/{dashboard_filters?}', [Controllers\Bdm\MeetingController::class, 'list'])->name('bdm.meeting.list');
+            // Meeting Routes
+            Route::match (['get', 'post'], '/meeting/list/{dashboard_filters?}', [Controllers\Bdm\MeetingController::class, 'list'])->name('bdm.meeting.list');
             Route::get('/meeting/ajax_list/', [Controllers\Bdm\MeetingController::class, 'ajax_list'])->name('bdm.meeting.list.ajax');
             Route::post('/meeting/add-process/', [Controllers\Bdm\MeetingController::class, 'add_process'])->name('bdm.meeting.add.process');
             Route::post('/meeting/status-update/{meeting_id?}', [Controllers\Bdm\MeetingController::class, 'status_update'])->name('bdm.meeting.status.update');
             Route::get('/meeting/delete/{meeting_id}', [Controllers\Bdm\MeetingController::class, 'delete'])->name('bdm.meeting.delete');
 
             // booking route
-            Route::match(['get', 'post'], '/booking/list/{dashboard_filters?}', [Controllers\Bdm\BookingController::class, 'list'])->name('bdm.booking.list');
+            Route::match (['get', 'post'], '/booking/list/{dashboard_filters?}', [Controllers\Bdm\BookingController::class, 'list'])->name('bdm.booking.list');
             Route::get('/booking/ajax_list/', [Controllers\Bdm\BookingController::class, 'ajax_list'])->name('bdm.booking.list.ajax');
             Route::post('/add_booking', [Controllers\Bdm\BookingController::class, 'add_process'])->name('bdm.booking.add');
             Route::get('/get_booking/{booking_id?}', [Controllers\Bdm\BookingController::class, 'get_booking'])->name('bdm.booking.get');
@@ -460,37 +460,63 @@ Route::middleware('verify_token')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('verify_vendor_token')->group(function () {
-Route::prefix('/vendor')->middleware('vendor')->group(function () {
-    Route::get('/dashboard', [Controllers\Vendor\DashboardController::class, 'index'])->name('vendor.dashboard');
-    Route::post('/update-profile-image', [Controllers\Vendor\DashboardController::class, 'update_profile_image'])->name('vendor.updateProfileImage');
+    Route::prefix('/vendor')->middleware('vendor')->group(function () {
+        Route::get('/dashboard', [Controllers\Vendor\DashboardController::class, 'index'])->name('vendor.dashboard');
+        Route::post('/update-profile-image', [Controllers\Vendor\DashboardController::class, 'update_profile_image'])->name('vendor.updateProfileImage');
 
-    //Lead Routes
-    Route::match(['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Vendor\NvLeadController::class, 'list'])->name('vendor.lead.list');
-    Route::get('/leads/ajax_list', [Controllers\Vendor\NvLeadController::class, 'ajax_list'])->name('vendor.lead.list.ajax');
-    Route::get('/leads/view/{lead_id?}', [Controllers\Vendor\NvLeadController::class, 'view'])->name('vendor.lead.view');
-    Route::match(['get', 'post'], '/leads/status-update/{forward_id}/{status?}', [Controllers\Vendor\NvLeadController::class, 'status_update'])->name('vendor.lead.status.update');
+        //Lead Routes
+        Route::match (['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Vendor\NvLeadController::class, 'list'])->name('vendor.lead.list');
+        Route::get('/leads/ajax_list', [Controllers\Vendor\NvLeadController::class, 'ajax_list'])->name('vendor.lead.list.ajax');
+        Route::get('/leads/view/{lead_id?}', [Controllers\Vendor\NvLeadController::class, 'view'])->name('vendor.lead.view');
+        Route::match (['get', 'post'], '/leads/status-update/{forward_id}/{status?}', [Controllers\Vendor\NvLeadController::class, 'status_update'])->name('vendor.lead.status.update');
 
-    //Note Routes
-    Route::get('/notes/manage_ajax/{note_id?}', [Controllers\Vendor\NvNoteController::class, 'manage_ajax'])->name('vendor.note.edit');
-    Route::post('/notes/manage-process/{note_id?}', [Controllers\Vendor\NvNoteController::class, 'manage_process'])->name('vendor.note.manage.process');
-    Route::get('/notes/delete/{note_id}', [Controllers\Vendor\NvNoteController::class, 'delete'])->name('vendor.note.delete');
+        //Note Routes
+        Route::get('/notes/manage_ajax/{note_id?}', [Controllers\Vendor\NvNoteController::class, 'manage_ajax'])->name('vendor.note.edit');
+        Route::post('/notes/manage-process/{note_id?}', [Controllers\Vendor\NvNoteController::class, 'manage_process'])->name('vendor.note.manage.process');
+        Route::get('/notes/delete/{note_id}', [Controllers\Vendor\NvNoteController::class, 'delete'])->name('vendor.note.delete');
 
-    //Task Routes
-    Route::match(['get', 'post'], '/tasks', [Controllers\Vendor\NvTaskController::class, 'list'])->name('vendor.task.list');
-    Route::get('/tasks/ajax_list/', [Controllers\Vendor\NvTaskController::class, 'ajax_list'])->name('vendor.task.list.ajax');
-    Route::post('/tasks/add-process/', [Controllers\Vendor\NvTaskController::class, 'add_process'])->name('vendor.task.add.process');
-    Route::post('/tasks/status-update/{task_id?}', [Controllers\Vendor\NvTaskController::class, 'status_update'])->name('vendor.task.status.update');
-    Route::get('/tasks/delete/{task_id}', [Controllers\Vendor\NvTaskController::class, 'delete'])->name('vendor.task.delete');
+        //Task Routes
+        Route::match (['get', 'post'], '/tasks', [Controllers\Vendor\NvTaskController::class, 'list'])->name('vendor.task.list');
+        Route::get('/tasks/ajax_list/', [Controllers\Vendor\NvTaskController::class, 'ajax_list'])->name('vendor.task.list.ajax');
+        Route::post('/tasks/add-process/', [Controllers\Vendor\NvTaskController::class, 'add_process'])->name('vendor.task.add.process');
+        Route::post('/tasks/status-update/{task_id?}', [Controllers\Vendor\NvTaskController::class, 'status_update'])->name('vendor.task.status.update');
+        Route::get('/tasks/delete/{task_id}', [Controllers\Vendor\NvTaskController::class, 'delete'])->name('vendor.task.delete');
 
-    //Meeting Routes
-    Route::match(['get', 'post'], '/meetings', [Controllers\Vendor\NvMeetingController::class, 'list'])->name('vendor.meeting.list');
-    Route::get('/meetings/ajax_list/', [Controllers\Vendor\NvMeetingController::class, 'ajax_list'])->name('vendor.meeting.list.ajax');
-    Route::post('/meetings/add-process/', [Controllers\Vendor\NvMeetingController::class, 'add_process'])->name('vendor.meeting.add.process');
-    Route::get('/meetings/delete/{meeting_id?}', [Controllers\Vendor\NvMeetingController::class, 'delete'])->name('vendor.meeting.delete');
-    Route::post('/meetings/status-update/{meeting_id?}', [Controllers\Vendor\NvMeetingController::class, 'status_update'])->name('vendor.meeting.status.update');
+        //Meeting Routes
+        Route::match (['get', 'post'], '/meetings', [Controllers\Vendor\NvMeetingController::class, 'list'])->name('vendor.meeting.list');
+        Route::get('/meetings/ajax_list/', [Controllers\Vendor\NvMeetingController::class, 'ajax_list'])->name('vendor.meeting.list.ajax');
+        Route::post('/meetings/add-process/', [Controllers\Vendor\NvMeetingController::class, 'add_process'])->name('vendor.meeting.add.process');
+        Route::get('/meetings/delete/{meeting_id?}', [Controllers\Vendor\NvMeetingController::class, 'delete'])->name('vendor.meeting.delete');
+        Route::post('/meetings/status-update/{meeting_id?}', [Controllers\Vendor\NvMeetingController::class, 'status_update'])->name('vendor.meeting.status.update');
 
-    // vendor help response routes
-    Route::get('/vendors/help/ajax', [Controllers\Vendor\NvNoteController::class, 'ajax_list'])->name('vendor.help.ajax.list');
-    Route::view('/vendors/help/list', 'vendor.rmhelpsupport.list')->name('vendor.help.list');
-});
+        // vendor help response routes
+        Route::get('/vendors/help/ajax', [Controllers\Vendor\NvNoteController::class, 'ajax_list'])->name('vendor.help.ajax.list');
+        Route::view('/vendors/help/list', 'vendor.rmhelpsupport.list')->name('vendor.help.list');
+
+        // personal lead section
+        //Lead Routes
+        Route::prefix('/personal')->group(function () {
+            Route::match (['get', 'post'], '/leads/list/{dashboard_filters?}', [Controllers\Vendor\PLeadController::class, 'list'])->name('pvendor.lead.list');
+            Route::get('/leads/ajax_list', [Controllers\Vendor\PLeadController::class, 'ajax_list'])->name('pvendor.lead.list.ajax');
+            Route::get('/leads/view/{lead_id?}', [Controllers\Vendor\PLeadController::class, 'view'])->name('pvendor.lead.view');
+            Route::post('/leads/add-process', [Controllers\Vendor\PLeadController::class, 'add_process'])->name('pvendor.lead.add.process');
+            Route::match (['get', 'post'], '/leads/status-update/{forward_id}/{status?}', [Controllers\Vendor\PLeadController::class, 'status_update'])->name('pvendor.lead.status.update');
+            Route::post('/leads/edit-process/{lead_id}', [Controllers\Vendor\PLeadController::class, 'edit_process'])->name('pvendor.lead.edit.process');
+
+            // Event Routes
+            Route::post('/events/add-process/', [Controllers\Vendor\PEventController::class, 'add_process'])->name('pvendor.event.add.process');
+            Route::get('/events/manage_ajax/{event_id?}', [Controllers\Vendor\PEventController::class, 'manage_ajax'])->name('pvendor.event.edit');
+            Route::post('/events/edit-process/{event_id?}', [Controllers\Vendor\PEventController::class, 'edit_process'])->name('pvendor.event.edit.process');
+
+            // Task Routes
+            Route::post('/tasks/add-process/', [Controllers\Vendor\PTaskController::class, 'add_process'])->name('pvendor.task.add.process');
+            Route::post('/tasks/status-update/{task_id?}', [Controllers\Vendor\PTaskController::class, 'status_update'])->name('pvendor.task.status.update');
+            Route::get('/tasks/delete/{task_id}', [Controllers\Vendor\PTaskController::class, 'delete'])->name('pvendor.task.delete');
+
+            // Meeting Routes
+            Route::post('/meetings/add-process/', [Controllers\Vendor\PMeetingController::class, 'add_process'])->name('pvendor.meeting.add.process');
+            Route::get('/meetings/delete/{meeting_id?}', [Controllers\Vendor\PMeetingController::class, 'delete'])->name('pvendor.meeting.delete');
+            Route::post('/meetings/status-update/{meeting_id?}', [Controllers\Vendor\PMeetingController::class, 'status_update'])->name('pvendor.meeting.status.update');
+        });
+    });
 });

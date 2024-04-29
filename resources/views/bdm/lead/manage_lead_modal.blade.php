@@ -91,3 +91,9 @@
         </div>
     </div>
 </div>
+<script>
+    function handle_create_lead() {
+            const manageLeadModal = new bootstrap.Modal(document.getElementById('manageLeadModal'));
+            manageLeadModal.show();
+        }
+</script>

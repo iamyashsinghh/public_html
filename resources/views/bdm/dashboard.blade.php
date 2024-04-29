@@ -1,5 +1,10 @@
 @extends('bdm.layouts.app')
 @section('title', 'Dashboard | BDM')
+@section('navbar-left-links')
+<li class="nav-item">
+    <a href="javascript:void(0);" class="nav-link" onclick="handle_create_lead()">Create New Lead</a>
+</li>
+@endsection
 @section('main')
     <div class="content-wrapper pb-5">
         <section class="content-header">
@@ -176,7 +181,7 @@
                             <div class="small-box text-sm" style="background-color: cadetblue;">
                                 <div class="inner">
                                     <h3>{{$bdm_today_meeting_leads}}</h3>
-                                    <p>Task Meeting Today</p>
+                                    <p>Meeting Schedule Today</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-bag"></i>
@@ -238,6 +243,5 @@
     </div>
 @endsection
 @section('footer-script')
-    <script>
-    </script>
+@include('bdm.lead.manage_lead_modal');
 @endsection

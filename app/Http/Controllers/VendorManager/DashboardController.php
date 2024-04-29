@@ -4,6 +4,9 @@ namespace App\Http\Controllers\VendorManager;
 
 use App\Http\Controllers\Controller;
 use App\Models\nvLeadForward;
+use App\Models\nvMeeting;
+use App\Models\nvTask;
+use App\Models\PVendorLead;
 use App\Models\Task;
 use App\Models\TeamMember;
 use App\Models\Vendor;
@@ -25,15 +28,21 @@ class DashboardController extends Controller {
         $to =  Carbon::today()->endOfMonth();
 
         foreach ($v_members as $v) {
+            $v['total_leads_received'] = nvLeadForward::where(['forward_to' => $v->id])->count();
             $v['leads_received_this_month'] = nvLeadForward::where(['forward_to' => $v->id])->where('lead_datetime', 'like', "%$current_month%")->count();
             $v['leads_received_today'] = nvLeadForward::where(['forward_to' => $v->id])->where('lead_datetime', 'like', "%$current_date%")->count();
             $v['unread_leads_this_month'] = nvLeadForward::where(['forward_to' => $v->id, 'read_status' => false])->where('lead_datetime', 'like', "%$current_month%")->count();
             $v['unread_leads_today'] = nvLeadForward::where(['forward_to' => $v->id, 'read_status' => false])->where('lead_datetime', 'like', "%$current_date%")->count();
             $v['unread_leads_overdue'] = nvLeadForward::where(['forward_to' => $v->id, 'read_status' => false])->where('lead_datetime',  '<', Carbon::today())->count();
 
-            $v['task_schedule_this_month'] = Task::where(['created_by' => $v->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_month%")->count();
-            $v['task_schedule_today'] = Task::where(['created_by' => $v->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_date%")->count();
-            $v['task_overdue'] = Task::where(['created_by' => $v->id, 'done_datetime' => null])->where('task_schedule_datetime', '<', Carbon::today())->count();
+            $v['task_schedule_this_month'] = nvTask::where(['created_by' => $v->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_month%")->count();
+            $v['task_schedule_today'] = nvTask::where(['created_by' => $v->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_date%")->count();
+            $v['task_overdue'] = nvTask::where(['created_by' => $v->id, 'done_datetime' => null])->where('task_schedule_datetime', '<', Carbon::today())->count();
+
+            $v['meeting_schedule_this_month'] = nvMeeting::where(['created_by' => $v->id, 'done_datetime' => null])->where('meeting_schedule_datetime', 'like', "%$current_month%")->count();
+            $v['meeting_schedule_today'] = nvMeeting::where(['created_by' => $v->id, 'done_datetime' => null])->where('meeting_schedule_datetime', 'like', "%$current_date%")->count();
+            $v['meeting_overdue'] = nvMeeting::where(['created_by' => $v->id, 'done_datetime' => null])->where('meeting_schedule_datetime', '<', Carbon::today())->count();
+            $v['created_lead'] = PVendorLead::where('created_by', $v->id)->count();
         }
 
         $vs_id = [];

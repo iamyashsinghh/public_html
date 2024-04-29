@@ -121,7 +121,7 @@
                                     <div class="form-group">
                                         <label for="category_select">Category <span class="text-danger">*</span></label>
                                         <select class="form-control" id="category_select" name="category" required>
-                                            <option value="" selected disabled>Select vendor category</option>
+                                            <option value="">Select vendor category</option>
                                             @foreach ($vendor_categories as $list)
                                                 <option value="{{ $list->id }}">{{ $list->name }}</option>
                                             @endforeach
@@ -156,8 +156,9 @@
                                 </div>
                                 <div class="col-sm-4 mb-3">
                                     <div class="form-group">
-                                        <label for="parent_member_select">Parent Member <i>(Vendor Manager)</i><span class="text-danger">*</span></label>
-                                        <select class="form-control" id="parent_member_select" name="parent_id" required>
+                                        <label for="parent_member_select">Parent Member <i>(Vendor Manager)</i><span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control" id="parent_member_select" name="parent_id">
                                             <option value="" disabled selected>Select Parent Member</option>
                                             @foreach ($team_members as $list)
                                                 <option value="{{ $list->id }}">{{ $list->name }}</option>
@@ -203,6 +204,8 @@
     <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
     <script>
+        var localities = @json($localities);
+
         function handle_whatsapp_msg(id) {
             const elementToUpdate = document.querySelector(`#what_id-${id}`);
             if (elementToUpdate) {
@@ -378,9 +381,15 @@
                         group_name_select.value = data.vendor.group_name;
                         vendor_altmobile_inp.value = data.vendor.alt_mobile_number;
                         category_select.querySelector(`option[value="${data.vendor.category_id}"]`).selected = true;
-                        if(data.vendor.parent_id){
-                            parent_member_select.querySelector(`option[value="${data.vendor.parent_id}"]`).selected = true;
+                        updateGroupDropdown(data.vendor.category_id, localities, data.vendor.group_name);
+                        const optionElement = parent_member_select.querySelector(
+                            `option[value="${data.vendor.parent_id}"]`);
+                        if (optionElement) {
+                            optionElement.selected = true;
+                        } else {
+                            console.error('Option element not found for value:', data.vendor.parent_id);
                         }
+
                         manageVendorModalHeading.innerText = "Edit Vendor";
                         modal.show();
                     } else {
@@ -398,32 +407,31 @@
         }
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var localities = @json($localities);
-
-            document.getElementById('category_select').addEventListener('change', function() {
-                var selectedCategoryId = this.value;
-                var groupSelect = document.getElementById('group_name_select');
-                var groupSelectlable = document.getElementById('group_name_select_lable');
-
-                groupSelect.innerHTML = '<option value="" selected disabled>Select group</option>';
-
-                if (selectedCategoryId == '4') {
-                    groupSelectlable.innerText = 'Select Locality';
-                    localities.forEach(function(locality) {
-                        var option = new Option(locality.name, locality.name);
-                        groupSelect.add(option);
-                    });
-                } else {
-                    for (var i = 65; i <= 90; i++) {
-                        var letter = String.fromCharCode(i);
-                        var option = new Option(letter, letter);
-                        groupSelect.add(option);
-                    }
-                    groupSelectlable.innerText = 'Select Group';
-                }
-            });
+        document.getElementById('category_select').addEventListener('change', function() {
+            updateGroupDropdown(this.value, localities);
         });
-        </script>
+
+        function updateGroupDropdown(categoryId, localities, selectedGroup = null) {
+            var groupSelect = document.getElementById('group_name_select');
+            var groupSelectLabel = document.getElementById('group_name_select_lable');
+            groupSelect.innerHTML = '<option value="" selected disabled>Select group</option>';
+            if (categoryId == '4') {
+                groupSelectLabel.innerText = 'Select Locality';
+                localities.forEach(function(locality) {
+                    var option = new Option(locality.name, locality.name);
+                    option.selected = locality.name === selectedGroup;
+                    groupSelect.add(option);
+                });
+            } else {
+                for (var i = 65; i <= 90; i++) {
+                    var letter = String.fromCharCode(i);
+                    var option = new Option(letter, letter);
+                    option.selected = letter === selectedGroup;
+                    groupSelect.add(option);
+                }
+                groupSelectLabel.innerText = 'Select Group';
+            }
+        }
+    </script>
 
 @endsection

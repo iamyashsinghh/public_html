@@ -46,8 +46,10 @@
                             <th class="text-nowrap">Lead Date</th>
                             <th class="">Name</th>
                             <th class="text-nowrap">Mobile</th>
+                            <th class="">Pax</th>
                             <th class="">Lead Status</th>
                             <th class="text-nowrap">Event Date</th>
+                            <th class="">Action</th>
                         </tr>
                     </thead>
                 </table>
@@ -172,9 +174,11 @@
             </form>
         </div>
     </aside>
+    
 </div>
 @endsection
 @section('footer-script')
+@include('vendormanager.vendorCrm.lead.nvlead_forwarded_info_modal')
 @php
 $filter = "";
 if (isset($filter_params['lead_status'])) {
@@ -239,13 +243,23 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
                 },
                 {
                     targets: 4,
+                    name: "pax",
+                    data: "pax",
+                },
+                {
+                    targets: 5,
                     name: "lead_status",
                     data: "lead_status",
                 },
                 {
-                    targets: 5,
+                    targets: 6,
                     name: "event_date",
                     data: "event_date",
+                },
+                {
+                    targets: 7,
+                    name: "lead_id",
+                    data: "lead_id",
                 },
             ],
             order: [
@@ -257,16 +271,18 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
                     row.style.background = "#3636361f";
                 }
                 const td_elements = row.querySelectorAll('td');
-                row.style.cursor = "pointer";
-                row.setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
-
                 td_elements[1].innerText = moment(data.lead_date).format("DD-MMM-YYYY hh:mm a");
                 if (data.lead_status == "Done") {
-                    td_elements[4].innerHTML = `<span class="badge badge-secondary">Done</span>`;
+                    td_elements[5].innerHTML = `<span class="badge badge-secondary">Done</span>`;
                 } else {
-                    td_elements[4].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
+                    td_elements[5].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
-                td_elements[5].innerText = data.event_date ? moment(data.event_date).format("DD-MMM-YYYY") : 'N/A';
+                td_elements[6].innerText = data.event_date ? moment(data.event_date).format("DD-MMM-YYYY") : 'N/A';
+                td_elements[7].innerHTML = `<button onclick="handle_get_nvlead_forwarded_info(${data.lead_id})" class="btn btn-sm mx-1 btn-info" title="Forward info"><i class="fa fa-share-alt" style="font-size: 15px;"></i> ${data.forwarded_count}</button>`
+                for (let i = 1; i < 7; i++) {
+                        td_elements[i].style.cursor = "pointer";
+                        td_elements[i].setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
+                }
             }
         });
     });
@@ -274,5 +290,36 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
     function handle_view_lead(lead_id) {
         window.open(`{{route('vendormanager.lead.view')}}/${lead_id}`);
     }
+
+    function handle_get_nvlead_forwarded_info(lead_id){
+            fetch(`{{route('vendormanager.lead.getForwardInfo')}}/${lead_id}`).then(response => response.json()).then(data => {
+                const forward_info_table_body = document.getElementById('forward_info_table_body');
+                const last_forwarded_info_paragraph = document.getElementById('last_forwarded_info_paragraph');
+                const modal = new bootstrap.Modal("#nvLeadForwardedInfoModal")
+                forward_info_table_body.innerHTML = "";
+                last_forwarded_info_paragraph.innerHTML = "";
+                if(data.success == true){
+                    let i = 1;
+                    for(let item of data.lead_forwards){
+                        let tr = document.createElement('tr');
+                        let tds = `<td>${i}</td>
+                        <td>${item.name}</td>
+                        <td>${item.role_name ? item.role_name : 'Vendor'}</td>
+                        <td>${item.business_name ? item.business_name : 'N/A'}</td>
+                        <td>
+                            <span class="badge badge-${item.read_status == 0 ? 'danger' : 'success'}">${item.read_status == 0 ? 'Unread': 'Read'}</span>
+                        </td>`;
+
+                        tr.innerHTML = tds;
+                        forward_info_table_body.appendChild(tr);
+                        i++;
+                    }
+                    last_forwarded_info_paragraph.innerHTML = data.last_forwarded_info;
+                    modal.show();
+                }else{
+                    toastr[data.alert_type](data.message);
+                }
+            })
+        }
 </script>
 @endsection

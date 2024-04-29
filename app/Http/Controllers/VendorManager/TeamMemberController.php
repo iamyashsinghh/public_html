@@ -28,3 +28,4 @@ class TeamMemberController extends Controller {
         return datatables($members)->toJson();
     }
 }
+
