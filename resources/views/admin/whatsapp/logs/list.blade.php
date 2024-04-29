@@ -66,7 +66,7 @@
                         name: "status",
                         data: "status",
                         render: function(data, type, row) {
-                            if (data === '1') {
+                            if (data === '0') {
                                 return `<span class="badge badge-success">Sent</span>`;
                             } else {
                                 return '<span class="badge badge-danger">Not Sent</span>';
