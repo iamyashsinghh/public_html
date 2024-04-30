@@ -208,6 +208,9 @@ class PLeadController extends Controller
         } else if ($status == "Booked"){
             $lead_forward->lead_status = "Booked";
             $lead_forward->read_status = true;
+            $lead_forward->done_title = null;
+            $lead_forward->done_message = null;
+            session(['show_congratulations' => true]);
         } else {
             $validate = Validator::make($request->all(), [
                 'forward_id' => 'required|exists:p_vendor_leads,id',

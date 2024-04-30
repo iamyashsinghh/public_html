@@ -815,6 +815,17 @@
 @endsection
 @section('footer-script')
     <script src="{{ asset('plugins/select2/js/select2.min.js') }}"></script>
+    @if(session('show_congratulations'))
+        <script>
+            window.addEventListener('load', function() {
+                const congratulationsModal = new bootstrap.Modal(document.getElementById('congratulationsModal'), {
+                    keyboard: false
+                });
+                congratulationsModal.show();
+                @php session()->forget('show_congratulations'); @endphp
+            });
+        </script>
+    @endif
     <script>
         $(document).ready(function() {
             if ("{{ $lead_forward->lead_status }}" == "Done") {
@@ -824,18 +835,12 @@
                     item.disabled = true;
                     item.removeAttribute('data-bs-toggle');
                 }
-            } else if ("{{ $lead_forward->lead_status }}" == "Booked") {
-                const congratulationsModal = document.getElementById('congratulationsModal');
-                const modal = new bootstrap.Modal(congratulationsModal);
-                modal.show();
             }
         })
-
 
         function handle_event_information(url_for_submit, url_for_fetch = null) {
             const manageEventModal = document.getElementById('manageEventModal');
             const modalHeading = manageEventModal.querySelector('.modal-title')
-
             manage_event_form.action = url_for_submit;
             const modal = new bootstrap.Modal(manageEventModal);
             if (url_for_fetch === null) {

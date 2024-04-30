@@ -144,6 +144,7 @@ class NvLeadController extends Controller {
             $lead_forward->read_status = true;
             $lead_forward->done_title = null;
             $lead_forward->done_message = null;
+            session(['show_congratulations' => true]);
         } else {
             $validate = Validator::make($request->all(), [
                 'forward_id' => 'required|exists:nv_lead_forwards,id',
