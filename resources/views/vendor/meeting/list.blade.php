@@ -23,7 +23,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                     <h1 class="m-0">{{$page_heading}}</h1>
                 </div>
             </div>
-            <div class="filter-container text-center">
+            <div class="filter-container text-center d-none">
                 <form action="{{route('vendor.meeting.list')}}" method="post">
                     @csrf
                     <label for="">Filter by meeting schedule date</label>
@@ -248,7 +248,7 @@ if (isset($filter_params['meeting_status'])) {
                 }
                 row.style.cursor = "pointer";
                 row.setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
-        
+
                 const td_elements = row.querySelectorAll('td');
                 td_elements[1].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
                 td_elements[1].classList.add('text-nowrap');
@@ -257,9 +257,9 @@ if (isset($filter_params['meeting_status'])) {
                 }else{
                     td_elements[4].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
-                
-                td_elements[5].innerHTML = moment(data.meeting_schedule_datetime).format("DD-MMM-YYYY hh:mm a");; 
-                
+
+                td_elements[5].innerHTML = moment(data.meeting_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
+
                 const meeting_schedule_date = moment(data.meeting_schedule_datetime).format("DD-MMM-YYYY");
                 const current_date = moment().format("DD-MMM-YYYY");
                 if (data.meeting_done_datetime != null) {
@@ -271,11 +271,11 @@ if (isset($filter_params['meeting_status'])) {
                 } else if (meeting_schedule_date == current_date) {
                     elem_class = "warning";
                     elem_text = "Today";
-                } else if (meeting_schedule_date < current_date) { 
+                } else if (meeting_schedule_date < current_date) {
                     elem_class = "danger";
                     elem_text = "Overdue";
-                } 
-                td_elements[6].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`; 
+                }
+                td_elements[6].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
 
                 td_elements[7].innerText = moment(data.event_datetime).format("DD-MMM-YYYY");
                 td_elements[8].innerText = moment(data.meeting_created_datetime).format("DD-MMM-YYYY hh:mm a");
