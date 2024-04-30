@@ -805,8 +805,6 @@
                     <div class="modal-body">
                         <img src="{{ asset('wb-logo2.webp') }}" alt="AdminLTE Logo" style="width: 100% !important;">
                         <p class="text-center mt-5"><b>Congratulations You have Booked a lead. Keep it Up!</b></p>
-                        <p class="text-center mt-2"><a class="btn  text-light p-2 m-1" style="background-color: var(--wb-dark-red)"
-                            href="{{ route('vendor.lead.status.update', $lead_forward->id) }}/Active"><i>Not Booked Click to Re-active</i></a></p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

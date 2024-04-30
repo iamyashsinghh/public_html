@@ -108,7 +108,7 @@
                     </a>
                 </div>
                 <div class="col-lg-12 mt-3">
-                    <h3>Tasks</h3>
+                    <h3>Booked</h3>
                 </div>
                 <div class="col-lg-3 col-6">
                     <a target="_blank" href="{{route('vendor.lead.list')}}" class="text-light">
