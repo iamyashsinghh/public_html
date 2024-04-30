@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 
 class NotifyVendorLead extends Mailable {
@@ -24,7 +25,7 @@ class NotifyVendorLead extends Mailable {
     public function envelope() {
         return new Envelope(
             subject: "Received new lead from " . env('APP_NAME'),
-            from: env('SMTP2_MAIL_FROM_ADDRESS')
+            from: new Address(env('SMTP2_MAIL_FROM_ADDRESS') , env('MAIL_FROM_NAME', 'Wedding Banquets'))
         );
     }
 
