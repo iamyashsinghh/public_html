@@ -20,7 +20,7 @@ class DashboardController extends Controller {
     public function index() {
         $auth_user = Auth::guard('vendormanager')->user();
 
-        $v_members = Vendor::select('id', 'name', 'business_name')->where(['parent_id' => $auth_user->id, 'status' => 1])->get();
+        $v_members = Vendor::select('id', 'name', 'business_name', 'start_date', 'end_date')->where(['parent_id' => $auth_user->id, 'status' => 1])->get();
         $current_month = date('Y-m');
         $current_date = date('Y-m-d');
 
@@ -43,7 +43,13 @@ class DashboardController extends Controller {
             $v['meeting_schedule_today'] = nvMeeting::where(['created_by' => $v->id, 'done_datetime' => null])->where('meeting_schedule_datetime', 'like', "%$current_date%")->count();
             $v['meeting_overdue'] = nvMeeting::where(['created_by' => $v->id, 'done_datetime' => null])->where('meeting_schedule_datetime', '<', Carbon::today())->count();
             $v['created_lead'] = PVendorLead::where('created_by', $v->id)->count();
-        }
+            if (isset($v->start_date) && isset($v->end_date)) {
+                $v['time_period_lead'] = nvLeadForward::where('forward_to', $v->id)
+                                                      ->whereBetween('lead_datetime', [new Carbon($v->start_date), new Carbon($v->end_date)])
+                                                      ->count();
+            } else {
+                $v['time_period_lead'] = 0;
+            }        }
 
         $vs_id = [];
         foreach ($v_members as $list) {
