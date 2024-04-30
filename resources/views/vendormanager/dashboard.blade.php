@@ -69,7 +69,7 @@
                                         <th class="p-1">Schedule Meeting this Month</th>
                                         <th class="p-1">Schedule Meeting Today</th>
                                         <th class="p-1">Meeting Overdue</th>
-                                        <th class="p-1">Lead Created</th>
+                                        <th class="p-1">Self Lead Created</th>
                                     </tr>
                                 </thead>
                                 <tbody>
