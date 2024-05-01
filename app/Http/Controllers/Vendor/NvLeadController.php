@@ -108,6 +108,8 @@ class NvLeadController extends Controller {
                 $from =  Carbon::today()->startOfMonth();
                 $to =  Carbon::today()->endOfMonth();
                 $leads->where('nv_lead_forwards.read_status', false);
+            } elseif($request->dashboard_filters == "bookeed_leads"){
+                $leads->where('nv_lead_forwards.lead_status', 'Booked');
             }
         }
 

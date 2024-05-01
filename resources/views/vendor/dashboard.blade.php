@@ -111,7 +111,7 @@
                     <h3>Booked</h3>
                 </div>
                 <div class="col-lg-3 col-6">
-                    <a target="_blank" href="{{route('vendor.lead.list')}}" class="text-light">
+                    <a target="_blank" href="{{route('vendor.lead.list', 'bookeed_leads')}}" class="text-light">
                         <div class="small-box text-sm" style="background: var(--wb-dark-red);">
                             <div class="inner">
                                 <h3>{{$leads_booked}}</h3>
