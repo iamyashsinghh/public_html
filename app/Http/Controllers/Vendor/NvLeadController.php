@@ -62,9 +62,9 @@ class NvLeadController extends Controller {
         ->where(['forward_to' => $auth_user->id]);
 
         if ($request->lead_status != null) {
-            $leads->where('lead_status', $request->lead_status);
+            $leads->where('nv_lead_forwards.lead_status', $request->lead_status);
         } elseif ($request->lead_read_status != null) {
-            $leads->where('read_status', '=', $request->lead_read_status);
+            $leads->where('nv_lead_forwards.read_status', '=', $request->lead_read_status);
         } elseif ($request->event_from_date != null) {
             $from =  Carbon::make($request->event_from_date);
             if ($request->event_to_date != null) {
@@ -72,7 +72,7 @@ class NvLeadController extends Controller {
             } else {
                 $to = Carbon::make($request->event_from_date)->endOfDay();
             }
-            $leads->whereBetween('event_datetime', [$from, $to]);
+            $leads->whereBetween('nv_lead_forwards.event_datetime', [$from, $to]);
         } elseif ($request->lead_from_date != null) {
             $from =  Carbon::make($request->lead_from_date);
             if ($request->lead_to_date != null) {
@@ -80,7 +80,7 @@ class NvLeadController extends Controller {
             } else {
                 $to = Carbon::make($request->lead_from_date)->endOfDay();
             }
-            $leads->whereBetween('lead_datetime', [$from, $to]);
+            $leads->whereBetween('nv_lead_forwards.lead_datetime', [$from, $to]);
         } elseif ($request->lead_done_from_date != null) {
             $from =  Carbon::make($request->lead_done_from_date);
             if ($request->lead_done_to_date != null) {
@@ -88,7 +88,7 @@ class NvLeadController extends Controller {
             } else {
                 $to = Carbon::make($request->lead_done_from_date)->endOfDay();
             }
-            $leads->where('lead_status', 'Done')->whereBetween('nv_lead_forwards.updated_at', [$from, $to]);
+            $leads->where('nv_lead_forwards.lead_status', 'Done')->whereBetween('nv_lead_forwards.updated_at', [$from, $to]);
         } elseif ($request->has_rm_message != null) {
             if ($request->has_rm_message == "yes") {
                 $leads->join('nvrm_messages as rm_msg', 'nv_lead_forwards.lead_id', '=', 'rm_msg.lead_id');

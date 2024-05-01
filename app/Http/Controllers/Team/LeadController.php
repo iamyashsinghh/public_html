@@ -158,7 +158,7 @@ class LeadController extends Controller
                 'leads.lead_status',
                 'leads.service_status',
                 'leads.read_status',
-            )->where('leads.forward_to', $auth_user->id);
+            )->where('leads.forward_to', $auth_user->id)->whereNull('leads.deleted_at');
 
             if ($request->has('lead_status') && $request->lead_status != '') {
                 $leads->where('leads.lead_status', $request->lead_status);
@@ -239,7 +239,7 @@ class LeadController extends Controller
                         GROUP BY tasks.lead_id
                         HAVING COUNT(CASE WHEN tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
                     "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
-                    ->whereNotNull('completed_tasks.lead_id') // Ensures the join found a match, thus the lead has all tasks completed
+                    ->whereNotNull('completed_tasks.lead_id')
                     ->where('leads.lead_status', '!=', 'Done');
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();

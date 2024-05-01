@@ -61,9 +61,9 @@ class PLeadController extends Controller
         )->where(['forward_to' => $auth_user->id]);
 
         if ($request->lead_status != null) {
-            $leads->where('lead_status', $request->lead_status);
+            $leads->where('p_vendor_leads.lead_status', $request->lead_status);
         } elseif ($request->lead_read_status != null) {
-            $leads->where('read_status', '=', $request->lead_read_status);
+            $leads->where('p_vendor_leads.read_status', '=', $request->lead_read_status);
         } elseif ($request->event_from_date != null) {
             $from =  Carbon::make($request->event_from_date);
             if ($request->event_to_date != null) {
@@ -71,7 +71,7 @@ class PLeadController extends Controller
             } else {
                 $to = Carbon::make($request->event_from_date)->endOfDay();
             }
-            $leads->whereBetween('event_datetime', [$from, $to]);
+            $leads->whereBetween('p_vendor_leads.event_datetime', [$from, $to]);
         } elseif ($request->lead_from_date != null) {
             $from =  Carbon::make($request->lead_from_date);
             if ($request->lead_to_date != null) {
@@ -79,7 +79,7 @@ class PLeadController extends Controller
             } else {
                 $to = Carbon::make($request->lead_from_date)->endOfDay();
             }
-            $leads->whereBetween('lead_datetime', [$from, $to]);
+            $leads->whereBetween('p_vendor_leads.lead_datetime', [$from, $to]);
         } elseif ($request->lead_done_from_date != null) {
             $from =  Carbon::make($request->lead_done_from_date);
             if ($request->lead_done_to_date != null) {
@@ -87,7 +87,7 @@ class PLeadController extends Controller
             } else {
                 $to = Carbon::make($request->lead_done_from_date)->endOfDay();
             }
-            $leads->where('lead_status', 'Done')->whereBetween('p_vendor_leads.updated_at', [$from, $to]);
+            $leads->where('p_vendor_leads.lead_status', 'Done')->whereBetween('p_vendor_leads.updated_at', [$from, $to]);
         } elseif ($request->has_rm_message != null) {
             if ($request->has_rm_message == "yes") {
                 $leads->join('nvrm_messages as rm_msg', 'p_vendor_leads.lead_id', '=', 'rm_msg.lead_id');

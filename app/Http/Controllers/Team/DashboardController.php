@@ -75,7 +75,7 @@ class DashboardController extends Controller
             $total_leads_received_today = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where('forward_to', $auth_user->id)->count();
             $unread_leads_this_month = LeadForward::where('lead_datetime', 'like', "%$current_month%")->where(['forward_to' => $auth_user->id, 'read_status' => false])->count();
             $unread_leads_today = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where(['forward_to' => $auth_user->id, 'read_status' => false])->count();
-            $total_unread_leads_overdue = LeadForward::where('lead_datetime', '<', Carbon::today())->where(['forward_to' => $auth_user->id, 'read_status' => false])->count();
+            $total_unread_leads_overdue = LeadForward::where('read_status', false)->where('lead_datetime', '<', Carbon::today())->where('forward_to' , $auth_user->id)->count();
 
             $task_schedule_this_month = Task::selectRaw('count(distinct(lead_id)) as count')->where('task_schedule_datetime', 'like', "%$current_month%")->where(['created_by' => $auth_user->id, 'done_datetime' => null])->first()->count;
             $task_schedule_today = Task::selectRaw('count(distinct(lead_id)) as count')->where('task_schedule_datetime', 'like', "%$current_date%")->where(['created_by' => $auth_user->id, 'done_datetime' => null])->first()->count;
