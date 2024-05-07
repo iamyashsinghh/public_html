@@ -87,8 +87,10 @@ class LeadController extends Controller
             'roles.name as created_by_role',
             'leads.whatsapp_msg_time',
             'leads.lead_catagory',
+            'ne.pax as pax',
             DB::raw("(select count(fwd.id) from lead_forwards as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
         )->leftJoin('team_members as tm', 'leads.created_by', 'tm.id')
+        ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id')
             ->leftJoin('roles', 'tm.role_id', 'roles.id');
 
         if ($request->has('lead_status') && $request->lead_status != '') {
@@ -127,6 +129,16 @@ class LeadController extends Controller
             $leads->where('read_status', $request->lead_read_status);
         }
 
+        if ($request->pax_min_value != null) {
+            $min =  $request->pax_min_value;
+            if ($request->pax_max_value != null) {
+                $max = $request->pax_max_value;
+            } else {
+                $max = $request->pax_min_value;
+            }
+            $leads->whereBetween('ne.pax', [$min, $max]);
+        }
+        
         if ($request->service_status != null) {
             $leads->where('service_status', $request->service_status);
         }

@@ -32,6 +32,9 @@ class PLeadController extends Controller
         if ($request->event_from_date != null) {
             $filter_params = ['event_from_date' => $request->event_from_date, 'event_to_date' => $request->event_to_date];
         }
+        if ($request->pax_min_value != null) {
+            $filter_params = ['pax_min_value' => $request->pax_min_value, 'pax_max_value' => $request->pax_max_value];
+        }
         if ($request->lead_from_date != null) {
             $filter_params = ['lead_from_date' => $request->lead_from_date, 'lead_to_date' => $request->lead_to_date];
         }
@@ -58,7 +61,9 @@ class PLeadController extends Controller
             'p_vendor_leads.lead_status',
             'p_vendor_leads.event_datetime as event_date',
             'p_vendor_leads.read_status',
-        )->where(['forward_to' => $auth_user->id]);
+            'ne.pax as pax',
+        )->leftJoin('p_vendor_events as ne', 'ne.lead_id', 'p_vendor_leads.id')
+        ->where(['forward_to' => $auth_user->id])->groupBy('nv_lead_forwards.mobile');
 
         if ($request->lead_status != null) {
             $leads->where('p_vendor_leads.lead_status', $request->lead_status);
@@ -88,6 +93,14 @@ class PLeadController extends Controller
                 $to = Carbon::make($request->lead_done_from_date)->endOfDay();
             }
             $leads->where('p_vendor_leads.lead_status', 'Done')->whereBetween('p_vendor_leads.updated_at', [$from, $to]);
+        } elseif ($request->pax_min_value != null) {
+            $min =  $request->pax_min_value;
+            if ($request->pax_max_value != null) {
+                $max = $request->pax_max_value;
+            } else {
+                $max = $request->pax_min_value;
+            }
+            $leads->whereBetween('ne.pax', [$min, $max]);
         } elseif ($request->has_rm_message != null) {
             if ($request->has_rm_message == "yes") {
                 $leads->join('nvrm_messages as rm_msg', 'p_vendor_leads.lead_id', '=', 'rm_msg.lead_id');

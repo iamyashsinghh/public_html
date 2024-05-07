@@ -46,6 +46,7 @@
                             <th class="text-nowrap">Lead Date</th>
                             <th class="">Name</th>
                             <th class="text-nowrap">Mobile</th>
+                            <th class="">Pax</th>
                             <th class="">Lead Status</th>
                             <th class="text-nowrap">Event Date</th>
                         </tr>
@@ -108,6 +109,23 @@
                                 <div class="custom-control custom-radio my-1">
                                     <input class="custom-control-input" type="radio" id="has_rm_message_yes_radio" name="has_rm_message" value="yes" {{isset($filter_params['has_rm_message']) && $filter_params['has_rm_message'] == 'yes'  ? 'checked' : ''}}>
                                     <label for="has_rm_message_yes_radio" class="custom-control-label">Yes</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse55" aria-expanded="true" aria-controls="collapse55">Pax</button>
+                        </h2>
+                        <div id="collapse55" class="accordion-collapse collapse {{isset($filter_params['pax_min_value']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                            <div class="accordion-body pl-2 pb-4">
+                                <div class="form-group">
+                                    <label for="pax_min_value">MIN</label>
+                                    <input type="text" class="form-control" id="pax_min_value" name="pax_min_value" value="{{isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : ''}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pax_max_value">To</label>
+                                    <input type="text" class="form-control" id="pax_max_value" name="pax_max_value" value="{{isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : ''}}">
                                 </div>
                             </div>
                         </div>
@@ -185,6 +203,8 @@ $filter = "lead_read_status=" . $filter_params['lead_read_status'];
 $filter = "has_rm_message=" . $filter_params['has_rm_message'];
 } elseif (isset($filter_params['event_from_date'])) {
 $filter = "event_from_date=" . $filter_params['event_from_date'] . "&event_to_date=" . $filter_params['event_to_date'];
+} elseif (isset($filter_params['pax_min_value'])) {
+$filter = "pax_min_value=" . $filter_params['pax_min_value'] . "&pax_max_value=" . $filter_params['pax_max_value'];
 } elseif (isset($filter_params['lead_from_date'])) {
 $filter = "lead_from_date=" . $filter_params['lead_from_date'] . "&lead_to_date=" . $filter_params['lead_to_date'];
 } elseif (isset($filter_params['lead_done_from_date'])) {
@@ -239,11 +259,16 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
                 },
                 {
                     targets: 4,
+                    name: "pax",
+                    data: "pax",
+                },
+                {
+                    targets: 5,
                     name: "lead_status",
                     data: "lead_status",
                 },
                 {
-                    targets: 5,
+                    targets: 6,
                     name: "event_date",
                     data: "event_date",
                 },
@@ -262,11 +287,11 @@ $filter = "lead_done_from_date=" . $filter_params['lead_done_from_date'] . "&lea
 
                 td_elements[1].innerText = moment(data.lead_date).format("DD-MMM-YYYY hh:mm a");
                 if (data.lead_status == "Done") {
-                    td_elements[4].innerHTML = `<span class="badge badge-secondary">Done</span>`;
+                    td_elements[5].innerHTML = `<span class="badge badge-secondary">Done</span>`;
                 } else {
-                    td_elements[4].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
+                    td_elements[5].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
-                td_elements[5].innerText = data.event_date ? moment(data.event_date).format("DD-MMM-YYYY") : 'N/A';
+                td_elements[6].innerText = data.event_date ? moment(data.event_date).format("DD-MMM-YYYY") : 'N/A';
             }
         });
     });

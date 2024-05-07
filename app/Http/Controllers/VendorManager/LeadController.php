@@ -36,6 +36,9 @@ class LeadController extends Controller {
         if ($request->lead_from_date != null) {
             $filter_params = ['lead_from_date' => $request->lead_from_date, 'lead_to_date' => $request->lead_to_date];
         }
+        if ($request->pax_min_value != null) {
+            $filter_params = ['pax_min_value' => $request->pax_min_value, 'pax_max_value' => $request->pax_max_value];
+        }
 
         $page_heading = $filter_params ? "Leads - Filtered" : "Leads";
         return view('vendormanager.vendorCrm.lead.list', compact('page_heading', 'filter_params', 'v_members'));
@@ -85,6 +88,14 @@ class LeadController extends Controller {
                 $to = Carbon::make($request->lead_from_date)->endOfDay();
             }
             $leads->whereBetween('lead_datetime', [$from, $to]);
+        } elseif ($request->pax_min_value != null) {
+            $min =  $request->pax_min_value;
+            if ($request->pax_max_value != null) {
+                $max = $request->pax_max_value;
+            } else {
+                $max = $request->pax_min_value;
+            }
+            $leads->whereBetween('ne.pax', [$min, $max]);
         } elseif ($request->lead_done_from_date != null) {
             $from =  Carbon::make($request->lead_done_from_date);
             if ($request->lead_done_to_date != null) {
