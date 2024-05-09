@@ -135,49 +135,49 @@ if (!function_exists('getAssigningBdm')) {
         }
     }
 }
-if (!function_exists('sendNotification')) {
+// if (!function_exists('sendNotification')) {
 
- function sendNotification($title, $body, $userid)
-    {
-        $token = TeamMember::where('id',$userid)->first();
-        if(empty($token->device_token)){
-            return 'done';
-        }
-        $msg = "Hey $token->name, you have recived a new lead. Mobile No: $body";
-        $url = 'https://fcm.googleapis.com/fcm/send';
-        $serverKey = env('FCM_MSG_SERVER_KEY');
-        $data = [
-            "registration_ids" => [$token->device_token],
-            "notification" => [
-                "title" => $title,
-                "body" => $msg,
-                "icon" => "https://wbcrm.in/favicon.jpg",
-                "click_action" => "https://wbcrm.in/team/venue-crm/leads/list"
-            ]
-        ];
-        $encodedData = json_encode($data);
-        $headers = [
-            'Authorization:key=' . $serverKey,
-            'Content-Type: application/json',
-        ];
+//  function sendNotification($title, $body, $userid)
+//     {
+//         $token = TeamMember::where('id',$userid)->first();
+//         if(empty($token->device_token)){
+//             return 'done';
+//         }
+//         $msg = "Hey $token->name, you have recived a new lead. Mobile No: $body";
+//         $url = 'https://fcm.googleapis.com/fcm/send';
+//         $serverKey = env('FCM_MSG_SERVER_KEY');
+//         $data = [
+//             "registration_ids" => [$token->device_token],
+//             "notification" => [
+//                 "title" => $title,
+//                 "body" => $msg,
+//                 "icon" => "https://wbcrm.in/favicon.jpg",
+//                 "click_action" => "https://wbcrm.in/team/venue-crm/leads/list"
+//             ]
+//         ];
+//         $encodedData = json_encode($data);
+//         $headers = [
+//             'Authorization:key=' . $serverKey,
+//             'Content-Type: application/json',
+//         ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
-        $result = curl_exec($ch);
-        if ($result === FALSE) {
-            die('Curl failed: ' . curl_error($ch));
-        }
-        curl_close($ch);
-        return true;
-    }
-}
+//         $ch = curl_init();
+//         curl_setopt($ch, CURLOPT_URL, $url);
+//         curl_setopt($ch, CURLOPT_POST, true);
+//         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+//         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+//         curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+//         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//         curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+//         $result = curl_exec($ch);
+//         if ($result === FALSE) {
+//             die('Curl failed: ' . curl_error($ch));
+//         }
+//         curl_close($ch);
+//         return true;
+//     }
+// }
 
 if (!function_exists('assignLeadsToRMs')) {
     function assignLeadsToRMs()
@@ -500,35 +500,18 @@ if (!function_exists('get_business_cat')) {
 Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
     Log::info($request);
     try {
-        $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
-        $is_email_valid = $request->post('email') != null ? "required|email" : "";
-        $is_preference_valid = $request->post('preference') != null ? "required|string|max:255" : "";
-        $mobile = $request->post('mobile');
-        $validate = Validator::make($request->all(), [
-            'name' => $is_name_valid,
-            'email' => $is_email_valid,
-            'preference' => $is_preference_valid,
-        ]);
-        if ($validate->fails()) {
-            return response()->json(['status' => false, 'msg' => $validate->errors()->first()]);
-        }
-        $mobile = $request->post('mobile') ?: $request->post('caller_id_number');
+        $mobile = $request->post('caller_id_number');
         $pattern = "/^\d{10}$/";
         if (!preg_match($pattern, $mobile)) {
             return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
         }
         $current_timestamp = date('Y-m-d H:i:s');
-        if ($request->post('call_to_number')) {
-            $call_to_wb_api_virtual_number = $request->post('call_to_number');
-            $lead_source = "WB|Call";
-            $crm_meta = CrmMeta::find(1);
-            $preference = $crm_meta->meta_value;
-        } else {
-            $call_to_wb_api_virtual_number = null;
-            $lead_source = "WB|Call";
-            $preference = $request->post('preference');
-        }
+        $call_to_wb_api_virtual_number = $request->post('call_to_number');
+        $lead_source = "WB|Call";
+        $crm_meta = CrmMeta::find(1);
+        $preference = $crm_meta->meta_value;
         $lead_cat_data = "Venue";
+        
         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
         if (!$listing_data) {
             $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
@@ -555,7 +538,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->service_status = false;
         $lead->done_title = null;
         $lead->done_message = null;
-        $lead->lead_color = "#4bff0033"; //green color
+        $lead->lead_color = "#4bff0033";
         $lead->virtual_number = $call_to_wb_api_virtual_number;
         $lead->whatsapp_msg_time = $current_timestamp;
         $get_rm = getAssigningRm();
@@ -564,8 +547,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->save();
         $promise = notify_users_about_lead_interakt_async($mobile, $request->post('name'));
         $promise->then(
-            function ($response) {
-            },
+            function ($response) {},
             function ($exception) {
             }
         )->wait();
@@ -574,8 +556,6 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
     }
 });
-
-
 
 Route::post('/new_lead', function (Request $request) {
     $startSubstring = "-546674";
@@ -675,7 +655,7 @@ Route::post('/new_lead', function (Request $request) {
                 }
             )->wait();
 
-            $notifyRm = sendNotification('WB | Notification', $mobile,  $get_rm->id);
+            // $notifyRm = sendNotification('WB | Notification', $mobile,  $get_rm->id);
 
             return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
         } catch (\Throwable $th) {
