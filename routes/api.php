@@ -511,7 +511,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $crm_meta = CrmMeta::find(1);
         $preference = $crm_meta->meta_value;
         $lead_cat_data = "Venue";
-        
+
         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
         if (!$listing_data) {
             $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
@@ -558,6 +558,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
 });
 
 Route::post('/new_lead', function (Request $request) {
+    Log::info($request);
     $startSubstring = "-546674";
     $endSubstring = "@";
     $encoded = $request->post('token');
