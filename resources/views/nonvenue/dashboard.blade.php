@@ -193,7 +193,7 @@
                     </a>
                 </div>
                 <div class="col-lg-12 my-3">
-                    <h3>Total Vendors Help</h3>
+                    <h3>Lead Forward</h3>
                 </div>
                 <div class="col-lg-3 col-6">
                     <a target="_blank" href="{{route('nonvenue.lead.list', 'forward_leads_this_month')}}" class="text-light">
