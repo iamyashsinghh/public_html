@@ -545,12 +545,12 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->assign_to = $get_rm->name;
         $lead->assign_id = $get_rm->id;
         $lead->save();
-        $promise = notify_users_about_lead_interakt_async($mobile, $request->post('name'));
-        $promise->then(
-            function ($response) {},
-            function ($exception) {
-            }
-        )->wait();
+        // $promise = notify_users_about_lead_interakt_async($mobile, $request->post('name'));
+        // $promise->then(
+        //     function ($response) {},
+        //     function ($exception) {
+        //     }
+        // )->wait();
         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
     } catch (\Throwable $th) {
         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
@@ -648,13 +648,13 @@ Route::post('/new_lead', function (Request $request) {
             $lead->assign_to = $get_rm->name;
             $lead->assign_id = $get_rm->id;
             $lead->save();
-            $promise = notify_users_about_lead_interakt_async($request->post('mobile'), $request->post('name'));
-            $promise->then(
-                function ($response) {
-                },
-                function ($exception) {
-                }
-            )->wait();
+            // $promise = notify_users_about_lead_interakt_async($request->post('mobile'), $request->post('name'));
+            // $promise->then(
+            //     function ($response) {
+            //     },
+            //     function ($exception) {
+            //     }
+            // )->wait();
 
             // $notifyRm = sendNotification('WB | Notification', $mobile,  $get_rm->id);
 

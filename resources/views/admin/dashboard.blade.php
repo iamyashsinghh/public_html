@@ -18,7 +18,6 @@
         <div class="container-fluid">
             <div class="row" id="admin-dashboard-cards">
                 <div class="col-lg-3 col-6">
-                    <!-- small box -->
                     <div class="small-box text-sm text-light" style="background: var(--wb-renosand);">
                         <div class="inner">
                             <h3>{{$total_vendors}}</h3>
@@ -30,9 +29,7 @@
                         <a href="{{route('admin.vendor.list')}}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-                <!-- ./col -->
                 <div class="col-lg-3 col-6">
-                    <!-- small box -->
                     <div class="small-box text-sm text-light" style="background: var(--wb-dark-red);">
                         <div class="inner">
                             <h3>{{$total_team}}</h3>
@@ -45,7 +42,6 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-6">
-                    <!-- small box -->
                     <div class="small-box text-sm text-light" style="background: var(--wb-renosand);">
                         <div class="inner">
                             <h3>{{$total_venue_leads}}</h3>
@@ -58,7 +54,6 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-6">
-                    <!-- small box -->
                     <div class="small-box text-sm text-light" style="background: var(--wb-dark-red);">
                         <div class="inner">
                             <h3>{{$total_nv_leads}}</h3>

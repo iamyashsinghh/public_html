@@ -100,8 +100,6 @@ $userName = 'Ritu';
                 </div>
                 <div class="modal-footer text-sm">
                     <div class="mx-5">
-                        <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnHey" title="Hey">Hey</a>
-                    <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnHello" title="Hello">Hello</a>
                     <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnGreetMsg" title="Hi (Name of person in lead), I'm {{ $userName }} your Wedding Planning assistant. Would you like me to help you find venues and wedding vendors for your wedding? (Some btns)">Rm Greet Msg</a>
                     </div>
                     <a href="javascript:void(0);" class="btn btn-sm btn-secondary m-1" data-bs-dismiss="modal">Close</a>
