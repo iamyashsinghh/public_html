@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TeamMember;
 use App\Models\Vendor;
 use App\Models\VendorCategory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\VendorLocalities;
 use Illuminate\Support\Facades\DB;
@@ -73,8 +74,8 @@ class VendorController extends Controller
             'vendors.is_whatsapp_msg',
             'vendors.created_at',
             'vendors.group_name',
-            DB::raw('(SELECT COUNT(*) FROM nv_lead_forwards WHERE nv_lead_forwards.forward_to = vendors.id AND (nv_lead_forwards.created_at BETWEEN vendors.start_date AND vendors.end_date OR (vendors.start_date IS NULL AND vendors.end_date IS NULL))) as total_leads')
-        )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
+            DB::raw('(SELECT COUNT(*) FROM nv_lead_forwards WHERE nv_lead_forwards.forward_to = vendors.id AND (nv_lead_forwards.created_at BETWEEN vendors.start_date AND COALESCE(vendors.end_date, NOW()) OR (vendors.start_date IS NULL AND vendors.end_date IS NULL))) as total_leads')
+            )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
             ->orderBy('group_name', 'asc')
             ->get();
         }else{
@@ -118,7 +119,6 @@ class VendorController extends Controller
             'profile_image' => 'mimes:jpg,jpeg,png,webp|max:1024',
             'category' => 'required|int|exists:vendor_categories,id',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
             'group_name' => 'nullable|string|max:255',
         ]);
 
@@ -166,7 +166,6 @@ class VendorController extends Controller
         $vendor->mobile = $request->mobile_number;
         $vendor->email = $request->email;
         $vendor->start_date = $request->start_date;
-        $vendor->end_date = $request->end_date;
         $vendor->group_name = $request->group_name;
         $vendor->alt_mobile_number = $request->alt_mobile_number;
         $vendor->parent_id = $request->parent_id;
@@ -180,6 +179,12 @@ class VendorController extends Controller
         $vendor = Vendor::find($vendor_id);
         if (!$vendor) {
             return abort(404);
+        }
+
+        if($status == 1){
+            $vendor->end_date = null;
+        }else{
+            $vendor->end_date = Carbon::now()->toDateString();
         }
         $vendor->status = $status;
         $vendor->save();

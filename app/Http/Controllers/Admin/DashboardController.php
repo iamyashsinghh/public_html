@@ -151,20 +151,19 @@ class DashboardController extends Controller {
             $v['meeting_schedule_today'] = nvMeeting::where(['created_by' => $v->id, 'done_datetime' => null])->where('meeting_schedule_datetime', 'like', "%$current_date%")->count();
             $v['meeting_overdue'] = nvMeeting::where(['created_by' => $v->id, 'done_datetime' => null])->where('meeting_schedule_datetime', '<', Carbon::today())->count();
             $v['created_lead'] = PVendorLead::where('created_by', $v->id)->count();
-            if (isset($v->start_date) && isset($v->end_date)) {
+            if (isset($v->start_date) && $v->start_date) {
+                $end_date = isset($v->end_date) && $v->end_date ? new Carbon($v->end_date) : Carbon::now();
                 $v['time_period_lead'] = nvLeadForward::where('forward_to', $v->id)
-                                                      ->whereBetween('lead_datetime', [new Carbon($v->start_date), new Carbon($v->end_date)])
+                                                      ->whereBetween('lead_datetime', [new Carbon($v->start_date), $end_date])
                                                       ->count();
             } else {
                 $v['time_period_lead'] = 0;
-            }        }
-
+            }
+        }
         $vs_id = [];
         foreach ($v_members as $list) {
             array_push($vs_id, $list->id);
         }
-
-
         return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month', 'venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members', 'yearly_calendar', 'v_members'));
     }
 }
