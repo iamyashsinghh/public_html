@@ -43,8 +43,8 @@ class AuthController extends Controller
         }
 
         try {
-            $verification_code = rand(111111, 999999);
-            // $verification_code = 999999;
+            // $verification_code = rand(111111, 999999);
+            $verification_code = 999999;
 
             $agent = new Agent();
             $browser_name = $agent->browser();
@@ -169,6 +169,9 @@ class AuthController extends Controller
             } else if ($user->role_id == 7) {
                 Auth::guard('vendormanager')->login($user);
                 return redirect()->route('vendormanager.dashboard');
+            }else if ($user->role_id == 8) {
+                Auth::guard('seomanager')->login($user);
+                return redirect()->route('seomanager.dashboard');
             } else {
                 Auth::guard('team')->login($user);
                 return redirect()->route('team.dashboard');
@@ -195,6 +198,8 @@ class AuthController extends Controller
             $guard_authenticated = Auth::guard('bdm');
         } else if (Auth::guard('vendormanager')->check()) {
             $guard_authenticated = Auth::guard('vendormanager');
+        } else if (Auth::guard('seomanager')->check()) {
+            $guard_authenticated = Auth::guard('seomanager');
         } else {
             $guard_authenticated = Auth::guard('vendor');
             $login_route_name = "vendor.login";
@@ -237,6 +242,9 @@ class AuthController extends Controller
                 } else if ($member->role_id == 7) {
                     Auth::guard('vendormanager')->login($member);
                     return redirect()->route('vendormanager.dashboard');
+                } else if ($member->role_id == 8) {
+                    Auth::guard('seomanager')->login($member);
+                    return redirect()->route('seomanager.dashboard');
                 } else if ($member->role_id == 6) {
                     Auth::guard('bdm')->login($member);
                     return redirect()->route('bdm.dashboard');

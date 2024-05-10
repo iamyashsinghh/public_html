@@ -64,6 +64,7 @@ class Kernel extends HttpKernel {
         'vendor' => \App\Http\Middleware\VendorAuth::class,
         'bdm'=> \App\Http\Middleware\BdmAuth::class,
         'vendormanager' => \App\Http\Middleware\VendorManagerAuth::class,
+        'seomanager' => \App\Http\Middleware\SEOManagerAuth::class,
         'verify_token' =>  \App\Http\Middleware\VerifyCsrfToken::class,
         'verify_vendor_token' =>  \App\Http\Middleware\VerifyVendorCsrfToken::class,
 

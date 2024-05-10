@@ -47,6 +47,7 @@ Route::post('whatsapp_msg_status_bdm', [Controllers\WhatsappMsgController::class
 
 
 
+
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => 'AuthCheck'], function () {
@@ -108,6 +109,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/leads/ajax_list', [Controllers\Admin\LeadController::class, 'ajax_list'])->name('admin.lead.list.ajax');
             Route::get('/leads/get_forward_info/{lead_id?}', [Controllers\Admin\LeadController::class, 'get_forward_info'])->name('admin.lead.getForwardInfo');
             Route::get('/leads/view/{lead_id?}', [Controllers\Admin\LeadController::class, 'view'])->name('admin.lead.view');
+
             // Route::get('leads/manage_ajax/{lead_id?}', [Controllers\Admin\LeadController::class, 'manage_ajax'])->name('admin.lead.edit');
             Route::get('/leads/delete/{lead_id?}', [Controllers\Admin\LeadController::class, 'delete'])->name('admin.lead.delete');
             Route::post('/leads/add-process', [Controllers\Admin\LeadController::class, 'add_process'])->name('admin.lead.add.process');
@@ -283,6 +285,18 @@ Route::middleware('verify_token')->group(function () {
             //Bypass login: Via vendormanager to vm crm
             Route::get('/bypass-login/{team_id?}', [AuthController::class, 'vendor_login_via_vendormanager'])->name('vendormanager.bypass.login');
         });
+    });
+
+     /*
+    |--------------------------------------------------------------------------
+    | For Seo Manager Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('/seomanager')->middleware('seomanager')->group(function () {
+        Route::get('/dashboard', [Controllers\SeoManager\DashboardController::class, 'index'])->name('seomanager.dashboard');
+
+        Route::match (['get', 'post'], '/leads', [Controllers\SeoManager\LeadController::class, 'list'])->name('seomanager.lead.list');
+        Route::get('/leads/ajax_list', [Controllers\SeoManager\LeadController::class, 'ajax_list'])->name('seomanager.lead.list.ajax');
     });
 
     /*

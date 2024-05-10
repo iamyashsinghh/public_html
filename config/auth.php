@@ -59,6 +59,10 @@ return [
             'driver' => 'session',
             'provider' => 'teamMembers',
         ],
+        'seomanager' => [
+            'driver' => 'session',
+            'provider' => 'teamMembers',
+        ],
         'vendor' => [
             'driver' => 'session',
             'provider' => 'vendors',
