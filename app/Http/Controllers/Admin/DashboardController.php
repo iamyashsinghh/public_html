@@ -130,7 +130,7 @@ class DashboardController extends Controller {
         }
 
 
-        $v_members = Vendor::select('id', 'name', 'business_name', 'start_date', 'end_date')->where('status', 1)->get();
+        $v_members = Vendor::select('id', 'name', 'business_name', 'category_id', 'start_date', 'end_date')->where('status', 1)->get();
         $current_month = date('Y-m');
         $current_date = date('Y-m-d');
         $from =  Carbon::today()->startOfMonth();
@@ -167,3 +167,4 @@ class DashboardController extends Controller {
         return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month', 'venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members', 'yearly_calendar', 'v_members'));
     }
 }
+                                                      
