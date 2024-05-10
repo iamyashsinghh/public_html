@@ -51,7 +51,7 @@
         </section>
         <section class="content">
             <div class="container-fluid">
-                <div class="table-responsive" style="overflow-x: visible;">
+                <div class="table-responsive">
                     <table id="serverTable" class="table text-sm">
                         <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                             <tr>
