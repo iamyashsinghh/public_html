@@ -170,8 +170,7 @@
                             <thead>
                                 <tr class="text-center">
                                     <th class="text-nowrap text-left px-2">CLH Name</th>
-                                    <th class="text-left text-nowrap px-2">VM Name</th>
-                                    <th class="text-left text-nowrap px-2">Venue Name</th>
+                                    <th class="text-left text-nowrap px-2">VM Name /<br/> Venue Name</th>
                                     <th class="px-2">WB Recce Target</th>
                                     <th class="px-2">Recce this Month</th>
                                     <th class="px-2">WB Recce %</th>
@@ -195,8 +194,7 @@
                                 @foreach ($vm_members as $vm)
                                     <tr class="text-center" style="font-weight: bold;">
                                         <td class="text-nowrap text-left px-2">{{$vm->get_manager ? $vm->get_manager->name : 'N/A'}}</td>
-                                        <td class="text-left text-nowrap px-2">{{$vm->name}}</td>
-                                        <td class="text-left text-nowrap px-2">{{$vm->venue_name}}</td>
+                                        <td class="text-left text-nowrap px-2">{{$vm->name}} /<br/> {{$vm->venue_name}}</td>
                                         <td><input type="number" style="width: 50px;" data-vm_id="{{$vm->id}}" value="{{$vm->wb_recce_target}}" onchange="wb_recce_target(this)"></td>
                                         <td class="recce_done_this_month_td">{{$vm->recce_done_this_month}}</td>
                                         @php
@@ -233,6 +231,56 @@
                                         <td data-value="{{$vm->task_overdue}}" class="task_overdue_td">{{$vm->task_overdue}}</td>
                                         <td data-value="{{$vm->unfollowed_leads}}" class="unfollowed_leads_td">{{$vm->unfollowed_leads}}</td>
                                         <td data-value="{{$total_unactioned}}" class="total_unactioned_td">{{$total_unactioned}}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="my-2">
+                <div class="card text-xs mb-5">
+                    <div class="card-header card-header-mod text-light" style="background: linear-gradient(48deg, #8e0000e6, #dfa930b5);">
+                        <h6 class="mb-0 text-bold">Vendor Productivity - {{date('F')}}</h5>
+                    </div>
+                    <div class="card-body p-0" style="max-width: 100%; overflow-x: auto;">
+                        <table class="table-bordered" style="width: 100%;">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="text-left px-1">Vendor Name /<br/> Business Name</th>
+                                    <th class="px-1">Total Leads Recieved</th>
+                                    <th class="px-1">Leads Between Subscription Period</th>
+                                    <th class="px-1">Leads Recieved this Month</th>
+                                    <th class="px-1">Leads Recieved Today</th>
+                                    <th class="px-1">Unread Leads this Month</th>
+                                    <th class="px-1">Unread Leads Overdue</th>
+                                    <th class="px-1">Schedule Task this Month</th>
+                                    <th class="px-1">Schedule Task Today</th>
+                                    <th class="px-1">Task Overdue</th>
+                                    <th class="px-1">Schedule Meeting this Month</th>
+                                    <th class="px-1">Schedule Meeting Today</th>
+                                    <th class="px-1">Meeting Overdue</th>
+                                    <th class="px-1">Self-Lead Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($v_members as $v)
+                                    <tr class="text-center" style="font-weight: bold;">
+                                        <td class="text-nowrap text-left p-1">{{$v->name}} /<br />{{$v->business_name}}</td>
+                                        <td class="p-1">{{$v->total_leads_received}}</td>
+                                        <td class="p-1">{{$v->time_period_lead}}</td>
+                                        <td class="p-1">{{$v->leads_received_this_month}}</td>
+                                        <td class="p-1">{{$v->leads_received_today}}</td>
+                                        <td class="p-1">{{$v->unread_leads_this_month}}</td>
+                                        <td class="p-1">{{$v->unread_leads_overdue}}</td>
+                                        <td class="p-1">{{$v->task_schedule_this_month}}</td>
+                                        <td class="p-1">{{$v->task_schedule_today}}</td>
+                                        <td class="p-1">{{$v->task_overdue}}</td>
+                                        <td class="p-1">{{$v->meeting_schedule_this_month}}</td>
+                                        <td class="p-1">{{$v->meeting_schedule_today}}</td>
+                                        <td class="p-1">{{$v->meeting_overdue}}</td>
+                                        <td class="p-1">{{$v->created_lead}}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
