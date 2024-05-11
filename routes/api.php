@@ -87,6 +87,14 @@ if (!function_exists('getAssigningRm')) {
         }
     }
 }
+if (!function_exists('getRmName')) {
+    function getRmName($name)
+    {
+        $rm_name = TeamMember::where(['role_id' => 4, 'status' => 1, 'name' => $name])->first();
+        return $rm_name;
+    }
+}
+
 if (!function_exists('getAssigningBdm')) {
     function getAssigningBdm()
     {
@@ -135,8 +143,8 @@ if (!function_exists('getAssigningBdm')) {
         }
     }
 }
-// if (!function_exists('sendNotification')) {
 
+// if (!function_exists('sendNotification')) {
 //  function sendNotification($title, $body, $userid)
 //     {
 //         $token = TeamMember::where('id',$userid)->first();
@@ -497,20 +505,29 @@ if (!function_exists('get_business_cat')) {
     }
 }
 
+
+
 Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
-    Log::info($request);
     try {
-        $mobile = $request->post('caller_id_number');
+        Log::info($request->all());
+        $mobile = $request->input('caller_id_number');
         $pattern = "/^\d{10}$/";
+
+        $caller_agent_name = $request->input('answered_agent.name');
+        if (!$caller_agent_name) {
+            $caller_agent_name = $request->input('missed_agent.name', 'Ritu Soni');
+        }
+
         if (!preg_match($pattern, $mobile)) {
             return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
         }
-        $current_timestamp = date('Y-m-d H:i:s');
-        $call_to_wb_api_virtual_number = $request->post('call_to_number');
+
+        $current_timestamp = now();
+        $call_to_wb_api_virtual_number = $request->input('call_to_number');
         $lead_source = "WB|Call";
+
         $crm_meta = CrmMeta::find(1);
-        $preference = $crm_meta->meta_value;
-        $lead_cat_data = "Venue";
+        $preference = $crm_meta ? $crm_meta->meta_value : 'la-fortuna-banquets-mayapuri';
 
         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
         if (!$listing_data) {
@@ -518,21 +535,23 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
             $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
             $lead_cat_data = $cat_data_cms->name;
         }
-        $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data ? $listing_data->location_id : 0)->first();
+
+        $locality = DB::connection('mysql2')->table('locations')->where('id', optional($listing_data)->location_id)->first();
+
         $lead = Lead::where('mobile', $mobile)->first();
         if ($lead) {
-            $lead->enquiry_count = $lead->enquiry_count + 1;
+            $lead->enquiry_count += 1;
         } else {
             $lead = new Lead();
-            $lead->name = $request->post('name');
-            $lead->email = $request->post('email');
+            $lead->name = $request->input('name');
+            $lead->email = $request->input('email');
             $lead->mobile = $mobile;
         }
         $lead->lead_datetime = $current_timestamp;
         $lead->source = $lead_source;
-        $lead->lead_catagory = $lead_cat_data;
+        $lead->lead_catagory = $lead_cat_data ?? null;
         $lead->preference = $preference;
-        $lead->locality = $locality ? $locality->name : null;
+        $lead->locality = optional($locality)->name;
         $lead->lead_status = "Super Hot Lead";
         $lead->read_status = false;
         $lead->service_status = false;
@@ -541,21 +560,82 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->lead_color = "#4bff0033";
         $lead->virtual_number = $call_to_wb_api_virtual_number;
         $lead->whatsapp_msg_time = $current_timestamp;
-        $get_rm = getAssigningRm();
+
+        $get_rm = getRmName($caller_agent_name);
         $lead->assign_to = $get_rm->name;
         $lead->assign_id = $get_rm->id;
         $lead->save();
-        // $promise = notify_users_about_lead_interakt_async($mobile, $request->post('name'));
-        // $promise->then(
-        //     function ($response) {},
-        //     function ($exception) {
-        //     }
-        // )->wait();
+
         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
     } catch (\Throwable $th) {
         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
     }
 });
+
+
+// Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
+//     Log::info($request);
+//     try {
+//         $mobile = $request->post('caller_id_number');
+//         $pattern = "/^\d{10}$/";
+//         $caller_agent_name = $request->post('answered_agent.name');
+//         if(!$caller_agent_name){
+//             $caller_agent_name = $request->post('missed_agent.name');
+//         }elseif(!$caller_agent_name){
+//             $caller_agent_name = 'Ritu Soni';
+//         }
+//         if (!preg_match($pattern, $mobile)) {
+//             return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
+//         }
+//         $current_timestamp = date('Y-m-d H:i:s');
+//         $call_to_wb_api_virtual_number = $request->post('call_to_number');
+//         $lead_source = "WB|Call";
+//         $crm_meta = CrmMeta::find(1);
+//         if($crm_meta){
+//             $preference = $crm_meta->meta_value;
+//         }else{
+//             $preference = 'la-fortuna-banquets-mayapuri';
+//         }
+//         $lead_cat_data = "Venue";
+
+//         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
+//         if (!$listing_data) {
+//             $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
+//             $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
+//             $lead_cat_data = $cat_data_cms->name;
+//         }
+//         $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data ? $listing_data->location_id : 0)->first();
+//         $lead = Lead::where('mobile', $mobile)->first();
+//         if ($lead) {
+//             $lead->enquiry_count = $lead->enquiry_count + 1;
+//         } else {
+//             $lead = new Lead();
+//             $lead->name = $request->post('name');
+//             $lead->email = $request->post('email');
+//             $lead->mobile = $mobile;
+//         }
+//         $lead->lead_datetime = $current_timestamp;
+//         $lead->source = $lead_source;
+//         $lead->lead_catagory = $lead_cat_data;
+//         $lead->preference = $preference;
+//         $lead->locality = $locality ? $locality->name : null;
+//         $lead->lead_status = "Super Hot Lead";
+//         $lead->read_status = false;
+//         $lead->service_status = false;
+//         $lead->done_title = null;
+//         $lead->done_message = null;
+//         $lead->lead_color = "#4bff0033";
+//         $lead->virtual_number = $call_to_wb_api_virtual_number;
+//         $lead->whatsapp_msg_time = $current_timestamp;
+//         $get_rm = getRmName($caller_agent_name);
+//         $lead->assign_to = $get_rm->name;
+//         $lead->assign_id = $get_rm->id;
+//         $lead->save();
+//         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
+//     } catch (\Throwable $th) {
+//         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
+//     }
+// });
 
 Route::post('/new_lead', function (Request $request) {
     Log::info($request);
@@ -648,22 +728,10 @@ Route::post('/new_lead', function (Request $request) {
             $lead->assign_to = $get_rm->name;
             $lead->assign_id = $get_rm->id;
             $lead->save();
-            // $promise = notify_users_about_lead_interakt_async($request->post('mobile'), $request->post('name'));
-            // $promise->then(
-            //     function ($response) {
-            //     },
-            //     function ($exception) {
-            //     }
-            // )->wait();
-
-            // $notifyRm = sendNotification('WB | Notification', $mobile,  $get_rm->id);
-
             return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
         }
-        // }
-
     } else {
         return response()->json(['status' => false, 'msg' => 'Something went wrong.'], 500);
     }
