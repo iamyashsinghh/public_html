@@ -144,49 +144,6 @@ if (!function_exists('getAssigningBdm')) {
     }
 }
 
-// if (!function_exists('sendNotification')) {
-//  function sendNotification($title, $body, $userid)
-//     {
-//         $token = TeamMember::where('id',$userid)->first();
-//         if(empty($token->device_token)){
-//             return 'done';
-//         }
-//         $msg = "Hey $token->name, you have recived a new lead. Mobile No: $body";
-//         $url = 'https://fcm.googleapis.com/fcm/send';
-//         $serverKey = env('FCM_MSG_SERVER_KEY');
-//         $data = [
-//             "registration_ids" => [$token->device_token],
-//             "notification" => [
-//                 "title" => $title,
-//                 "body" => $msg,
-//                 "icon" => "https://wbcrm.in/favicon.jpg",
-//                 "click_action" => "https://wbcrm.in/team/venue-crm/leads/list"
-//             ]
-//         ];
-//         $encodedData = json_encode($data);
-//         $headers = [
-//             'Authorization:key=' . $serverKey,
-//             'Content-Type: application/json',
-//         ];
-
-//         $ch = curl_init();
-//         curl_setopt($ch, CURLOPT_URL, $url);
-//         curl_setopt($ch, CURLOPT_POST, true);
-//         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-//         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-//         curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-//         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//         curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
-//         $result = curl_exec($ch);
-//         if ($result === FALSE) {
-//             die('Curl failed: ' . curl_error($ch));
-//         }
-//         curl_close($ch);
-//         return true;
-//     }
-// }
-
 if (!function_exists('assignLeadsToRMs')) {
     function assignLeadsToRMs()
     {
@@ -522,8 +479,11 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
                 $caller_agent_name = $missed_agents[0]['name'];
             }
         }
+
         if (!$caller_agent_name) {
-            $caller_agent_name = 'Ritu Soni';
+            $get_rm = getAssigningRm();
+        } else {
+            $get_rm = getRmName($caller_agent_name);
         }
 
         if (!preg_match($pattern, $mobile)) {
@@ -533,7 +493,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $current_timestamp = now();
         $call_to_wb_api_virtual_number = $request->input('call_to_number');
         $lead_source = "WB|Call";
-
+        
         $crm_meta = CrmMeta::find(1);
         $preference = $crm_meta ? $crm_meta->meta_value : 'la-fortuna-banquets-mayapuri';
 
@@ -568,11 +528,9 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->lead_color = "#4bff0033";
         $lead->virtual_number = $call_to_wb_api_virtual_number;
         $lead->whatsapp_msg_time = $current_timestamp;
-        $get_rm = getRmName($caller_agent_name);
         $lead->assign_to = $get_rm->name;
         $lead->assign_id = $get_rm->id;
         $lead->save();
-
         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
     } catch (\Throwable $th) {
         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
