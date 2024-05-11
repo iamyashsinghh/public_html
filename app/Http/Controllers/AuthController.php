@@ -138,7 +138,6 @@ class AuthController extends Controller
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Timeout. Please try again.']);
             return redirect()->back();
         }
-
         $last_login_at = date('Y-m-d', strtotime($login_info->login_at));
         $current_date = date('Y-m-d');
         if ($current_date > $last_login_at) {
@@ -152,7 +151,6 @@ class AuthController extends Controller
         $login_info->token = $request->_token;
         $login_info->logout_at = null;
         $login_info->save();
-
         if ($request->verified_login_type === "team") {
             if ($user->role_id == 1) {
                 Auth::guard('admin')->login($user);
@@ -177,7 +175,6 @@ class AuthController extends Controller
                 return redirect()->route('team.dashboard');
             }
         } else {
-
             Auth::guard('vendor')->login($user);
             return redirect()->route('vendor.dashboard');
         }
