@@ -5,8 +5,6 @@ use App\Models\CrmMeta;
 use App\Models\Lead;
 use App\Models\nvLead;
 use App\Models\nvrmLeadForward;
-use App\Models\LeadForward;
-use App\Models\BlockedIp;
 use App\Models\whatsappMessages;
 use App\Models\TeamMember;
 use Illuminate\Http\Request;
@@ -14,15 +12,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Response;
 use GuzzleHttp\Client;
-use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Vendor;
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -143,49 +136,6 @@ if (!function_exists('getAssigningBdm')) {
         }
     }
 }
-
-// if (!function_exists('sendNotification')) {
-//  function sendNotification($title, $body, $userid)
-//     {
-//         $token = TeamMember::where('id',$userid)->first();
-//         if(empty($token->device_token)){
-//             return 'done';
-//         }
-//         $msg = "Hey $token->name, you have recived a new lead. Mobile No: $body";
-//         $url = 'https://fcm.googleapis.com/fcm/send';
-//         $serverKey = env('FCM_MSG_SERVER_KEY');
-//         $data = [
-//             "registration_ids" => [$token->device_token],
-//             "notification" => [
-//                 "title" => $title,
-//                 "body" => $msg,
-//                 "icon" => "https://wbcrm.in/favicon.jpg",
-//                 "click_action" => "https://wbcrm.in/team/venue-crm/leads/list"
-//             ]
-//         ];
-//         $encodedData = json_encode($data);
-//         $headers = [
-//             'Authorization:key=' . $serverKey,
-//             'Content-Type: application/json',
-//         ];
-
-//         $ch = curl_init();
-//         curl_setopt($ch, CURLOPT_URL, $url);
-//         curl_setopt($ch, CURLOPT_POST, true);
-//         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-//         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-//         curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-//         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//         curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
-//         $result = curl_exec($ch);
-//         if ($result === FALSE) {
-//             die('Curl failed: ' . curl_error($ch));
-//         }
-//         curl_close($ch);
-//         return true;
-//     }
-// }
 
 if (!function_exists('assignLeadsToRMs')) {
     function assignLeadsToRMs()
@@ -505,8 +455,6 @@ if (!function_exists('get_business_cat')) {
     }
 }
 
-
-
 Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
     try {
         Log::info($request->all());
@@ -571,71 +519,6 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
     }
 });
-
-
-// Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
-//     Log::info($request);
-//     try {
-//         $mobile = $request->post('caller_id_number');
-//         $pattern = "/^\d{10}$/";
-//         $caller_agent_name = $request->post('answered_agent.name');
-//         if(!$caller_agent_name){
-//             $caller_agent_name = $request->post('missed_agent.name');
-//         }elseif(!$caller_agent_name){
-//             $caller_agent_name = 'Ritu Soni';
-//         }
-//         if (!preg_match($pattern, $mobile)) {
-//             return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
-//         }
-//         $current_timestamp = date('Y-m-d H:i:s');
-//         $call_to_wb_api_virtual_number = $request->post('call_to_number');
-//         $lead_source = "WB|Call";
-//         $crm_meta = CrmMeta::find(1);
-//         if($crm_meta){
-//             $preference = $crm_meta->meta_value;
-//         }else{
-//             $preference = 'la-fortuna-banquets-mayapuri';
-//         }
-//         $lead_cat_data = "Venue";
-
-//         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
-//         if (!$listing_data) {
-//             $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
-//             $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
-//             $lead_cat_data = $cat_data_cms->name;
-//         }
-//         $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data ? $listing_data->location_id : 0)->first();
-//         $lead = Lead::where('mobile', $mobile)->first();
-//         if ($lead) {
-//             $lead->enquiry_count = $lead->enquiry_count + 1;
-//         } else {
-//             $lead = new Lead();
-//             $lead->name = $request->post('name');
-//             $lead->email = $request->post('email');
-//             $lead->mobile = $mobile;
-//         }
-//         $lead->lead_datetime = $current_timestamp;
-//         $lead->source = $lead_source;
-//         $lead->lead_catagory = $lead_cat_data;
-//         $lead->preference = $preference;
-//         $lead->locality = $locality ? $locality->name : null;
-//         $lead->lead_status = "Super Hot Lead";
-//         $lead->read_status = false;
-//         $lead->service_status = false;
-//         $lead->done_title = null;
-//         $lead->done_message = null;
-//         $lead->lead_color = "#4bff0033";
-//         $lead->virtual_number = $call_to_wb_api_virtual_number;
-//         $lead->whatsapp_msg_time = $current_timestamp;
-//         $get_rm = getRmName($caller_agent_name);
-//         $lead->assign_to = $get_rm->name;
-//         $lead->assign_id = $get_rm->id;
-//         $lead->save();
-//         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
-//     } catch (\Throwable $th) {
-//         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
-//     }
-// });
 
 Route::post('/new_lead', function (Request $request) {
     Log::info($request);
@@ -788,7 +671,6 @@ Route::post('handle_calling_request', function (Request $request) {
     if ($validate->fails()) {
         return response()->json(['success' => false, 'message' => $validate->errors()->first()]);
     }
-
     try {
         $crm_meta = CrmMeta::find(1);
         $crm_meta->meta_value = $request->slug;
