@@ -513,9 +513,17 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $mobile = $request->input('caller_id_number');
         $pattern = "/^\d{10}$/";
 
-        $caller_agent_name = $request->input('answered_agent.name');
+        $caller_agent_name = null;
+        if ($request->input('answered_agent') !== null) {
+            $caller_agent_name = $request->input('answered_agent.name');
+        } elseif ($request->input('missed_agent') !== null) {
+            $missed_agents = $request->input('missed_agent');
+            if (!empty ($missed_agents)) {
+                $caller_agent_name = $missed_agents[0]['name'];
+            }
+        }
         if (!$caller_agent_name) {
-            $caller_agent_name = $request->input('missed_agent.name', 'Ritu Soni');
+            $caller_agent_name = 'Ritu Soni';
         }
 
         if (!preg_match($pattern, $mobile)) {
@@ -560,7 +568,6 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->lead_color = "#4bff0033";
         $lead->virtual_number = $call_to_wb_api_virtual_number;
         $lead->whatsapp_msg_time = $current_timestamp;
-
         $get_rm = getRmName($caller_agent_name);
         $lead->assign_to = $get_rm->name;
         $lead->assign_id = $get_rm->id;
@@ -752,7 +759,7 @@ Route::post('/business_lead', function (Request $request) {
         $lead = BdmLead::where('mobile', $mobile)->first();
 
         $bussinesCatId = 4;
-        if($request->post('business_type') == '2'){
+        if ($request->post('business_type') == '2') {
             $bussinesCatId = get_business_cat($request->post('business_category'));
         }
         if ($lead) {
