@@ -466,12 +466,14 @@ if (!function_exists('get_business_cat')) {
 Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
     try {
         Log::info('Received Tata call data:', $request->all());
+
         $mobile = $request->input('caller_id_number');
         $pattern = "/^\d{10}$/";
+
         $caller_agent_name = null;
         $lead_cat_data = null;
         $get_rm = null;
-        $recording_url = $request->input('recording_url');
+
         if ($request->input('answered_agent') !== null) {
             $caller_agent_name = $request->input('answered_agent.name');
         } elseif ($request->input('missed_agent') !== null) {
@@ -506,21 +508,21 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
             }
         }
 
+        // Get locality
         $locality = DB::connection('mysql2')->table('locations')->where('id', optional($listing_data)->location_id)->first();
 
+        // Find or create lead
         $lead = Lead::where('mobile', $mobile)->first();
         if ($lead) {
             $lead->enquiry_count += 1;
-            if ($recording_url !== null) {
-                $lead->recording_url .= ',' . $recording_url;
-            }
         } else {
             $lead = new Lead();
             $lead->name = $request->input('name');
             $lead->email = $request->input('email');
             $lead->mobile = $mobile;
-            $lead->recording_url = $recording_url;
         }
+
+        // Update lead details
         $lead->lead_datetime = $current_timestamp;
         $lead->source = $lead_source;
         $lead->lead_catagory = $lead_cat_data;
@@ -538,8 +540,10 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->assign_id = $get_rm ? $get_rm->id : null;
         $lead->save();
 
+        // Return success response
         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with the best price..!']);
     } catch (\Throwable $th) {
+        // Log and return error response
         Log::error('Error processing Tata call data: ' . $th->getMessage());
         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
     }
