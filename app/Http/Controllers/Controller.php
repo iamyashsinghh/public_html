@@ -237,7 +237,7 @@ class Controller extends BaseController {
         }
     }
 
-    public function sendNotification($title = 'hello', $body= '9565676128', $userid)
+    public function sendNotification($userid, $title = 'hello', $body= '9565676128')
     {
 
         $token = TeamMember::where('id',$userid)->first();

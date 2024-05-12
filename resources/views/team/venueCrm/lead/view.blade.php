@@ -603,6 +603,48 @@
                             </div>
                         </div>
                     </div>
+                    @if ($auth_user->role_id == 4)
+                    <div class="card mb-5">
+                        <div class="card-header text-light" style="background-color: var(--wb-renosand);">
+                            <h3 class="card-title">Call Recordings</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="serverTable" class="table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-nowrap">S.No.</th>
+                                            <th class="">Recording</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                        $recording_urls = !empty($lead->recording_url) ? explode(',', $lead->recording_url) : [];
+                                        @endphp
+                                        @if(count($recording_urls) > 0)
+                                        @foreach ($recording_urls as $key => $url)
+                                        <tr>
+                                            <td>{{$key+1}}</td>
+                                            <td>
+                                                <audio controls>
+                                                    <source src="{{$url}}" type="audio/mpeg">
+                                                    Your browser does not support the audio element.
+                                                </audio>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                        @else
+                                        <tr>
+                                            <td class="text-center text-muted" colspan="2">No data available in table</td>
+                                        </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    @endif
                 </div>
             </div>
         </div>
