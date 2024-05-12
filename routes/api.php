@@ -473,6 +473,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $caller_agent_name = null;
         $lead_cat_data = null;
         $get_rm = null;
+        $recording_url = $request->input('recording_url');
 
         if ($request->input('answered_agent') !== null) {
             $caller_agent_name = $request->input('answered_agent.name');
@@ -514,15 +515,19 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         // Find or create lead
         $lead = Lead::where('mobile', $mobile)->first();
         if ($lead) {
+            if ($recording_url !== null) {
+                $lead->recording_url .= ',' . $recording_url;
+            }
             $lead->enquiry_count += 1;
         } else {
             $lead = new Lead();
             $lead->name = $request->input('name');
             $lead->email = $request->input('email');
             $lead->mobile = $mobile;
+            if ($recording_url !== null) {
+                $lead->recording_url = $recording_url;
+            }
         }
-
-        // Update lead details
         $lead->lead_datetime = $current_timestamp;
         $lead->source = $lead_source;
         $lead->lead_catagory = $lead_cat_data;
