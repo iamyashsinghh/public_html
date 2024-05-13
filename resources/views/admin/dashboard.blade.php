@@ -664,7 +664,7 @@
                 data: ("{{$venue_leads_for_this_month}}").split(",")
             },
             {
-                label: 'Call Leads',
+                label: 'Call',
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#a06b14",
@@ -672,7 +672,7 @@
                 data: ("{{$venue_call_leads_for_this_month}}").split(",")
             },
             {
-                label: 'Form Leads',
+                label: 'Form ',
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#aa559f",
@@ -680,7 +680,7 @@
                 data: ("{{$venue_form_leads_for_this_month}}").split(",")
             },
             {
-                label: 'Whatsapp Leads',
+                label: 'Whatsapp',
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#618200",
