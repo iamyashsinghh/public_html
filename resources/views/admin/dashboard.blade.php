@@ -656,7 +656,7 @@
         data: {
             labels: current_month_days_arr,
             datasets: [{
-                label: 'Venue Leads',
+                label: 'Total Leads',
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#891010",
@@ -670,6 +670,14 @@
                 backgroundColor: "#a06b14",
                 borderColor: "rgba(0,0,0,0.2)",
                 data: ("{{$venue_call_leads_for_this_month}}").split(",")
+            },
+            {
+                label: 'Venue Form Leads',
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "#aa559f",
+                borderColor: "rgba(0,0,0,0.1)",
+                data: ("{{$venue_form_leads_for_this_month}}").split(",")
             }]
         },
         options: {
