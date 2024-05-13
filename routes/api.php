@@ -814,7 +814,7 @@ Route::post('handle_calling_request', function (Request $request) {
     try {
         $crm_meta = CrmMeta::find(1);
         $crm_meta->meta_value = $request->slug;
-        $crm_meta->id_ad = $request->is_ad;
+        $crm_meta->is_ad = $request->is_ad;
         $crm_meta->save();
         return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Data stored successfully.']);
     } catch (\Throwable $th) {
