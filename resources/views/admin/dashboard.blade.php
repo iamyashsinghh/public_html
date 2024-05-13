@@ -660,7 +660,7 @@
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#891010",
-                borderColor: "rgba(0,0,255,0.1)",
+                borderColor: "#891010",
                 data: ("{{$venue_leads_for_this_month}}").split(",")
             },
             {
@@ -668,7 +668,7 @@
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#a06b14",
-                borderColor: "rgba(0,0,0,0.2)",
+                borderColor: "#a06b14",
                 data: ("{{$venue_call_leads_for_this_month}}").split(",")
             },
             {
@@ -676,7 +676,7 @@
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#aa559f",
-                borderColor: "rgba(0,0,0,0.1)",
+                borderColor: "#aa559f",
                 data: ("{{$venue_form_leads_for_this_month}}").split(",")
             },
             {
@@ -684,7 +684,7 @@
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#618200",
-                borderColor: "rgba(0,0,0,0.1)",
+                borderColor: "#618200",
                 data: ("{{$venue_whatsapp_leads_for_this_month}}").split(",")
             },
             {
@@ -692,7 +692,7 @@
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#4497bb",
-                borderColor: "rgba(0,0,0,0.1)",
+                borderColor: "#4497bb",
                 data: ("{{$venue_ads_leads_for_this_month}}").split(",")
             },
             {
@@ -700,7 +700,7 @@
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#cbe21d",
-                borderColor: "rgba(0,0,0,0.1)",
+                borderColor: "#cbe21d",
                 data: ("{{$venue_organic_leads_for_this_month}}").split(",")
             }]
         },
