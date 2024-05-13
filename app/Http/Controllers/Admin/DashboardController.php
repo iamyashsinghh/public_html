@@ -48,6 +48,14 @@ class DashboardController extends Controller {
         }
         $venue_form_leads_for_this_month = implode(",", $venue_form_leads_for_this_month);
 
+        $venue_whatsapp_leads_for_this_month = [];
+        for ($i = 1; $i <= date('d'); $i++) {
+            $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
+            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->where('source', 'WB|WhatsApp')->count();
+            array_push($venue_whatsapp_leads_for_this_month, $count);
+        }
+        $venue_whatsapp_leads_for_this_month = implode(",", $venue_whatsapp_leads_for_this_month);
+
         $venue_call_leads_for_this_month = [];
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
