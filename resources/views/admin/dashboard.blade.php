@@ -685,7 +685,7 @@
                 lineTension: 0,
                 backgroundColor: "#618200",
                 borderColor: "rgba(0,0,0,0.1)",
-                data: ("{{$venue_form_leads_for_this_month}}").split(",")
+                data: ("{{$venue_whatsapp_leads_for_this_month}}").split(",")
             }]
         },
         options: {
