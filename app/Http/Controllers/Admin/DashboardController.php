@@ -205,6 +205,6 @@ class DashboardController extends Controller {
         foreach ($v_members as $list) {
             array_push($vs_id, $list->id);
         }
-        return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month','venue_form_leads_for_this_month', 'venue_call_leads_for_this_month','venue_whatsapp_leads_for_this_month','venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members', 'yearly_calendar', 'v_members'));
+        return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month','venue_form_leads_for_this_month','venue_ads_leads_for_this_month','venue_organic_leads_for_this_month', 'venue_call_leads_for_this_month','venue_whatsapp_leads_for_this_month','venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members', 'yearly_calendar', 'v_members'));
     }
 }
