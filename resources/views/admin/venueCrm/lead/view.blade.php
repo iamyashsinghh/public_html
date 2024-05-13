@@ -629,7 +629,7 @@
                                                     </audio>
                                                 </td>
                                                 <td>
-                                                    Datetime: {{$data['datetime']}}<br>
+                                                    Datetime: {{date('d-M-Y h:i a', strtotime($data['datetime']))}}<br>
                                                     Caller Agent: {{$data['caller_agent']}}
                                                 </td>
                                             </tr>
