@@ -189,7 +189,9 @@
                 ],
                 order: [[1, 'desc']],
                 rowCallback: function(row, data, index) {
-
+                    if(data.is_ad == 1){
+                        row.style.backgroundColor = "#4497bb"
+                    }
                 }
             });
             $('#filters-form').on('submit', function(e) {

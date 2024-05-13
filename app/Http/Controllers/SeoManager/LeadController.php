@@ -49,7 +49,8 @@ class LeadController extends Controller
             'leads.source',
             'leads.preference',
             'leads.locality',
-            'leads.lead_catagory'
+            'leads.lead_catagory',
+            'leads.is_ad'
         );
         if ($request->has('lead_from_date') && $request->lead_from_date != '') {
             $from = Carbon::make($request->lead_from_date);
