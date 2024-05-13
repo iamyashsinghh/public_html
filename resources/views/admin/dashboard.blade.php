@@ -656,29 +656,45 @@
         data: {
             labels: current_month_days_arr,
             datasets: [{
+                label: 'Venue Leads',
                 fill: false,
                 lineTension: 0,
                 backgroundColor: "#891010",
                 borderColor: "rgba(0,0,255,0.1)",
                 data: ("{{$venue_leads_for_this_month}}").split(",")
+            },
+            {
+                label: 'Venue Call Leads',
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "#a06b14",
+                borderColor: "rgba(0,0,0,0.2)",
+                data: ("{{$venue_call_leads_for_this_month}}").split(",")
             }]
         },
         options: {
-            legend: {
-                display: false
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        min: 1
-                    }
-                }],
-            },
-            //  title: {
-            //     display: true,
-            //     text: "Last 30 Days Leads (Vanues)"
-            //  }
+        legend: {
+            display: false
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    min: 1
+                }
+            }],
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+                label: function(tooltipItem, data) {
+                    var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                    var value = tooltipItem.yLabel;
+                    return label + ': ' + value;
+                }
+            }
         }
+    }
     });
 
     new Chart("venue_chart_years", {
