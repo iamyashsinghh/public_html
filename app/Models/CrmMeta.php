@@ -10,6 +10,8 @@ use App\Traits\HasAuthenticatedUser;
 class CrmMeta extends Model
 {
     use HasFactory, HasAuthenticatedUser,LogsActivity;
+    protected $table = 'crm_metas';
+    protected $guarded = [];
     public function getActivitylogOptions(): LogOptions
     {
         $userId = $this->getAuthenticatedUserId();
