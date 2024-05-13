@@ -45,7 +45,7 @@ class AuthController extends Controller
         try {
             $verification_code = rand(111111, 999999);
             // $verification_code = 999999;
-            
+
             $agent = new Agent();
             $browser_name = $agent->browser();
             $browser_version = $agent->version($browser_name);
