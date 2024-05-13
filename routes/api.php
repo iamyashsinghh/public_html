@@ -582,7 +582,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
 
         $crm_meta = CrmMeta::find(1);
         $preference = $crm_meta ? $crm_meta->meta_value : 'la-fortuna-banquets-mayapuri';
-
+        $id_ad =  $crm_meta ? $crm_meta->is_ad : '0';
         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
         if (!$listing_data) {
             $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
@@ -643,6 +643,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->read_status = false;
         $lead->service_status = false;
         $lead->done_title = null;
+        $lead->is_ad = $id_ad;
         $lead->done_message = null;
         $lead->lead_color = "#4bff0033";
         $lead->virtual_number = $call_to_wb_api_virtual_number;
@@ -810,10 +811,10 @@ Route::post('handle_calling_request', function (Request $request) {
     if ($validate->fails()) {
         return response()->json(['success' => false, 'message' => $validate->errors()->first()]);
     }
-
     try {
         $crm_meta = CrmMeta::find(1);
         $crm_meta->meta_value = $request->slug;
+        $crm_meta->id_ad = $request->is_ad;
         $crm_meta->save();
         return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Data stored successfully.']);
     } catch (\Throwable $th) {
