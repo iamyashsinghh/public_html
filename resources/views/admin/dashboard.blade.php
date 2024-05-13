@@ -797,17 +797,60 @@
             type: "bar",
             data: {
                 labels: ("{{ $yearly_calendar }}").split(','),
-                datasets: [{
-                    fill: false,
-                    lineTension: 0,
-                    backgroundColor: "#891010",
-                    borderColor: "rgba(0,0,255,0.1)",
-                    data: ("{{ $venue_leads_for_this_year }}").split(',')
-                }]
+                datasets: [
+                    {
+                        label: 'Total Leads',
+                        fill: false,
+                        lineTension: 0,
+                        backgroundColor: "#891010",
+                        borderColor: "#891010",
+                        data: ("{{ $venue_leads_for_this_year }}").split(",")
+                    },
+                    {
+                        label: 'Call',
+                        fill: false,
+                        lineTension: 0,
+                        backgroundColor: "#a06b14",
+                        borderColor: "#a06b14",
+                        data: ("{{ $venue_call_leads_for_this_year }}").split(",")
+                    },
+                    {
+                        label: 'Form ',
+                        fill: false,
+                        lineTension: 0,
+                        backgroundColor: "#aa559f",
+                        borderColor: "#aa559f",
+                        data: ("{{ $venue_form_leads_for_this_year }}").split(",")
+                    },
+                    {
+                        label: 'Whatsapp',
+                        fill: false,
+                        lineTension: 0,
+                        backgroundColor: "#618200",
+                        borderColor: "#618200",
+                        data: ("{{ $venue_whatsapp_leads_for_this_year }}").split(",")
+                    },
+                    {
+                        label: 'Ad Data',
+                        fill: false,
+                        lineTension: 0,
+                        backgroundColor: "#4497bb",
+                        borderColor: "#4497bb",
+                        data: ("{{ $venue_ads_leads_for_this_year}}").split(",")
+                    },
+                    {
+                        label: 'Organic',
+                        fill: false,
+                        lineTension: 0,
+                        backgroundColor: "#cbe21d",
+                        borderColor: "#cbe21d",
+                        data: ("{{ $venue_organic_leads_for_this_year}}").split(",")
+                    }
+                ]
             },
             options: {
                 legend: {
-                    display: false
+                    display: true
                 },
                 scales: {
                     yAxes: [{
@@ -816,6 +859,17 @@
                         }
                     }],
                 },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                            var value = tooltipItem.yLabel;
+                            return label + ': ' + value;
+                        }
+                    }
+                }
             }
         });
 
