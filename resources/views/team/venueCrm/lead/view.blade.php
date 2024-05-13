@@ -615,34 +615,53 @@
                                         <tr>
                                             <th class="text-nowrap">S.No.</th>
                                             <th class="">Recording</th>
+                                            <th class="">Metadata</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php
-                                        $recording_urls = !empty($lead->recording_url) ? explode(',', $lead->recording_url) : [];
+                                        $recording_urls_with_metadata = [];
+                                        if (!empty($lead->recording_url)) {
+                                            $recording_data = json_decode($lead->recording_url, true) ?? [];
+                                            foreach ($recording_data as $index => $data) {
+                                                // Extract URL and metadata
+                                                $url = $data['url'];
+                                                $metadata = json_decode($data['metadata'], true);
+                                                // Append URL, datetime, and caller agent to the array
+                                                $recording_urls_with_metadata[] = [
+                                                    'url' => $url,
+                                                    'datetime' => $metadata['datetime'],
+                                                    'caller_agent' => $metadata['caller_agent']
+                                                ];
+                                            }
+                                        }
                                         @endphp
-                                        @if(count($recording_urls) > 0)
-                                        @foreach ($recording_urls as $key => $url)
+                                        @if(count($recording_urls_with_metadata) > 0)
+                                        @foreach ($recording_urls_with_metadata as $key => $data)
                                         <tr>
                                             <td>{{$key+1}}</td>
                                             <td>
                                                 <audio controls>
-                                                    <source src="{{$url}}" type="audio/mpeg">
+                                                    <source src="{{$data['url']}}" type="audio/mpeg">
                                                     Your browser does not support the audio element.
                                                 </audio>
+                                            </td>
+                                            <td>
+                                                Datetime: {{$data['datetime']}}<br>
+                                                Caller Agent: {{$data['caller_agent']}}
                                             </td>
                                         </tr>
                                         @endforeach
                                         @else
                                         <tr>
-                                            <td class="text-center text-muted" colspan="2">No data available in table</td>
+                                            <td class="text-center text-muted" colspan="3">No data available in table</td>
                                         </tr>
                                         @endif
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                     @endif
                 </div>
             </div>

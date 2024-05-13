@@ -547,7 +547,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card mb-5">
+                        {{-- <div class="card mb-5">
                             <div class="card-header text-light" style="background-color: var(--wb-renosand);">
                                 <h3 class="card-title">Call Recordings</h3>
                             </div>
@@ -585,7 +585,7 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="card mb-5">
                             <div class="card-header text-light" style="background-color: var(--wb-renosand);">
                                 <h3 class="card-title">Call Recordings</h3>
