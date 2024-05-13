@@ -736,6 +736,7 @@ Route::post('/new_lead', function (Request $request) {
             $lead->source = $lead_source;
             $lead->lead_catagory = $lead_cat_data;
             $lead->preference = $preference;
+            $lead->is_ad = $request->post('is_ad');
             $lead->locality = $locality ? $locality->name : null;
             $lead->lead_status = "Super Hot Lead";
             $lead->read_status = false;
