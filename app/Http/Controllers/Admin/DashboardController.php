@@ -56,6 +56,22 @@ class DashboardController extends Controller {
         }
         $venue_whatsapp_leads_for_this_month = implode(",", $venue_whatsapp_leads_for_this_month);
 
+        $venue_ads_leads_for_this_month = [];
+        for ($i = 1; $i <= date('d'); $i++) {
+            $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
+            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->where('is_ad', '1')->count();
+            array_push($venue_ads_leads_for_this_month, $count);
+        }
+        $venue_ads_leads_for_this_month = implode(",", $venue_ads_leads_for_this_month);
+
+        $venue_organic_leads_for_this_month = [];
+        for ($i = 1; $i <= date('d'); $i++) {
+            $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
+            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->where('is_ad', '0')->count();
+            array_push($venue_organic_leads_for_this_month, $count);
+        }
+        $venue_organic_leads_for_this_month = implode(",", $venue_organic_leads_for_this_month);
+
         $venue_call_leads_for_this_month = [];
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
@@ -192,4 +208,3 @@ class DashboardController extends Controller {
         return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month','venue_form_leads_for_this_month', 'venue_call_leads_for_this_month','venue_whatsapp_leads_for_this_month','venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members', 'yearly_calendar', 'v_members'));
     }
 }
-                                                      

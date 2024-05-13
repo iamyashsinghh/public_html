@@ -686,6 +686,22 @@
                 backgroundColor: "#618200",
                 borderColor: "rgba(0,0,0,0.1)",
                 data: ("{{$venue_whatsapp_leads_for_this_month}}").split(",")
+            },
+            {
+                label: 'Ad Data',
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "#4497bb",
+                borderColor: "rgba(0,0,0,0.1)",
+                data: ("{{$venue_ads_leads_for_this_month}}").split(",")
+            },
+            {
+                label: 'Organic',
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "#cbe21d",
+                borderColor: "rgba(0,0,0,0.1)",
+                data: ("{{$venue_organic_leads_for_this_month}}").split(",")
             }]
         },
         options: {
