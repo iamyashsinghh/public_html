@@ -23,7 +23,7 @@ $auth_user = Auth::guard('team')->user();
                 <h1 class="m-0">{{$page_heading}}</h1>
             </div>
             @if (!isset($filter_params['dashboard_filters']))
-            <div class="filter-container text-center">
+            <div class="filter-container text-center d-none">
                 <form action="{{route('team.bookings.list')}}" method="post">
                     @csrf
                     <label for="">Filter by booking date</label>
@@ -127,6 +127,31 @@ $auth_user = Auth::guard('team')->user();
                                 <div class="form-group">
                                     <label for="event_to_date_inp">To</label>
                                     <input type="date" class="form-control" id="event_to_date_inp" name="event_to_date" value="{{isset($filter_params['event_to_date']) ? $filter_params['event_to_date'] : ''}}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#collapse6"
+                                aria-expanded="true" aria-controls="collapse6">Booking date</button>
+                        </h2>
+                        <div id="collapse6"
+                            class="accordion-collapse collapse {{ isset($filter_params['booking_from_date']) ? 'show' : '' }}"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body pl-2 pb-4">
+                                <div class="form-group">
+                                    <label for="booking_from_date_inp">From</label>
+                                    <input type="date" class="form-control" id="booking_from_date_inp"
+                                        name="booking_from_date"
+                                        value="{{ isset($filter_params['booking_from_date']) ? $filter_params['booking_from_date'] : '' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="booking_to_date">To</label>
+                                    <input type="date" class="form-control" id="booking_to_date"
+                                        name="booking_to_date"
+                                        value="{{ isset($filter_params['booking_to_date']) ? $filter_params['booking_to_date'] : '' }}">
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,7 @@
-@extends('team.layouts.app')
+@extends('admin.layouts.app')
 @section('header-css')
 <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="//cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
 @endsection
 @section('title', $page_heading." | Venue CRM")
 @if (!isset($filter_params['dashboard_filters']))
@@ -17,6 +18,15 @@
 $filter_start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 @endphp
+<style>.buttons-prints{
+    color: fff;
+    border: none !important;
+    background-color: var(--wb-renosand) !important;
+    border-radius: 3px !important; 
+}
+.buttons-prints span{
+    color: fff !important;
+}</style>
 <div class="content-wrapper pb-5">
     <section class="content-header">
         <div class="container-fluid">
@@ -27,14 +37,14 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
             </div>
             @if (!isset($filter_params['dashboard_filters']))
                 <div class="filter-container text-center d-none">
-                    <form action="{{route('team.visit.list')}}" method="post">
+                    <form action="{{route('admin.visit.list')}}" method="post">
                         @csrf
                         <label for="">Filter by visit schedule date</label>
                         <input type="date" name="visit_schedule_from_date" value="{{isset($filter_params['visit_schedule_from_date']) ? $filter_params['visit_schedule_from_date'] : ''}}" class="form-control form-control-sm d-inline-block" style="width: unset;" required>
                         <span class="">To:</span>
                         <input type="date" name="visit_schedule_to_date" value="{{isset($filter_params['visit_schedule_to_date']) ? $filter_params['visit_schedule_to_date'] : ''}}" class="form-control form-control-sm d-inline-block" style="width: unset;">
                         <button type="submit" class="btn text-light btn-sm" style="background-color: var(--wb-dark-red)">Submit</button>
-                        <a href="{{route('team.visit.list')}}" class="btn btn-secondary btn-sm">Reset</a>
+                        <a href="{{route('admin.visit.list')}}" class="btn btn-secondary btn-sm">Reset</a>
                     </form>
                 </div>
             @endif
@@ -68,7 +78,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
         <div class="p-3 control-sidebar-content">
             <h5>Visit Filters</h5>
             <hr class="mb-2">
-            <form action="{{route('team.visit.list')}}" method="post">
+            <form action="{{route('admin.visit.list')}}" method="post">
                 @csrf
                 <div class="accordion text-sm" id="accordionExample">
                     <div class="accordion-item">
@@ -150,7 +160,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                 </div>
                 <div class="my-5">
                     <button type="submit" class="btn btn-sm text-light btn-block" style="background-color: var(--wb-renosand);">Apply</button>
-                    <a href="{{route('team.visit.list')}}" type="submit" class="btn btn-sm btn-secondary btn-block">Reset</a>
+                    <a href="{{route('admin.visit.list')}}" type="submit" class="btn btn-sm btn-secondary btn-block">Reset</a>
                 </div>
             </form>
         </div>
@@ -173,12 +183,26 @@ if (isset($filter_params['visit_status'])) {
 }
 @endphp
 <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="//cdn.datatables.net/buttons/2.3.6/js/buttons.flash.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="//cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="//cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 <script src="{{asset('plugins/moment/moment.min.js')}}"></script>
 <script>
-    const data_url = `{{route('team.visit.list.ajax')}}?{!!$filter!!}`;
+    const data_url = `{{route('admin.visit.list.ajax')}}?{!!$filter!!}`;
     $(document).ready(function() {
         $('#serverTable').DataTable({
             pageLength: 10,
+                lengthMenu: [10, 25, 50, 100],
+                processing: true,
+                dom: '<"d-flex justify-content-between"lfB>rtip',
+                buttons: [{
+                    extend: 'excelHtml5',
+                    text: '<i class="fas fa-file-excel"></i> Export to Excel',
+                    className: 'btn text-light btn-sm buttons-prints mx-1'
+                }],
+                loading: true,
             language: {
                 "search": "_INPUT_", // Removes the 'Search' field label
                 "searchPlaceholder": "Type here to search..", // Placeholder for the search box
@@ -289,39 +313,7 @@ if (isset($filter_params['visit_status'])) {
     });
 
     function handle_view_lead(forward_id) {
-        window.open(`{{route('team.lead.view')}}/${forward_id}#visit_card_container`);
-    }
-
-    function handle_get_forward_info(lead_id) {
-        fetch(`{{route('team.lead.getForwardInfo')}}/${lead_id}`).then(response => response.json()).then(data => {
-            const forward_info_table_body = document.getElementById('forward_info_table_body');
-            const modal = new bootstrap.Modal("#leadForwardedMemberInfo")
-            forward_info_table_body.innerHTML = "";
-            if (data.success == true) {
-                if(data.lead_forwards.length > 0){
-                    let i = 1;
-                    for (let item of data.lead_forwards) {
-                        let tr = document.createElement('tr');
-                        let tds = `<td>${i}</td>
-                        <td>${item.name}</td>
-                        <td>${item.venue_name}</td>
-                        <td>${item.read_status == 0 ? 'Unread': 'Read'}</td>
-                        <td>${moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a")}</td>`;
-    
-                        tr.innerHTML = tds;
-                        forward_info_table_body.appendChild(tr);
-                        i++;
-                    }
-                }else{
-                    forward_info_table_body.innerHTML = `<tr>
-                        <td colspan="5">No data available in table</td>
-                    </tr>`
-                }
-                modal.show();
-            } else {
-                toastr[data.alert_type](data.message);
-            }
-        })
+        window.open(`{{route('admin.lead.view')}}/${forward_id}#visit_card_container`);
     }
 </script>
 @endsection

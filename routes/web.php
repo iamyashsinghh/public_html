@@ -123,6 +123,10 @@ Route::middleware('verify_token')->group(function () {
             Route::post('party-area/manage-process/{area_id?}', [Controllers\Admin\PartyAreaController::class, 'manage_process'])->name('admin.partyArea.manage.process');
             Route::get('party-area/delete/{area_id}', [Controllers\Admin\PartyAreaController::class, 'delete'])->name('admin.partyArea.delete');
 
+            // visits route
+            Route::match (['get', 'post'], '/visits/list/{dashboard_filters?}', [Controllers\Admin\VisitController::class, 'list'])->name('admin.visit.list');
+            Route::get('/visits/ajax_list', [Controllers\Admin\VisitController::class, 'ajax_list'])->name('admin.visit.list.ajax');
+
             //Food preference routes
             Route::post('food-preference/manage-process/{id?}', [Controllers\Admin\FoodPreferenceController::class, 'manage_process'])->name('admin.foodPreference.manage.process');
             Route::get('food-preference/delete/{id}', [Controllers\Admin\FoodPreferenceController::class, 'delete'])->name('admin.foodPreference.delete');

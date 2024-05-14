@@ -86,6 +86,15 @@ $uri = end($uri_arr);
                                 </a>
                             </span>
                         </li>
+                        
+                        <li class="nav-item">
+                            <span class="nav-link d-flex justify-content-between align-items-center">
+                                <a href="{{route('admin.visit.list')}}" class="link_prop w-100 visits_link">
+                                    <i class="fas fa-business-time nav-icon"></i>
+                                <p>Visits</p>
+                                </a>
+                            </span>
+                        </li>
                         <li class="nav-item">
                             <span class="nav-link d-flex justify-content-between align-items-center">
                                 <a href="{{route('admin.bookings.list')}}" class="link_prop w-100 bookings_link">
