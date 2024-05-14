@@ -521,6 +521,60 @@
                     </div>
                 </div>
 
+                <div class="my-2">
+                    <div class="card text-xs mb-5">
+                        <div class="card-header card-header-mod text-light"
+                            style="background: linear-gradient(48deg, #8e0000e6, #dfa930b5);">
+                            <h6 class="mb-0 text-bold">NVRM Statics - {{ date('F') }}</h5>
+                        </div>
+                        <div class="card-body p-0" style="max-width: 100%; overflow-x: auto;">
+                            <table class="table-bordered" style="width: 100%;">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th class="text-left px-1">Rm Name</th>
+                                        <th class="px-1">Leads Recieved this Month</th>
+                                        <th class="px-1">Leads Recieved Today</th>
+                                        <th class="px-1">Unread Leads Today</th>
+                                        <th class="px-1">Unread Leads this Month</th>
+                                        <th class="px-1">Unread Leads Overdue</th>
+                                        <th class="px-1">NVRM Unfollowed Leads</th>
+                                        <th class="px-1">Schedule Task this Month</th>
+                                        <th class="px-1">Schedule Task Today</th>
+                                        <th class="px-1">Task Overdue</th>
+                                        <th class="px-1">Forword Lead This Month</th>
+                                        <th class="px-1">Forword Lead Today</th>
+                                        @foreach ($categories as $category)
+                                            <th class="px-1">{{ $category->name }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($nv_members as $v)
+                                        <tr class="text-center" style="font-weight: bold;">
+                                            <td class="text-nowrap text-left p-1">{{ $v->name }}</td>
+                                            <td class="p-1">{{ $v->leads_received_this_month }}</td>
+                                            <td class="p-1">{{ $v->leads_received_today }}</td>
+                                            <td class="p-1">{{ $v->unread_leads_today }}</td>
+                                            <td class="p-1">{{ $v->unread_leads_this_month }}</td>
+                                            <td class="p-1">{{ $v->unread_leads_overdue }}</td>
+                                            <td class="p-1">{{ $v->nvrm_unfollowed_leads }}</td>
+                                            <td class="p-1">{{ $v->task_schedule_this_month }}</td>
+                                            <td class="p-1">{{ $v->task_schedule_today }}</td>
+                                            <td class="p-1">{{ $v->task_overdue }}</td>
+                                            <td class="p-1">{{ $v->forward_leads_this_month }}</td>
+                                            <td class="p-1">{{ $v->forward_leads_today }}</td>
+                                            @foreach ($categories as $category)
+                                                <td class="px-1">{{ $v->forward_leads_by_category[$category->name] }}
+                                                </td>
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="vm-statics my-2">
                     <h2>VM Statics</h2>
                     @foreach ($vm_members as $vm)
@@ -797,8 +851,7 @@
             type: "bar",
             data: {
                 labels: ("{{ $yearly_calendar }}").split(','),
-                datasets: [
-                    {
+                datasets: [{
                         label: 'Total Leads',
                         fill: false,
                         lineTension: 0,
@@ -836,7 +889,7 @@
                         lineTension: 0,
                         backgroundColor: "#4497bb",
                         borderColor: "#4497bb",
-                        data: ("{{ $venue_ads_leads_for_this_year}}").split(",")
+                        data: ("{{ $venue_ads_leads_for_this_year }}").split(",")
                     },
                     {
                         label: 'Organic',
@@ -844,7 +897,7 @@
                         lineTension: 0,
                         backgroundColor: "#cbe21d",
                         borderColor: "#cbe21d",
-                        data: ("{{ $venue_organic_leads_for_this_year}}").split(",")
+                        data: ("{{ $venue_organic_leads_for_this_year }}").split(",")
                     }
                 ]
             },

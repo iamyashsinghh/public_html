@@ -7,19 +7,24 @@ use App\Models\Lead;
 use App\Models\LeadForward;
 use App\Models\nvLead;
 use App\Models\nvLeadForward;
+use App\Models\nvLeadForwardInfo;
 use App\Models\nvMeeting;
+use App\Models\nvrmLeadForward;
 use App\Models\nvTask;
 use App\Models\PVendorLead;
 use App\Models\Task;
 use App\Models\TeamMember;
 use App\Models\Vendor;
+use App\Models\VendorCategory;
 use App\Models\Visit;
 use App\Models\VmProductivity;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class DashboardController extends Controller {
-    public function index() {
+class DashboardController extends Controller
+{
+    public function index()
+    {
         $yearly_calendar = [];
         for ($i = 12; $i >= 0; $i--) {
             $date = date('Y-M', strtotime("-$i month"));
@@ -148,14 +153,14 @@ class DashboardController extends Controller {
         $current_month = date('Y-m');
         $current_date = date('Y-m-d');
 
-        $from =  Carbon::today()->startOfMonth();
-        $to =  Carbon::today()->endOfMonth();
+        $from = Carbon::today()->startOfMonth();
+        $to = Carbon::today()->endOfMonth();
         foreach ($vm_members as $vm) {
             $vm['leads_received_this_month'] = LeadForward::where(['forward_to' => $vm->id])->where('lead_datetime', 'like', "%$current_month%")->count();
             $vm['leads_received_today'] = LeadForward::where(['forward_to' => $vm->id])->where('lead_datetime', 'like', "%$current_date%")->count();
             $vm['unread_leads_this_month'] = LeadForward::where(['forward_to' => $vm->id, 'read_status' => false])->where('lead_datetime', 'like', "%$current_month%")->count();
             $vm['unread_leads_today'] = LeadForward::where(['forward_to' => $vm->id, 'read_status' => false])->where('lead_datetime', 'like', "%$current_date%")->count();
-            $vm['unread_leads_overdue'] = LeadForward::where(['forward_to' => $vm->id, 'read_status' => false])->where('lead_datetime',  '<', Carbon::today())->count();
+            $vm['unread_leads_overdue'] = LeadForward::where(['forward_to' => $vm->id, 'read_status' => false])->where('lead_datetime', '<', Carbon::today())->count();
 
             $vm['task_schedule_this_month'] = Task::where(['created_by' => $vm->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_month%")->count();
             $vm['task_schedule_today'] = Task::where(['created_by' => $vm->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_date%")->count();
@@ -213,15 +218,15 @@ class DashboardController extends Controller {
         $v_members = Vendor::select('id', 'name', 'business_name', 'category_id', 'start_date', 'end_date')->where('status', 1)->get();
         $current_month = date('Y-m');
         $current_date = date('Y-m-d');
-        $from =  Carbon::today()->startOfMonth();
-        $to =  Carbon::today()->endOfMonth();
+        $from = Carbon::today()->startOfMonth();
+        $to = Carbon::today()->endOfMonth();
         foreach ($v_members as $v) {
             $v['total_leads_received'] = nvLeadForward::where(['forward_to' => $v->id])->count();
             $v['leads_received_this_month'] = nvLeadForward::where(['forward_to' => $v->id])->where('lead_datetime', 'like', "%$current_month%")->count();
             $v['leads_received_today'] = nvLeadForward::where(['forward_to' => $v->id])->where('lead_datetime', 'like', "%$current_date%")->count();
             $v['unread_leads_this_month'] = nvLeadForward::where(['forward_to' => $v->id, 'read_status' => false])->where('lead_datetime', 'like', "%$current_month%")->count();
             $v['unread_leads_today'] = nvLeadForward::where(['forward_to' => $v->id, 'read_status' => false])->where('lead_datetime', 'like', "%$current_date%")->count();
-            $v['unread_leads_overdue'] = nvLeadForward::where(['forward_to' => $v->id, 'read_status' => false])->where('lead_datetime',  '<', Carbon::today())->count();
+            $v['unread_leads_overdue'] = nvLeadForward::where(['forward_to' => $v->id, 'read_status' => false])->where('lead_datetime', '<', Carbon::today())->count();
 
             $v['task_schedule_this_month'] = nvTask::where(['created_by' => $v->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_month%")->count();
             $v['task_schedule_today'] = nvTask::where(['created_by' => $v->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_date%")->count();
@@ -234,8 +239,8 @@ class DashboardController extends Controller {
             if (isset($v->start_date) && $v->start_date) {
                 $end_date = isset($v->end_date) && $v->end_date ? new Carbon($v->end_date) : Carbon::now();
                 $v['time_period_lead'] = nvLeadForward::where('forward_to', $v->id)
-                                                      ->whereBetween('lead_datetime', [new Carbon($v->start_date), $end_date])
-                                                      ->count();
+                    ->whereBetween('lead_datetime', [new Carbon($v->start_date), $end_date])
+                    ->count();
             } else {
                 $v['time_period_lead'] = 0;
             }
@@ -244,6 +249,99 @@ class DashboardController extends Controller {
         foreach ($v_members as $list) {
             array_push($vs_id, $list->id);
         }
-        return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month','venue_form_leads_for_this_month','venue_ads_leads_for_this_month','venue_whatsapp_leads_for_this_year','venue_organic_leads_for_this_month','venue_form_leads_for_this_year','venue_call_leads_for_this_year','venue_ads_leads_for_this_year','venue_organic_leads_for_this_year', 'venue_call_leads_for_this_month','venue_whatsapp_leads_for_this_month','venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members', 'yearly_calendar', 'v_members'));
+
+        $nv_members = TeamMember::select('id', 'name')->where('status', 1)->where('role_id', '3')->get();
+        $current_month = date('Y-m');
+        $current_date = date('Y-m-d');
+        $from = Carbon::today()->startOfMonth();
+        $to = Carbon::today()->endOfMonth();
+        $currentDateTime = Carbon::today();
+        $currentDateStart = Carbon::now()->startOfDay();
+        $currentDateEnd = Carbon::now()->endOfDay();
+        $currentMonthStart = Carbon::now()->startOfMonth();
+        $currentMonthEnd = Carbon::now()->endOfMonth();
+        foreach ($nv_members as $key => $v) {
+            $v['leads_received_this_month'] = nvrmLeadForward::where('lead_datetime', 'like', "%$current_month%")->whereNull('deleted_at')->where('forward_to', $v->id)->distinct('lead_id')->count();
+            $v['leads_received_today'] = nvrmLeadForward::where('lead_datetime', 'like', "%$current_date%")->whereNull('deleted_at')->where('forward_to', $v->id)->distinct('lead_id')->count();
+            $v['unread_leads_this_month'] = nvrmLeadForward::where('lead_datetime', 'like', "%$current_month%")->whereNull('deleted_at')->where(['read_status' => false])->where('forward_to', $v->id)->distinct('lead_id')->count();
+            $v['unread_leads_today'] = nvrmLeadForward::where('lead_datetime', 'like', "%$current_date%")->where(['read_status' => false])->whereNull('deleted_at')->where('forward_to', $v->id)->distinct('lead_id')->count();
+            $v['unread_leads_overdue'] = nvrmLeadForward::where('lead_datetime', '>=', Carbon::parse('2024-02-01')->startOfDay())
+                ->where('lead_datetime', '<=', Carbon::now())
+                ->where('read_status', false)
+                ->whereNull('deleted_at')
+                ->where('forward_to', $v->id)
+                ->distinct('lead_id')
+                ->count('lead_id');
+            
+            $v['forward_leads_this_month'] = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $v->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
+            $v['forward_leads_today'] = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_date%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $v->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
+
+            $v['nvrm_unfollowed_leads'] = nvrmLeadForward::query()
+                ->where('lead_status', '!=', 'Done')
+                ->whereNull('deleted_at')
+                ->whereExists(function ($query) use ($v) {
+                    $query->select(DB::raw(1))
+                        ->from('nvrm_tasks')
+                        ->whereColumn('nvrm_tasks.lead_id', 'nvrm_lead_forwards.lead_id')
+                        ->whereNotNull('nvrm_tasks.done_datetime')
+                        ->whereNull('nvrm_tasks.deleted_at')
+                        ->where('nvrm_tasks.created_by', $v->id);
+                })
+                ->whereDoesntHave('nvrm_tasks', function ($query) {
+                    $query->whereNull('done_datetime');
+                })
+                ->distinct('lead_id')
+                ->count();
+
+
+            $v['task_schedule_this_month'] = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
+                ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
+                ->where('nvrm_tasks.task_schedule_datetime', '<', $currentDateTime)
+                ->whereNull('nvrm_tasks.done_datetime')
+                ->whereNull('nvrm_lead_forwards.deleted_at')
+                ->whereNull('nvrm_tasks.deleted_at')
+                ->where('nvrm_tasks.created_by', $v->id)
+                ->count();
+
+            $v['task_schedule_today'] = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
+                ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
+                ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentDateStart, $currentDateEnd])
+                ->whereNull('nvrm_tasks.done_datetime')
+                ->whereNull('nvrm_lead_forwards.deleted_at')
+                ->whereNull('nvrm_tasks.deleted_at')
+                ->where('nvrm_tasks.created_by', $v->id)
+                ->count();
+
+            $v['task_overdue'] = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
+                ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
+                ->where('nvrm_tasks.task_schedule_datetime', '<', $currentDateTime)
+                ->whereNull('nvrm_tasks.done_datetime')
+                ->whereNull('nvrm_lead_forwards.deleted_at')
+                ->whereNull('nvrm_tasks.deleted_at')
+                ->where('nvrm_tasks.created_by', $v->id)
+                ->count();
+
+            $categories = VendorCategory::whereIn('id', [1, 2, 3, 4, 5])->get();
+            $forward_leads_by_category = [];
+            foreach ($categories as $category) {
+                $category_name = $category->name;
+                $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                    ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                    ->where('vendors.category_id', $category->id)
+                    ->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")
+                    ->where(['nv_lead_forward_infos.forward_from' => $v->id])
+                    ->groupBy('nv_lead_forward_infos.lead_id')
+                    ->get()
+                    ->count();
+                $forward_leads_by_category[$category_name] = $lead_count;
+            }
+            $nv_members[$key]->forward_leads_by_category = $forward_leads_by_category;
+        }
+        // dd($nv_members);
+        $nv_id = [];
+        foreach ($nv_members as $list) {
+            array_push($nv_id, $list->id);
+        }
+        return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month', 'venue_form_leads_for_this_month', 'venue_ads_leads_for_this_month', 'venue_whatsapp_leads_for_this_year', 'venue_organic_leads_for_this_month', 'venue_form_leads_for_this_year', 'venue_call_leads_for_this_year', 'venue_ads_leads_for_this_year', 'venue_organic_leads_for_this_year', 'venue_call_leads_for_this_month', 'venue_whatsapp_leads_for_this_month', 'venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members', 'yearly_calendar', 'v_members', 'nv_members', 'categories'));
     }
 }
