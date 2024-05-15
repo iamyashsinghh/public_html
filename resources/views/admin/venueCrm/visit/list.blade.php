@@ -196,7 +196,7 @@ if (isset($filter_params['visit_status'])) {
             pageLength: 10,
                 lengthMenu: [10, 25, 50, 100],
                 processing: true,
-                dom: '<"d-flex justify-content-between"lfB>rtip',
+                dom: '<""lfB>rtip',
                 buttons: [{
                     extend: 'excelHtml5',
                     text: '<i class="fas fa-file-excel"></i> Export to Excel',
@@ -271,7 +271,7 @@ if (isset($filter_params['visit_status'])) {
                 },
             ],
             order: [
-                [5, 'asc']
+                [1, 'desc']
             ],
             rowCallback: function(row, data, index) {
                 row.style.cursor = "pointer";

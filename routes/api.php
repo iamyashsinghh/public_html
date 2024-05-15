@@ -747,6 +747,7 @@ Route::post('/new_lead', function (Request $request) {
             $lead->whatsapp_msg_time = $current_timestamp;
             $lead->lead_color = "#4bff0033"; //green color
             $lead->virtual_number = $call_to_wb_api_virtual_number;
+            $lead->user_ip = $request->post('user_ip');
             $get_rm = getAssigningRm();
             $lead->assign_to = $get_rm->name;
             $lead->assign_id = $get_rm->id;

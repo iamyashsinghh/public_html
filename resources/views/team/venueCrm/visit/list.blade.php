@@ -247,7 +247,7 @@ if (isset($filter_params['visit_status'])) {
                 },
             ],
             order: [
-                [5, 'asc']
+                [1, 'desc']
             ],
             rowCallback: function(row, data, index) {
                 row.style.cursor = "pointer";
