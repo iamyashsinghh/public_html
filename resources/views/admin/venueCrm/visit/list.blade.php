@@ -54,7 +54,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
         <div class="container-fluid">
             <div class="table-responsive">
                 <table id="serverTable" class="table text-sm">
-                    <thead>
+                    <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                         <tr>
                             <th class="text-nowrap">Lead ID</th>
                             <th class="text-nowrap">Lead Date</th>
@@ -69,7 +69,6 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                         </tr>
                     </thead>
                 </table>
-
             </div>
         </div>
     </section>

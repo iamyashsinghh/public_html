@@ -33,7 +33,7 @@
             <div class="container-fluid">
                 <div class="table-responsive">
                     <table id="serverTable" class="table text-sm">
-                        <thead>
+                        <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                             <tr>
                                 <th class="text-nowrap">&nbsp;&nbsp;ID&nbsp;&nbsp;</th>
                                 <th class="text-nowrap">Profile Image</th>
