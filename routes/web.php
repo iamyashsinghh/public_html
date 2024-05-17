@@ -261,7 +261,6 @@ Route::middleware('verify_token')->group(function () {
             Route::post('/leads/forward', [Controllers\Manager\LeadController::class, 'lead_forward'])->name('manager.lead.forward');
             Route::post('/leads/add_process', [Controllers\Manager\LeadController::class, 'add_process'])->name('manager.lead.add_process');
 
-
             //Bypass login: Via manager to vm crm
             Route::get('/bypass-login/{team_id?}', [AuthController::class, 'team_login_via_manager'])->name('manager.bypass.login');
 
@@ -274,6 +273,10 @@ Route::middleware('verify_token')->group(function () {
 
             // leadforwardapproval routes
             Route::get('/leadforwardapproval/list', [Controllers\Manager\ForwardApprovalController::class, 'list'])->name('manager.leadforwardapproval.list');
+
+             // visits route
+             Route::match (['get', 'post'], '/visits/list/{dashboard_filters?}', [Controllers\Manager\VisitsController::class, 'list'])->name('manager.visit.list');
+             Route::get('/visits/ajax_list', [Controllers\Manager\VisitsController::class, 'ajax_list'])->name('manager.visit.list.ajax');
         });
     });
 

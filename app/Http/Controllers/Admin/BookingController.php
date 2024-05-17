@@ -51,6 +51,7 @@ class BookingController extends Controller {
             'bookings.total_gmv',
             'bookings.advance_amount',
             'bookings.quarter_advance_collected',
+            'events.event_name',
         )->join('bookings', 'bookings.id', 'lead_forwards.booking_id')
             ->join('vm_events as events', 'events.id', 'bookings.event_id')
             ->join('team_members', 'team_members.id', 'lead_forwards.forward_to')

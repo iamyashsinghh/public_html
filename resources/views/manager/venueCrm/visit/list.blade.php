@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('manager.layouts.app')
 @section('header-css')
 <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="//cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
@@ -37,14 +37,14 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
             </div>
             @if (!isset($filter_params['dashboard_filters']))
                 <div class="filter-container text-center d-none">
-                    <form action="{{route('admin.visit.list')}}" method="post">
+                    <form action="{{route('manager.visit.list')}}" method="post">
                         @csrf
                         <label for="">Filter by visit schedule date</label>
                         <input type="date" name="visit_schedule_from_date" value="{{isset($filter_params['visit_schedule_from_date']) ? $filter_params['visit_schedule_from_date'] : ''}}" class="form-control form-control-sm d-inline-block" style="width: unset;" required>
                         <span class="">To:</span>
                         <input type="date" name="visit_schedule_to_date" value="{{isset($filter_params['visit_schedule_to_date']) ? $filter_params['visit_schedule_to_date'] : ''}}" class="form-control form-control-sm d-inline-block" style="width: unset;">
                         <button type="submit" class="btn text-light btn-sm" style="background-color: var(--wb-dark-red)">Submit</button>
-                        <a href="{{route('admin.visit.list')}}" class="btn btn-secondary btn-sm">Reset</a>
+                        <a href="{{route('manager.visit.list')}}" class="btn btn-secondary btn-sm">Reset</a>
                     </form>
                 </div>
             @endif
@@ -80,7 +80,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
         <div class="p-3 control-sidebar-content">
             <h5>Visit Filters</h5>
             <hr class="mb-2">
-            <form action="{{route('admin.visit.list')}}" method="post">
+            <form action="{{route('manager.visit.list')}}" method="post">
                 @csrf
                 <div class="accordion text-sm" id="accordionExample">
                     <div class="accordion-item">
@@ -230,7 +230,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                 </div>
                 <div class="my-5">
                     <button type="submit" class="btn btn-sm text-light btn-block" style="background-color: var(--wb-renosand);">Apply</button>
-                    <a href="{{route('admin.visit.list')}}" type="submit" class="btn btn-sm btn-secondary btn-block">Reset</a>
+                    <a href="{{route('manager.visit.list')}}" type="submit" class="btn btn-sm btn-secondary btn-block">Reset</a>
                 </div>
             </form>
         </div>
@@ -268,18 +268,13 @@ if (isset($filter_params['visit_status'])) {
 <script src="//cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 <script src="{{asset('plugins/moment/moment.min.js')}}"></script>
 <script>
-    const data_url = `{{route('admin.visit.list.ajax')}}?{!!$filter!!}`;
+    const data_url = `{{route('manager.visit.list.ajax')}}?{!!$filter!!}`;
     $(document).ready(function() {
         $('#serverTable').DataTable({
             pageLength: 10,
                 lengthMenu: [10, 25, 50, 100],
                 processing: true,
-                dom: '<""lfB>rtip',
-                buttons: [{
-                    extend: 'excelHtml5',
-                    text: '<i class="fas fa-file-excel"></i> Export to Excel',
-                    className: 'btn text-light btn-sm buttons-prints mx-1'
-                }],
+               
                 loading: true,
             language: {
                 "search": "_INPUT_", // Removes the 'Search' field label
@@ -410,7 +405,7 @@ if (isset($filter_params['visit_status'])) {
     });
 
     function handle_view_lead(forward_id) {
-        window.open(`{{route('admin.lead.view')}}/${forward_id}#visit_card_container`);
+        window.open(`{{route('manager.lead.view')}}/${forward_id}#visit_card_container`);
     }
 </script>
 @endsection

@@ -261,6 +261,7 @@ class LeadController extends Controller
         $validate = Validator::make($request->all(), [
             'forward_leads_id' => 'required',
             'forward_vms_id' => 'required',
+            'forword_lead_reason' => 'required',
         ]);
 
         if ($validate->fails()) {
@@ -312,7 +313,7 @@ class LeadController extends Controller
                     $lead_forward->email = $lead->email;
                     $lead_forward->mobile = $lead->mobile;
                     $lead_forward->alternate_mobile = $lead->alternate_mobile;
-                    $lead_forward->source = $lead->source;
+                    $lead_forward->source = $existing_lead_forwards->source;
                     $lead_forward->locality = $lead->locality;
                     $lead_forward->lead_status = $lead->lead_status;
                     $lead_forward->read_status = false;

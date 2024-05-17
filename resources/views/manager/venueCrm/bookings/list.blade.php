@@ -5,7 +5,7 @@
 @section('title', $page_heading." | Venue CRM")
 @if (!isset($filter_params['dashboard_filters']))
     @section('navbar-right-links')
-    <li class="nav-item">     
+    <li class="nav-item">
         <a class="nav-link" title="Filters" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
             <i class="fas fa-filter"></i>
         </a>
@@ -20,7 +20,7 @@
                 <h1 class="m-0">{{$page_heading}}</h1>
             </div>
             @if (!isset($filter_params['dashboard_filters']))
-            <div class="filter-container text-center">
+            <div class="filter-container text-center d-none">
                 <form action="{{route('manager.bookings.list')}}" method="post">
                     @csrf
                     <label for="">Filter by booking date</label>
@@ -47,6 +47,7 @@
                             <th class="">VM Name</th>
                             <th class="">Name</th>
                             <th class="text-nowrap">Mobile</th>
+                            <th class="text-nowrap">Event Name</th>
                             <th class="text-nowrap">Event Date</th>
                             <th class="">PAX</th>
                             <th class="">Total GMV</th>
@@ -114,6 +115,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">Event Date</button>
@@ -127,6 +129,31 @@
                                 <div class="form-group">
                                     <label for="event_to_date_inp">To</label>
                                     <input type="date" class="form-control" id="event_to_date_inp" name="event_to_date" value="{{isset($filter_params['event_to_date']) ? $filter_params['event_to_date'] : ''}}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#collapse6"
+                                aria-expanded="true" aria-controls="collapse6">Booking date</button>
+                        </h2>
+                        <div id="collapse6"
+                            class="accordion-collapse collapse {{ isset($filter_params['booking_from_date']) ? 'show' : '' }}"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body pl-2 pb-4">
+                                <div class="form-group">
+                                    <label for="booking_from_date_inp">From</label>
+                                    <input type="date" class="form-control" id="booking_from_date_inp"
+                                        name="booking_from_date"
+                                        value="{{ isset($filter_params['booking_from_date']) ? $filter_params['booking_from_date'] : '' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="booking_to_date">To</label>
+                                    <input type="date" class="form-control" id="booking_to_date"
+                                        name="booking_to_date"
+                                        value="{{ isset($filter_params['booking_to_date']) ? $filter_params['booking_to_date'] : '' }}">
                                 </div>
                             </div>
                         </div>
@@ -178,18 +205,20 @@ if (isset($filter_params['booking_source'])) {
             order: [
                 [1, 'desc']
             ],
-            rowCallback: function(row, data, index) {    
+            rowCallback: function(row, data, index) {
                 //Intl.NumberFormat('en-US').format(80000)
                 const td_elements = row.querySelectorAll('td');
                 td_elements[1].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a");
                 td_elements[2].innerText = data[2] ?? 'N/A';
-                td_elements[7].innerText = data[7] ? moment(data[7]).format("DD-MMM-YYYY") : 'N/A';
-                td_elements[9].innerText = Intl.NumberFormat('en-US').format(data[9]);
-                td_elements[10].innerText = Intl.NumberFormat('en-US').format(data[10]);
+                td_elements[8].innerText = data[7] ? moment(data[7]).format("DD-MMM-YYYY") : 'N/A';
+                td_elements[7].innerText = data[12];
+                td_elements[9].innerText = Intl.NumberFormat('en-US').format(data[8]);
+                td_elements[10].innerText = Intl.NumberFormat('en-US').format(data[9]);
+                td_elements[11].innerText = Intl.NumberFormat('en-US').format(data[10]);
                 if(data[11] == 0){
-                    td_elements[11].innerHTML = `<span class="badge badge-danger">Not Completed</span>`;
+                    td_elements[12].innerHTML = `<span class="badge badge-danger">Not Completed</span>`;
                 }else{
-                    td_elements[11].innerHTML = `<span class="badge badge-success">Completed</span>`;
+                    td_elements[12].innerHTML = `<span class="badge badge-success">Completed</span>`;
                 }
 
                 for (let i = 0; i < 12; i++) {

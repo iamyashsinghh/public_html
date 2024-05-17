@@ -55,7 +55,7 @@
         </section>
         <section class="content">
             <div class="container-fluid">
-                <div class="table-responsive" style="overflow-x: visible;">
+                <div class="table-responsive" >
                     <table id="serverTable" class="table text-sm">
                         <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                             <tr>
@@ -66,6 +66,7 @@
                                 <th class="">VM Name</th>
                                 <th class="">Name</th>
                                 <th class="text-nowrap">Mobile</th>
+                                <th class="text-nowrap">Event Name</th>
                                 <th class="text-nowrap">Event Date</th>
                                 <th class="">PAX</th>
                                 <th class="">Total GMV</th>
@@ -101,10 +102,10 @@
                                         <label for="checkbox1" class="custom-control-label">WB|Team</label>
                                     </div>
                                     <div class="custom-control custom-radio my-1">
-                                        <input id="checkbox1" class="custom-control-input" type="radio"
+                                        <input id="checkbox5" class="custom-control-input" type="radio"
                                             name="booking_source" value="VM|Reference"
                                             {{ isset($filter_params['booking_source']) && $filter_params['booking_source'] == 'VM|Reference' ? 'checked' : '' }}>
-                                        <label for="checkbox1" class="custom-control-label">VM|Reference</label>
+                                        <label for="checkbox5" class="custom-control-label">VM|Reference</label>
                                     </div>
                                     <div class="custom-control custom-radio my-1">
                                         <input id="checkbox2" class="custom-control-input" type="radio"
@@ -275,14 +276,15 @@
                     const td_elements = row.querySelectorAll('td');
                     td_elements[1].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a");
                     td_elements[2].innerText = data[2] ?? 'N/A';
-                    td_elements[7].innerText = data[7] ? moment(data[7]).format("DD-MMM-YYYY") : 'N/A';
-                    td_elements[9].innerText = Intl.NumberFormat('en-US').format(data[9]);
-                    td_elements[10].innerText = Intl.NumberFormat('en-US').format(data[10]);
+                    td_elements[7].innerText = data[12] ?? 'N/A';
+                    td_elements[8].innerText = data[7] ? moment(data[7]).format("DD-MMM-YYYY") : 'N/A';
+                    td_elements[10].innerText = Intl.NumberFormat('en-US').format(data[9]);
+                    td_elements[11].innerText = Intl.NumberFormat('en-US').format(data[10]);
                     if (data[11] == 0) {
-                        td_elements[11].innerHTML =
+                        td_elements[12].innerHTML =
                             `<span class="badge badge-danger">Not Completed</span>`;
                     } else {
-                        td_elements[11].innerHTML =
+                        td_elements[12].innerHTML =
                         `<span class="badge badge-success">Completed</span>`;
                     }
 

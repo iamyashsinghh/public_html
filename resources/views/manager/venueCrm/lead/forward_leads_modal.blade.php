@@ -23,13 +23,13 @@
                 </div>
                 <div class="modal-body text-sm">
                     <div class="row">
-                        <label>Reason For Forwading</label>
-                       <textarea name="forword_lead_reason" class="form-control"></textarea>
+                        <label>Reason For Forwading <span class="text-danger">*</span></label>
+                       <textarea name="forword_lead_reason" class="form-control" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <a href="{{route('manager.lead.list')}}" class="btn btn-sm bg-secondary m-1" data-bs-dismiss="modal">Cancel</a>
-                    <button type="submit" onclick="btn_preloader(this)" class="btn btn-sm text-light m-1" style="background-color: var(--wb-dark-red);">Forward</button>
+                    <button type="submit" class="btn btn-sm text-light m-1" style="background-color: var(--wb-dark-red);">Forward</button>
                 </div>
             </form>
         </div>

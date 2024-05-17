@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
 use App\Models\LeadForward;
+use App\Models\TeamMember;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
-class VisitController extends Controller
+class VisitsController extends Controller
 {
     public function list(Request $request, $dashboard_filters = null) {
         $filter_params = "";
@@ -37,10 +39,16 @@ class VisitController extends Controller
             $page_heading = ucwords(str_replace("_", " ", $dashboard_filters));
         }
 
-        return view('admin.venueCrm.visit.list', compact('page_heading', 'filter_params'));
+        return view('manager.venueCrm.visit.list', compact('page_heading', 'filter_params'));
     }
 
     public function ajax_list(Request $request) {
+        $auth_user = Auth::guard('manager')->user();
+        $vm_members = TeamMember::select('id', 'name', 'venue_name')->where('parent_id', $auth_user->id)->get();
+        $vms_id = [];
+        foreach ($vm_members as $list) {
+            array_push($vms_id, $list->id);
+        }
         $visits = LeadForward::select(
             'lead_forwards.lead_id',
             'lead_forwards.lead_datetime',
@@ -57,7 +65,7 @@ class VisitController extends Controller
             'visits.event_name as event_name',
         )->join('visits', ['lead_forwards.visit_id' => 'visits.id'])
         ->join('team_members', 'team_members.id', 'lead_forwards.forward_to')
-        ->where(['visits.deleted_at' => null]);
+        ->where(['visits.deleted_at' => null])->whereIn('lead_forwards.forward_to', $vms_id);
 
         $current_date = date('Y-m-d');
         if ($request->visit_status == "Upcoming") {
