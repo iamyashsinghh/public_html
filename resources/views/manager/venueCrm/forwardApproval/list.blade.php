@@ -45,7 +45,7 @@
                                             @if ($list->is_approved == 0)
                                                 <a href="javascript:void(0)" class="btn text-light btn-sm"
                                                     style="background-color: var(--wb-dark-red)">Rejected</a>
-                                            @elseif ($list->is_approved === 1)
+                                            @elseif ($list->is_approved == 1)
                                                 <a href="javascript:void(0)" class="btn text-light btn-sm"
                                                     style="background-color: var(--wb-renosand)">Approved</a>
                                             @elseif ($list->is_approved == 2)
