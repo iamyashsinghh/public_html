@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="col-sm-6 mb-3">
                                     <div class="form-group">
-                                        <label for="vanue_inp">Venue Name</label>
+                                        <label for="vanue_inp">Venue Display Name</label>
                                         <input type="text" class="form-control" id="vanue_inp"
                                             placeholder="Enter venue name." name="venue_name"
                                             value="{{ $member->venue_name }}">
@@ -80,7 +80,20 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 mb-3">
+                                <div class="col-sm-6 mb-3" id="select_venue">
+                                    <div class="form-group">
+                                        <label for="venue_select">Select Venue<span class="text-danger">*</span></label>
+                                        <select class="form-control" name="venue_id" id="venue_select" required>
+                                            <option value="" selected disabled>Select Venue</option>
+                                            @foreach ($venues as $list)
+                                                <option value="{{ $list->id }}"
+                                                    {{ $member->venue_id == $list->id ? 'selected' : '' }}>
+                                                    {{ $list->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3" id="parent_member">
                                     <div class="form-group">
                                         <label for="status_select">Parent Member <span class="text-xs">(Manager)</label>
                                         <select class="form-control" name="manager" id="status_select">
@@ -158,6 +171,15 @@
             toggleNVRMSelection($(this).val());
         });
         function toggleNVRMSelection(selectedRole) {
+            
+            if(selectedRole == '5'){
+                $('#select_venue').show();
+                $('#parent_member').show();
+            }else{
+                $('#select_venue').hide(); 
+                $('#parent_member').hide(); 
+            }
+
             if(selectedRole == '4') {
                 $('#nvrm_selection').show();
             } else {

@@ -144,6 +144,14 @@ Route::middleware('verify_token')->group(function () {
 
             //VM Productivity
             Route::post('/vm_productivity/manage_process', [Controllers\Admin\VmProductivityController::class, 'manage_process'])->name('vm_productivity.manage_process');
+
+            //Venue routes
+            Route::get('/venue/list', [Controllers\Admin\VenueController::class, 'list'])->name('admin.venue.list');
+            Route::post('/venue/manage-process/{id?}', [Controllers\Admin\VenueController::class, 'manage_process'])->name('admin.venue.manage.process');
+
+            // leadforwardapproval routes
+            Route::get('/leadforwardapproval/list', [Controllers\Admin\ForwardApproval::class, 'list'])->name('admin.leadforwardapproval.list');
+            Route::get('/leadforwardapproval/status_update/{id?}/{status?}', [Controllers\Admin\ForwardApproval::class, 'manage_process'])->name('admin.leadforwardapproval.status_update');
         });
 
         Route::prefix('nonvenue-crm')->group(function () {
@@ -163,7 +171,6 @@ Route::middleware('verify_token')->group(function () {
             Route::post('/vendor-categories/manage-process/{id?}', [Controllers\Admin\VendorCategoryController::class, 'manage_process'])->name('admin.vendorCategory.manage.process');
 
             // vendor locality routes
-            //Vendor category routes
             Route::get('/vendor-localities', [Controllers\Admin\VendorLocalityController::class, 'list'])->name('admin.vendorLocality.list');
             Route::post('/vendor-localities/manage-process/{id?}', [Controllers\Admin\VendorLocalityController::class, 'manage_process'])->name('admin.vendorLocality.manage.process');
 
@@ -252,6 +259,8 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/leads/get_forward_info/{lead_id?}', [Controllers\Manager\LeadController::class, 'get_forward_info'])->name('manager.lead.getForwardInfo');
             Route::get('/leads/view/{lead_id?}', [Controllers\Manager\LeadController::class, 'view'])->name('manager.lead.view');
             Route::post('/leads/forward', [Controllers\Manager\LeadController::class, 'lead_forward'])->name('manager.lead.forward');
+            Route::post('/leads/add_process', [Controllers\Manager\LeadController::class, 'add_process'])->name('manager.lead.add_process');
+
 
             //Bypass login: Via manager to vm crm
             Route::get('/bypass-login/{team_id?}', [AuthController::class, 'team_login_via_manager'])->name('manager.bypass.login');
@@ -262,6 +271,9 @@ Route::middleware('verify_token')->group(function () {
             //Booking routes
             Route::match (['get', 'post'], '/bookings/list/{dashboard_filters?}', [Controllers\Manager\BookingController::class, 'list'])->name('manager.bookings.list');
             Route::get('/bookings/ajax_list/', [Controllers\Manager\BookingController::class, 'ajax_list'])->name('manager.bookings.list.ajax');
+
+            // leadforwardapproval routes
+            Route::get('/leadforwardapproval/list', [Controllers\Manager\ForwardApprovalController::class, 'list'])->name('manager.leadforwardapproval.list');
         });
     });
 
@@ -291,11 +303,11 @@ Route::middleware('verify_token')->group(function () {
         });
     });
 
-     /*
-    |--------------------------------------------------------------------------
-    | For Seo Manager Routes
-    |--------------------------------------------------------------------------
-    */
+    /*
+   |--------------------------------------------------------------------------
+   | For Seo Manager Routes
+   |--------------------------------------------------------------------------
+   */
     Route::prefix('/seomanager')->middleware('seomanager')->group(function () {
         Route::get('/dashboard', [Controllers\SeoManager\DashboardController::class, 'index'])->name('seomanager.dashboard');
 

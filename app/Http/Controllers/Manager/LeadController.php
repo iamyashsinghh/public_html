@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use App\Models\Lead;
 use App\Models\LeadForward;
+use App\Models\LeadForwardApproval;
 use App\Models\LeadForwardInfo;
 use App\Models\TeamMember;
 use App\Models\VmEvent;
@@ -14,19 +16,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class LeadController extends Controller {
+class LeadController extends Controller
+{
     private $current_timestamp;
-    public function __construct() {
+    public function __construct()
+    {
         $this->current_timestamp = date('Y-m-d H:i:s');
     }
 
-    public function list(Request $request) { //done
+    public function list(Request $request)
+    { //done
         $auth_user = Auth::guard('manager')->user();
         $vm_members = TeamMember::select('id', 'name', 'venue_name')->where('parent_id', $auth_user->id)->orderBy('name', 'asc')->get();
 
         $filter_params = "";
         if ($request->lead_status != null) {
-            $filter_params =  ['lead_status' => $request->lead_status];
+            $filter_params = ['lead_status' => $request->lead_status];
         }
         if ($request->has_rm_message != null) {
             $filter_params = ['has_rm_message' => $request->has_rm_message];
@@ -45,7 +50,8 @@ class LeadController extends Controller {
         return view('manager.venueCrm.lead.list', compact('page_heading', 'filter_params', 'vm_members'));
     }
 
-    public function ajax_list(Request $request) { //done
+    public function ajax_list(Request $request)
+    { //done
         $auth_user = Auth::guard('manager')->user();
 
         $vm_members = TeamMember::select('id', 'name', 'venue_name')->where('parent_id', $auth_user->id)->get();
@@ -69,7 +75,7 @@ class LeadController extends Controller {
         if ($request->lead_status != null) {
             $leads->where('leads.lead_status', $request->lead_status)->where('leads.lead_id', '>', 0);
         } elseif ($request->event_from_date != null) {
-            $from =  Carbon::make($request->event_from_date);
+            $from = Carbon::make($request->event_from_date);
             if ($request->event_to_date != null) {
                 $to = Carbon::make($request->event_to_date)->endOfDay();
             } else {
@@ -77,7 +83,7 @@ class LeadController extends Controller {
             }
             $leads->whereBetween('leads.event_datetime', [$from, $to])->orderBy('leads.event_datetime', 'asc');
         } elseif ($request->lead_from_date != null) {
-            $from =  Carbon::make($request->lead_from_date);
+            $from = Carbon::make($request->lead_from_date);
             if ($request->lead_to_date != null) {
                 $to = Carbon::make($request->lead_to_date)->endOfDay();
             } else {
@@ -106,83 +112,134 @@ class LeadController extends Controller {
         return datatables($leads)->toJson();
     }
 
-    // public function add_process(Request $request) {
-    //     $is_name_valid = $request->name !== null ? "required|string|max:255" : "";
-    //     $is_email_valid = $request->email !== null ? "required|email" : "";
-    //     $is_alt_mobile_valid = $request->alternate_mobile_number !== null ? "required|digits:10|" : "";
-    //     $validate = Validator::make($request->all(), [
-    //         'name' => $is_name_valid,
-    //         'email' => $is_email_valid,
-    //         'alternate_mobile_number' => $is_alt_mobile_valid,
-    //         'mobile_number' => "required|digits:10",
-    //         'lead_source' => 'required',
-    //         'lead_status' => 'required',
-    //         'event_date' => 'required|date'
-    //     ]);
+    public function add_process(Request $request) {
+        $rules = [
+            'mobile_number' => 'required|digits:10',
+            'lead_source' => 'required',
+            'lead_status' => 'required',
+            'event_date' => 'required|date',
+            'forward_vms_id' => 'required|array'
+        ];
 
-    //     if ($validate->fails()) {
-    //         session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
-    //         return redirect()->back();
-    //     }
+        if ($request->filled('name')) {
+            $rules['name'] = 'required|string|max:255';
+        }
+        if ($request->filled('email')) {
+            $rules['email'] = 'required|email';
+        }
+        if ($request->filled('alternate_mobile_number')) {
+            $rules['alternate_mobile_number'] = 'required|digits:10';
+        }
 
-    //     $auth_user = Auth::guard('manager')->user();
-    //     $exist_lead = Lead::where('mobile', $request->mobile_number)->first();
-    //     if ($exist_lead) { // Here we are finding the lead with same mobile number and just only adding event information.
-    //         $lead_link = route('manager.lead.view', $exist_lead->lead_id);
-    //         session()->flash('status', ['success' => true, 'alert_type' => 'info', 'message' => "Lead is already exist with this mobile number. Click on the link below to view the lead. <a href='$lead_link'><b>$lead_link</b></a>"]);
+        $validate = Validator::make($request->all(), $rules);
 
-    //         return redirect()->back();
-    //     }
+        if ($validate->fails()) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
+            return redirect()->back();
+        }
 
-    //     $lead = new Lead();
-    //     $lead->created_by = $auth_user->id;
-    //     $lead->lead_datetime = $this->current_timestamp;
-    //     $lead->name = $request->name;
-    //     $lead->email = $request->email;
-    //     $lead->mobile = $request->mobile_number;
-    //     $lead->alternate_mobile = $request->alternate_mobile_number;
-    //     $lead->source = $request->lead_source;
-    //     $lead->locality = $request->locality;
-    //     $lead->lead_status = $request->lead_status;
-    //     $lead->event_datetime = $request->event_date . " " . date('H:i:s');
-    //     $lead->pax = $request->number_of_guest;
-    //     $lead->save();
+        $auth_user = Auth::guard('manager')->user();
+        $exist_lead = Lead::where('mobile', $request->mobile_number)->first();
+        if ($exist_lead) {
+            $lead_link = route('manager.lead.view', $exist_lead->lead_id);
+            session()->flash('status', ['success' => true, 'alert_type' => 'info', 'message' => "Lead already exists with this mobile number. Click on the link below to view the lead. <a href='$lead_link'><b>$lead_link</b></a>"]);
+            return redirect()->back();
+        }
 
-    //     $event = new Event();
-    //     $event->created_by = $auth_user->id;
-    //     $event->lead_id = $lead->lead_id;
-    //     $event->event_name = $request->event_name;
-    //     $event->event_datetime = $request->event_date . " " . date('H:i:s');
-    //     $event->pax = $request->number_of_guest;
-    //     $event->budget = $request->budget;
-    //     $event->food_Preference = $request->food_Preference;
-    //     $event->event_slot = $request->event_slot;
-    //     $event->save();
+        $lead = new Lead();
+        $lead->created_by = $auth_user->id;
+        $lead->lead_datetime = now();
+        $lead->name = $request->name;
+        $lead->email = $request->email;
+        $lead->mobile = $request->mobile_number;
+        $lead->alternate_mobile = $request->alternate_mobile_number;
+        $lead->source = $request->lead_source;
+        $lead->locality = $request->locality;
+        $lead->lead_status = $request->lead_status;
+        $lead->event_datetime = $request->event_date . ' ' . now()->format('H:i:s');
+        $lead->pax = $request->number_of_guest;
+        $lead->save();
 
-    //     session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Lead added successfully."]);
-    //     return redirect()->back();
-    // }
+        $event = new Event();
+        $event->created_by = $auth_user->id;
+        $event->lead_id = $lead->lead_id;
+        $event->event_name = $request->event_name;
+        $event->event_datetime = $request->event_date . ' ' . now()->format('H:i:s');
+        $event->pax = $request->number_of_guest;
+        $event->budget = $request->budget;
+        $event->food_preference = $request->food_preference;
+        $event->event_slot = $request->event_slot;
+        $event->save();
 
-    // public function edit_process(Request $request, $lead_id) {
-    //     $lead = Lead::find($lead_id);
-    //     if (!$lead) {
-    //         session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
-    //         return redirect()->back();
-    //     }
+        $primary_events = $lead->get_primary_events();
 
-    //     $lead->name = $request->name;
-    //     $lead->email = $request->email;
-    //     $lead->alternate_mobile = $request->alternate_mobile_number;
-    //     $lead->source = $request->lead_source;
-    //     $lead->locality = $request->locality;
-    //     $lead->lead_status = $request->lead_status;
-    //     $lead->save();
+        foreach ($request->forward_vms_id as $vm_id) {
+            $lead_forward = new LeadForward();
+            $lead_forward->lead_id = $lead->lead_id;
+            $lead_forward->forward_to = $vm_id;
+            $lead_forward->lead_datetime = now();
+            $lead_forward->name = $lead->name;
+            $lead_forward->email = $lead->email;
+            $lead_forward->mobile = $lead->mobile;
+            $lead_forward->alternate_mobile = $lead->alternate_mobile;
+            $lead_forward->source = $lead->source;
+            $lead_forward->locality = $lead->locality;
+            $lead_forward->lead_status = $lead->lead_status;
+            $lead_forward->read_status = false;
+            $lead_forward->service_status = false;
+            $lead_forward->done_title = null;
+            $lead_forward->done_message = null;
+            $lead_forward->event_datetime = $lead->event_datetime;
+            $lead_forward->save();
 
-    //     session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead updated successfully.']);
-    //     return redirect()->back();
-    // }
+            foreach ($primary_events as $main_event) {
+                $vm_events = VmEvent::firstOrNew(['event_id' => $main_event->id, 'created_by' => $vm_id]);
+                $vm_events->lead_id = $lead->lead_id;
+                $vm_events->event_name = $main_event->event_name;
+                $vm_events->event_datetime = $main_event->event_datetime;
+                $vm_events->pax = $main_event->pax;
+                $vm_events->budget = $main_event->budget;
+                $vm_events->food_preference = $main_event->food_preference;
+                $vm_events->event_slot = $main_event->event_slot;
+                $vm_events->save();
+            }
 
-    public function view($lead_id) { //done
+            $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead->lead_id, 'forward_from' => $auth_user->id, 'forward_to' => $vm_id])->first();
+                    if (!$lead_forward_info) {
+                        $lead_forward_info = new LeadForwardInfo();
+                        $lead_forward_info->lead_id = $lead->lead_id;
+                        $lead_forward_info->forward_from = $auth_user->id;
+                        $lead_forward_info->forward_to = $vm_id;
+                    }
+                    $lead_forward_info->updated_at = $this->current_timestamp;
+                    $lead_forward_info->save();
+
+        }
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead added successfully.']);
+        return redirect()->back();
+    }
+
+
+    public function edit_process(Request $request, $lead_id) {
+        $lead = Lead::find($lead_id);
+        if (!$lead) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
+            return redirect()->back();
+        }
+        $lead->name = $request->name;
+        $lead->email = $request->email;
+        $lead->alternate_mobile = $request->alternate_mobile_number;
+        $lead->source = $request->lead_source;
+        $lead->locality = $request->locality;
+        $lead->lead_status = $request->lead_status;
+        $lead->save();
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead updated successfully.']);
+        return redirect()->back();
+    }
+
+    public function view($lead_id)
+    { //done
         $auth_user = Auth::guard('manager')->user();
         $lead = Lead::find($lead_id);
         $vm_members = TeamMember::select('id', 'name', 'venue_name')->where('parent_id', $auth_user->id)->orderBy('name', 'asc')->get();
@@ -199,7 +256,8 @@ class LeadController extends Controller {
         return view('manager.venueCrm.lead.view', compact('lead', 'leads_forward', 'visits', 'tasks', 'bookings', 'notes', 'vm_members'));
     }
 
-    public function lead_forward(Request $request) {
+    public function lead_forward(Request $request)
+    {
         $validate = Validator::make($request->all(), [
             'forward_leads_id' => 'required',
             'forward_vms_id' => 'required',
@@ -213,67 +271,109 @@ class LeadController extends Controller {
         $leads_id = explode(',', $request->forward_leads_id);
         $leads = Lead::whereIn('lead_id', $leads_id)->get();
         $auth_user = Auth::guard('manager')->user();
+
+        $forwarded_count = 0;
+        $waiting_for_approval_count = 0;
+
         foreach ($leads as $lead) {
             $primary_events = $lead->get_primary_events();
+            $existing_lead_forwards = LeadForward::where('lead_id', $lead->lead_id)->get();
+            $venue_ids_assigned = [];
+
             foreach ($request->forward_vms_id as $vm_id) {
-                $exist_lead_forward = LeadForward::where(['lead_id' => $lead->lead_id, 'forward_to' => $vm_id])->first();
-                if ($exist_lead_forward) {
-                    $lead_forward = $exist_lead_forward;
+                $forwarding_member = TeamMember::find($vm_id);
+                $forwarding_member_venue_id = $forwarding_member->venue_id ?? null;
+                if (in_array($forwarding_member_venue_id, $venue_ids_assigned)) {
+                    continue;
+                }
+
+                $existing_lead_forward = $existing_lead_forwards->first(function ($lead_forward) use ($forwarding_member_venue_id) {
+                    return $lead_forward->teamMember->venue_id == $forwarding_member_venue_id;
+                });
+
+                if ($existing_lead_forward) {
+                    if ($existing_lead_forward->forward_to != $vm_id) {
+                        $new_approval = new LeadForwardApproval();
+                        $new_approval->reason = $request->forword_lead_reason;
+                        $new_approval->forward_from = $existing_lead_forward->forward_to;
+                        $new_approval->forward_to = $vm_id;
+                        $new_approval->forward_by = $auth_user->id;
+                        $new_approval->lead_id = $existing_lead_forward->lead_id;
+                        $new_approval->is_approved = '2';
+                        $new_approval->save();
+                        $waiting_for_approval_count++;
+                    }
                 } else {
                     $lead_forward = new LeadForward();
                     $lead_forward->lead_id = $lead->lead_id;
                     $lead_forward->forward_to = $vm_id;
-                }
-                $lead_forward->lead_datetime = $this->current_timestamp;
-                $lead_forward->name = $lead->name;
-                $lead_forward->email = $lead->email;
-                $lead_forward->mobile = $lead->mobile;
-                $lead_forward->alternate_mobile = $lead->alternate_mobile;
-                $lead_forward->source = $lead->source;
-                $lead_forward->locality = $lead->locality;
-                $lead_forward->lead_status = $lead->lead_status;
-                $lead_forward->read_status = false;
-                $lead_forward->service_status = false;
-                $lead_forward->done_title = null;
-                $lead_forward->done_message = null;
-                $lead_forward->event_datetime = $lead->event_datetime;
-                $lead_forward->save();
+                    $lead_forward->lead_datetime = $this->current_timestamp;
+                    $lead_forward->name = $lead->name;
+                    $lead_forward->email = $lead->email;
+                    $lead_forward->mobile = $lead->mobile;
+                    $lead_forward->alternate_mobile = $lead->alternate_mobile;
+                    $lead_forward->source = $lead->source;
+                    $lead_forward->locality = $lead->locality;
+                    $lead_forward->lead_status = $lead->lead_status;
+                    $lead_forward->read_status = false;
+                    $lead_forward->service_status = false;
+                    $lead_forward->done_title = null;
+                    $lead_forward->done_message = null;
+                    $lead_forward->event_datetime = $lead->event_datetime;
+                    $lead_forward->save();
 
-                foreach ($primary_events as $main_event) {
-                    $vm_events = VmEvent::where(['event_id' => $main_event->id, 'created_by' => $vm_id])->first();
-                    if (!$vm_events) {
-                        $vm_events = new VmEvent();
+                    foreach ($primary_events as $main_event) {
+                        $vm_events = VmEvent::where(['event_id' => $main_event->id, 'created_by' => $vm_id])->first();
+                        if (!$vm_events) {
+                            $vm_events = new VmEvent();
+                        }
+                        $vm_events->lead_id = $lead->lead_id;
+                        $vm_events->created_by = $vm_id;
+                        $vm_events->event_name = $main_event->event_name;
+                        $vm_events->event_datetime = $main_event->event_datetime;
+                        $vm_events->pax = $main_event->pax;
+                        $vm_events->budget = $main_event->budget;
+                        $vm_events->food_preference = $main_event->food_preference;
+                        $vm_events->event_slot = $main_event->event_slot;
+                        $vm_events->event_id = $main_event->id;
+                        $vm_events->save();
                     }
-                    $vm_events->lead_id = $lead->lead_id;
-                    $vm_events->created_by = $vm_id;
-                    $vm_events->event_name = $main_event->event_name;
-                    $vm_events->event_datetime = $main_event->event_datetime;
-                    $vm_events->pax = $main_event->pax;
-                    $vm_events->budget = $main_event->budget;
-                    $vm_events->food_preference = $main_event->food_preference;
-                    $vm_events->event_slot = $main_event->event_slot;
-                    $vm_events->event_id = $main_event->id;
-                    $vm_events->save();
-                }
 
-                //update or insert lead_forward_info table
-                $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead->lead_id, 'forward_from' => $auth_user->id, 'forward_to' => $vm_id])->first();
-                if (!$lead_forward_info) {
-                    $lead_forward_info = new LeadForwardInfo();
-                    $lead_forward_info->lead_id = $lead->lead_id;
-                    $lead_forward_info->forward_from = $auth_user->id;
-                    $lead_forward_info->forward_to = $vm_id;
+                    $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead->lead_id, 'forward_from' => $auth_user->id, 'forward_to' => $vm_id])->first();
+                    if (!$lead_forward_info) {
+                        $lead_forward_info = new LeadForwardInfo();
+                        $lead_forward_info->lead_id = $lead->lead_id;
+                        $lead_forward_info->forward_from = $auth_user->id;
+                        $lead_forward_info->forward_to = $vm_id;
+                    }
+                    $lead_forward_info->updated_at = $this->current_timestamp;
+                    $lead_forward_info->save();
+
+                    $venue_ids_assigned[] = $forwarding_member_venue_id;
+                    $forwarded_count++;
+
                 }
-                $lead_forward_info->updated_at = $this->current_timestamp;
-                $lead_forward_info->save();
             }
         }
 
-        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Lead's Forwarded successfully."]);
+        $status_message = "Lead(s) processed successfully.";
+        if ($forwarded_count > 0 && $waiting_for_approval_count > 0) {
+            $status_message = "{$forwarded_count} lead(s) forwarded successfully. {$waiting_for_approval_count} lead(s) waiting for approval.";
+        } elseif ($forwarded_count > 0) {
+            $status_message = "{$forwarded_count} lead(s) forwarded successfully.";
+        } elseif ($waiting_for_approval_count > 0) {
+            $status_message = "{$waiting_for_approval_count} lead(s) waiting for approval.";
+        }
+
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $status_message]);
         return redirect()->back();
     }
 
-    public function get_forward_info($lead_id = 0) { //done
+
+
+    public function get_forward_info($lead_id = 0)
+    {
         try {
             $auth_user = Auth::guard('manager')->user();
 

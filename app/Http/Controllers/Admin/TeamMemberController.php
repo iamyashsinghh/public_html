@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LoginInfo;
 use App\Models\Role;
 use App\Models\TeamMember;
+use App\Models\Venue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -15,8 +16,7 @@ class TeamMemberController extends Controller {
     public function list() {
         $page_heading = "Team Members";
         $roles = Role::get();
-        
-        return view('admin.venueCrm.team.list', compact('page_heading', 'roles'));
+        return view('admin.venueCrm.team.list', compact('page_heading', 'roles',));
     }
 
     public function ajax_list(Request $request) {
@@ -45,7 +45,7 @@ class TeamMemberController extends Controller {
 
     public function manage($id = 0) {
         $roles = Role::select('id', 'name')->get();
-
+        $venues = Venue::select('id', 'name')->get();
         $manager_role = Role::select('id')->where('name', 'like', '%Manager%')->first();
         if ($manager_role) {
             $managers = TeamMember::select('id', 'name')->where('role_id', $manager_role->id)->get();
@@ -61,7 +61,7 @@ class TeamMemberController extends Controller {
             $member = json_decode(json_encode(['id' => 0, 'role_id' => '', 'name' => '', 'email' => '', 'mobile' => '', 'venue_name' => '', 'status' => '', 'nvrm_id' => '']));
         }
         $getRm = TeamMember::select('id', 'name')->where('venue_name', 'RM >< Non Venue')->get();
-        return view('admin.venueCrm.team.manage', compact('page_heading', 'roles', 'managers', 'member', 'getRm'));
+        return view('admin.venueCrm.team.manage', compact('page_heading', 'roles', 'managers', 'member', 'getRm', 'venues'));
     }
 
     public function manage_process($id = 0, Request $request) {
@@ -119,6 +119,7 @@ class TeamMemberController extends Controller {
         $member->email = $request->email;
         $member->mobile = $request->mobile_number;
         $member->venue_name = $request->venue_name;
+        $member->venue_id = $request->venue_id;
         $member->status = $request->status;
         $member->nvrm_id = $request->nvrm_id;
         $member->save();

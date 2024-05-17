@@ -86,7 +86,22 @@ $uri = end($uri_arr);
                                 </a>
                             </span>
                         </li>
-                        
+                        <li class="nav-item">
+                            <span class="nav-link d-flex justify-content-between align-items-center">
+                                <a href="{{route('admin.venue.list')}}" class="link_prop w-100 venue_link">
+                                    <i class="nav-icon fas fa-home"></i>
+                                <p>Venues</p>
+                                </a>
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <span class="nav-link d-flex justify-content-between align-items-center">
+                                <a href="{{route('admin.leadforwardapproval.list')}}" class="link_prop w-100 leadforwardapproval_link">
+                                    <i class="nav-icon fas fa-home"></i>
+                                    <p>Forward Lead Approval</p>
+                                </a>
+                            </span>
+                        </li>
                         <li class="nav-item">
                             <span class="nav-link d-flex justify-content-between align-items-center">
                                 <a href="{{route('admin.visit.list')}}" class="link_prop w-100 visits_link">

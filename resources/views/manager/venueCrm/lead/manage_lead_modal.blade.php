@@ -5,9 +5,26 @@
                 <h4 class="modal-title">Create Lead</h4>
                 <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i></button>
             </div>
-            <form id="manage_lead_form" method="post">
+            <form id="manage_lead_form" action="{{route('manager.lead.add_process')}}" method="post">
                 <div class="modal-body text-sm">
                     @csrf
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                        <label for="name_inp">Forward Lead to Vm <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @foreach ($vm_members as $list)
+                        <div class="col-sm-4 mb-3">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input checkbox_for_vm" id="forward_vms_id_checkbox{{$list->id}}" type="checkbox" name="forward_vms_id[]" value="{{$list->id}}">
+                                <label class="form-check-label" for="forward_vms_id_checkbox{{$list->id}}">{{$list->name}} ({{$list->venue_name}})</label>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                     <div class="row">
                         <div class="col-sm-4 mb-3">
                             <div class="form-group">
@@ -24,7 +41,8 @@
                         <div class="col-sm-4 mb-3">
                             <div class="form-group">
                                 <label for="mobile_inp">Mobile No. <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="mobile_inp" placeholder="Enter mobile no." name="mobile_number" required>
+                                <input type="text" class="form-control" id="mobile_inp" placeholder="Enter mobile no." name="mobile_number" required onblur="validate_mobile_number(this, `{{route('venue.lead.phoneNumber.validate')}}/${this.value}`)" min="10" max="10">
+                                <span class="text-danger ml-1 position-absolute d-none">Invalid phone number</span>
                             </div>
                         </div>
                         <div class="col-sm-4 mb-">
@@ -43,8 +61,7 @@
                             <div class="form-group">
                                 <label for="lead_source_select">Lead Source</label>
                                 <select class="form-control" id="lead_source_select" name="lead_source" required>
-                                    <option value="WB|Team" selected>WB|Team</option>
-                                    <option value="VM|Reference">VM|Reference</option>
+                                    <option value="VM|Reference" selected>VM|Reference</option>
                                     <option value="WB|Call">WB|Call</option>
                                     <option value="Walk-in">Walk-in</option>
                                     <option value="Other">Other</option>

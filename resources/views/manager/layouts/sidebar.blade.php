@@ -52,6 +52,12 @@ $uri = Route::currentRouteName();
                         <p>Bookings</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{route('manager.leadforwardapproval.list')}}" class="nav-link w-100 {{$uri == "manager.leadforwardapproval.list" ? 'active' : ''}}">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Lead Approval Status</p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>

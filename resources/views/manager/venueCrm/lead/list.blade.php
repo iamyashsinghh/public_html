@@ -29,7 +29,7 @@
             </div>
             <div class="button-group my-4">
             </div>
-            <div class="filter-container text-center">
+            <div class="filter-container text-center d-none">
                 <form action="{{route('manager.lead.list')}}" method="post">
                     @csrf
                     <label for="">Filter by lead date</label>
@@ -60,11 +60,11 @@
                         </tr>
                     </thead>
                 </table>
-                
+
             </div>
         </div>
     </section>
-  
+
     <aside class="control-sidebar control-sidebar-dark" style="display: none;">
         {{-- filter sidebar for leads page --}}
         <div class="p-3 control-sidebar-content">
@@ -172,6 +172,8 @@
     </aside>
     @include('manager.venueCrm.lead.forward_leads_modal')
     @include('manager.venueCrm.lead.lead_forwarded_info_modal')
+    @include('manager.venueCrm.lead.manage_lead_modal')
+
 </div>
 @endsection
 @section('footer-script')

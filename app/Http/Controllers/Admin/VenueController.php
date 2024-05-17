@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Venue;
 use Illuminate\Http\Request;
-use App\Models\VendorLocalities;
 use Illuminate\Support\Facades\Validator;
 
-class VendorLocalityController extends Controller
+class VenueController extends Controller
 {
     public function list() {
-        $page_heading = "Vendor Localities";
-        $localities = VendorLocalities::all();
-        return view('admin.nonVenueCrm.vendor.locality_list', compact('localities', 'page_heading'));
+        $page_heading = "Venues";
+        $venues = Venue::all();
+        return view('admin.venueCrm.venue.list', compact('venues', 'page_heading'));
     }
 
     public function manage_process(Request $request, $locality_id = 0) {
         $validate = Validator::make($request->all(), [
-            'locality_name' => 'required|string|min:3,max:255',
+            'venue_name' => 'required|string|min:3,max:255',
         ]);
 
         if ($validate->fails()) {
@@ -26,14 +26,14 @@ class VendorLocalityController extends Controller
         }
 
         if ($locality_id > 0) {
-            $msg = "Category updated.";
-            $category = VendorLocalities::find($locality_id);
+            $msg = "Venue updated.";
+            $venue = Venue::find($locality_id);
         } else {
-            $msg = "Category added.";
-            $category = new VendorLocalities();
+            $msg = "Venue added.";
+            $venue = new Venue();
         }
-        $category->name = $request->locality_name;
-        $category->save();
+        $venue->name = $request->venue_name;
+        $venue->save();
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $msg]);
         return redirect()->back();
     }

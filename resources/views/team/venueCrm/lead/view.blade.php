@@ -417,7 +417,7 @@
                                                 <button class="btn" onclick="handle_view_message(`{{$list->message ?: 'N/A'}}`)"><i class="fa fa-comment-dots" style="color: var(--wb-renosand);"></i></button>
                                             </td>
                                             <td>
-                                                @php
+                                                    @php
                                                 $schedule_date = date('Y-m-d', strtotime($list->visit_schedule_datetime));
                                                 if ($list->done_datetime !== null) {
                                                     $elem_class = "success";
@@ -661,7 +661,7 @@
                                 </table>
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     @endif
                 </div>
             </div>

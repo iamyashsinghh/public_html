@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Traits\HasAuthenticatedUser;
-class VmEvent extends Model
+
+class LeadForwardApproval extends Model
 {
-    use HasFactory, HasAuthenticatedUser,LogsActivity;
-    protected $guarded = [];
+    use HasFactory, HasAuthenticatedUser, LogsActivity;
     public function getActivitylogOptions(): LogOptions
     {
         $userId = $this->getAuthenticatedUserId();
@@ -20,5 +20,13 @@ class VmEvent extends Model
             ->setDescriptionForEvent(function (string $eventName) use ($userId) {
                 return "This model has been {$eventName} by User ID: {$userId}";
             });
+    }
+    protected $table = 'lead_forward_approval';
+    protected $guarded = [];
+
+    public static function getTeamMemberName($teamMemberId)
+    {
+        $teamMember = TeamMember::find($teamMemberId);
+        return "$teamMember->name / $teamMember->venue_name ";
     }
 }
