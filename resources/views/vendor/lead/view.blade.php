@@ -29,7 +29,7 @@
                         Meeting</button>
                     <button class="btn btn-xs text-light px-2 m-1" style="background-color: var(--wb-dark-red)"
                         onclick="handle_note_information(`{{ route('vendor.note.manage.process') }}`)"><i
-                            class="fa fa-plus"></i> Add Note</button>
+                            class="fa fa-plus"></i> Ask help From Rm</button>
                     <div class="dropdown d-inline-block">
                         <a href="javascript:void(0);"
                             class="btn dropdown-toggle text-light btn-xs px-2 mx-1 {{ $lead_forward->lead_status == 'Done' ? 'bg-secondary' : '' }}"
