@@ -33,8 +33,14 @@ class LeadController extends Controller {
         if ($request->event_from_date != null) {
             $filter_params = ['event_from_date' => $request->event_from_date, 'event_to_date' => $request->event_to_date];
         }
+        if ($request->lead_done_from_date != null) {
+            $filter_params = ['lead_done_from_date' => $request->lead_done_from_date, 'lead_done_to_date' => $request->lead_done_to_date];
+        }
         if ($request->lead_from_date != null) {
             $filter_params = ['lead_from_date' => $request->lead_from_date, 'lead_to_date' => $request->lead_to_date];
+        }
+        if ($request->lead_read_status != null) {
+            $filter_params = ['lead_read_status' => $request->lead_read_status];
         }
         if ($request->pax_min_value != null) {
             $filter_params = ['pax_min_value' => $request->pax_min_value, 'pax_max_value' => $request->pax_max_value];
@@ -70,17 +76,20 @@ class LeadController extends Controller {
 
         if ($request->lead_status != null) {
             $leads->where('lead_status', $request->lead_status);
-        } elseif ($request->lead_read_status != null) {
-            $leads->where('read_status', '=', $request->lead_read_status);
-        } elseif ($request->event_from_date != null) {
+        }
+        if ($request->lead_read_status != null) {
+            $leads->where('nv_lead_forwards.read_status', '=', $request->lead_read_status);
+        }
+        if ($request->event_from_date != null) {
             $from =  Carbon::make($request->event_from_date);
             if ($request->event_to_date != null) {
                 $to = Carbon::make($request->event_to_date)->endOfDay();
             } else {
                 $to = Carbon::make($request->event_from_date)->endOfDay();
             }
-            $leads->whereBetween('event_datetime', [$from, $to]);
-        } elseif ($request->lead_from_date != null) {
+            $leads->whereBetween('nv_lead_forwards.event_datetime', [$from, $to]);
+        }
+        if ($request->lead_from_date != null) {
             $from =  Carbon::make($request->lead_from_date);
             if ($request->lead_to_date != null) {
                 $to = Carbon::make($request->lead_to_date)->endOfDay();
@@ -88,7 +97,8 @@ class LeadController extends Controller {
                 $to = Carbon::make($request->lead_from_date)->endOfDay();
             }
             $leads->whereBetween('lead_datetime', [$from, $to]);
-        } elseif ($request->pax_min_value != null) {
+        }
+        if ($request->pax_min_value != null) {
             $min =  $request->pax_min_value;
             if ($request->pax_max_value != null) {
                 $max = $request->pax_max_value;
@@ -96,21 +106,24 @@ class LeadController extends Controller {
                 $max = $request->pax_min_value;
             }
             $leads->whereBetween('ne.pax', [$min, $max]);
-        } elseif ($request->lead_done_from_date != null) {
+        }
+        if ($request->lead_done_from_date != null) {
             $from =  Carbon::make($request->lead_done_from_date);
             if ($request->lead_done_to_date != null) {
                 $to = Carbon::make($request->lead_done_to_date)->endOfDay();
             } else {
                 $to = Carbon::make($request->lead_done_from_date)->endOfDay();
             }
-            $leads->where('lead_status', 'Done')->whereBetween('nv_lead_forwards.updated_at', [$from, $to]);
-        } elseif ($request->has_rm_message != null) {
+            $leads->where('nv_lead_forwards.lead_status', 'Done')->whereBetween('nv_lead_forwards.updated_at', [$from, $to]);
+        }
+        if ($request->has_rm_message != null) {
             if ($request->has_rm_message == "yes") {
                 $leads->join('nvrm_messages as rm_msg', 'nv_lead_forwards.lead_id', '=', 'rm_msg.lead_id');
             } else {
                 $leads->leftJoin('nvrm_messages as rm_msg', 'nv_lead_forwards.lead_id', '=', 'rm_msg.lead_id')->where('rm_msg.title', null);
             }
-        } elseif ($request->dashboard_filters != null) {
+        }
+        if ($request->dashboard_filters != null) {
             if ($request->dashboard_filters == "leads_of_the_month") {
                 $from =  Carbon::today()->startOfMonth();
                 $to =  Carbon::today()->endOfMonth();
