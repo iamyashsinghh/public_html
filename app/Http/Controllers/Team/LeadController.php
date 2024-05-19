@@ -93,7 +93,7 @@ class LeadController extends Controller
                 DB::raw("(select count(fwd.id) from lead_forwards as fwd where fwd.lead_id = leads.lead_id) as forwarded_count"),
                 'leads.lead_catagory',
             )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by');
-            $leads->where('leads.deleted_at', null);
+            $leads->where('leads.deleted_at', null)->groupBy('leads.mobile');
 
             if ($request->has('lead_status') && $request->lead_status != '') {
                 $leads->where('leads.lead_status', $request->lead_status);
@@ -396,6 +396,7 @@ class LeadController extends Controller
                 }
             }
         }
+
         return datatables($leads)->make(false);
     }
 
