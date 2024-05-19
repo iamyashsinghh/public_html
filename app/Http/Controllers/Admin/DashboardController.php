@@ -166,12 +166,6 @@ class DashboardController extends Controller
             $vm['task_schedule_today'] = Task::where(['created_by' => $vm->id, 'done_datetime' => null])->where('task_schedule_datetime', 'like', "%$current_date%")->count();
             $vm['task_overdue'] = Task::where(['created_by' => $vm->id, 'done_datetime' => null])->where('task_schedule_datetime', '<', Carbon::today())->count();
 
-            // $vm['recce_schedule_this_month'] = Visit::where(['created_by' => $vm->id, 'done_datetime' => null])->where('visit_schedule_datetime', 'like', "%$current_month%")->count();
-            // $vm['recce_schedule_today'] = Visit::where(['created_by' => $vm->id, 'done_datetime' => null])->where('visit_schedule_datetime', 'like', "%$current_date%")->count();
-            // $vm['recce_overdue'] = Visit::where(['created_by' => $vm->id, 'done_datetime' => null])->where('visit_schedule_datetime', '<', Carbon::today())->count();
-            // $vm['recce_done_this_month'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id])->whereBetween('visits.done_datetime', [$from, $to])->count();
-            // $vm['bookings_this_month'] = LeadForward::join('bookings', 'bookings.id', 'lead_forwards.booking_id')->where(['created_by' => $vm->id, 'bookings.deleted_at' => null])->whereBetween('bookings.created_at', [$from, $to])->count();
-
             $vm['recce_schedule_this_month'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.done_datetime' => null, 'visits.deleted_at' => null])->whereBetween('visits.visit_schedule_datetime', [$from, $to])->count();
             $vm['recce_schedule_today'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.done_datetime' => null, 'visits.deleted_at' => null])->where('visits.visit_schedule_datetime', 'like', "%$current_date%")->count();
             $vm['recce_done_this_month'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.deleted_at' => null])->whereBetween('visits.done_datetime', [$from, $to])->count();
@@ -272,7 +266,7 @@ class DashboardController extends Controller
                 ->where('forward_to', $v->id)
                 ->distinct('lead_id')
                 ->count('lead_id');
-            
+
             $v['forward_leads_this_month'] = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $v->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
             $v['forward_leads_today'] = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_date%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $v->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
 
@@ -337,7 +331,6 @@ class DashboardController extends Controller
             }
             $nv_members[$key]->forward_leads_by_category = $forward_leads_by_category;
         }
-        // dd($nv_members);
         $nv_id = [];
         foreach ($nv_members as $list) {
             array_push($nv_id, $list->id);

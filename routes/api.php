@@ -176,21 +176,14 @@ Route::get('/getlol', function () {
     $oneYearAgo = Carbon::now()->subYear();
     $oneYearAgo0 = Carbon::now()->subMonth();
 
-    // Query to find leads updated before one month ago
-
     $uniqueLeadsCount = Lead::join('events', 'leads.lead_id', '=', 'events.lead_id')
         ->where('leads.lead_datetime', '<', $oneYearAgo)
         ->where('events.event_datetime', '<', $oneYearAgo0)
         ->groupBy('leads.lead_id')
         ->get()
-        ->count();  // Counting distinct lead IDs
+        ->count();
 
-
-
-    // Return the count of unique leads
     return $uniqueLeadsCount;
-    // return Lead::withTrashed()->where('mobile', '7827066945')->get();
-    // Return the count
 });
 
 Route::post('/save_wa', function (Request $request) {
