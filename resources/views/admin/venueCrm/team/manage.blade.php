@@ -83,7 +83,7 @@
                                 <div class="col-sm-6 mb-3" id="select_venue">
                                     <div class="form-group">
                                         <label for="venue_select">Select Venue<span class="text-danger">*</span></label>
-                                        <select class="form-control" name="venue_id" id="venue_select" required>
+                                        <select class="form-control" name="venue_id" id="venue_select">
                                             <option value="" selected disabled>Select Venue</option>
                                             @if (isset($member->venue_id))
 
