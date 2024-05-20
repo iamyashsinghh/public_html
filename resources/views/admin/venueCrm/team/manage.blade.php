@@ -85,11 +85,19 @@
                                         <label for="venue_select">Select Venue<span class="text-danger">*</span></label>
                                         <select class="form-control" name="venue_id" id="venue_select" required>
                                             <option value="" selected disabled>Select Venue</option>
-                                            @foreach ($venues as $list)
-                                                <option value="{{ $list->id }}"
-                                                    {{ $member->venue_id == $list->id ? 'selected' : '' }}>
-                                                    {{ $list->name }}</option>
-                                            @endforeach
+                                            @if (isset($member->venue_id))
+
+                                                @foreach ($venues as $list)
+                                                    <option value="{{ $list->id }}"
+                                                        {{ $member->venue_id == $list->id ? 'selected' : '' }}>
+                                                        {{ $list->name }}</option>
+                                                @endforeach
+                                            @else
+                                                @foreach ($venues as $list)
+                                                    <option value="{{ $list->id }}">
+                                                        {{ $list->name }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
@@ -124,7 +132,8 @@
                                 </div>
                                 <div class="col-sm-12 mb-3" id="nvrm_selection">
                                     <div class="form-group">
-                                        <label for="nv_nvrm_inp">Select NVRM (<i style="font-size:13px">Select Nvrm if this is rm account</i>)</label>
+                                        <label for="nv_nvrm_inp">Select NVRM (<i style="font-size:13px">Select Nvrm if
+                                                this is rm account</i>)</label>
                                         <div class="d-flex">
                                             @foreach ($getRm as $rm)
                                                 <div class="custom-control custom-radio my-1 mx-2">
@@ -162,30 +171,31 @@
     </div>
 @endsection
 @section('footer-script')
-<script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-<script src="{{asset('plugins/moment/moment.min.js')}}"></script>
-<script>
-    $(document).ready(function() {
-        toggleNVRMSelection($('#role_select').val());
-        $('#role_select').change(function() {
-            toggleNVRMSelection($(this).val());
-        });
-        function toggleNVRMSelection(selectedRole) {
-            
-            if(selectedRole == '5'){
-                $('#select_venue').show();
-                $('#parent_member').show();
-            }else{
-                $('#select_venue').hide(); 
-                $('#parent_member').hide(); 
-            }
+    <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            toggleNVRMSelection($('#role_select').val());
+            $('#role_select').change(function() {
+                toggleNVRMSelection($(this).val());
+            });
 
-            if(selectedRole == '4') {
-                $('#nvrm_selection').show();
-            } else {
-                $('#nvrm_selection').hide();
+            function toggleNVRMSelection(selectedRole) {
+
+                if (selectedRole == '5') {
+                    $('#select_venue').show();
+                    $('#parent_member').show();
+                } else {
+                    $('#select_venue').hide();
+                    $('#parent_member').hide();
+                }
+
+                if (selectedRole == '4') {
+                    $('#nvrm_selection').show();
+                } else {
+                    $('#nvrm_selection').hide();
+                }
             }
-        }
-    });
-</script>
+        });
+    </script>
 @endsection
