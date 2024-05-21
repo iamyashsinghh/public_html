@@ -68,7 +68,7 @@ class AuthController extends Controller
                 $login_info->login_type = $request->login_type;
                 $login_info->request_otp_count = 1;
             }
-
+            
             $login_info->otp_code = $verification_code;
             $login_info->request_otp_at = date('Y-m-d H:i:s');
             $login_info->ip_address = $client_ip;

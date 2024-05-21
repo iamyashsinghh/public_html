@@ -110,7 +110,7 @@ class DashboardController extends Controller
             array_push($venue_form_leads_for_this_year, $count);
         }
         $venue_form_leads_for_this_year = implode(",", $venue_form_leads_for_this_year);
-        
+
         return view('seomanager.dashboard', compact('venue_leads_for_this_month','venue_form_leads_for_this_month', 'venue_ads_leads_for_this_month', 'venue_whatsapp_leads_for_this_year', 'venue_organic_leads_for_this_month', 'venue_form_leads_for_this_year', 'venue_call_leads_for_this_year', 'venue_ads_leads_for_this_year', 'venue_organic_leads_for_this_year', 'venue_call_leads_for_this_month', 'venue_whatsapp_leads_for_this_month', 'venue_leads_for_this_year','yearly_calendar'));
     }
 

@@ -171,12 +171,10 @@ class LeadController extends Controller
                 'leads.service_status',
                 'leads.read_status',
                 'ne.pax as pax',
-            )->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'leads.lead_id')->where('leads.forward_to', $auth_user->id)->whereNull('leads.deleted_at');
-
+            )->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'leads.lead_id')->where('leads.forward_to', $auth_user->id)->whereNull('leads.deleted_at')->groupBy('leads.lead_id');
             if ($request->has('lead_status') && $request->lead_status != '') {
                 $leads->where('leads.lead_status', $request->lead_status);
             }
-
             if ($request->pax_min_value != null) {
                 $min =  $request->pax_min_value;
                 if ($request->pax_max_value != null) {
