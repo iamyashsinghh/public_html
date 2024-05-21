@@ -114,6 +114,22 @@ class NvLeadController extends Controller
             }
             $leads->whereBetween('nv_leads.lead_datetime', [$from, $to])->orderBy('nv_leads.lead_datetime', 'asc');
         }
+        // if ($request->category != null) {
+        //     $current_month = date('Y-m');
+        //     $category_name = $request->category;
+        //     $leads->join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+        //         ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+        //         ->where('vendors.category_id', $category->id)
+        //         ->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")
+        //         ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
+        //         ->groupBy('nv_lead_forward_infos.lead_id');
+
+        //     // $leads->join('vendors', 'nvrm_lead_forwards.forward_to', '=', 'vendors.id')
+        //     //     ->join('vendor_categories', 'vendors.category_id', '=', 'vendor_categories.id')
+        //     //     ->where('vendor_categories.name', '=', $category_name)
+        //     //     ->where('nvrm_lead_forwards.lead_datetime', 'like', "%$current_month%")
+        //     //     ->whereNull('nvrm_lead_forwards.deleted_at');
+        // }
         if ($request->has_rm_message != null) {
             if ($request->has_rm_message == "yes") {
                 $leads->join('nvrm_messages as nvrm_msg', 'nv_leads.id', '=', 'nvrm_msg.lead_id');

@@ -32,6 +32,7 @@ class DashboardController extends Controller
         $currentDateEnd = Carbon::now()->endOfDay();
         $currentMonthStart = Carbon::now()->startOfMonth();
         $currentMonthEnd = Carbon::now()->endOfMonth();
+
         $rm_unfollowed_leads = Lead::query()
         ->where('lead_status', '!=', 'Done')
         ->whereNull('deleted_at')

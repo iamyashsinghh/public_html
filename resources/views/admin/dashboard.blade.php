@@ -521,6 +521,56 @@
                     </div>
                 </div>
 
+                <h2>RM Statics</h2>
+                <div class="my-2">
+                    <div class="card text-xs mb-5">
+                        <div class="card-header card-header-mod text-light"
+                            style="background: linear-gradient(48deg, #8e0000e6, #dfa930b5);">
+                            <h6 class="mb-0 text-bold">RM Statics - {{ date('F') }}</h5>
+                        </div>
+                        <div class="card-body p-0" style="max-width: 100%; overflow-x: auto;">
+                            <table class="table-bordered" style="width: 100%;">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th class="text-left px-1">Rm Name</th>
+                                        <th class="px-1">Leads Recieved this Month</th>
+                                        <th class="px-1">Leads Recieved Today</th>
+                                        <th class="px-1">Unread Leads Today</th>
+                                        <th class="px-1">Unread Leads this Month</th>
+                                        <th class="px-1">Unread Leads Overdue</th>
+                                        <th class="px-1">RM Unfollowed Leads</th>
+                                        <th class="px-1">Schedule Task this Month</th>
+                                        <th class="px-1">Schedule Task Today</th>
+                                        <th class="px-1">Task Overdue</th>
+                                        <th class="px-1">Forword Lead This Month</th>
+                                        <th class="px-1">Forword Lead Today</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($rm_members as $v)
+                                        <tr class="text-center" style="font-weight: bold;">
+                                            <td class="text-nowrap text-left p-1">{{ $v->name }}</td>
+                                            <td class="p-1">{{ $v->total_leads_received_this_month }}</td>
+                                            <td class="p-1">{{ $v->total_leads_received_today }}</td>
+                                            <td class="p-1">{{ $v->unread_leads_today }}</td>
+                                            <td class="p-1">{{ $v->unread_leads_this_month }}</td>
+                                            <td class="p-1">{{ $v->total_unread_leads_overdue }}</td>
+                                            <td class="p-1">{{ $v->rm_unfollowed_leads }}</td>
+                                            <td class="p-1">{{ $v->rm_month_task_leads }}</td>
+                                            <td class="p-1">{{ $v->rm_today_task_leads }}</td>
+                                            <td class="p-1">{{ $v->rm_task_overdue_leads }}</td>
+                                            <td class="p-1">{{ $v->forward_leads_this_month }}</td>
+                                            <td class="p-1">{{ $v->forward_leads_today }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <h2>NVRM Statics</h2>
                 <div class="my-2">
                     <div class="card text-xs mb-5">
                         <div class="card-header card-header-mod text-light"

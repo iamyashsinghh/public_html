@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Lead;
 use App\Models\LeadForward;
+use App\Models\LeadForwardInfo;
 use App\Models\nvLead;
 use App\Models\nvLeadForward;
 use App\Models\nvLeadForwardInfo;
@@ -209,6 +210,68 @@ class DashboardController extends Controller
         }
 
 
+        $currentDateTime = Carbon::today();
+        $currentDateStart = Carbon::now()->startOfDay();
+        $currentDateEnd = Carbon::now()->endOfDay();
+        $currentMonthStart = Carbon::now()->startOfMonth();
+        $currentMonthEnd = Carbon::now()->endOfMonth();
+
+        $rm_members = TeamMember::select('id', 'name',)->where(['role_id' => 4, 'status' => 1])->get();
+        $current_month = date('Y-m');
+
+        foreach ($rm_members as $rm) {
+            $rm['total_leads_received_this_month'] = Lead::where('lead_datetime', 'like', "%$current_month%")->where('assign_id', $rm->id)->count();
+            $rm['total_leads_received_today'] =  Lead::where('lead_datetime', 'like', "%$current_date%")->where('assign_id', $rm->id)->count();
+            $rm['unread_leads_this_month'] =  Lead::where('lead_datetime', 'like', "%$current_month%")->where('read_status', false)->where('assign_id', $rm->id)->count();
+            $rm['unread_leads_today'] = Lead::where('lead_datetime', 'like', "%$current_date%")->where('read_status', false)->where('assign_id', $rm->id)->count();
+            $rm['total_unread_leads_overdue'] = Lead::where('lead_datetime', '<', Carbon::today())->where('read_status', false)->where('assign_id', $rm->id)->count();
+            $rm['forward_leads_this_month'] =  LeadForwardInfo::whereBetween('updated_at', [$from, $to])->where('forward_from', $rm->id)->groupBy('lead_id')->get()->count();
+            $rm['forward_leads_today'] = LeadForwardInfo::where('updated_at', 'like', "%$current_date%")->where('forward_from', $rm->id)->groupBy('lead_id')->get()->count();
+
+            $rm['rm_task_overdue_leads'] = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
+            ->where('leads.lead_status', '!=', 'Done')
+            ->where('tasks.task_schedule_datetime', '<', $currentDateTime)
+            ->whereNull('tasks.done_datetime')
+            ->whereNull('leads.deleted_at')
+            ->whereNull('tasks.deleted_at')
+            ->where('tasks.created_by', $rm->id)
+            ->count();
+
+            $rm['rm_today_task_leads'] = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
+            ->where('leads.lead_status', '!=', 'Done')
+            ->whereBetween('tasks.task_schedule_datetime', [$currentDateStart, $currentDateEnd])
+            ->whereNull('tasks.done_datetime')
+            ->whereNull('leads.deleted_at')
+            ->whereNull('tasks.deleted_at')
+            ->where('tasks.created_by', $rm->id)
+            ->count();
+
+            $rm['rm_month_task_leads'] = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
+            ->whereBetween('tasks.task_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
+            ->whereNull('leads.deleted_at')
+            ->whereNull('tasks.deleted_at')
+            ->where('tasks.created_by', $rm->id)
+            ->count();
+
+            $rm['rm_unfollowed_leads'] =  Lead::query()
+            ->where('lead_status', '!=', 'Done')
+            ->whereNull('deleted_at')
+            ->whereExists(function ($query) use ($rm) {
+                $query->select(DB::raw(1))
+                      ->from('tasks')
+                      ->whereColumn('tasks.lead_id', 'leads.lead_id')
+                      ->whereNotNull('tasks.done_datetime')
+                      ->whereNull('tasks.deleted_at')
+                      ->where('tasks.created_by', $rm->id);
+            })
+            ->whereDoesntHave('get_tasks', function ($query) {
+                $query->whereNull('done_datetime');
+            })
+            ->distinct('lead_id')
+            ->count();
+        }
+
+
         $v_members = Vendor::select('id', 'name', 'business_name', 'category_id', 'start_date', 'end_date')->where('status', 1)->get();
         $current_month = date('Y-m');
         $current_date = date('Y-m-d');
@@ -335,6 +398,6 @@ class DashboardController extends Controller
         foreach ($nv_members as $list) {
             array_push($nv_id, $list->id);
         }
-        return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month', 'venue_form_leads_for_this_month', 'venue_ads_leads_for_this_month', 'venue_whatsapp_leads_for_this_year', 'venue_organic_leads_for_this_month', 'venue_form_leads_for_this_year', 'venue_call_leads_for_this_year', 'venue_ads_leads_for_this_year', 'venue_organic_leads_for_this_year', 'venue_call_leads_for_this_month', 'venue_whatsapp_leads_for_this_month', 'venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members', 'yearly_calendar', 'v_members', 'nv_members', 'categories'));
+        return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month', 'venue_form_leads_for_this_month', 'venue_ads_leads_for_this_month', 'venue_whatsapp_leads_for_this_year', 'venue_organic_leads_for_this_month', 'venue_form_leads_for_this_year', 'venue_call_leads_for_this_year', 'venue_ads_leads_for_this_year', 'venue_organic_leads_for_this_year', 'venue_call_leads_for_this_month', 'venue_whatsapp_leads_for_this_month', 'venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members','rm_members', 'yearly_calendar', 'v_members', 'nv_members', 'categories'));
     }
 }

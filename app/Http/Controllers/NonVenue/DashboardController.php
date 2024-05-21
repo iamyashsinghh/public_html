@@ -99,9 +99,9 @@ class DashboardController extends Controller
             ->count();
 
         // vendor help counts
-        $vendor_all_help = nvNote::count();
-        $vendor_non_responsed_help = nvNote::whereNull('done_by')->count();
-        $vendor_total_helped = nvNote::where('done_by', $auth_user->id)->count();
+        $vendor_all_help = nvNote::where('id', '>', 592)->count();
+        $vendor_non_responsed_help = nvNote::where('id', '>', 592)->whereNull('done_by')->count();
+        $vendor_total_helped = nvNote::where('id', '>', 592)->where('done_by', $auth_user->id)->count();
 
         $response_data = compact(
             'total_leads_received_this_month',

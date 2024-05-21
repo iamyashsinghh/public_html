@@ -35,7 +35,7 @@ class NvNotesController extends Controller
                 'vendors.name as created_by_name',
                 'vendor_categories.name as category_name',
                 'team_members.name as done_by_name'
-            );
+            )->where('nv_notes.id', '>', 592);
         if (!empty($request->dashboard_filters)) {
             if ($request->dashboard_filters == "vendor_non_responsed_help") {
                 $vendor_help->whereNull('nv_notes.done_by');
