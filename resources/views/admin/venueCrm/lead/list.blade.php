@@ -257,11 +257,11 @@
                             <div id="collapse55" class="accordion-collapse collapse {{isset($filter_params['pax_min_value']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
                                     <div class="form-group">
-                                        <label for="pax_min_value">MIN</label>
+                                        <label for="pax_min_value">Min</label>
                                         <input type="text" class="form-control" id="pax_min_value" name="pax_min_value" value="{{isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : ''}}">
                                     </div>
                                     <div class="form-group">
-                                        <label for="pax_max_value">To</label>
+                                        <label for="pax_max_value">Max</label>
                                         <input type="text" class="form-control" id="pax_max_value" name="pax_max_value" value="{{isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : ''}}">
                                     </div>
                                 </div>

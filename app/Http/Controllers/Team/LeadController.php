@@ -92,7 +92,9 @@ class LeadController extends Controller
                 'leads.is_whatsapp_msg',
                 DB::raw("(select count(fwd.id) from lead_forwards as fwd where fwd.lead_id = leads.lead_id) as forwarded_count"),
                 'leads.lead_catagory',
-            )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by');
+                'ne.pax as pax',
+            )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
+            ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
             $leads->where('leads.deleted_at', null)->groupBy('leads.mobile');
 
             if ($request->has('lead_status') && $request->lead_status != '') {
@@ -103,6 +105,16 @@ class LeadController extends Controller
                 $from = Carbon::make($request->event_from_date);
                 $to = $request->has('event_to_date') && $request->event_to_date != '' ? Carbon::make($request->event_to_date)->endOfDay() : $from->copy()->endOfDay();
                 $leads->whereBetween('leads.event_datetime', [$from, $to]);
+            }
+
+            if ($request->pax_min_value != null) {
+                $min =  $request->pax_min_value;
+                if ($request->pax_max_value != null) {
+                    $max = $request->pax_max_value;
+                } else {
+                    $max = $request->pax_min_value;
+                }
+                $leads->whereBetween('ne.pax', [$min, $max]);
             }
 
             if ($request->has('lead_from_date') && $request->lead_from_date != '') {
@@ -158,11 +170,23 @@ class LeadController extends Controller
                 'leads.lead_status',
                 'leads.service_status',
                 'leads.read_status',
-            )->where('leads.forward_to', $auth_user->id)->whereNull('leads.deleted_at');
+                'ne.pax as pax',
+            )->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'leads.lead_id')->where('leads.forward_to', $auth_user->id)->whereNull('leads.deleted_at');
 
             if ($request->has('lead_status') && $request->lead_status != '') {
                 $leads->where('leads.lead_status', $request->lead_status);
             }
+
+            if ($request->pax_min_value != null) {
+                $min =  $request->pax_min_value;
+                if ($request->pax_max_value != null) {
+                    $max = $request->pax_max_value;
+                } else {
+                    $max = $request->pax_min_value;
+                }
+                $leads->whereBetween('ne.pax', [$min, $max]);
+            }
+
 
             if ($request->has('event_from_date') && $request->event_from_date != '') {
                 $from = Carbon::make($request->event_from_date);

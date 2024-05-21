@@ -74,7 +74,8 @@ class LeadController extends Controller
 
         if ($request->lead_status != null) {
             $leads->where('leads.lead_status', $request->lead_status)->where('leads.lead_id', '>', 0);
-        } elseif ($request->event_from_date != null) {
+        }
+        if ($request->event_from_date != null) {
             $from = Carbon::make($request->event_from_date);
             if ($request->event_to_date != null) {
                 $to = Carbon::make($request->event_to_date)->endOfDay();
@@ -82,7 +83,8 @@ class LeadController extends Controller
                 $to = Carbon::make($request->event_from_date)->endOfDay();
             }
             $leads->whereBetween('leads.event_datetime', [$from, $to])->orderBy('leads.event_datetime', 'asc');
-        } elseif ($request->lead_from_date != null) {
+        }
+        if ($request->lead_from_date != null) {
             $from = Carbon::make($request->lead_from_date);
             if ($request->lead_to_date != null) {
                 $to = Carbon::make($request->lead_to_date)->endOfDay();
@@ -90,14 +92,16 @@ class LeadController extends Controller
                 $to = Carbon::make($request->lead_from_date)->endOfDay();
             }
             $leads->whereBetween('leads.lead_datetime', [$from, $to])->orderBy('leads.lead_datetime', 'asc');
-        } elseif ($request->has_rm_message != null) {
+        }
+        if ($request->has_rm_message != null) {
             if ($request->has_rm_message == "yes") {
                 $leads->join('rm_messages as rm_msg', 'leads.lead_id', '=', 'rm_msg.lead_id');
             } else {
                 $leads->leftJoin('rm_messages as rm_msg', 'leads.lead_id', '=', 'rm_msg.lead_id')->where('rm_msg.title', null);
             }
             $leads->orderBy('lead_datetime', 'desc');
-        } elseif ($request->pax_from != null) {
+        }
+        if ($request->pax_from != null) {
             if ($request->pax_to != null) {
                 $pax_range = [$request->pax_from, $request->pax_to];
                 $leads->whereBetween('leads.pax', $pax_range);

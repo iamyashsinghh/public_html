@@ -26,6 +26,9 @@ class VisitController extends Controller {
         if ($request->visit_schedule_from_date != null) {
             $filter_params = ['visit_schedule_from_date' => $request->visit_schedule_from_date, 'visit_schedule_to_date' => $request->visit_schedule_to_date];
         }
+        if ($request->pax_min_value != null) {
+            $filter_params = ['pax_min_value' => $request->pax_min_value, 'pax_max_value' => $request->pax_max_value];
+        }
 
         $page_heading = $filter_params ? "Visits - Filtered" : "Visits";
 
@@ -49,7 +52,10 @@ class VisitController extends Controller {
             'lead_forwards.event_datetime',
             'visits.created_at as visit_created_datetime',
             'visits.done_datetime as visit_done_datetime',
-        )->join('visits', ['lead_forwards.visit_id' => 'visits.id'])->where(['lead_forwards.forward_to' => $auth_user->id, 'visits.deleted_at' => null]);
+            'ne.pax as pax',
+        )->join('visits', ['lead_forwards.visit_id' => 'visits.id'])
+        ->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'lead_forwards.lead_id')
+        ->where(['lead_forwards.forward_to' => $auth_user->id, 'visits.deleted_at' => null])->groupBy('lead_forwards.lead_id');
 
         $current_date = date('Y-m-d');
         if ($request->visit_status == "Upcoming") {
@@ -68,6 +74,14 @@ class VisitController extends Controller {
                 $to = Carbon::make($request->visit_created_from_date)->endOfDay();
             }
             $visits->whereBetween('visits.created_at', [$from, $to]);
+        }elseif ($request->pax_min_value != null) {
+            $min = $request->pax_min_value;
+            if ($request->pax_max_value != null) {
+                $max = $request->pax_max_value;
+            } else {
+                $max = $request->pax_min_value;
+            }
+            $visits->whereBetween('ne.pax', [$min, $max]);
         } elseif ($request->visit_done_from_date) {
             $from = Carbon::make($request->visit_done_from_date);
             if ($request->visit_done_to_date != null) {

@@ -115,6 +115,31 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
+                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#collapse55"
+                                aria-expanded="true" aria-controls="collapse55">Pax</button>
+                        </h2>
+                        <div id="collapse55"
+                            class="accordion-collapse collapse {{ isset($filter_params['pax_min_value']) ? 'show' : '' }}"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body pl-2 pb-4">
+                                <div class="form-group">
+                                    <label for="pax_min_value">Min</label>
+                                    <input type="text" class="form-control" id="pax_min_value"
+                                        name="pax_min_value"
+                                        value="{{ isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : '' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pax_max_value">Max</label>
+                                    <input type="text" class="form-control" id="pax_max_value"
+                                        name="pax_max_value"
+                                        value="{{ isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : '' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
                             <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">visit Done Date</button>
                         </h2>
                         <div id="collapse3" class="accordion-collapse collapse {{isset($filter_params['visit_done_from_date']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
@@ -168,7 +193,14 @@ if (isset($filter_params['visit_status'])) {
     $filter = "visit_done_from_date=" . $filter_params['visit_done_from_date'] . "&visit_done_to_date=" . $filter_params['visit_done_to_date'];
 }elseif (isset($filter_params['visit_schedule_from_date'])) {
     $filter = "visit_schedule_from_date=" . $filter_params['visit_schedule_from_date'] . "&visit_schedule_to_date=" . $filter_params['visit_schedule_to_date'];
-}elseif(isset($filter_params['dashboard_filters'])){
+}elseif (isset($filter_params['pax_min_value'])) {
+            $filter =
+                'pax_min_value=' .
+                $filter_params['pax_min_value'] .
+                '&pax_max_value=' .
+                $filter_params['pax_max_value'];
+        }
+elseif(isset($filter_params['dashboard_filters'])){
     $filter = "dashboard_filters=" . $filter_params['dashboard_filters'];
 }
 @endphp
@@ -252,7 +284,7 @@ if (isset($filter_params['visit_status'])) {
             rowCallback: function(row, data, index) {
                 row.style.cursor = "pointer";
                 row.setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
-        
+
                 const td_elements = row.querySelectorAll('td');
                 td_elements[1].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
                 td_elements[1].classList.add('text-nowrap');
@@ -261,9 +293,9 @@ if (isset($filter_params['visit_status'])) {
                 }else{
                     td_elements[4].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
-                
-                td_elements[5].innerHTML = moment(data.visit_schedule_datetime).format("DD-MMM-YYYY hh:mm a");; 
-                
+
+                td_elements[5].innerHTML = moment(data.visit_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
+
                 const visit_schedule_date = moment(data.visit_schedule_datetime).format("YYYY-MM-DD");
                 const current_date = moment().format("YYYY-MM-DD");
                 if (data.visit_done_datetime != null) {
@@ -275,11 +307,11 @@ if (isset($filter_params['visit_status'])) {
                 } else if (visit_schedule_date == current_date) {
                     elem_class = "warning";
                     elem_text = "Today";
-                } else if (visit_schedule_date < current_date) { 
+                } else if (visit_schedule_date < current_date) {
                     elem_class = "danger";
                     elem_text = "Overdue";
-                } 
-                td_elements[6].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`; 
+                }
+                td_elements[6].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
 
                 td_elements[7].innerText = moment(data.event_datetime).format("DD-MMM-YYYY");
                 td_elements[8].innerText = moment(data.visit_created_datetime).format("DD-MMM-YYYY hh:mm a");
@@ -307,7 +339,7 @@ if (isset($filter_params['visit_status'])) {
                         <td>${item.venue_name}</td>
                         <td>${item.read_status == 0 ? 'Unread': 'Read'}</td>
                         <td>${moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a")}</td>`;
-    
+
                         tr.innerHTML = tds;
                         forward_info_table_body.appendChild(tr);
                         i++;

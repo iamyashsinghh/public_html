@@ -270,6 +270,23 @@
                         @endif
                         <div class="accordion-item">
                             <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse55" aria-expanded="true" aria-controls="collapse55">Pax</button>
+                            </h2>
+                            <div id="collapse55" class="accordion-collapse collapse {{isset($filter_params['pax_min_value']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="form-group">
+                                        <label for="pax_min_value">MIN</label>
+                                        <input type="text" class="form-control" id="pax_min_value" name="pax_min_value" value="{{isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : ''}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pax_max_value">To</label>
+                                        <input type="text" class="form-control" id="pax_max_value" name="pax_max_value" value="{{isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : ''}}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
                                 <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
                                     type="button" data-bs-toggle="collapse" data-bs-target="#collapse5"
                                     aria-expanded="true" aria-controls="collapse5">Event Date</button>
@@ -469,8 +486,6 @@
                                 td_elements[5].innerHTML =
                                     `<div class="d-flex"><div>${data[3]} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data[3]})" style="font-size: 25px; color: green;"></i></div>`;
                             }
-
-
 
                             row.style.background = data[8];
                             td_elements[9].innerText = data[19] ?? 'N/A';

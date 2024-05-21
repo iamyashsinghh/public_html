@@ -86,14 +86,15 @@ class NvLeadController extends Controller
             'roles.name as team_role',
             'nv_leads.created_by',
             DB::raw("count(fwd_info.id) as forwarded_count"),
-            'forward_to_tm.name as forward_to_name'
+            'forward_to_tm.name as forward_to_name',
+            'ne.pax as pax',
         )->leftJoin('nv_leads', 'nv_leads.id', 'nvrm_lead_forwards.lead_id')
             ->leftJoin('team_members as tm', 'nv_leads.created_by', 'tm.id')
             ->leftJoin('roles', 'tm.role_id', 'roles.id')
             ->leftJoin('team_members as forward_to_tm', 'nvrm_lead_forwards.forward_to', 'forward_to_tm.id') // Add this line to join the team_members table again for forward_to
             ->leftJoin('nv_lead_forward_infos as fwd_info', ['nvrm_lead_forwards.lead_id' => 'fwd_info.lead_id'])
+            ->leftJoin('nv_events as ne', 'ne.lead_id', '=', 'nvrm_lead_forwards.lead_id')
                         ->groupBy('nvrm_lead_forwards.mobile');
-
 
         if ($request->event_from_date != null) {
             $from = Carbon::make($request->event_from_date);
@@ -120,6 +121,17 @@ class NvLeadController extends Controller
                 $leads->leftJoin('nvrm_messages as nvrm_msg', 'nv_leads.id', '=', 'nvrm_msg.lead_id')->where('nvrm_msg.title', null);
             }
         }
+
+        if ($request->pax_min_value != null) {
+            $min =  $request->pax_min_value;
+            if ($request->pax_max_value != null) {
+                $max = $request->pax_max_value;
+            } else {
+                $max = $request->pax_min_value;
+            }
+            $leads->whereBetween('ne.pax', [$min, $max]);
+        }
+
         if ($request->has('lead_status') && $request->lead_status != '') {
             $leads->where('nvrm_lead_forwards.lead_status', $request->lead_status);
         }

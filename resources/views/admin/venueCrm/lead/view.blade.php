@@ -48,7 +48,7 @@
                                                 <th class="">Message</th>
                                             </tr>
                                         </thead>
-
+                                        
                                         <body>
                                             @if (sizeof($lead->get_rm_messages) > 0)
                                                 @foreach ($lead->get_rm_messages as $key => $list)
@@ -643,7 +643,7 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
             </div>

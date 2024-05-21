@@ -25,6 +25,9 @@ class BookingController extends Controller {
         if ($request->booking_from_date != null) {
             $filter_params = ['booking_from_date' => $request->booking_from_date, 'booking_to_date' => $request->booking_to_date];
         }
+        if ($request->pax_min_value != null) {
+            $filter_params = ['pax_min_value' => $request->pax_min_value, 'pax_max_value' => $request->pax_max_value];
+        }
         $page_heading = $filter_params ? "Bookings - Filtered" : "Bookings";
         if ($dashboard_filters !== null) {
             $filter_params = ['dashboard_filters' => $dashboard_filters];
@@ -81,6 +84,14 @@ class BookingController extends Controller {
                 $to = Carbon::make($request->event_from_date)->endOfDay();
             }
             $bookings->whereBetween('events.event_datetime', [$from, $to]);
+        }elseif ($request->pax_min_value != null) {
+            $min = $request->pax_min_value;
+            if ($request->pax_max_value != null) {
+                $max = $request->pax_max_value;
+            } else {
+                $max = $request->pax_min_value;
+            }
+            $bookings->whereBetween('events.pax', [$min, $max]);
         } elseif ($request->dashboard_filters != null) {
             if ($request->dashboard_filters == "bookings_this_month") {
                 $from =  Carbon::today()->startOfMonth();

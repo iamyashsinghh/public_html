@@ -55,7 +55,7 @@
         </section>
         <section class="content">
             <div class="container-fluid">
-                <div class="table-responsive" >
+                <div class="table-responsive">
                     <table id="serverTable" class="table text-sm">
                         <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                             <tr>
@@ -203,6 +203,23 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse55" aria-expanded="true" aria-controls="collapse55">Pax</button>
+                            </h2>
+                            <div id="collapse55" class="accordion-collapse collapse {{isset($filter_params['pax_min_value']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="form-group">
+                                        <label for="pax_min_value">Min</label>
+                                        <input type="text" class="form-control" id="pax_min_value" name="pax_min_value" value="{{isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : ''}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pax_max_value">Max</label>
+                                        <input type="text" class="form-control" id="pax_max_value" name="pax_max_value" value="{{isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : ''}}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="my-5">
                         <button type="submit" class="btn btn-sm text-light btn-block"
@@ -228,6 +245,12 @@
                 $filter_params['booking_from_date'] .
                 '&booking_to_date=' .
                 $filter_params['booking_to_date'];
+        } elseif (isset($filter_params['pax_min_value'])) {
+            $filter =
+                'pax_min_value=' .
+                $filter_params['pax_min_value'] .
+                '&pax_max_value=' .
+                $filter_params['pax_max_value'];
         } elseif (isset($filter_params['event_from_date'])) {
             $filter =
                 'event_from_date=' .
@@ -272,12 +295,12 @@
                     [1, 'desc']
                 ],
                 rowCallback: function(row, data, index) {
-                    //Intl.NumberFormat('en-US').format(80000)
                     const td_elements = row.querySelectorAll('td');
                     td_elements[1].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a");
                     td_elements[2].innerText = data[2] ?? 'N/A';
                     td_elements[7].innerText = data[12] ?? 'N/A';
                     td_elements[8].innerText = data[7] ? moment(data[7]).format("DD-MMM-YYYY") : 'N/A';
+                    td_elements[9].innerText = data[8];
                     td_elements[10].innerText = Intl.NumberFormat('en-US').format(data[9]);
                     td_elements[11].innerText = Intl.NumberFormat('en-US').format(data[10]);
                     if (data[11] == 0) {
@@ -285,7 +308,7 @@
                             `<span class="badge badge-danger">Not Completed</span>`;
                     } else {
                         td_elements[12].innerHTML =
-                        `<span class="badge badge-success">Completed</span>`;
+                            `<span class="badge badge-success">Completed</span>`;
                     }
 
                     for (let i = 0; i < 12; i++) {

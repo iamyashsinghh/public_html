@@ -86,8 +86,8 @@
                         </div>
                         <div class="col-sm-4 mb-3">
                             <div class="form-group">
-                                <label for="event_date_inp">Event Date</label>
-                                <input type="date" min="{{date('Y-m-d')}}" class="form-control" id="event_date_inp" name="event_date">
+                                <label for="event_date_inp">Event Date <span class="text-danger">*</span></label>
+                                <input type="date" min="{{date('Y-m-d')}}" class="form-control" id="event_date_inp" name="event_date" required>
                             </div>
                         </div>
                         <div class="col-sm-4 mb-3">

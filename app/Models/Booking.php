@@ -21,7 +21,7 @@ class Booking extends Model {
             });
     }
     public function get_vm() {
-        return $this->hasOne(TeamMember::class, 'id', 'created_by');
+        return $this->hasOne(TeamMember::class, 'id', 'created_by')->withTrashed();
     }
 
     public function get_event() {

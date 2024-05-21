@@ -66,10 +66,11 @@ class NvLeadController extends Controller
             'nvrm_lf.last_forwarded_by',
             'nvrm_lf.service_status',
             'nvrm_lf.lead_status',
+            'ne.pax as pax',
         )->leftJoin('team_members as tm', 'nv_leads.created_by', 'tm.id')
             ->leftJoin('roles', 'tm.role_id', 'roles.id')
+            ->leftJoin('nv_events as ne', 'ne.lead_id', '=', 'nv_leads.id')
             ->leftJoin('nvrm_lead_forwards as nvrm_lf', 'nv_leads.id', 'nvrm_lf.lead_id')
-            // ->distinct();
             ->groupBy('nv_leads.mobile');
 
         if ($request->event_from_date != null) {
@@ -104,6 +105,16 @@ class NvLeadController extends Controller
 
         if ($request->lead_read_status != null) {
             $leads->where('nvrm_lf.read_status', $request->lead_read_status);
+        }
+
+        if ($request->pax_min_value != null) {
+            $min =  $request->pax_min_value;
+            if ($request->pax_max_value != null) {
+                $max = $request->pax_max_value;
+            } else {
+                $max = $request->pax_min_value;
+            }
+            $leads->whereBetween('ne.pax', [$min, $max]);
         }
 
         if ($request->service_status != null) {
