@@ -173,17 +173,16 @@ if (!function_exists('assignLeadsToRMs')) {
 
 
 Route::get('/getlol', function () {
-    $oneYearAgo = Carbon::now()->subYear();
-    $oneYearAgo0 = Carbon::now()->subMonth();
+    // $oneYearAgo = Carbon::now()->subYear();
+    // $oneYearAgo0 = Carbon::now()->subMonth();
 
-    $uniqueLeadsCount = Lead::join('events', 'leads.lead_id', '=', 'events.lead_id')
-        ->where('leads.lead_datetime', '<', $oneYearAgo)
-        ->where('events.event_datetime', '<', $oneYearAgo0)
-        ->groupBy('leads.lead_id')
-        ->get()
-        ->count();
+    // $uniqueLeadsCount = Lead::join('events', 'leads.lead_id', '=', 'events.lead_id')
+    //     ->where('leads.lead_datetime', '<', $oneYearAgo)
+    //     ->where('events.event_datetime', '<', $oneYearAgo0)
+    //     ->groupBy('leads.lead_id')
+    //     ->get();
 
-    return $uniqueLeadsCount;
+    // return $uniqueLeadsCount;
 });
 
 Route::post('/save_wa', function (Request $request) {

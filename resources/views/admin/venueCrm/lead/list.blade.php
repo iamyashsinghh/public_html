@@ -413,11 +413,12 @@
                 language: {
                     "search": "_INPUT_",
                     "searchPlaceholder": "Type here to search..",
-                    processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
+                    processing: `<i class="fa fa-spinner fa-spin"></i><span class="sr-only"></span>`, // loader
                 },
-                serverSide: true,
+                serverSide: false,
                 lengthMenu: [ [10, 25, 50, 100, 200, 500, 1000], [10, 25, 50, 100, 200, 500, 1000] ],
                 loading: true,
+                processing: true,
                 ajax: {
                     url: data_url,
                     headers: {
