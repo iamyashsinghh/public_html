@@ -699,7 +699,7 @@ class WhatsappMsgController extends Controller
             $newWaMsg->time = $currentTimestamp;
             $newWaMsg->type = 'text';
             $newWaMsg->is_sent = "1";
-            $newWaMsg->body = "*Hi $nameOfRecipient*, \n I'm $request->greetmsg, your Wedding Planning assistant. Would you like me to help you find venues and wedding vendors for your wedding?";
+            $newWaMsg->body = "*Hi $nameOfRecipient*, \n I'm $request->greetmsg, your *Relationship Manager*. Do you need any support to improve your lead conversion? If yes, please let me know.";
             $newWaMsg->save();
             return response()->json(['message' => 'Message sent successfully.'], 200);
         } else {
