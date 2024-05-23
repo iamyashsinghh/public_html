@@ -100,7 +100,7 @@ $userName = '';
                 </div>
                 <div class="modal-footer text-sm">
                     <div class="mx-5">
-                    <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnGreetMsg" title="Hi (Name of Vendor), I’m {{ $userName }}, your *Relationship Manager*. Do you need any support to improve your lead conversion? If yes, please let me know. (Yes {reply btn})">RM Greet Msg</a>
+                    <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnnvGreetMsg" title="Hi (Name of Vendor), I’m {{ $userName }}, your *Relationship Manager*. Do you need any support to improve your lead conversion? If yes, please let me know. (Yes {reply btn})">RM Greet Msg</a>
                     </div>
                     <a href="javascript:void(0);" class="btn btn-sm btn-secondary m-1" data-bs-dismiss="modal">Close</a>
                     <a href="javascript:void(0);" class="btn btn-sm text-light m-1"
@@ -176,7 +176,7 @@ $userName = '';
         });
     });
 
-    $("#sendMessageBtnGreetMsg").click(function() {
+    $("#sendMessageBtnnvGreetMsg").click(function() {
         var $btn = $(this);
     var originalText = $btn.html();
     $btn.html('<i class="fa fa-spinner fa-spin"></i>');
