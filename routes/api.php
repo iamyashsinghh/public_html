@@ -554,7 +554,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
             $caller_agent_name = $request->input('answered_agent.name');
         } elseif ($request->input('missed_agent') !== null) {
             $missed_agents = $request->input('missed_agent');
-            if (!empty($missed_agents)) {
+            if (!empty ($missed_agents)) {
                 $caller_agent_name = $missed_agents[0]['name'];
             }
         }
@@ -574,7 +574,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
 
         $crm_meta = CrmMeta::find(1);
         $preference = $crm_meta ? $crm_meta->meta_value : 'la-fortuna-banquets-mayapuri';
-        $id_ad =  $crm_meta ? $crm_meta->is_ad : '0';
+        $id_ad = $crm_meta ? $crm_meta->is_ad : '0';
         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
         if (!$listing_data) {
             $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
@@ -696,8 +696,21 @@ Route::post('/new_lead', function (Request $request) {
                 $lead_source = "WB|Form";
                 $preference = $request->post('preference');
             }
+
+            $url_components = parse_url($preference);
+            if (isset($url_components['query'])) {
+                parse_str($url_components['query'], $query_params);
+                $cleaned_query_params = array_filter($query_params, function ($value) {
+                    return !empty($value);
+                });
+                $cleaned_query_string = http_build_query($cleaned_query_params);
+                $cleaned_url = $url_components['path'] . '?' . $cleaned_query_string;
+                $preference = $cleaned_url;
+            }
+
             $lead_cat_data = "Venue";  // Default category name
             $listing_data = null;
+
 
             $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
             if (!$listing_data) {
