@@ -7,6 +7,7 @@ use App\Models\BdmLead;
 use App\Models\Lead;
 use App\Models\nvLead;
 use App\Models\nvrmLeadForward;
+use App\Models\Vendor;
 use App\Models\WhatsappBulkMsgTask;
 use App\Models\whatsappMessages;
 use App\Models\WhatsappCampain;
@@ -483,7 +484,7 @@ class WhatsappMsgController extends Controller
             if (!$getlead) {
                 return response()->json(['message' => 'Lead not found.'], 404);
             }
-            
+
             if ($getlead->assign_id == $auth_user->id) {
                 $getlead->is_whatsapp_msg = 0;
                 if ($getlead->save()) {
@@ -628,6 +629,67 @@ class WhatsappMsgController extends Controller
                     ]
                 ]);
         Log::info($response);
+        if ($response->successful()) {
+            Log::info($response);
+            $currentTimestamp = Carbon::now();
+            $newWaMsg = new whatsappMessages();
+            $newWaMsg->msg_id = "$request->recipient";
+            $newWaMsg->msg_from = "$request->recipient";
+            $newWaMsg->time = $currentTimestamp;
+            $newWaMsg->type = 'text';
+            $newWaMsg->is_sent = "1";
+            $newWaMsg->body = "*Hi $nameOfRecipient*, \n I'm $request->greetmsg, your Wedding Planning assistant. Would you like me to help you find venues and wedding vendors for your wedding?";
+            $newWaMsg->save();
+            return response()->json(['message' => 'Message sent successfully.'], 200);
+        } else {
+            return response()->json(['error' => 'Failed to send message.'], $response->status());
+        }
+    }
+
+    public function whatsapp_msg_send_nv_greet_btn(Request $request)
+    {
+        if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+            return false;
+        }
+        $nameOfVendor = Vendor::where('mobile', $request->recipient)->first();
+
+        $nameOfRecipient = $nameOfVendor ? $nameOfVendor->name : 'Sir/Madam';
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $authKey = env('TATA_AUTH_KEY');
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer $authKey",
+            'Content-Type' => 'application/json'
+        ])->post($url, [
+                    "to" => "91$request->recipient",
+                    "type" => "template",
+                    "template" => [
+                        "name" => "nv_vendor_chat_inisiate_btn",
+                        "language" => [
+                            "code" => "en"
+                        ],
+                        "components" => [
+                            [
+                                "type" => "header",
+                                "parameters" => [
+                                    [
+                                        "type" => "text",
+                                        "text" => "$nameOfRecipient",
+                                    ]
+                                ]
+                            ],
+                            [
+                                "type" => "body",
+                                "parameters" => [
+                                    [
+                                        "type" => "text",
+                                        "text" => "$request->greetmsg",
+                                    ]
+                                ]
+                            ]
+                        ],
+                    ]
+                ]);
         if ($response->successful()) {
             Log::info($response);
             $currentTimestamp = Carbon::now();

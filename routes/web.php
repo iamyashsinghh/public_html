@@ -38,6 +38,9 @@ Route::post('whatsapp_msg_send_hey', [Controllers\WhatsappMsgController::class, 
 Route::post('whatsapp_msg_send_hello', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_hello'])->name('whatsapp_chat.send.hello');
 // send a hi lead_name i am rm name i am your wedding panner assistant
 Route::post('whatsapp_msg_send_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_greet_btn'])->name('whatsapp_chat.send.greet_btn');
+// nv great msg
+Route::post('whatsapp_msg_send_nv_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_greet_btn'])->name('whatsapp_chat.send.nv_greet_btn');
+
 
 // update status
 Route::post('whatsapp_msg_status', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status'])->name('whatsapp_chat.status');
