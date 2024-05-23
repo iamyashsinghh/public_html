@@ -97,7 +97,7 @@ $uri = end($uri_arr);
                         <li class="nav-item">
                             <span class="nav-link d-flex justify-content-between align-items-center">
                                 <a href="{{route('admin.leadforwardapproval.list')}}" class="link_prop w-100 leadforwardapproval_link">
-                                    <i class="nav-icon fas fa-home"></i>
+                                    <i class="fa fa-paper-plane"></i>
                                     <p>Forward Lead Approval</p>
                                 </a>
                             </span>
