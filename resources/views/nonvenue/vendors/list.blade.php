@@ -69,7 +69,7 @@
     </div>
 @endsection
 @section('footer-script')
-    @include('whatsapp.chat');
+    @include('whatsapp.nvchat');
     <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
     <script>
