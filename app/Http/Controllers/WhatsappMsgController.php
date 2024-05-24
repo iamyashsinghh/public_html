@@ -785,7 +785,7 @@ class WhatsappMsgController extends Controller
             $originalName = $file->getClientOriginalName();
             $sanitizedFileName = time() . '-' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
             $filePath = $file->storeAs('uploads/documents', $sanitizedFileName, 'public');
-            Log::info("File uploaded to: $filePath");
+            // Log::info("File uploaded to: $filePath");
 
             $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
             $authKey = env('TATA_AUTH_KEY');
@@ -793,9 +793,9 @@ class WhatsappMsgController extends Controller
             $recipent = $request->input('phone_inp_id_doc');
             $doc_url = asset("storage/$filePath");
 
-            Log::info("Document URL: $doc_url");
-            Log::info("Recipient: $recipent");
-            Log::info("Document Title: $documentTitle");
+            // Log::info("Document URL: $doc_url");
+            // Log::info("Recipient: $recipent");
+            // Log::info("Document Title: $documentTitle");
 
             $response = Http::withHeaders([
                 'Authorization' => "Bearer $authKey",
@@ -822,11 +822,11 @@ class WhatsappMsgController extends Controller
 
                 return response()->json(['message' => 'Message sent successfully.'], 200);
             } else {
-                Log::error("Failed to send message: " . $response->body());
+                // Log::error("Failed to send message: " . $response->body());
                 return response()->json(['error' => 'Failed to send message.'], $response->status());
             }
         } catch (\Exception $e) {
-            Log::error("Error uploading document and sending message: " . $e->getMessage());
+            // Log::error("Error uploading document and sending message: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred. Please try again later.'], 500);
         }
     }
