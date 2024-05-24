@@ -783,7 +783,7 @@ class WhatsappMsgController extends Controller
         try {
             $file = $request->file('document');
             $originalName = $file->getClientOriginalName();
-            $sanitizedFileName = time() . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME), '_') . '.' . $file->getClientOriginalExtension();
+            $sanitizedFileName = time() . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
             $filePath = $file->storeAs('uploads/documents', $sanitizedFileName, 'public');
             Log::info("File uploaded to: $filePath");
 
