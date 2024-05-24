@@ -167,7 +167,7 @@ $userName = '';
     $("#uploadDocumentSubmit").click(function() {
         var documentInput = $("#document")[0];
         var documentTitle = $("#documentTitle").val();
-        var phone_inp_id_doc = $("#phone_inp_id_doc").val();
+        var phone_inp_id_doc = $("#phone_inp_id").val();
 
         if (documentInput.files && documentInput.files[0]) {
             $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Uploading...');
