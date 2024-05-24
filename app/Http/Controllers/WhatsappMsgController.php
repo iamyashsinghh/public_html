@@ -817,7 +817,7 @@ class WhatsappMsgController extends Controller
                 $newWaMsg->time = $currentTimestamp;
                 $newWaMsg->type = 'text';
                 $newWaMsg->is_sent = 1;
-                $newWaMsg->body = "Document URL: $doc_url";
+                $newWaMsg->body = "Document URL: $doc_url  && caption $documentTitle";
                 $newWaMsg->save();
 
                 return response()->json(['message' => 'Message sent successfully.'], 200);
