@@ -299,7 +299,7 @@
     </div>
 @endsection
 @section('footer-script')
-    @include('whatsapp.chat');
+    @include('whatsapp.bdmchat');
     @include('whatsapp.multiplemsg');
     @include('bdm.lead.manage_lead_modal');
     @php
@@ -339,7 +339,7 @@
                 .catch((error) => {});
         }
 
-        
+
         var dashfilters = @json($dashfilters);
         const data_url = `{{ route('bdm.lead.list.ajax') }}?{!! $filter !!}`;
         $(document).ready(function() {

@@ -487,6 +487,9 @@ class NvLeadController extends Controller
                     'lead_email' => $forward->email ?: 'N/A',
                     'lead_mobile' => $forward->mobile ?: 'N/A',
                 ];
+                // if($request->nvrm_msg_id == 4){
+                //     $data['pax'] = $event->pax;
+                // }
                 if (env('MAIL_STATUS') === true) {
                     Mail::mailer('smtp2')->to($vendor->email)->send(new NotifyVendorLead($data));
                 }

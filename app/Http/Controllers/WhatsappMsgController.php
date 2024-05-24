@@ -706,5 +706,65 @@ class WhatsappMsgController extends Controller
             return response()->json(['error' => 'Failed to send message.'], $response->status());
         }
     }
+    public function whatsapp_msg_send_bdm_greet_btn(Request $request)
+    {
+        if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+            return false;
+        }
+        $nameOfVendor = BdmLead::where('mobile', $request->recipient)->first();
+
+        $nameOfRecipient = $nameOfVendor ? $nameOfVendor->name : 'Sir/Madam';
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $authKey = env('TATA_AUTH_KEY');
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer $authKey",
+            'Content-Type' => 'application/json'
+        ])->post($url, [
+                    "to" => "91$request->recipient",
+                    "type" => "template",
+                    "template" => [
+                        "name" => "bdm_nv_chat_btn_re",
+                        "language" => [
+                            "code" => "en"
+                        ],
+                        "components" => [
+                            [
+                                "type" => "header",
+                                "parameters" => [
+                                    [
+                                        "type" => "text",
+                                        "text" => "$nameOfRecipient",
+                                    ]
+                                ]
+                            ],
+                            [
+                                "type" => "body",
+                                "parameters" => [
+                                    [
+                                        "type" => "text",
+                                        "text" => "$request->greetmsg",
+                                    ]
+                                ]
+                            ]
+                        ],
+                    ]
+                ]);
+        if ($response->successful()) {
+            Log::info($response);
+            $currentTimestamp = Carbon::now();
+            $newWaMsg = new whatsappMessages();
+            $newWaMsg->msg_id = "$request->recipient";
+            $newWaMsg->msg_from = "$request->recipient";
+            $newWaMsg->time = $currentTimestamp;
+            $newWaMsg->type = 'text';
+            $newWaMsg->is_sent = "1";
+            $newWaMsg->body = "*Hi $nameOfRecipient*, \n I'm $request->greetmsg, Your Key Account Manager, Are you looking for a source to grow your Business in Wedding industry? Wedding Banquets take pride in being a leading platform for booking Banquet Halls. Our platform helps *500+* clients in booking banquet halls every month. As, every Indian Wedding requires vendor services such as Professional *Photographers*, Celebrity *Makeup Artists*, Expert *Mehendi Artists* and Best *Band & Dhol* services. So, with our strong presence in the wedding industry, we aim to help you provide  💯% Assured and Guaranteed business by providing a platform for you to get more clientele traffic for expanding your availability to potential clients.✅Let's schedule a face-to-face meeting to discuss how we can help grow your business. Don't miss this business opportunity";
+            $newWaMsg->save();
+            return response()->json(['message' => 'Message sent successfully.'], 200);
+        } else {
+            return response()->json(['error' => 'Failed to send message.'], $response->status());
+        }
+    }
 
 }

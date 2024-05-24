@@ -40,6 +40,8 @@ Route::post('whatsapp_msg_send_hello', [Controllers\WhatsappMsgController::class
 Route::post('whatsapp_msg_send_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_greet_btn'])->name('whatsapp_chat.send.greet_btn');
 // nv great msg
 Route::post('whatsapp_msg_send_nv_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_greet_btn'])->name('whatsapp_chat.send.nv_greet_btn');
+// bdm great msg
+Route::post('whatsapp_msg_send_bdm_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_bdm_greet_btn'])->name('whatsapp_chat.send.bdm_greet_btn');
 
 
 // update status
