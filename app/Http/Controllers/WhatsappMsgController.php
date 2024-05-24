@@ -773,6 +773,7 @@ class WhatsappMsgController extends Controller
         $validator = Validator::make($request->all(), [
             'document' => 'required|mimes:jpg,jpeg,png,webp,zip,pdf|max:20480',
             'documentTitle' => 'required|string',
+            'phone_inp_id_doc' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -800,17 +801,15 @@ class WhatsappMsgController extends Controller
                 'Authorization' => "Bearer $authKey",
                 'Content-Type' => 'application/json'
             ])->post($url, [
-                        "to" => "91$recipent",
-                        "type" => "template",
-                        "document" => [
-                            "link" => $doc_url,
-                            "caption" => $documentTitle
-                        ]
-                    ]);
+                "to" => "91$recipent",
+                "type" => "document",
+                "document" => [
+                    "link" => $doc_url,
+                    "caption" => $documentTitle
+                ]
+            ]);
 
             if ($response->successful()) {
-                // Log::info("Message sent successfully: " . $response->body());
-
                 $currentTimestamp = Carbon::now();
                 $newWaMsg = new whatsappMessages();
                 $newWaMsg->msg_id = $recipent;
@@ -831,6 +830,7 @@ class WhatsappMsgController extends Controller
             return response()->json(['error' => 'An error occurred. Please try again later.'], 500);
         }
     }
+
 
 
 }
