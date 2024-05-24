@@ -773,7 +773,6 @@ class WhatsappMsgController extends Controller
         $validator = Validator::make($request->all(), [
             'document' => 'required|mimes:jpg,jpeg,png,webp,zip,pdf|max:20480',
             'documentTitle' => 'required|string',
-            'phone_inp_id_doc' => 'required|string'
         ]);
 
         if ($validator->fails()) {
