@@ -129,7 +129,7 @@ $userName = '';
                         <label for="document" class="form-label">Choose Document</label>
                         <input class="form-control" type="file" id="document" name="document" required>
                     </div>
-                        <input class="form-control d-none" type="number" id="phone_inp_id_doc" name="phone_inp_id_doc">
+                        <input class="form-control" type="number" id="phone_inp_id_doc" name="phone_inp_id_doc">
                 </form>
             </div>
             <div class="modal-footer">
