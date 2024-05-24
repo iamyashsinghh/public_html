@@ -16,6 +16,7 @@ use App\Models\WhatsappTemplates;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -765,6 +766,57 @@ class WhatsappMsgController extends Controller
         } else {
             return response()->json(['error' => 'Failed to send message.'], $response->status());
         }
+    }
+
+    public function uploadDocumentbdm(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'document' => 'required|mimes:jpg,jpeg,png,webp,zip,pdf|max:20480', // max file size 20MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->first()], 400);
+        }
+
+        $file = $request->file('document');
+        $originalName = $file->getClientOriginalName();
+        $sanitizedFileName = time() . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME), '_') . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs('uploads/documents', $sanitizedFileName, 'public');
+        Log::info($filePath);
+
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $authKey = env('TATA_AUTH_KEY');
+
+        $documentTitle = $request->input('documentTitle');
+        $recipent = $request->input('phone_inp_id_doc');
+        $doc_url = "https://wbcrm.in/storage/$filePath";
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer $authKey",
+            'Content-Type' => 'application/json'
+        ])->post($url, [
+                    "to" => "91$recipent",
+                    "type" => "template",
+                    "document" => [
+                        "link" => $doc_url,
+                        "caption" => "Wedding Banquets $documentTitle"
+                    ]
+                ]);
+
+                if ($response->successful()) {
+                    Log::info($response);
+                    $currentTimestamp = Carbon::now();
+                    $newWaMsg = new whatsappMessages();
+                    $newWaMsg->msg_id = "$recipent";
+                    $newWaMsg->msg_from = "$recipent";
+                    $newWaMsg->time = $currentTimestamp;
+                    $newWaMsg->type = 'text';
+                    $newWaMsg->is_sent = "1";
+                    $newWaMsg->body = "This is sended document url $doc_url";
+                    $newWaMsg->save();
+                    return response()->json(['message' => 'Message sent successfully.'], 200);
+                } else {
+                    return response()->json(['error' => 'Failed to send message.'], $response->status());
+                }
     }
 
 }

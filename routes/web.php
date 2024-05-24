@@ -42,6 +42,9 @@ Route::post('whatsapp_msg_send_greet_btn', [Controllers\WhatsappMsgController::c
 Route::post('whatsapp_msg_send_nv_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_greet_btn'])->name('whatsapp_chat.send.nv_greet_btn');
 // bdm great msg
 Route::post('whatsapp_msg_send_bdm_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_bdm_greet_btn'])->name('whatsapp_chat.send.bdm_greet_btn');
+// bdm documnet send
+Route::post('upload_document_bdm', [Controllers\WhatsappMsgController::class, 'uploadDocumentbdm'])->name('whatsapp_chat.send.bdm_doc_send');
+
 
 
 // update status

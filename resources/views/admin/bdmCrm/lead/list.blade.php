@@ -306,7 +306,7 @@
     </div>
 @endsection
 @section('footer-script')
-    @include('whatsapp.bdmchat');
+    @include('whatsapp.abdmchat');
     @include('whatsapp.bdm_wa_multi_msg');
     @include('admin.bdmCrm.lead.manage_lead_modal');
     @include('admin.bdmCrm.lead.forward_leads_modal');

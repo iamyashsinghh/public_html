@@ -101,7 +101,7 @@ $userName = '';
                 <div class="modal-footer text-sm">
                     <div class="mx-5">
                     <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnBdmGreetMsg" title="Hi (Name of Vendor), I’m {{ $userName }}, I'm {{1}} , Your Key Account Manager, Are you looking for a source to grow your Business in Wedding industry? Wedding Banquets take pride in being a leading platform for booking Banquet Halls. Our platform helps *500+* clients in booking banquet halls every month. As, every Indian Wedding requires vendor services such as Professional *Photographers*, Celebrity *Makeup Artists*, Expert *Mehendi Artists* and Best *Band & Dhol* services. So, with our strong presence in the wedding industry, we aim to help you provide  💯% Assured and Guaranteed business by providing a platform for you to get more clientele traffic for expanding your availability to potential clients.✅ Let's schedule a face-to-face meeting to discuss how we can help grow your business. Don't miss this business opportunity! (reply btns)">Bdm Greet Msg</a>
-                    {{-- <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="uploadDocumentBtn">Upload Document</a> --}}
+                    <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="uploadDocumentBtn">Upload Document</a>
                     </div>
                     <a href="javascript:void(0);" class="btn btn-sm btn-secondary m-1" data-bs-dismiss="modal">Close</a>
                     <a href="javascript:void(0);" class="btn btn-sm text-light m-1"
