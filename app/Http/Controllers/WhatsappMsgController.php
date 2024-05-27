@@ -536,7 +536,7 @@ class WhatsappMsgController extends Controller
                 "to" => "91$request->recipient",
                 "type" => "text",
                 "text" => [
-                    "body" => "Hi"
+                    "body" => "hi"
                 ]
             ]);
 
