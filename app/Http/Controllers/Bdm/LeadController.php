@@ -85,7 +85,7 @@ class LeadController extends Controller
                 'bdm_leads.enquiry_count',
                 'bdm_leads.is_whatsapp_msg',
             )->leftJoin('team_members as tm', 'tm.id', 'bdm_leads.created_by')
-            ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat');
+            ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat')->where('bdm_leads.assign_id', $auth_user->id);
             $leads->where('bdm_leads.deleted_at', null)->groupBy('bdm_leads.mobile');
 
             if ($request->has('lead_status') && $request->lead_status != '') {
