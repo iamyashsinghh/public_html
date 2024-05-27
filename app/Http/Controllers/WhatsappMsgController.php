@@ -518,47 +518,44 @@ class WhatsappMsgController extends Controller
             }
         }
 
-        Log::info($sendTemplateMessage);
-        Log::info($latestMessage);
+        // if value is false then temple else normal i dont know why but this code is running like this
 
-
-        // $response = Http::withHeaders([
-        //     'Authorization' => "Bearer $authKey",
-        //     'Content-Type' => 'application/json'
-        // ])->post($url, $sendTemplateMessage ? [
-        //         "to" => "91$request->recipient",
-        //         "type" => "template",
-        //         "template" => [
-        //             "name" => "hi_msg",
-        //             "language" => [
-        //                 "code" => "en"
-        //             ],
-        //             "components" => [],
-        //         ]
-        //     ] : [
-        //         "messaging_product" => "whatsapp",
-        //         "recipient_type" => "individual",
-        //         "to" => "91$request->recipient",
-        //         "type" => "text",
-        //         "text" => [
-        //             "body" => "hi"
-        //         ]
-        //     ]);
-
-        // if ($response->successful()) {
-        //     $currentTimestamp = Carbon::now();
-        //     $newWaMsg = new whatsappMessages();
-        //     $newWaMsg->msg_id = $request->recipient;
-        //     $newWaMsg->msg_from = $request->recipient;
-        //     $newWaMsg->time = $currentTimestamp;
-        //     $newWaMsg->type = 'text';
-        //     $newWaMsg->is_sent = "1";
-        //     $newWaMsg->body = $sendTemplateMessage ? "Hi" : "*Hi*";
-        //     $newWaMsg->save();
-        //     return response()->json(['message' => 'Message sent successfully.'], 200);
-        // } else {
-        //     return response()->json(['error' => 'Failed to send message.'], $response->status());
-        // }
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer $authKey",
+            'Content-Type' => 'application/json'
+        ])->post($url, $sendTemplateMessage ? [
+            "messaging_product" => "whatsapp",
+            "recipient_type" => "individual",
+            "to" => "91$request->recipient",
+            "type" => "text",
+            "text" => [
+                "body" => "hi"
+            ]
+        ]:[
+            "to" => "91$request->recipient",
+            "type" => "template",
+            "template" => [
+                "name" => "hi_msg",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [],
+            ]
+        ]);
+        if ($response->successful()) {
+            $currentTimestamp = Carbon::now();
+            $newWaMsg = new whatsappMessages();
+            $newWaMsg->msg_id = $request->recipient;
+            $newWaMsg->msg_from = $request->recipient;
+            $newWaMsg->time = $currentTimestamp;
+            $newWaMsg->type = 'text';
+            $newWaMsg->is_sent = "1";
+            $newWaMsg->body = $sendTemplateMessage ? "*Hi*" : "Hi";
+            $newWaMsg->save();
+            return response()->json(['message' => 'Message sent successfully.'], 200);
+        } else {
+            return response()->json(['error' => 'Failed to send message.'], $response->status());
+        }
     }
 
     public function whatsapp_msg_send_hello(Request $request)
