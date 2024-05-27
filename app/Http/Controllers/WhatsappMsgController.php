@@ -507,7 +507,7 @@ class WhatsappMsgController extends Controller
         }
         $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
         $authKey = env('TATA_AUTH_KEY');
-        $latestMessage = whatsappMessages::where('mobile', $request->recipient)->orderBy('created_at', 'desc')->first();
+        $latestMessage = whatsappMessages::where('msg_from', $request->recipient)->where('is_sent', 0)->orderBy('created_at', 'desc')->first();
         $now = Carbon::now();
         $sendTemplateMessage = false;
         if ($latestMessage) {
@@ -802,17 +802,12 @@ class WhatsappMsgController extends Controller
             $originalName = $file->getClientOriginalName();
             $sanitizedFileName = time() . '-' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME), '-') . '.' . $file->getClientOriginalExtension();
             $filePath = $file->storeAs('uploads/documents', $sanitizedFileName, 'public');
-            // Log::info("File uploaded to: $filePath");
 
             $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
             $authKey = env('TATA_AUTH_KEY');
             $documentTitle = $request->input('documentTitle');
             $recipent = $request->input('phone_inp_id_doc');
             $doc_url = asset("storage/$filePath");
-
-            // Log::info("Document URL: $doc_url");
-            // Log::info("Recipient: $recipent");
-            // Log::info("Document Title: $documentTitle");
 
             $response = Http::withHeaders([
                 'Authorization' => "Bearer $authKey",
@@ -839,11 +834,9 @@ class WhatsappMsgController extends Controller
 
                 return response()->json(['message' => 'Message sent successfully.'], 200);
             } else {
-                // Log::error("Failed to send message: " . $response->body());
                 return response()->json(['error' => 'Failed to send message.'], $response->status());
             }
         } catch (\Exception $e) {
-            // Log::error("Error uploading document and sending message: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred. Please try again later.'], 500);
         }
     }
