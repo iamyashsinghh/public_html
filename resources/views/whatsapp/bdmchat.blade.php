@@ -62,14 +62,14 @@
     }
 </style>
 @php
-$guards = ['admin', 'team', 'nonvenue', 'bdm' ];
-$userName = '';
+    $guards = ['admin', 'team', 'nonvenue', 'bdm'];
+    $userName = '';
     foreach ($guards as $guard) {
-    if (auth()->guard($guard)->check()) {
-        $userName = auth()->guard($guard)->user()->name;
-        break;
+        if (auth()->guard($guard)->check()) {
+            $userName = auth()->guard($guard)->user()->name;
+            break;
+        }
     }
-}
 @endphp
 <div class="modal fade" id="wa_msg" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
@@ -100,23 +100,33 @@ $userName = '';
                 </div>
                 <div class="modal-footer text-sm">
                     <div class="mx-5 d-flex align-items-center">
-                        <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnBdmGreetMsg" title="Hi (Name of Vendor), I’m {{ $userName }}, I'm {{1}} , Your Key Account Manager, Are you looking for a source to grow your Business in Wedding industry? Wedding Banquets take pride in being a leading platform for booking Banquet Halls. Our platform helps *500+* clients in booking banquet halls every month. As, every Indian Wedding requires vendor services such as Professional *Photographers*, Celebrity *Makeup Artists*, Expert *Mehendi Artists* and Best *Band & Dhol* services. So, with our strong presence in the wedding industry, we aim to help you provide  💯% Assured and Guaranteed business by providing a platform for you to get more clientele traffic for expanding your availability to potential clients.✅ Let's schedule a face-to-face meeting to discuss how we can help grow your business. Don't miss this business opportunity! (reply btns)">Bdm Greet Msg</a>
-                        <a href="javascript:void(0);" class="mt-2 mx-2" style="margin-top: 0 !important; color: #000; font-size: 1.5rem" id="uploadDocumentBtn"><i class="fa-sharp fa-solid fa-paperclip"></i></a>
+                        <a href="javascript:void(0);" class="btn btn-sm m-1 text-light"
+                            style="background-color: var(--wb-dark-red)" id="sendMessageBtnBdmGreetMsg"
+                            title="Hi (Name of Vendor), I’m {{ $userName }}, I'm {{ 1 }} , Your Key Account Manager, Are you looking for a source to grow your Business in Wedding industry? Wedding Banquets take pride in being a leading platform for booking Banquet Halls. Our platform helps *500+* clients in booking banquet halls every month. As, every Indian Wedding requires vendor services such as Professional *Photographers*, Celebrity *Makeup Artists*, Expert *Mehendi Artists* and Best *Band & Dhol* services. So, with our strong presence in the wedding industry, we aim to help you provide  💯% Assured and Guaranteed business by providing a platform for you to get more clientele traffic for expanding your availability to potential clients.✅ Let's schedule a face-to-face meeting to discuss how we can help grow your business. Don't miss this business opportunity! (reply btns)">Bdm
+                            Greet Msg</a>
+                        <a href="javascript:void(0);" class="btn btn-sm m-1 text-light"
+                            style="background-color: var(--wb-dark-red)" id="sendMessageBtnHi" title="Hi">Hi</a>
+                        <a href="javascript:void(0);" class="mt-2 mx-2"
+                            style="margin-top: 0 !important; color: #000; font-size: 1.5rem" id="uploadDocumentBtn"><i
+                                class="fa-sharp fa-solid fa-paperclip"></i></a>
                     </div>
                     <a href="javascript:void(0);" class="btn btn-sm btn-secondary m-1" data-bs-dismiss="modal">Close</a>
-                    <a href="javascript:void(0);" class="btn btn-sm text-light m-1" style="background-color: var(--wb-dark-red);" id="sendMessageBtn">Submit</a>
+                    <a href="javascript:void(0);" class="btn btn-sm text-light m-1"
+                        style="background-color: var(--wb-dark-red);" id="sendMessageBtn">Submit</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="documentUploadModal" tabindex="-1" aria-labelledby="documentUploadModalLabel" aria-hidden="true">
+<div class="modal fade" id="documentUploadModal" tabindex="-1" aria-labelledby="documentUploadModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="documentUploadModalLabel">Upload Document</h5>
-                <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i></button>
+                <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fa fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <form id="documentUploadForm" enctype="multipart/form-data">
@@ -128,7 +138,7 @@ $userName = '';
                         <label for="document" class="form-label">Choose Document</label>
                         <input class="form-control" type="file" id="document" name="document" required>
                     </div>
-                        <input class="form-control d-none" type="number" id="phone_inp_id_doc" name="phone_inp_id_doc">
+                    <input class="form-control d-none" type="number" id="phone_inp_id_doc" name="phone_inp_id_doc">
                 </form>
             </div>
             <div class="modal-footer">
@@ -192,11 +202,12 @@ $userName = '';
                     $('#sendMessageBtn').prop('disabled', false);
                     alert(response.message);
                     $("#document").val('');
-                $("#documentTitle").val('');
+                    $("#documentTitle").val('');
                 },
                 error: function(xhr, status, error) {
                     $('#uploadDocumentSubmit').prop('disabled', false).html('Upload');
-                    alert(xhr.responseJSON.error || 'An error occurred while uploading the document. Please try again.');
+                    alert(xhr.responseJSON.error ||
+                        'An error occurred while uploading the document. Please try again.');
                 }
             });
         } else {
@@ -204,62 +215,37 @@ $userName = '';
         }
     });
 
-    $("#sendMessageBtnHey").click(function() {
+    $("#sendMessageBtnHi").click(function() {
         var $btn = $(this);
-    var originalText = $btn.html();
-    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
-    $btn.prop('disabled', true);
+        var originalText = $btn.html();
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $btn.prop('disabled', true);
         var recipient = $("#phone_inp_id").val();
         var data = {
             recipient: recipient,
         };
         $.ajax({
-            url: '{{ route('whatsapp_chat.send.hey') }}',
+            url: '{{ route('whatsapp_chat.send.hi') }}',
             type: 'POST',
             data: data,
             dataType: 'json',
             success: function(response) {
                 $('#message').val('');
                 $btn.html(originalText);
-            $btn.prop('disabled', false);
+                $btn.prop('disabled', false);
             },
             error: function(xhr, status, error) {
                 $btn.html(originalText);
-            $btn.prop('disabled', false);
-            }
-        });
-    });
-    $("#sendMessageBtnHello").click(function() {
-        var $btn = $(this);
-    var originalText = $btn.html();
-    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
-    $btn.prop('disabled', true);
-        var recipient = $("#phone_inp_id").val();
-        var data = {
-            recipient: recipient,
-        };
-        $.ajax({
-            url: '{{ route('whatsapp_chat.send.hello') }}',
-            type: 'POST',
-            data: data,
-            dataType: 'json',
-            success: function(response) {
-                $('#message').val('');
-                $btn.html(originalText);
-            $btn.prop('disabled', false);
-            },
-            error: function(xhr, status, error) {
-                $btn.html(originalText);
-            $btn.prop('disabled', false);
+                $btn.prop('disabled', false);
             }
         });
     });
 
     $("#sendMessageBtnBdmGreetMsg").click(function() {
         var $btn = $(this);
-    var originalText = $btn.html();
-    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
-    $btn.prop('disabled', true);
+        var originalText = $btn.html();
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $btn.prop('disabled', true);
         var recipient = $("#phone_inp_id").val();
         var greetMsg = `{{ $userName }}`;
         var data = {
@@ -274,20 +260,20 @@ $userName = '';
             success: function(response) {
                 $('#message').val('');
                 $btn.html(originalText);
-            $btn.prop('disabled', false);
+                $btn.prop('disabled', false);
             },
             error: function(xhr, status, error) {
                 $btn.html(originalText);
-            $btn.prop('disabled', false);
+                $btn.prop('disabled', false);
             }
         });
     });
 
     $("#sendMessageBtn").click(function() {
         var $btn = $(this);
-    var originalText = $btn.html();
-    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
-    $btn.prop('disabled', true);
+        var originalText = $btn.html();
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $btn.prop('disabled', true);
 
         var message = $("#what_msg_send").val();
         var recipient = $("#phone_inp_id").val();
@@ -305,11 +291,11 @@ $userName = '';
                 $('#message').val('');
                 messageSendElement.value = '';
                 $btn.html(originalText);
-            $btn.prop('disabled', false);
+                $btn.prop('disabled', false);
             },
             error: function(xhr, status, error) {
-            $btn.html(originalText);
-            $btn.prop('disabled', false);
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
             }
         });
     });
@@ -375,25 +361,25 @@ $userName = '';
         }, 10000);
 
         function fetchNewMessages() {
-            if(lastMessageTimestamp != ''){
+            if (lastMessageTimestamp != '') {
                 const data_url = `{{ route('whatsapp_chat.get_new', '') }}/${id}?lastTimestamp=${lastMessageTimestamp}`;
-            $.ajax({
-                url: data_url,
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.length > 0) {
-                        response.forEach(message => {
-                            const messageHTML = buildMessageHTML(message);
-                            $('.whatsapp_msg').append(messageHTML);
-                        });
-                        lastMessageTimestamp = response[response.length - 1].time;
+                $.ajax({
+                    url: data_url,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.length > 0) {
+                            response.forEach(message => {
+                                const messageHTML = buildMessageHTML(message);
+                                $('.whatsapp_msg').append(messageHTML);
+                            });
+                            lastMessageTimestamp = response[response.length - 1].time;
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching new messages:", xhr.responseText);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error fetching new messages:", xhr.responseText);
-                }
-            });
+                });
             }
         }
         newmessageFetchInterval = setInterval(fetchNewMessages, 5000);
@@ -435,6 +421,7 @@ $userName = '';
                 });
             });
         }
+
         function buildMessageHTML(message) {
             let bodyContent = '';
             const msgClass = message.is_sent ? 'whatsapp-card-send' : 'whatsapp-card';
@@ -455,7 +442,7 @@ $userName = '';
                     bodyContent =
                         `<audio controls src="${message.doc}">Your browser does not support the audio element.</audio>`;
                     break;
-                    case 'button':
+                case 'button':
                     bodyContent = message.body;
                     break;
                 case 'location':

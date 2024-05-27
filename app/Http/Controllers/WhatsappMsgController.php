@@ -396,7 +396,6 @@ class WhatsappMsgController extends Controller
                         ]
                     ]);
 
-            Log::info($response);
             $tempMsg = WhatsappTemplates::where('template_name', $WhatsappBulkMsgTask->template_name)->first()->msg;
             $bodyMsg = Str::replace('{{1}}', $var_name, $tempMsg);
             $currentTimestamp = Carbon::now();
@@ -501,44 +500,62 @@ class WhatsappMsgController extends Controller
         }
     }
 
-    public function whatsapp_msg_send_hey(Request $request)
+    public function whatsapp_msg_send_hi(Request $request)
     {
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
             return false;
         }
         $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
         $authKey = env('TATA_AUTH_KEY');
+        $latestMessage = whatsappMessages::where('mobile', $request->recipient)->orderBy('created_at', 'desc')->first();
+        $now = Carbon::now();
+        $sendTemplateMessage = false;
+        if ($latestMessage) {
+            $createdAt = new Carbon($latestMessage->created_at);
+            $hoursDiff = $now->diffInHours($createdAt);
+            if ($hoursDiff <= 24) {
+                $sendTemplateMessage = true;
+            }
+        }
         $response = Http::withHeaders([
             'Authorization' => "Bearer $authKey",
             'Content-Type' => 'application/json'
-        ])->post($url, [
-                    "to" => "91$request->recipient",
-                    "type" => "template",
-                    "template" => [
-                        "name" => "hey",
-                        "language" => [
-                            "code" => "en"
-                        ],
-                        "components" => [],
-                    ]
-                ]);
-        Log::info($response);
+        ])->post($url, $sendTemplateMessage ? [
+                "to" => "91$request->recipient",
+                "type" => "template",
+                "template" => [
+                    "name" => "hi_msg",
+                    "language" => [
+                        "code" => "en"
+                    ],
+                    "components" => [],
+                ]
+            ] : [
+                "messaging_product" => "whatsapp",
+                "recipient_type" => "individual",
+                "to" => "91$request->recipient",
+                "type" => "text",
+                "text" => [
+                    "body" => "Hi"
+                ]
+            ]);
+
         if ($response->successful()) {
-            Log::info($response);
             $currentTimestamp = Carbon::now();
             $newWaMsg = new whatsappMessages();
-            $newWaMsg->msg_id = "$request->recipient";
-            $newWaMsg->msg_from = "$request->recipient";
+            $newWaMsg->msg_id = $request->recipient;
+            $newWaMsg->msg_from = $request->recipient;
             $newWaMsg->time = $currentTimestamp;
             $newWaMsg->type = 'text';
             $newWaMsg->is_sent = "1";
-            $newWaMsg->body = "Hey";
+            $newWaMsg->body = $sendTemplateMessage ? "Hi" : "*Hi*";
             $newWaMsg->save();
             return response()->json(['message' => 'Message sent successfully.'], 200);
         } else {
             return response()->json(['error' => 'Failed to send message.'], $response->status());
         }
     }
+
     public function whatsapp_msg_send_hello(Request $request)
     {
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
@@ -801,13 +818,13 @@ class WhatsappMsgController extends Controller
                 'Authorization' => "Bearer $authKey",
                 'Content-Type' => 'application/json'
             ])->post($url, [
-                "to" => "91$recipent",
-                "type" => "document",
-                "document" => [
-                    "link" => $doc_url,
-                    "caption" => $documentTitle
-                ]
-            ]);
+                        "to" => "91$recipent",
+                        "type" => "document",
+                        "document" => [
+                            "link" => $doc_url,
+                            "caption" => $documentTitle
+                        ]
+                    ]);
 
             if ($response->successful()) {
                 $currentTimestamp = Carbon::now();

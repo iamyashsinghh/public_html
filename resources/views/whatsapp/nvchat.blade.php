@@ -135,7 +135,7 @@ $userName = '';
             recipient: recipient,
         };
         $.ajax({
-            url: '{{ route('whatsapp_chat.send.hey') }}',
+            url: '{{ route('whatsapp_chat.send.hi') }}',
             type: 'POST',
             data: data,
             dataType: 'json',
