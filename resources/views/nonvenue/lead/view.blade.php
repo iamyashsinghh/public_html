@@ -140,10 +140,8 @@
                                     <div class="col-sm-6">
                                         <span class="text-bold mx-1" style="color: var(--wb-wood)">Mobile No.: </span>
                                         <span class="mx-1">{{ $lead->mobile }}</span>
-                                        <div class="phone_action_btns" style="position: absolute; top: -8px; left: 11rem;">
-                                            <a target="_blank" href="https://wa.me/{{ $lead->mobile }}"
-                                                class="text-success text-bold mx-1" style="font-size: 20px;"><i
-                                                    class="fab fa-whatsapp"></i></a>
+                                        <div class="phone_action_btns d-flex" style="position: absolute; top: -8px; left: 11rem;">
+                                            <a href="#" class="d-flex"><div> </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg({{$lead->mobile}})" style="font-size: 25px; color: green;"></i></a>
                                             <a href="tel:{{ $lead->mobile }}" class="text-primary text-bold mx-1"
                                                 style="font-size: 20px;"><i class="fa fa-phone-alt"></i></a>
                                         </div>
@@ -823,7 +821,38 @@
     </div>
 @endsection
 @section('footer-script')
+@include('whatsapp.chat');
     <script>
+
+function handle_whatsapp_msg(id) {
+            const elementToUpdate = document.querySelector(`#what_id-${id}`);
+
+            if (elementToUpdate) {
+                elementToUpdate.outerHTML =
+                    `<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${id})" style="font-size: 25px; color: green;"></i>`;
+            }
+            const form_title = document.querySelector(`#form_title_modal`);
+            form_title.innerHTML = `Whatsapp Messages of ${id}`;
+            const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg'));
+            wamsg(id);
+            manageWhatsappChatModal.show();
+            const wa_status_url = `{{ route('whatsapp_chat.status_nv_team') }}`;
+            const wa_status_data = {
+                mobile: id
+            };
+            fetch(wa_status_url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(wa_status_data),
+                })
+                .then(response => response.json())
+                .then(data => {})
+                .catch((error) => {});
+        }
+
+        
         function handle_task_status_update(task_id) {
         const url = `{{route('nonvenue.task.status.update')}}/${task_id}`;
         const modal = new bootstrap.Modal('#manageTaskStatusModal');
