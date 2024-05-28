@@ -124,7 +124,7 @@ class Controller extends BaseController {
                                 ]
                             ]
                         ]
-                    ]
+                    ] 
                 ]);
                 $currentTimestamp = Carbon::now();
                 $msg = "Hi $name, /n You have just received a new inquiry from *{{1}}* have booked with Wedding Banquets. For any Query:- Don't hesitate to get in touch with our *RM* Team: 8882198989 *Respond to leads on the go with the Wedding Banquets for Business CRM.*";
