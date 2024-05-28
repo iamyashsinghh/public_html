@@ -137,7 +137,7 @@ class Controller extends BaseController {
                 $newWaMsg->is_sent = "1";
                 $newWaMsg->body = "$bodyMsg";
                 $newWaMsg->save();
-            return true;
+            return $response;
     }
 
     function notify_wbvendor_lead_using_interakt($phone, $name, $number, $eventdate, $pax, $lead_id) {
