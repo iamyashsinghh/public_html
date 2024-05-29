@@ -293,7 +293,7 @@ $userName = '';
 
         messageFetchInterval = setInterval(function() {
             fetchMessages(currentPage);
-        }, 10000);
+        }, 4000);
 
         function fetchNewMessages() {
             if(lastMessageTimestamp != ''){
