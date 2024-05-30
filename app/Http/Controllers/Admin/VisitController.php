@@ -50,28 +50,29 @@ class VisitController extends Controller
     }
 
     public function ajax_list(Request $request)
-{
-    $visits = LeadForward::select(
-        'lead_forwards.lead_id',
-        'lead_forwards.lead_datetime',
-        'lead_forwards.source',
-        'team_members.venue_name as venue_name',
-        'team_members.name as vm_name',
-        'lead_forwards.name',
-        'lead_forwards.mobile',
-        'lead_forwards.lead_status',
-        'visits.visit_schedule_datetime',
-        'lead_forwards.event_datetime',
-        'visits.created_at as visit_created_datetime',
-        'visits.done_datetime as visit_done_datetime',
-        'visits.event_name as event_name',
-        'ne.pax as pax',
-    )
-    ->join('visits', 'visits.id', '=', 'lead_forwards.visit_id')
-    ->join('team_members', 'team_members.id', '=', 'lead_forwards.forward_to')
-    ->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'lead_forwards.lead_id')
-    ->groupBy('lead_forwards.id')
-    ->whereNull('visits.deleted_at');
+    {
+        $visits = LeadForward::select(
+            'lead_forwards.lead_id',
+            'lead_forwards.lead_datetime',
+            'lead_forwards.source',
+            'team_members.venue_name as venue_name',
+            'team_members.name as vm_name',
+            'lead_forwards.name',
+            'lead_forwards.mobile',
+            'lead_forwards.lead_status',
+            'visits.visit_schedule_datetime',
+            'lead_forwards.event_datetime',
+            'visits.created_at as visit_created_datetime',
+            'visits.done_datetime as visit_done_datetime',
+            'visits.event_name as event_name',
+            'ne.pax as pax'
+        )
+        ->join('visits', 'visits.id', '=', 'lead_forwards.visit_id')
+        ->join('team_members', 'team_members.id', '=', 'lead_forwards.forward_to')
+        ->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'lead_forwards.lead_id')
+        ->groupBy('lead_forwards.id')
+        ->whereNull('visits.deleted_at');
+
 
     if ($request->visit_status == "Upcoming") {
         $visits->where('visits.visit_schedule_datetime', '>', Carbon::today()->endOfDay())->whereNull('visits.done_datetime');
