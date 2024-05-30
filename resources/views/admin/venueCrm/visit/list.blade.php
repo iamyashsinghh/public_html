@@ -256,162 +256,105 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 @endsection
 @section('footer-script')
 @php
-$filter = "";
+$filters = [];
+
 if (isset($filter_params['visit_status'])) {
-    $filter = "visit_status=" . $filter_params['visit_status'];
+    $filters[] = "visit_status=" . $filter_params['visit_status'];
 }
 if (isset($filter_params['visit_created_from_date'])) {
-    $filter = "visit_created_from_date=" . $filter_params['visit_created_from_date'] . "&visit_created_to_date=" . $filter_params['visit_created_to_date'];
+    $filters[] = "visit_created_from_date=" . $filter_params['visit_created_from_date'] . "&visit_created_to_date=" . $filter_params['visit_created_to_date'];
 }
 if (isset($filter_params['visits_source'])) {
-            $filter = 'visits_source=' . $filter_params['visits_source'];
+    $filters[] = 'visits_source=' . $filter_params['visits_source'];
 }
 if (isset($filter_params['visit_done_from_date'])) {
-    $filter = "visit_done_from_date=" . $filter_params['visit_done_from_date'] . "&visit_done_to_date=" . $filter_params['visit_done_to_date'];
+    $filters[] = "visit_done_from_date=" . $filter_params['visit_done_from_date'] . "&visit_done_to_date=" . $filter_params['visit_done_to_date'];
 }
 if (isset($filter_params['visit_schedule_from_date'])) {
-    $filter = "visit_schedule_from_date=" . $filter_params['visit_schedule_from_date'] . "&visit_schedule_to_date=" . $filter_params['visit_schedule_to_date'];
+    $filters[] = "visit_schedule_from_date=" . $filter_params['visit_schedule_from_date'] . "&visit_schedule_to_date=" . $filter_params['visit_schedule_to_date'];
 }
 if (isset($filter_params['pax_min_value'])) {
-    $filter = "pax_min_value=" . $filter_params['pax_min_value'] . "&pax_max_value=" . $filter_params['pax_max_value'];
+    $filters[] = "pax_min_value=" . $filter_params['pax_min_value'] . "&pax_max_value=" . $filter_params['pax_max_value'];
 }
 if (isset($filter_params['event_from_date'])) {
-            $filter =
-                'event_from_date=' .
-                $filter_params['event_from_date'] .
-                '&event_to_date=' .
-                $filter_params['event_to_date'];
-}elseif(isset($filter_params['dashboard_filters'])){
-    $filter = "dashboard_filters=" . $filter_params['dashboard_filters'];
+    $filters[] = 'event_from_date=' . $filter_params['event_from_date'] . '&event_to_date=' . $filter_params['event_to_date'];
 }
+if (isset($filter_params['dashboard_filters'])) {
+    $filters[] = "dashboard_filters=" . $filter_params['dashboard_filters'];
+}
+
+$filter = implode('&', $filters);
 @endphp
+
+@section('footer-script')
 <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script src="//cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
 <script src="//cdn.datatables.net/buttons/2.3.6/js/buttons.flash.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 <script src="//cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
 <script src="//cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
-<script src="{{asset('plugins/moment/moment.min.js')}}"></script>
+<script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
 <script>
-    const data_url = `{{route('admin.visit.list.ajax')}}?{!!$filter!!}`;
+    const data_url = `{{ route('admin.visit.list.ajax') }}?{!! $filter !!}`;
     $(document).ready(function() {
         $('#serverTable').DataTable({
             pageLength: 10,
-                lengthMenu: [10, 25, 50, 100],
-                processing: true,
-                dom: '<""lfB>rtip',
-                buttons: [{
-                    extend: 'excelHtml5',
-                    text: '<i class="fas fa-file-excel"></i> Export to Excel',
-                    className: 'btn text-light btn-sm buttons-prints mx-1'
-                }],
-                loading: true,
+            lengthMenu: [10, 25, 50, 100],
+            processing: true,
+            dom: '<""lfB>rtip',
+            buttons: [{
+                extend: 'excelHtml5',
+                text: '<i class="fas fa-file-excel"></i> Export to Excel',
+                className: 'btn text-light btn-sm buttons-prints mx-1'
+            }],
             language: {
-                "search": "_INPUT_", // Removes the 'Search' field label
-                "searchPlaceholder": "Type here to search..", // Placeholder for the search box
-                processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
+                "search": "_INPUT_",
+                "searchPlaceholder": "Type here to search..",
+                processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`,
             },
             serverSide: true,
-            loading: true,
             ajax: {
                 url: data_url,
                 headers: {
-                    'X-CSRF-TOKEN': "{{csrf_token()}}",
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
                 },
                 method: "get",
                 dataSrc: "data",
             },
-
-            columns: [{
-                    targets: 0,
-                    name: "lead_id",
-                    data: "lead_id",
-                },
-                {
-                    targets: 1,
-                    name: "lead_datetime",
-                    data: "lead_datetime",
-                },
-                {
-                    targets: 2,
-                    name: "source",
-                    data: "source",
-                },
-                {
-                    targets: 3,
-                    name: "vm_name",
-                    data: "vm_name",
-                },
-                {
-                    targets: 4,
-                    name: "venue_name",
-                    data: "venue_name",
-                },
-                {
-                    targets: 5,
-                    name: "name",
-                    data: "name",
-                },
-                {
-                    targets: 6,
-                    name: "mobile",
-                    data: "mobile",
-                },
-                {
-                    targets: 7,
-                    name: "lead_status",
-                    data: "lead_status",
-                },
-                {
-                    targets: 8,
-                    name: "visit_schedule_datetime",
-                    data: "visit_schedule_datetime",
-                },
-                {
-                    targets: 9,
-                    name: "lead_id",
-                    data: "lead_id",
-                },
-                {
-                    targets: 10,
-                    name: "event_name",
-                    data: "event_name",
-                },
-                {
-                    targets: 11,
-                    name: "event_datetime",
-                    data: "event_datetime",
-                },
-                {
-                    targets: 12,
-                    name: "visit_created_datetime",
-                    data: "visit_created_datetime",
-                },
-                {
-                    targets: 13,
-                    name: "visit_done_datetime",
-                    data: "visit_done_datetime",
-                },
+            columns: [
+                { name: "lead_id", data: "lead_id" },
+                { name: "lead_datetime", data: "lead_datetime" },
+                { name: "source", data: "source" },
+                { name: "vm_name", data: "vm_name" },
+                { name: "venue_name", data: "venue_name" },
+                { name: "name", data: "name" },
+                { name: "mobile", data: "mobile" },
+                { name: "lead_status", data: "lead_status" },
+                { name: "visit_schedule_datetime", data: "visit_schedule_datetime" },
+                { name: "lead_id", data: "lead_id" },
+                { name: "event_name", data: "event_name" },
+                { name: "event_datetime", data: "event_datetime" },
+                { name: "visit_created_datetime", data: "visit_created_datetime" },
+                { name: "visit_done_datetime", data: "visit_done_datetime" },
             ],
-            order: [
-                [1, 'desc']
-            ],
-            rowCallback: function(row, data, index) {
+            order: [[1, 'desc']],
+            rowCallback: function(row, data) {
                 row.style.cursor = "pointer";
                 row.setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
 
                 const td_elements = row.querySelectorAll('td');
                 td_elements[1].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
                 td_elements[1].classList.add('text-nowrap');
-                if(data.lead_status == "Done"){
+                if (data.lead_status == "Done") {
                     td_elements[7].innerHTML = `<span class="badge badge-secondary">Done</span>`;
-                }else{
+                } else {
                     td_elements[7].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
                 }
                 td_elements[8].innerHTML = moment(data.visit_schedule_datetime).format("DD-MMM-YYYY hh:mm a");
 
                 const visit_schedule_date = moment(data.visit_schedule_datetime).format("YYYY-MM-DD");
                 const current_date = moment().format("YYYY-MM-DD");
+                let elem_class, elem_text;
                 if (data.visit_done_datetime != null) {
                     elem_class = "secondary";
                     elem_text = "Done";
@@ -435,7 +378,7 @@ if (isset($filter_params['event_from_date'])) {
     });
 
     function handle_view_lead(forward_id) {
-        window.open(`{{route('admin.lead.view')}}/${forward_id}#visit_card_container`);
+        window.open(`{{ route('admin.lead.view') }}/${forward_id}#visit_card_container`);
     }
 </script>
 @endsection

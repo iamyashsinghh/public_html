@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -11,33 +10,39 @@ class VisitController extends Controller
 {
     public function list(Request $request, $dashboard_filters = null)
     {
-        $filter_params = "";
+        $filter_params = [];
+
         if ($request->visit_status != null) {
-            $filter_params = ['visit_status' => $request->visit_status];
+            $filter_params['visit_status'] = $request->visit_status;
         }
         if ($request->visits_source != null) {
-            $filter_params = ['visits_source' => $request->visits_source];
+            $filter_params['visits_source'] = $request->visits_source;
         }
         if ($request->event_from_date != null) {
-            $filter_params = ['event_from_date' => $request->event_from_date, 'event_to_date' => $request->event_to_date];
+            $filter_params['event_from_date'] = $request->event_from_date;
+            $filter_params['event_to_date'] = $request->event_to_date;
         }
         if ($request->visit_created_from_date != null) {
-            $filter_params = ['visit_created_from_date' => $request->visit_created_from_date, 'visit_created_to_date' => $request->visit_created_to_date];
+            $filter_params['visit_created_from_date'] = $request->visit_created_from_date;
+            $filter_params['visit_created_to_date'] = $request->visit_created_to_date;
         }
         if ($request->visit_done_from_date != null) {
-            $filter_params = ['visit_done_from_date' => $request->visit_done_from_date, 'visit_done_to_date' => $request->visit_done_to_date];
+            $filter_params['visit_done_from_date'] = $request->visit_done_from_date;
+            $filter_params['visit_done_to_date'] = $request->visit_done_to_date;
         }
         if ($request->visit_schedule_from_date != null) {
-            $filter_params = ['visit_schedule_from_date' => $request->visit_schedule_from_date, 'visit_schedule_to_date' => $request->visit_schedule_to_date];
+            $filter_params['visit_schedule_from_date'] = $request->visit_schedule_from_date;
+            $filter_params['visit_schedule_to_date'] = $request->visit_schedule_to_date;
         }
         if ($request->pax_min_value != null) {
-            $filter_params = ['pax_min_value' => $request->pax_min_value, 'pax_max_value' => $request->pax_max_value];
+            $filter_params['pax_min_value'] = $request->pax_min_value;
+            $filter_params['pax_max_value'] = $request->pax_max_value;
         }
 
         $page_heading = $filter_params ? "Visits - Filtered" : "Visits";
 
         if ($dashboard_filters !== null) {
-            $filter_params = ['dashboard_filters' => $dashboard_filters];
+            $filter_params['dashboard_filters'] = $dashboard_filters;
             $page_heading = ucwords(str_replace("_", " ", $dashboard_filters));
         }
 
