@@ -313,6 +313,7 @@ $filter = implode('&', $filters);
                 processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`,
             },
             serverSide: true,
+            lengthMenu: [ [10, 25, 50, 100, 200, 500], [10, 25, 50, 100, 200, 500]],
             ajax: {
                 url: data_url,
                 headers: {
