@@ -259,17 +259,23 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 $filter = "";
 if (isset($filter_params['visit_status'])) {
     $filter = "visit_status=" . $filter_params['visit_status'];
-} elseif (isset($filter_params['visit_created_from_date'])) {
+}
+if (isset($filter_params['visit_created_from_date'])) {
     $filter = "visit_created_from_date=" . $filter_params['visit_created_from_date'] . "&visit_created_to_date=" . $filter_params['visit_created_to_date'];
-}elseif (isset($filter_params['visits_source'])) {
+}
+if (isset($filter_params['visits_source'])) {
             $filter = 'visits_source=' . $filter_params['visits_source'];
-}elseif (isset($filter_params['visit_done_from_date'])) {
+}
+if (isset($filter_params['visit_done_from_date'])) {
     $filter = "visit_done_from_date=" . $filter_params['visit_done_from_date'] . "&visit_done_to_date=" . $filter_params['visit_done_to_date'];
-}elseif (isset($filter_params['visit_schedule_from_date'])) {
+}
+if (isset($filter_params['visit_schedule_from_date'])) {
     $filter = "visit_schedule_from_date=" . $filter_params['visit_schedule_from_date'] . "&visit_schedule_to_date=" . $filter_params['visit_schedule_to_date'];
-}elseif (isset($filter_params['pax_min_value'])) {
+}
+if (isset($filter_params['pax_min_value'])) {
     $filter = "pax_min_value=" . $filter_params['pax_min_value'] . "&pax_max_value=" . $filter_params['pax_max_value'];
-}elseif (isset($filter_params['event_from_date'])) {
+}
+if (isset($filter_params['event_from_date'])) {
             $filter =
                 'event_from_date=' .
                 $filter_params['event_from_date'] .
