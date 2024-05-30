@@ -70,11 +70,14 @@ class VisitController extends Controller
         $current_date = date('Y-m-d');
         if ($request->visit_status == "Upcoming") {
             $visits->where('visits.visit_schedule_datetime', '>', Carbon::today()->endOfDay())->whereNull('visits.done_datetime');
-        } elseif ($request->visit_status == "Today") {
+        }
+        if ($request->visit_status == "Today") {
             $visits->where('visits.visit_schedule_datetime', 'like', "%$current_date%")->whereNull('visits.done_datetime');
-        } elseif ($request->visit_status == "Overdue") {
+        }
+        if ($request->visit_status == "Overdue") {
             $visits->where('visits.visit_schedule_datetime', '<', Carbon::today())->whereNull('visits.done_datetime');
-        } elseif ($request->visit_status == "Done") {
+        }
+        if ($request->visit_status == "Done") {
             $visits->whereNotNull('visits.done_datetime');
         }
         if ($request->visits_source) {
