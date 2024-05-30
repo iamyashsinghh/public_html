@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LeadForward;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class VisitController extends Controller
 {
@@ -61,11 +62,11 @@ class VisitController extends Controller
             'lead_forwards.mobile',
             'lead_forwards.lead_status',
             'visits.visit_schedule_datetime',
-            'lead_forwards.event_datetime',
             'visits.created_at as visit_created_datetime',
             'visits.done_datetime as visit_done_datetime',
             'visits.event_name as event_name',
-            'ne.pax as pax'
+            'ne.pax as pax',
+            DB::raw('DATE(lead_forwards.event_datetime) as event_datetime'),
         )
         ->join('visits', 'visits.id', '=', 'lead_forwards.visit_id')
         ->join('team_members', 'team_members.id', '=', 'lead_forwards.forward_to')
