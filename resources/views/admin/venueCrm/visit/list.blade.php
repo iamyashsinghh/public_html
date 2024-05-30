@@ -68,6 +68,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                             <th class="text-nowrap">Visit Status</th>
                             <th class="text-nowrap">Event Name</th>
                             <th class="text-nowrap">Event Date</th>
+                            <th class="text-nowrap">Pax</th>
                             <th class="text-nowrap">Visit Created Date</th>
                             <th class="text-nowrap">Visit Done Date</th>
                         </tr>
@@ -335,6 +336,7 @@ $filter = implode('&', $filters);
                 { name: "lead_id", data: "lead_id" },
                 { name: "event_name", data: "event_name" },
                 { name: "event_datetime", data: "event_datetime" },
+                { name: "pax", data: "pax" },
                 { name: "visit_created_datetime", data: "visit_created_datetime" },
                 { name: "visit_done_datetime", data: "visit_done_datetime" },
             ],
@@ -372,8 +374,8 @@ $filter = implode('&', $filters);
                 td_elements[9].innerHTML = `<span class="badge badge-${elem_class}">${elem_text}</span>`;
                 td_elements[10].innerText = data.event_name;
                 td_elements[11].innerText = moment(data.event_datetime).format("DD-MMM-YYYY");
-                td_elements[12].innerText = moment(data.visit_created_datetime).format("DD-MMM-YYYY hh:mm a");
-                td_elements[13].innerText = data.visit_done_datetime ? moment(data.visit_done_datetime).format("DD-MMM-YYYY hh:mm a") : 'N/A';
+                td_elements[13].innerText = moment(data.visit_created_datetime).format("DD-MMM-YYYY hh:mm a");
+                td_elements[14].innerText = data.visit_done_datetime ? moment(data.visit_done_datetime).format("DD-MMM-YYYY hh:mm a") : 'N/A';
             }
         });
     });
