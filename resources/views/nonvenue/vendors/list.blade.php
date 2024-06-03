@@ -210,7 +210,7 @@
             const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg'));
             wamsg(id);
             manageWhatsappChatModal.show();
-            const wa_status_url = `{{ route('whatsapp_chat.status_nv_team') }}`;
+            const wa_status_url = `{{ route('whatsapp_chat.status_nv_team_vendor') }}`;
             const wa_status_data = {
                 mobile: id
             };

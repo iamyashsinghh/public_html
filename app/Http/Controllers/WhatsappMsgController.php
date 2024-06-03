@@ -468,6 +468,15 @@ class WhatsappMsgController extends Controller
         }
     }
 
+    public function whatsapp_msg_status_nv_team_vendor(Request $request)
+    {
+        $getvendor = Vendor::where('mobile', $request->mobile)->first();
+        if ($getvendor) {
+            $getvendor->is_whatsapp_msg = 0;
+            $getvendor->save();
+        }
+    }
+
     public function whatsapp_msg_status_bdm(Request $request)
     {
         $guards = ['bdm'];

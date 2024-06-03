@@ -36,6 +36,7 @@ Route::get('whatsapp_msg_send_multiple', [Controllers\WhatsappMsgController::cla
 // send hey msg or hi
 Route::post('whatsapp_msg_send_hi', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_hi'])->name('whatsapp_chat.send.hi');
 Route::post('whatsapp_msg_send_hello', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_hello'])->name('whatsapp_chat.send.hello');
+
 // send a hi lead_name i am rm name i am your wedding panner assistant
 Route::post('whatsapp_msg_send_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_greet_btn'])->name('whatsapp_chat.send.greet_btn');
 // nv great msg
@@ -52,7 +53,7 @@ Route::post('whatsapp_msg_status', [Controllers\WhatsappMsgController::class, 'w
 Route::post('whatsapp_msg_status_vendor', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status_vendor'])->name('whatsapp_chat.status_nv');
 Route::post('whatsapp_msg_status_nv_team', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status_nv_team'])->name('whatsapp_chat.status_nv_team');
 Route::post('whatsapp_msg_status_bdm', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status_bdm'])->name('whatsapp_chat.status.bdm');
-
+Route::post('whatsapp_msg_status_nv_team_vendor', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status_nv_team_vendor'])->name('whatsapp_chat.status_nv_team_vendor');
 
 
 
