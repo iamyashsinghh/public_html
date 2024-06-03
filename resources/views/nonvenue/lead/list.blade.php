@@ -86,10 +86,11 @@
                                 <thead>
                                     <tr>
                                         <th class="text-nowrap">S.No.</th>
-                                        <th class="text-nowrap">Vendor Name</th>
+                                        <th class="text-nowrap">Updated At</th>
+                                        <th class="text-nowrap">Rm/Vendor Name</th>
+                                        <th class="text-nowrap">Role</th>
                                         <th class="text-nowrap">Business Name</th>
-                                        <th class="text-nowrap">Category</th>
-                                        <th class="text-nowrap">Forwarded At</th>
+                                        <th class="text-nowrap">Read Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="forward_info_table_body">
@@ -213,16 +214,24 @@
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="true" aria-controls="collapse4">Has NVRM Message</button>
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse4"
+                                    aria-expanded="true" aria-controls="collapse4">Has NVRM Message</button>
                             </h2>
-                            <div id="collapse4" class="accordion-collapse collapse {{isset($filter_params['has_rm_message']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                            <div id="collapse4"
+                                class="accordion-collapse collapse {{ isset($filter_params['has_rm_message']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
                                     <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio" id="has_rm_message_no_radio" name="has_rm_message" value="no" {{isset($filter_params['has_rm_message']) && $filter_params['has_rm_message'] == 'no'  ? 'checked' : ''}}>
+                                        <input class="custom-control-input" type="radio" id="has_rm_message_no_radio"
+                                            name="has_rm_message" value="no"
+                                            {{ isset($filter_params['has_rm_message']) && $filter_params['has_rm_message'] == 'no' ? 'checked' : '' }}>
                                         <label for="has_rm_message_no_radio" class="custom-control-label">No</label>
                                     </div>
                                     <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio" id="has_rm_message_yes_radio" name="has_rm_message" value="yes" {{isset($filter_params['has_rm_message']) && $filter_params['has_rm_message'] == 'yes'  ? 'checked' : ''}}>
+                                        <input class="custom-control-input" type="radio" id="has_rm_message_yes_radio"
+                                            name="has_rm_message" value="yes"
+                                            {{ isset($filter_params['has_rm_message']) && $filter_params['has_rm_message'] == 'yes' ? 'checked' : '' }}>
                                         <label for="has_rm_message_yes_radio" class="custom-control-label">Yes</label>
                                     </div>
                                 </div>
@@ -230,34 +239,50 @@
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">Event Date</button>
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse5"
+                                    aria-expanded="true" aria-controls="collapse5">Event Date</button>
                             </h2>
-                            <div id="collapse5" class="accordion-collapse collapse {{isset($filter_params['event_from_date']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                            <div id="collapse5"
+                                class="accordion-collapse collapse {{ isset($filter_params['event_from_date']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
                                     <div class="form-group">
                                         <label for="event_from_date_inp">From</label>
-                                        <input type="date" class="form-control" id="event_from_date_inp" name="event_from_date" value="{{isset($filter_params['event_from_date']) ? $filter_params['event_from_date'] : ''}}">
+                                        <input type="date" class="form-control" id="event_from_date_inp"
+                                            name="event_from_date"
+                                            value="{{ isset($filter_params['event_from_date']) ? $filter_params['event_from_date'] : '' }}">
                                     </div>
                                     <div class="form-group">
                                         <label for="event_to_date_inp">To</label>
-                                        <input type="date" class="form-control" id="event_to_date_inp" name="event_to_date" value="{{isset($filter_params['event_to_date']) ? $filter_params['event_to_date'] : ''}}">
+                                        <input type="date" class="form-control" id="event_to_date_inp"
+                                            name="event_to_date"
+                                            value="{{ isset($filter_params['event_to_date']) ? $filter_params['event_to_date'] : '' }}">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse55" aria-expanded="true" aria-controls="collapse55">Pax</button>
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse55"
+                                    aria-expanded="true" aria-controls="collapse55">Pax</button>
                             </h2>
-                            <div id="collapse55" class="accordion-collapse collapse {{isset($filter_params['pax_min_value']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                            <div id="collapse55"
+                                class="accordion-collapse collapse {{ isset($filter_params['pax_min_value']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
                                     <div class="form-group">
                                         <label for="pax_min_value">MIN</label>
-                                        <input type="text" class="form-control" id="pax_min_value" name="pax_min_value" value="{{isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : ''}}">
+                                        <input type="text" class="form-control" id="pax_min_value"
+                                            name="pax_min_value"
+                                            value="{{ isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : '' }}">
                                     </div>
                                     <div class="form-group">
                                         <label for="pax_max_value">MAX</label>
-                                        <input type="text" class="form-control" id="pax_max_value" name="pax_max_value" value="{{isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : ''}}">
+                                        <input type="text" class="form-control" id="pax_max_value"
+                                            name="pax_max_value"
+                                            value="{{ isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : '' }}">
                                     </div>
                                 </div>
                             </div>
@@ -289,17 +314,25 @@
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="true" aria-controls="collapse6">Lead Date</button>
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse6"
+                                    aria-expanded="true" aria-controls="collapse6">Lead Date</button>
                             </h2>
-                            <div id="collapse6" class="accordion-collapse collapse {{isset($filter_params['lead_from_date']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                            <div id="collapse6"
+                                class="accordion-collapse collapse {{ isset($filter_params['lead_from_date']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
                                     <div class="form-group">
                                         <label for="lead_from_date_inp">From</label>
-                                        <input type="date" class="form-control" id="lead_from_date_inp" name="lead_from_date" value="{{isset($filter_params['lead_from_date']) ? $filter_params['lead_from_date'] : ''}}">
+                                        <input type="date" class="form-control" id="lead_from_date_inp"
+                                            name="lead_from_date"
+                                            value="{{ isset($filter_params['lead_from_date']) ? $filter_params['lead_from_date'] : '' }}">
                                     </div>
                                     <div class="form-group">
                                         <label for="lead_to_date_inp">To</label>
-                                        <input type="date" class="form-control" id="lead_to_date_inp" name="lead_to_date" value="{{isset($filter_params['lead_to_date']) ? $filter_params['lead_to_date'] : ''}}">
+                                        <input type="date" class="form-control" id="lead_to_date_inp"
+                                            name="lead_to_date"
+                                            value="{{ isset($filter_params['lead_to_date']) ? $filter_params['lead_to_date'] : '' }}">
                                     </div>
                                 </div>
                             </div>
@@ -447,7 +480,10 @@
                         },
 
                     ],
-                    order: [[11, 'desc'],[1, 'desc']],
+                    order: [
+                        [11, 'desc'],
+                        [1, 'desc']
+                    ],
                     rowCallback: function(row, data, index) {
                         if (data.read_status == 1) {
                             row.style.background = "#3636361f";
@@ -462,7 +498,7 @@
                         }
                         td_elements[0].innerHTML =
                             `<input type="checkbox" class="forward_lead_checkbox" value="${data.mobile}">`;
-                            td_elements[1].innerHTML =
+                        td_elements[1].innerHTML =
                             `${data.lead_id}`;
                         td_elements[3].innerText = moment(data.lead_date).format("DD-MMM-YYYY hh:mm a");
                         if (data.is_whatsapp_msg === 1) {
@@ -473,25 +509,26 @@
                                 `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
                         }
                         if (data.service_status == 1) {
-                                td_elements[7].innerHTML =
-                                    `<span class="badge badge-success">Contacted</span>`;
-                            } else {
-                                td_elements[7].innerHTML =
-                                    `<span class="badge badge-danger">Not-Contacted</span>`;
-                            }
-                            td_elements[8].innerHTML =
-                            data.team_name ? data.team_name +"-" +data.team_role : 'N/A';
-                            td_elements[9].innerText = data.last_forwarded_by ? data.last_forwarded_by: 'N/A';
-                            td_elements[11].classList = 'd-flex';
-                            if(data.unresolved_notes != ''){
-                                td_elements[11].innerHTML =
-                                `<a href="{{route('nonvenue.lead.view')}}/${data.lead_id}#get_nvrm_help_messages_card" target="_blank" class="text-dark" data-bs-toggle="tooltip" data-bs-html="true" title="${data.unresolved_notes.split(', ').join('\n')}"><i class="fa fa-eye" style="padding: 5px; border-radius: 50%; font-size: 15px; margin-right: 15px; background-color: green; color: white;"></i></a>
-                                <button onclick="handle_get_forward_info(${data.lead_id})" class="btn p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data.forwarded_count}</button>`
-                            }else{
+                            td_elements[7].innerHTML =
+                                `<span class="badge badge-success">Contacted</span>`;
+                        } else {
+                            td_elements[7].innerHTML =
+                                `<span class="badge badge-danger">Not-Contacted</span>`;
+                        }
+                        td_elements[8].innerHTML =
+                            data.team_name ? data.team_name + "-" + data.team_role : 'N/A';
+                        td_elements[9].innerText = data.last_forwarded_by ? data.last_forwarded_by :
+                            'N/A';
+                        td_elements[11].classList = 'd-flex';
+                        if (data.unresolved_notes != '') {
                             td_elements[11].innerHTML =
-                            `<a href="{{route('nonvenue.lead.view')}}/${data.lead_id}" target="_blank" class="text-dark" data-bs-toggle="tooltip" data-bs-html="true" title="View"><i class="fa fa-eye" style="font-size: 15px; margin-right: 15px;"></i></a>
+                                `<a href="{{ route('nonvenue.lead.view') }}/${data.lead_id}#get_nvrm_help_messages_card" target="_blank" class="text-dark" data-bs-toggle="tooltip" data-bs-html="true" title="${data.unresolved_notes.split(', ').join('\n')}"><i class="fa fa-eye" style="padding: 5px; border-radius: 50%; font-size: 15px; margin-right: 15px; background-color: green; color: white;"></i></a>
+                                <button onclick="handle_get_forward_info(${data.lead_id})" class="btn p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data.forwarded_count}</button>`
+                        } else {
+                            td_elements[11].innerHTML =
+                                `<a href="{{ route('nonvenue.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark" data-bs-toggle="tooltip" data-bs-html="true" title="View"><i class="fa fa-eye" style="font-size: 15px; margin-right: 15px;"></i></a>
                             <button onclick="handle_get_forward_info(${data.lead_id})" class="btn p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data.forwarded_count}</button>`
-                            }
+                        }
                     }
                 });
             } else {
@@ -583,8 +620,12 @@
                             searchable: false,
                         },
                     ],
-                    order: [[11, 'desc'],[1, 'desc']],
+                    order: [
+                        [11, 'desc'],
+                        [1, 'desc']
+                    ],
                     rowCallback: function(row, data, index) {
+                        let forwarded_count = data.nvrm_forwarded_count+data.nv_forwarded_count;
                         if (data.read_status == 1) {
                             row.style.background = "#3636361f";
                         }
@@ -598,7 +639,7 @@
                         }
                         td_elements[0].innerHTML =
                             `<input type="checkbox" class="forward_lead_checkbox" value="${data.mobile}">`;
-                            td_elements[1].innerHTML =
+                        td_elements[1].innerHTML =
                             `${data.lead_id}`;
                         td_elements[3].innerText = moment(data.lead_date).format("DD-MMM-YYYY hh:mm a");
                         if (data.is_whatsapp_msg === 1) {
@@ -609,25 +650,26 @@
                                 `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
                         }
                         if (data.service_status == 1) {
-                                td_elements[7].innerHTML =
-                                    `<span class="badge badge-success">Contacted</span>`;
-                            } else {
-                                td_elements[7].innerHTML =
-                                    `<span class="badge badge-danger">Not-Contacted</span>`;
-                            }
-                            td_elements[8].innerHTML =
-                            data.team_name ? data.team_name +"-" +data.team_role : 'N/A';
-                            td_elements[9].innerText = data.last_forwarded_by ? data.last_forwarded_by: 'N/A';
-                            td_elements[11].classList = 'd-flex';
-                            if(data.unresolved_notes != ''){
-                                td_elements[11].innerHTML =
-                                `<a href="{{route('nonvenue.lead.view')}}/${data.lead_id}#get_nvrm_help_messages_card" target="_blank" class="text-dark" data-bs-toggle="tooltip" data-bs-html="true" title="${data.unresolved_notes.split(', ').join('\n')}"><i class="fa fa-eye" style="padding: 5px; border-radius: 50%; font-size: 15px; margin-right: 15px; background-color: green; color: white;"></i></a>
-                                <button onclick="handle_get_forward_info(${data.lead_id})" class="btn p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data.forwarded_count}</button>`
-                            }else{
+                            td_elements[7].innerHTML =
+                                `<span class="badge badge-success">Contacted</span>`;
+                        } else {
+                            td_elements[7].innerHTML =
+                                `<span class="badge badge-danger">Not-Contacted</span>`;
+                        }
+                        td_elements[8].innerHTML =
+                            data.team_name ? data.team_name + "-" + data.team_role : 'N/A';
+                        td_elements[9].innerText = data.last_forwarded_by ? data.last_forwarded_by :
+                            'N/A';
+                        td_elements[11].classList = 'd-flex';
+                        if (data.unresolved_notes != '') {
                             td_elements[11].innerHTML =
-                            `<a href="{{route('nonvenue.lead.view')}}/${data.lead_id}" target="_blank" class="text-dark" data-bs-toggle="tooltip" data-bs-html="true" title="View"><i class="fa fa-eye" style="font-size: 15px; margin-right: 15px;"></i></a>
-                            <button onclick="handle_get_forward_info(${data.lead_id})" class="btn p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data.forwarded_count}</button>`
-                            }
+                                `<a href="{{ route('nonvenue.lead.view') }}/${data.lead_id}#get_nvrm_help_messages_card" target="_blank" class="text-dark" data-bs-toggle="tooltip" data-bs-html="true" title="${data.unresolved_notes.split(', ').join('\n')}"><i class="fa fa-eye" style="padding: 5px; border-radius: 50%; font-size: 15px; margin-right: 15px; background-color: green; color: white;"></i></a>
+                                <button onclick="handle_get_forward_info(${data.lead_id})" class="btn p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${forwarded_count}</button>`
+                        } else {
+                            td_elements[11].innerHTML =
+                                `<a href="{{ route('nonvenue.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark" data-bs-toggle="tooltip" data-bs-html="true" title="View"><i class="fa fa-eye" style="font-size: 15px; margin-right: 15px;"></i></a>
+                            <button onclick="handle_get_forward_info(${data.lead_id})" class="btn p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${forwarded_count}</button>`
+                        }
                     }
                 });
                 $('#filters-form').on('submit', function(e) {
@@ -677,12 +719,17 @@
                         if (data.lead_forwards.length > 0) {
                             let i = 1;
                             for (let item of data.lead_forwards) {
+                                let updated_at = item.updated_at ? moment(item.updated_at).format(
+                                    "DD-MMM-YYYY hh:mm a") : 'N/A';
                                 let tr = document.createElement('tr');
                                 let tds = `<td>${i}</td>
+                        <td>${updated_at}</td>
                         <td>${item.name}</td>
-                        <td>${item.business_name}</td>
-                        <td>${item.category_name}</td>
-                        <td>${moment(item.lead_forwarded_at).format("DD-MMM-YYYY hh:mm a")}</td>`;
+                        <td>${item.role_name ? item.role_name : 'Vendor'}</td>
+                        <td>${item.business_name ? item.business_name : 'N/A'}</td>
+                        <td>
+                            <span class="badge badge-${item.read_status == 0 ? 'danger' : 'success'}">${item.read_status == 0 ? 'Unread': 'Read'}</span>
+                        </td>`;
 
                                 tr.innerHTML = tds;
                                 forward_info_table_body.appendChild(tr);

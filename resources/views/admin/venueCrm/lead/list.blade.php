@@ -55,8 +55,7 @@
                     <table id="serverTable" class="table text-sm">
                         <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                             <tr>
-                                <th class=""><input type="checkbox" onchange="handle_select_all_leads(this)"
-                                        class=""></th>
+                                <th class=""><input type="checkbox" onchange="handle_select_all_leads(this)"></th>
                                 <th class="text-nowrap">Lead ID</th>
                                 <th class="">Assigned Rm Name</th>
                                 <th class="text-nowrap">Lead Date</th>
@@ -88,12 +87,15 @@
                                 class="fa fa-times"></i></button>
                     </div>
                     <div class="modal-body">
+                        <p id="last_forwarded_info_paragraph" class="text-sm mb-2"></p>
                         <div class="table-responsive">
                             <table id="clientTable" class="table text-sm">
                                 <thead>
                                     <tr>
                                         <th class="text-nowrap">S.No.</th>
-                                        <th class="text-nowrap">Name</th>
+                                        <th class="text-nowrap">Forward At</th>
+                                        <th class="text-nowrap">Rm Name</th>
+                                        <th class="text-nowrap">Vm Name</th>
                                         <th class="text-nowrap">Venue Name</th>
                                         <th class="text-nowrap">Read Status</th>
                                     </tr>
@@ -365,7 +367,6 @@
 
         function send_what_msg_multiple() {
             const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg_multiple'));
-
             var selectedValues = [];
             $('.forward_lead_checkbox:checked').each(function() {
                 selectedValues.push($(this).val());
@@ -406,6 +407,7 @@
                 .then(data => {})
                 .catch((error) => {});
         }
+
         const data_url = `{{ route('admin.lead.list.ajax') }}`;
         $(document).ready(function() {
             dataTable = $('#serverTable').DataTable({
@@ -432,7 +434,8 @@
                     },
                     dataSrc: "data",
                 },
-                columns: [{
+                columns: [
+                    {
                         targets: 0,
                         name: "lead_id",
                         data: "lead_id",
@@ -547,21 +550,18 @@
                                 td_elements[8].innerHTML =
                                     `<span class="badge badge-danger">Not-Contacted</span>`;
                             }
-                        // td_elements[8].innerText = data.service_status ? data.service_status : 'N/A';
                     td_elements[9].innerText = data.lead_catagory ? data.lead_catagory : 'N/A';
                     td_elements[10].innerText = data.preference ? data.preference : 'N/A';
                     td_elements[11].innerText = data.locality ? data.locality : 'N/A';
                     td_elements[12].innerText = data.created_by ? data.created_by + " - " + data
                         .created_by_role : 'N/A';
                     td_elements[14].innerText = data.lead_status ? data.lead_status : 'N/A';
-
                     td_elements[13].classList.add('text-nowrap');
                     td_elements[13].innerHTML = data.last_forwarded_by ? data.last_forwarded_by : 'N/A';
-
                     const action_btns =
                         `<a href="{{ route('admin.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
-                <button onclick="handle_get_forward_info(${data.lead_id})" class="btn mx-2 p-0 px-2 btn-info" title="Forward info"><i class="fa fa-share-alt" style="font-size: 15px;"></i> ${data.forwarded_count ? data.forwarded_count : '0'}</button>
-                <a href="{{ route('admin.lead.delete') }}/${data.lead_id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>`
+                         <button onclick="handle_get_forward_info(${data.lead_id})" class="btn mx-2 p-0 px-2 btn-info" title="Forward info"><i class="fa fa-share-alt" style="font-size: 15px;"></i> ${data.forwarded_count ? data.forwarded_count : '0'}</button>
+                         <a href="{{ route('admin.lead.delete') }}/${data.lead_id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>`
                     td_elements[15].classList.add('text-nowrap');
                     td_elements[15].innerHTML = action_btns;
                 }
@@ -572,10 +572,10 @@
                 dataTable.ajax.reload(null, false);
                 document.querySelector('[data-widget="control-sidebar"]').click();
             });
+
         });
 
         let for_forward_leads_id = [];
-
         function handle_select_all_leads(elem) {
             const forward_lead_checkbox = document.querySelectorAll('.forward_lead_checkbox');
             if (elem.checked) {

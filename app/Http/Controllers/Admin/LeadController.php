@@ -88,7 +88,7 @@ class LeadController extends Controller
             'leads.whatsapp_msg_time',
             'leads.lead_catagory',
             'ne.pax as pax',
-            DB::raw("(select count(fwd.id) from lead_forwards as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
+            DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
         )->leftJoin('team_members as tm', 'leads.created_by', 'tm.id')
         ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id')
             ->leftJoin('roles', 'tm.role_id', 'roles.id')->groupBy('leads.mobile');
@@ -368,12 +368,21 @@ class LeadController extends Controller
     public function get_forward_info($lead_id = 0)
     {
         try {
-            $lead_forwards = LeadForward::select(
-                'tm.name',
+            $lead_forwards = LeadForwardInfo::select(
+                'tm.name as to_name',
                 'tm.venue_name',
-                'lead_forwards.read_status'
-            )->join('team_members as tm', 'lead_forwards.forward_to', '=', 'tm.id')
-                ->where(['lead_forwards.lead_id' => $lead_id])->orderBy('lead_forwards.lead_datetime', 'desc')->get();
+                'rm.name as from_name',
+                'lead_forwards.read_status',
+                'lead_forward_infos.updated_at',
+            )->join('team_members as tm', 'lead_forward_infos.forward_to', '=', 'tm.id')
+            ->join('team_members as rm', 'lead_forward_infos.forward_from', '=', 'rm.id')
+            ->join('lead_forwards', function($join) use ($lead_id) {
+                $join->on('lead_forwards.forward_to', '=', 'tm.id')
+                     ->where('lead_forwards.lead_id', '=', $lead_id);
+            })
+            ->where('lead_forward_infos.lead_id', $lead_id)
+            ->orderBy('lead_forwards.updated_at', 'desc')
+            ->get();
 
             $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead_id])->orderBy('updated_at', 'desc')->first();
             if ($lead_forward_info) {

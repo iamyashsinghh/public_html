@@ -897,6 +897,8 @@
             }
         });
 
+        // console.log("{{$venue_leads_for_this_year}}");
+
         new Chart("venue_chart_years", {
             type: "bar",
             data: {

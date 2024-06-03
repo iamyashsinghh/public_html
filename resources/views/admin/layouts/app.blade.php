@@ -20,7 +20,7 @@
     @include('includes.preloader')
     @include('admin.layouts.navbar')
     @include('admin.layouts.sidebar')
-  
+
     <div class="wrapper">
         @section('main')
         @show
@@ -55,7 +55,7 @@
                 },
             });
         }
-       
+
         // global function: for http request
         function common_ajax(request_url, method, body = null) {
             return fetch(request_url, {
@@ -71,30 +71,31 @@
         function handle_get_forward_info(lead_id){
             fetch(`{{route('admin.lead.getForwardInfo')}}/${lead_id}`).then(response => response.json()).then(data => {
                 const forward_info_table_body = document.getElementById('forward_info_table_body');
-                // const last_forwarded_info_paragraph = document.getElementById('last_forwarded_info_paragraph');
+                const last_forwarded_info_paragraph = document.getElementById('last_forwarded_info_paragraph');
                 const modal = new bootstrap.Modal("#leadForwardedMemberInfo")
                 forward_info_table_body.innerHTML = "";
-                // last_forwarded_info_paragraph.innerHTML = "";
+                last_forwarded_info_paragraph.innerHTML = "";
                 if(data.success == true){
                     let i = 1;
                     for(let item of data.lead_forwards){
+                       let updated_at = moment(item.updated_at).format("DD-MMM-YYYY hh:mm a")
                         let tr = document.createElement('tr');
                         let tds = `<td>${i}</td>
-                        <td>${item.name}</td>
+                        <td>${updated_at}</td>
+                        <td>${item.from_name}</td>
+                        <td>${item.to_name}</td>
                         <td>${item.venue_name}</td>
-                        <td>
-                            <span class="badge badge-${item.read_status == 0 ? 'danger' : 'success'}">${item.read_status == 0 ? 'Unread': 'Read'}</span>
-                        </td>`;
-
+                        <td><span class="badge badge-${item.read_status == 0 ? 'danger' : 'success'}">${item.read_status == 0 ? 'Unread': 'Read'}</span></td>`;
                         tr.innerHTML = tds;
                         forward_info_table_body.appendChild(tr);
                         i++;
                     }
-                    // last_forwarded_info_paragraph.innerHTML = data.last_forwarded_info;
+                    last_forwarded_info_paragraph.innerHTML = data.last_forwarded_info;
                     modal.show();
                 }else{
                     toastr[data.$alert_type](data.message);
                 }
+                console.log(data.lead_forwards)
             })
         }
 
@@ -108,8 +109,10 @@
                 if(data.success == true){
                     let i = 1;
                     for(let item of data.lead_forwards){
+                        let updated_at = item.updated_at ? moment(item.updated_at).format("DD-MMM-YYYY hh:mm a") : 'N/A';
                         let tr = document.createElement('tr');
                         let tds = `<td>${i}</td>
+                        <td>${updated_at}</td>
                         <td>${item.name}</td>
                         <td>${item.role_name ? item.role_name : 'Vendor'}</td>
                         <td>${item.business_name ? item.business_name : 'N/A'}</td>
@@ -144,7 +147,7 @@
         //             login_info_modal_body.querySelector('.li_platform').innerText = info.platform ? info.platform : 'N/A';
         //             login_info_modal_body.querySelector('.li_logout').innerText = info.logout_at ? moment(info.logout_at).format("DD-MMM-YYYY hh:mm a") : 'N/A';
         //         }
-                
+
 
         //         const modal = new bootstrap.Modal("#memberLoginInfoModal");
         //         modal.show();

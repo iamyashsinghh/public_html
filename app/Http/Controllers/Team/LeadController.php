@@ -90,7 +90,7 @@ class LeadController extends Controller
                 'leads.last_forwarded_by',
                 'leads.enquiry_count',
                 'leads.is_whatsapp_msg',
-                DB::raw("(select count(fwd.id) from lead_forwards as fwd where fwd.lead_id = leads.lead_id) as forwarded_count"),
+                DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
                 'leads.lead_catagory',
                 'ne.pax as pax',
             )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
@@ -249,8 +249,8 @@ class LeadController extends Controller
                         'leads.last_forwarded_by',
                         'leads.enquiry_count',
                         'leads.is_whatsapp_msg',
-                        DB::raw("(select count(fwd.id) from lead_forwards as fwd where fwd.lead_id = leads.lead_id) as forwarded_count")
-                    )
+                        DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
+                        )
                     ->leftJoin('team_members as tm', 'tm.id', '=', 'leads.created_by')
                     ->whereNull('leads.deleted_at')
                     ->leftJoin(DB::raw("
@@ -295,8 +295,8 @@ class LeadController extends Controller
                         'leads.last_forwarded_by',
                         'leads.enquiry_count',
                         'leads.is_whatsapp_msg',
-                        DB::raw("(select count(fwd.id) from lead_forwards as fwd where fwd.lead_id = leads.lead_id) as forwarded_count"),
-                    )->join('leads', ['leads.lead_id' => 'fwd_info.lead_id'])
+                        DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
+                        )->join('leads', ['leads.lead_id' => 'fwd_info.lead_id'])
                         ->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
                         ->where(['fwd_info.forward_from' => $auth_user->id])->groupBy('fwd_info.lead_id');
                     $leads->whereBetween('fwd_info.updated_at', [$from, $to]);
@@ -322,8 +322,8 @@ class LeadController extends Controller
                         'leads.last_forwarded_by',
                         'leads.enquiry_count',
                         'leads.is_whatsapp_msg',
-                        DB::raw("(select count(fwd.id) from lead_forwards as fwd where fwd.lead_id = leads.lead_id) as forwarded_count"),
-                    )->join('leads', ['leads.lead_id' => 'fwd_info.lead_id'])
+                        DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
+                        )->join('leads', ['leads.lead_id' => 'fwd_info.lead_id'])
                         ->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
                         ->where(['fwd_info.forward_from' => $auth_user->id])->groupBy('fwd_info.lead_id');
                     $leads->whereBetween('fwd_info.updated_at', [$from, $to]);
@@ -655,13 +655,21 @@ class LeadController extends Controller
     public function get_forward_info($lead_id = 0)
     {
         try {
-            $lead_forwards = LeadForward::select(
-                'tm.name',
+            $lead_forwards = LeadForwardInfo::select(
+                'tm.name as to_name',
                 'tm.venue_name',
+                'rm.name as from_name',
                 'lead_forwards.read_status',
-                'lead_forwards.lead_datetime as lead_forwarded_at'
-            )->join('team_members as tm', 'lead_forwards.forward_to', '=', 'tm.id')
-                ->where(['lead_forwards.lead_id' => $lead_id])->orderBy('lead_forwards.lead_datetime', 'desc')->get();
+                'lead_forward_infos.updated_at',
+            )->join('team_members as tm', 'lead_forward_infos.forward_to', '=', 'tm.id')
+            ->join('team_members as rm', 'lead_forward_infos.forward_from', '=', 'rm.id')
+            ->join('lead_forwards', function($join) use ($lead_id) {
+                $join->on('lead_forwards.forward_to', '=', 'tm.id')
+                     ->where('lead_forwards.lead_id', '=', $lead_id);
+            })
+            ->where('lead_forward_infos.lead_id', $lead_id)
+            ->orderBy('lead_forwards.updated_at', 'desc')
+            ->get();
 
             $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead_id])->orderBy('updated_at', 'desc')->first();
             if ($lead_forward_info) {
@@ -672,7 +680,7 @@ class LeadController extends Controller
 
             return response()->json(['success' => true, 'lead_forwards' => $lead_forwards, 'last_forwarded_info' => $last_forwarded_info]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.', 'error' => $th]);
+            return response()->json(['success' => true, 'alert_type' => 'error', 'message' => 'Something went wrong.', 'error' => $th]);
         }
     }
 
@@ -804,13 +812,13 @@ class LeadController extends Controller
             }
 
             //update or insert lead_forward_info table;
-            $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead->lead_id, 'forward_from' => $auth_user->id, 'forward_to' => $vm_id])->first();
-            if (!$lead_forward_info) {
+            // $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead->lead_id, 'forward_from' => $auth_user->id, 'forward_to' => $vm_id])->first();
+            // if (!$lead_forward_info) {
                 $lead_forward_info = new LeadForwardInfo();
                 $lead_forward_info->lead_id = $lead->lead_id;
                 $lead_forward_info->forward_from = $auth_user->id;
                 $lead_forward_info->forward_to = $vm_id;
-            }
+            // }
             $lead_forward_info->updated_at = $this->current_timestamp;
             $lead_forward_info->save();
         }

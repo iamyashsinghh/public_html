@@ -12,7 +12,8 @@
                         <thead>
                             <tr>
                                 <th class="text-nowrap">S.No.</th>
-                                <th class="text-nowrap">Name</th>
+                                <th class="text-nowrap">Updated At</th>
+                                <th class="text-nowrap">Rm/Vendor Name</th>
                                 <th class="text-nowrap">Role</th>
                                 <th class="text-nowrap">Business Name</th>
                                 <th class="text-nowrap">Read Status</th>

@@ -108,9 +108,11 @@
                                 <thead>
                                     <tr>
                                         <th class="text-nowrap">S.No.</th>
-                                        <th class="text-nowrap">Name</th>
+                                        <th class="text-nowrap">Forward At</th>
+                                        <th class="text-nowrap">Rm Name</th>
+                                        <th class="text-nowrap">Vm Name</th>
                                         <th class="text-nowrap">Venue Name</th>
-                                        <th class="text-nowrap">Forwarded At</th>
+                                        <th class="text-nowrap">Read Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="forward_info_table_body">
@@ -568,7 +570,6 @@
                                     `<span class="badge badge-danger">Not-Contacted</span>`;
                             }
 
-
                             if (data[7] == 1) {
                                 row.style.background = "#3636361f";
                             }
@@ -579,8 +580,6 @@
                                 td_elements[5].innerHTML =
                                     `<div class="d-flex"><div>${data[3]} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data[3]})" style="font-size: 25px; color: green;"></i></div>`;
                             }
-
-
 
                             row.style.background = data[8];
                             td_elements[9].innerText = data[19] ?? 'N/A';
@@ -596,7 +595,7 @@
                             }
                             td_elements[13].innerHTML = last_forward_by;
                             td_elements[15].innerHTML =
-                                `<button onclick="handle_get_forward_info(${data[0]})" class="btn mx-2 p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data[18]}</button>`
+                                `<button onclick="handle_get_forward_info(${data[0]})" class="btn mx-2 p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data[18] ? data[18] : 0}</button>`
 
 
                         for (let i = 1; i < 12; i++) {
@@ -654,17 +653,19 @@
                     last_forwarded_info_paragraph.innerText = data.last_forwarded_info;
                     if (data.lead_forwards.length > 0) {
                         let i = 1;
-                        for (let item of data.lead_forwards) {
-                            let tr = document.createElement('tr');
-                            let tds = `<td>${i}</td>
-                        <td>${item.name}</td>
+                        for(let item of data.lead_forwards){
+                       let updated_at = moment(item.updated_at).format("DD-MMM-YYYY hh:mm a")
+                        let tr = document.createElement('tr');
+                        let tds = `<td>${i}</td>
+                        <td>${updated_at}</td>
+                        <td>${item.from_name}</td>
+                        <td>${item.to_name}</td>
                         <td>${item.venue_name}</td>
-                        <td>${moment(item.lead_forwarded_at).format("DD-MMM-YYYY hh:mm a")}</td>`;
-
-                            tr.innerHTML = tds;
-                            forward_info_table_body.appendChild(tr);
-                            i++;
-                        }
+                        <td><span class="badge badge-${item.read_status == 0 ? 'danger' : 'success'}">${item.read_status == 0 ? 'Unread': 'Read'}</span></td>`;
+                        tr.innerHTML = tds;
+                        forward_info_table_body.appendChild(tr);
+                        i++;
+                    }
                     } else {
                         forward_info_table_body.innerHTML = `<tr>
                         <td colspan="5">No data available in table</td>

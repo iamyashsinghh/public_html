@@ -85,7 +85,8 @@ class NvLeadController extends Controller
             'tm.name as team_name',
             'roles.name as team_role',
             'nv_leads.created_by',
-            DB::raw("count(fwd_info.id) as forwarded_count"),
+            DB::raw("(select count(nvrm_fwd.id) from nvrm_lead_forwards as nvrm_fwd where nvrm_fwd.lead_id = nv_leads.id group by nvrm_fwd.lead_id) as nvrm_forwarded_count"),
+            DB::raw("(select count(nv_fwd.id) from nv_lead_forwards as nv_fwd where nv_fwd.lead_id = nv_leads.id group by nv_fwd.lead_id) as nv_forwarded_count"),
             'forward_to_tm.name as forward_to_name',
             'ne.pax as pax',
         )->leftJoin('nv_leads', 'nv_leads.id', 'nvrm_lead_forwards.lead_id')
@@ -346,19 +347,44 @@ class NvLeadController extends Controller
 
     public function get_forward_info($lead_id = 0)
     {
-        $auth_user = Auth::guard('nonvenue')->user();
         try {
-            $lead_forwards = nvLeadForwardInfo::from('nv_lead_forward_infos as fwd_info')->select(
-                'v.name',
-                'v.business_name',
-                'fwd_info.updated_at as lead_forwarded_at',
-                'vc.name as category_name',
-            )->Join('vendors as v', 'fwd_info.forward_to', 'v.id')
-                ->join('vendor_categories as vc', 'v.category_id', 'vc.id')
-                ->where(['fwd_info.lead_id' => $lead_id])->orderBy('fwd_info.updated_at', 'desc')->get();
-            return response()->json(['success' => true, 'lead_forwards' => $lead_forwards]);
+            $nvrm_forwards = nvrmLeadForward::select(
+                'tm.name',
+                'r.name as role_name',
+                'nvrm_lead_forwards.read_status',
+            )->leftJoin('team_members as tm', 'nvrm_lead_forwards.forward_to', '=', 'tm.id')->leftJoin('roles as r', 'tm.role_id', '=', 'r.id')
+                ->where(['nvrm_lead_forwards.lead_id' => $lead_id])->groupBy('nvrm_lead_forwards.forward_to')->orderBy('nvrm_lead_forwards.lead_datetime', 'desc')->get()->toArray();
+
+                $nv_forwards =  nvLeadForwardInfo::select(
+                    'v.name as name',
+                    'v.business_name',
+                    'nvrm.name as from_name',
+                    'nv_lead_forwards.read_status',
+                    'nv_lead_forward_infos.updated_at'
+                )->join('vendors as v', 'nv_lead_forward_infos.forward_to', '=', 'v.id')
+                ->join('team_members as nvrm', 'nv_lead_forward_infos.forward_from', '=', 'nvrm.id')
+                ->join('nv_lead_forwards', function($join) use ($lead_id) {
+                    $join->on('nv_lead_forwards.forward_to', '=', 'v.id')
+                         ->where('nv_lead_forwards.lead_id', '=', $lead_id);
+                })
+                ->where('nv_lead_forward_infos.lead_id', $lead_id)
+                ->orderBy('nv_lead_forwards.updated_at', 'desc')
+                ->get()->toArray();
+
+
+            $lead_forwards = array_merge($nvrm_forwards, $nv_forwards);
+            rsort($lead_forwards);
+
+            $lead_forward_info = nvLeadForwardInfo::where(['lead_id' => $lead_id])->orderBy('updated_at', 'desc')->first();
+            if ($lead_forward_info) {
+                $last_forwarded_info = "Last forwarded by: " . $lead_forward_info->get_forward_from->name . " to " . $lead_forward_info->get_forward_to->name . " @ " . date('d-M-Y h:i a', strtotime($lead_forward_info->updated_at));
+            } else {
+                $last_forwarded_info = "Last forwarded by: N/A";
+            }
+
+            return response()->json(['success' => true, 'lead_forwards' => $lead_forwards, 'last_forwarded_info' => $last_forwarded_info]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.', 'error' => $th->getMessage()]);
         }
     }
 

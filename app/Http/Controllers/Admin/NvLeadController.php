@@ -311,16 +311,26 @@ class NvLeadController extends Controller
             $nvrm_forwards = nvrmLeadForward::select(
                 'tm.name',
                 'r.name as role_name',
-                'nvrm_lead_forwards.read_status'
+                'nvrm_lead_forwards.read_status',
             )->leftJoin('team_members as tm', 'nvrm_lead_forwards.forward_to', '=', 'tm.id')->leftJoin('roles as r', 'tm.role_id', '=', 'r.id')
                 ->where(['nvrm_lead_forwards.lead_id' => $lead_id])->groupBy('nvrm_lead_forwards.forward_to')->orderBy('nvrm_lead_forwards.lead_datetime', 'desc')->get()->toArray();
 
-            $nv_forwards = nvLeadForward::select(
-                'v.name',
-                'v.business_name',
-                'nv_lead_forwards.read_status'
-            )->leftJoin('vendors as v', 'nv_lead_forwards.forward_to', '=', 'v.id')
-                ->where(['nv_lead_forwards.lead_id' => $lead_id])->groupBy('nv_lead_forwards.forward_to')->orderBy('nv_lead_forwards.lead_datetime', 'desc')->get()->toArray();
+                $nv_forwards =  nvLeadForwardInfo::select(
+                    'v.name as name',
+                    'v.business_name',
+                    'nvrm.name as from_name',
+                    'nv_lead_forwards.read_status',
+                    'nv_lead_forward_infos.updated_at'
+                )->join('vendors as v', 'nv_lead_forward_infos.forward_to', '=', 'v.id')
+                ->join('team_members as nvrm', 'nv_lead_forward_infos.forward_from', '=', 'nvrm.id')
+                ->join('nv_lead_forwards', function($join) use ($lead_id) {
+                    $join->on('nv_lead_forwards.forward_to', '=', 'v.id')
+                         ->where('nv_lead_forwards.lead_id', '=', $lead_id);
+                })
+                ->where('nv_lead_forward_infos.lead_id', $lead_id)
+                ->orderBy('nv_lead_forwards.updated_at', 'desc')
+                ->get()->toArray();
+
 
             $lead_forwards = array_merge($nvrm_forwards, $nv_forwards);
             rsort($lead_forwards);
