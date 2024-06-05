@@ -13,6 +13,7 @@ Route::get('/fool', function () {
 Route::post('/store-token', [Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
 Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->name('send.token');
 Route::get('/sheet', [Controllers\GoogleSheetController::class, 'getSheetData'])->name('get.sheet');
+Route::get('google/callback', [Controllers\GoogleSheetController::class, 'handleGoogleCallback']);
 
 
 Route::get('/optimize', function () {

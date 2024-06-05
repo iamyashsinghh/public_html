@@ -15,18 +15,61 @@ class GoogleSheetController extends Controller
         $client->setAuthConfig(storage_path('app/google/credentials.json'));
         $client->setAccessType('offline');
 
-        $service = new Sheets($client);
+        $authUrl = $client->createAuthUrl();
 
-        $spreadsheetId = 'your-spreadsheet-id';
-        $range = 'Sheet1!A1:D10';
+        return redirect($authUrl);
 
-        $response = $service->spreadsheets_values->get($spreadsheetId, $range);
-        $values = $response->getValues();
+        // $client = new Google_Client();
+        // $client->setApplicationName('Google Sheets API Laravel');
+        // $client->setScopes(Sheets::SPREADSHEETS_READONLY);
+        // $client->setAuthConfig(storage_path('app/google/credentials.json'));
+        // $client->setAccessType('offline');
 
-        if (empty($values)) {
-            return response()->json(['message' => 'No data found.']);
+        // $service = new Sheets($client);
+
+        // $spreadsheetId = 'your-spreadsheet-id';
+        // $range = 'Sheet1!A1:D10';
+
+        // $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+        // $values = $response->getValues();
+
+        // if (empty($values)) {
+        //     return response()->json(['message' => 'No data found.']);
+        // } else {
+        //     return response()->json($values);
+        // }
+    }
+
+    public function handleGoogleCallback(Request $request)
+    {
+        $client = new Google_Client();
+        $client->setApplicationName('Google Sheets API Laravel');
+        $client->setScopes(Sheets::SPREADSHEETS_READONLY);
+        $client->setAuthConfig(storage_path('app/google/credentials.json'));
+        $client->setAccessType('offline');
+
+        if ($request->input('code')) {
+            $client->fetchAccessTokenWithAuthCode($request->input('code'));
+
+            $service = new Sheets($client);
+
+            $spreadsheetId = 'your-spreadsheet-id';
+            $range = 'Sheet1!A1:D10';
+
+            try {
+                $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+                $values = $response->getValues();
+
+                if (empty($values)) {
+                    return response()->json(['message' => 'No data found.']);
+                } else {
+                    return response()->json($values);
+                }
+            } catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()]);
+            }
         } else {
-            return response()->json($values);
+            return response()->json(['error' => 'Authorization code not provided.']);
         }
     }
 }
