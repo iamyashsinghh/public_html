@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -40,11 +41,11 @@ class VisitController extends Controller
             $filter_params['pax_max_value'] = $request->pax_max_value;
         }
 
-        $page_heading = $filter_params ? "Visits - Filtered" : "Visits";
+        $page_heading = $filter_params ? 'Visits - Filtered' : 'Visits';
 
         if ($dashboard_filters !== null) {
             $filter_params['dashboard_filters'] = $dashboard_filters;
-            $page_heading = ucwords(str_replace("_", " ", $dashboard_filters));
+            $page_heading = ucwords(str_replace('_', ' ', $dashboard_filters));
         }
 
         return view('admin.venueCrm.visit.list', compact('page_heading', 'filter_params'));
@@ -74,67 +75,84 @@ class VisitController extends Controller
         ->groupBy('lead_forwards.id')
         ->whereNull('visits.deleted_at');
 
-
-    if ($request->visit_status == "Upcoming") {
-        $visits->where('visits.visit_schedule_datetime', '>', Carbon::today()->endOfDay())->whereNull('visits.done_datetime');
-    }
-    if ($request->visit_status == "Today") {
-        $current_date = date('Y-m-d');
-        $visits->where('visits.visit_schedule_datetime', 'like', "%$current_date%")->whereNull('visits.done_datetime');
-    }
-    if ($request->visit_status == "Overdue") {
-        $visits->where('visits.visit_schedule_datetime', '<', Carbon::today())->whereNull('visits.done_datetime');
-    }
-    if ($request->visit_status == "Done") {
-        $visits->whereNotNull('visits.done_datetime');
-    }
-    if ($request->visits_source) {
-        $visits->where('lead_forwards.source', $request->visits_source);
-    }
-    if ($request->visit_created_from_date) {
-        $from = Carbon::make($request->visit_created_from_date);
-        $to = $request->visit_created_to_date ? Carbon::make($request->visit_created_to_date)->endOfDay() : $from->endOfDay();
-        $visits->whereBetween('visits.created_at', [$from, $to]);
-    }
-    if ($request->event_from_date) {
-        $from = Carbon::make($request->event_from_date);
-        $to = $request->event_to_date ? Carbon::make($request->event_to_date)->endOfDay() : $from->endOfDay();
-        $visits->whereBetween('lead_forwards.event_datetime', [$from, $to]);
-    }
-    if ($request->visit_done_from_date) {
-        $from = Carbon::make($request->visit_done_from_date);
-        $to = $request->visit_done_to_date ? Carbon::make($request->visit_done_to_date)->endOfDay() : $from->endOfDay();
-        $visits->whereBetween('visits.done_datetime', [$from, $to]);
-    }
-    if ($request->visit_schedule_from_date) {
-        $from = Carbon::make($request->visit_schedule_from_date);
-        $to = $request->visit_schedule_to_date ? Carbon::make($request->visit_schedule_to_date)->endOfDay() : $from->endOfDay();
-        $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
-    }
-    if ($request->pax_min_value) {
-        $min = $request->pax_min_value;
-        $max = $request->pax_max_value ?? $min;
-        $visits->whereBetween('ne.pax', [$min, $max]);
-    }
-    if ($request->dashboard_filters) {
-        if ($request->dashboard_filters == "recce_schedule_this_month") {
-            $from = Carbon::today()->startOfMonth();
-            $to = Carbon::today()->endOfMonth();
-            $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
-        } elseif ($request->dashboard_filters == "recce_schedule_today") {
-            $from = Carbon::today()->startOfDay();
-            $to = Carbon::today()->endOfDay();
-            $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
-        } elseif ($request->dashboard_filters == "total_recce_overdue") {
-            $visits->where('visits.visit_schedule_datetime', '<', Carbon::today())->whereNull('visits.done_datetime');
-        } elseif ($request->dashboard_filters == "recce_done_this_month") {
-            $from = Carbon::today()->startOfMonth();
-            $to = Carbon::today()->endOfMonth();
+        if ($request->has('visit_status')) {
+            $visits->where(function ($query) use ($request) {
+                foreach ($request->visit_status as $status) {
+                    switch ($status) {
+                        case 'Upcoming':
+                            $query->orWhere(function ($q) {
+                                $q->where('visits.visit_schedule_datetime', '>', Carbon::today()->endOfDay())
+                                    ->whereNull('visits.done_datetime');
+                            });
+                            break;
+                        case 'Today':
+                            $current_date = date('Y-m-d');
+                            $query->orWhere(function ($q) use ($current_date) {
+                                $q->where('visits.visit_schedule_datetime', 'like', "%$current_date%")
+                                    ->whereNull('visits.done_datetime');
+                            });
+                            break;
+                        case 'Overdue':
+                            $query->orWhere(function ($q) {
+                                $q->where('visits.visit_schedule_datetime', '<', Carbon::today())
+                                    ->whereNull('visits.done_datetime');
+                            });
+                            break;
+                        case 'Done':
+                            $query->orWhereNotNull('visits.done_datetime');
+                            break;
+                    }
+                }
+            });
+        }
+        if ($request->visits_source) {
+            $visits->whereIn('lead_forwards.source', $request->visits_source);
+        }
+        if ($request->visit_created_from_date) {
+            $from = Carbon::make($request->visit_created_from_date);
+            $to = $request->visit_created_to_date ? Carbon::make($request->visit_created_to_date)->endOfDay() : $from->endOfDay();
+            $visits->whereBetween('visits.created_at', [$from, $to]);
+        }
+        if ($request->event_from_date) {
+            $from = Carbon::make($request->event_from_date);
+            $to = $request->event_to_date ? Carbon::make($request->event_to_date)->endOfDay() : $from->endOfDay();
+            $visits->whereBetween('lead_forwards.event_datetime', [$from, $to]);
+        }
+        if ($request->visit_done_from_date) {
+            $from = Carbon::make($request->visit_done_from_date);
+            $to = $request->visit_done_to_date ? Carbon::make($request->visit_done_to_date)->endOfDay() : $from->endOfDay();
             $visits->whereBetween('visits.done_datetime', [$from, $to]);
         }
-    }
+        if ($request->visit_schedule_from_date) {
+            $from = Carbon::make($request->visit_schedule_from_date);
+            $to = $request->visit_schedule_to_date ? Carbon::make($request->visit_schedule_to_date)->endOfDay() : $from->endOfDay();
+            $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
+        }
+        if ($request->pax_min_value) {
+            $min = $request->pax_min_value;
+            $max = $request->pax_max_value ?? $min;
+            $visits->whereBetween('ne.pax', [$min, $max]);
+        }
+        if ($request->dashboard_filters) {
+            if ($request->dashboard_filters == 'recce_schedule_this_month') {
+                $from = Carbon::today()->startOfMonth();
+                $to = Carbon::today()->endOfMonth();
+                $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
+            } elseif ($request->dashboard_filters == 'recce_schedule_today') {
+                $from = Carbon::today()->startOfDay();
+                $to = Carbon::today()->endOfDay();
+                $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
+            } elseif ($request->dashboard_filters == 'total_recce_overdue') {
+                $visits->where('visits.visit_schedule_datetime', '<', Carbon::today())->whereNull('visits.done_datetime');
+            } elseif ($request->dashboard_filters == 'recce_done_this_month') {
+                $from = Carbon::today()->startOfMonth();
+                $to = Carbon::today()->endOfMonth();
+                $visits->whereBetween('visits.done_datetime', [$from, $to]);
+            }
+        }
 
-    $visits = $visits->get();
-    return datatables($visits)->toJson();
-}
+        $visits = $visits->get();
+
+        return datatables($visits)->toJson();
+    }
 }

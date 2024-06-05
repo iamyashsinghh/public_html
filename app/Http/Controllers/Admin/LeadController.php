@@ -94,7 +94,7 @@ class LeadController extends Controller
             ->leftJoin('roles', 'tm.role_id', 'roles.id')->groupBy('leads.mobile');
 
         if ($request->has('lead_status') && $request->lead_status != '') {
-            $leads->where('leads.lead_status', $request->lead_status);
+            $leads->whereIn('leads.lead_status', $request->lead_status);
         }
 
         if ($request->has('event_from_date') && $request->event_from_date != '') {
@@ -154,7 +154,7 @@ class LeadController extends Controller
         }
 
         if ($request->team_members != null) {
-            $leads->where('leads.assign_id', $request->team_members);
+            $leads->whereIn('leads.assign_id', $request->team_members);
         }
 
         $leads->orderBy('leads.whatsapp_msg_time', 'desc');

@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.0.2",
         "defuse/php-encryption": "^2.4",
+        "google/apiclient": "^2.14",
         "guzzlehttp/guzzle": "^7.2",
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^9.19",
