@@ -26,7 +26,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                 </div>
             </div>
             @if (!isset($filter_params['dashboard_filters']))
-                <div class="filter-container text-center">
+                <div class="filter-container text-center d-none">
                     <form action="{{route('team.task.list')}}" method="post">
                         @csrf
                         <label for="">Filter by task schedule date</label>
@@ -77,21 +77,21 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                         </h2>
                         <div id="collapse1" class="accordion-collapse collapse {{isset($filter_params['task_status']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
                             <div class="accordion-body pl-2 pb-4">
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="task_status_upcoming_radio" name="task_status" value="Upcoming" {{isset($filter_params['task_status']) && $filter_params['task_status'] == 'Upcoming'  ? 'checked' : ''}}>
-                                    <label for="task_status_upcoming_radio" class="custom-control-label">Upcoming</label>
+                                <div class="custom-control custom-checkbox my-1">
+                                    <input class="custom-control-input" type="checkbox" id="task_status_upcoming_checkbox" name="task_status[]" value="Upcoming" {{isset($filter_params['task_status']) && in_array('Upcoming', $filter_params['task_status']) ? 'checked' : ''}}>
+                                    <label for="task_status_upcoming_checkbox" class="custom-control-label">Upcoming</label>
                                 </div>
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="task_status_today_radio" name="task_status" value="Today" {{isset($filter_params['task_status']) && $filter_params['task_status'] == 'Today'  ? 'checked' : ''}}>
-                                    <label for="task_status_today_radio" class="custom-control-label">Today</label>
+                                <div class="custom-control custom-checkbox my-1">
+                                    <input class="custom-control-input" type="checkbox" id="task_status_today_checkbox" name="task_status[]" value="Today" {{isset($filter_params['task_status']) && in_array('Today', $filter_params['task_status']) ? 'checked' : ''}}>
+                                    <label for="task_status_today_checkbox" class="custom-control-label">Today</label>
                                 </div>
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="task_status_overdue_radio" name="task_status" value="Overdue" {{isset($filter_params['task_status']) && $filter_params['task_status'] == 'Overdue'  ? 'checked' : ''}}>
-                                    <label for="task_status_overdue_radio" class="custom-control-label">Overdue</label>
+                                <div class="custom-control custom-checkbox my-1">
+                                    <input class="custom-control-input" type="checkbox" id="task_status_overdue_checkbox" name="task_status[]" value="Overdue" {{isset($filter_params['task_status']) && in_array('Overdue', $filter_params['task_status']) ? 'checked' : ''}}>
+                                    <label for="task_status_overdue_checkbox" class="custom-control-label">Overdue</label>
                                 </div>
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="task_status_done_radio" name="task_status" value="Done" {{isset($filter_params['task_status']) && $filter_params['task_status'] == 'Done'  ? 'checked' : ''}}>
-                                    <label for="task_status_done_radio" class="custom-control-label">Done</label>
+                                <div class="custom-control custom-checkbox my-1">
+                                    <input class="custom-control-input" type="checkbox" id="task_status_done_checkbox" name="task_status[]" value="Done" {{isset($filter_params['task_status']) && in_array('Done', $filter_params['task_status']) ? 'checked' : ''}}>
+                                    <label for="task_status_done_checkbox" class="custom-control-label">Done</label>
                                 </div>
                             </div>
                         </div>
@@ -159,18 +159,27 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 @endsection
 @section('footer-script')
 @php
-$filter = "";
-if (isset($filter_params['task_status'])) {
-    $filter = "task_status=" . $filter_params['task_status'];
-} elseif (isset($filter_params['task_created_from_date'])) {
-    $filter = "task_created_from_date=" . $filter_params['task_created_from_date'] . "&task_created_to_date=" . $filter_params['task_created_to_date'];
-}elseif (isset($filter_params['task_done_from_date'])) {
-    $filter = "task_done_from_date=" . $filter_params['task_done_from_date'] . "&task_done_to_date=" . $filter_params['task_done_to_date'];
-}elseif (isset($filter_params['task_schedule_from_date'])) {
-    $filter = "task_schedule_from_date=" . $filter_params['task_schedule_from_date'] . "&task_schedule_to_date=" . $filter_params['task_schedule_to_date'];
-}elseif(isset($filter_params['dashboard_filters'])){
-    $filter = "dashboard_filters=" . $filter_params['dashboard_filters'];
+$filters = [];
+if (isset($filter_params['task_status']) && is_array($filter_params['task_status'])) {
+            foreach ($filter_params['task_status'] as $source) {
+                $filters[] = 'task_status[]=' . urlencode($source);
+            }
+        }
+
+if (isset($filter_params['task_created_from_date'])) {
+    $filters[] = "task_created_from_date=" . $filter_params['task_created_from_date'] . "&task_created_to_date=" . $filter_params['task_created_to_date'];
 }
+if (isset($filter_params['task_done_from_date'])) {
+    $filters[] = "task_done_from_date=" . $filter_params['task_done_from_date'] . "&task_done_to_date=" . $filter_params['task_done_to_date'];
+}
+if (isset($filter_params['task_schedule_from_date'])) {
+    $filters[] = "task_schedule_from_date=" . $filter_params['task_schedule_from_date'] . "&task_schedule_to_date=" . $filter_params['task_schedule_to_date'];
+}
+if(isset($filter_params['dashboard_filters'])){
+    $filters[] = "dashboard_filters=" . $filter_params['dashboard_filters'];
+}
+
+$filter = implode('&', $filters);
 @endphp
 <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script src="{{asset('plugins/moment/moment.min.js')}}"></script>

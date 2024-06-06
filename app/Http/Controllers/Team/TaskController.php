@@ -52,16 +52,37 @@ class TaskController extends Controller {
         )->join('tasks', ['leads.lead_id' => 'tasks.lead_id'])->where(['tasks.created_by' => $auth_user->id, 'tasks.deleted_at' => null]);
 
         $current_date = date('Y-m-d');
-        if ($request->task_status == "Upcoming") {
-            $tasks->where('tasks.task_schedule_datetime', '>', Carbon::today()->endOfDay());
-        } elseif ($request->task_status == "Today") {
-            $tasks->where('tasks.task_schedule_datetime', 'like', "%$current_date%");
-        } elseif ($request->task_status == "Overdue") {
-            $tasks->where('tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('tasks.done_datetime');
-            // return $tasks->toSql();
-        } elseif ($request->task_status == "Done") {
-            $tasks->whereNotNull('tasks.done_datetime');
-        } elseif ($request->task_created_from_date) {
+        if ($request->has('task_status')) {
+            $tasks->where(function ($query) use ($request) {
+                foreach ($request->task_status as $status) {
+                    switch ($status) {
+                        case 'Upcoming':
+                            $query->orWhere(function ($q) {
+                                $q->where('tasks.task_schedule_datetime', '>', Carbon::today()->endOfDay())
+                                    ->whereNull('tasks.done_datetime');
+                            });
+                            break;
+                        case 'Today':
+                            $current_date = date('Y-m-d');
+                            $query->orWhere(function ($q) use ($current_date) {
+                                $q->where('tasks.task_schedule_datetime', 'like', "%$current_date%")
+                                    ->whereNull('tasks.done_datetime');
+                            });
+                            break;
+                        case 'Overdue':
+                            $query->orWhere(function ($q) {
+                                $q->where('tasks.task_schedule_datetime', '<', Carbon::today())
+                                    ->whereNull('tasks.done_datetime');
+                            });
+                            break;
+                        case 'Done':
+                            $query->orWhereNotNull('tasks.done_datetime');
+                            break;
+                    }
+                }
+            });
+        }
+        if ($request->task_created_from_date) {
             $from = Carbon::make($request->task_created_from_date);
             if ($request->task_created_to_date != null) {
                 $to = Carbon::make($request->task_created_to_date)->endOfDay();
@@ -69,7 +90,8 @@ class TaskController extends Controller {
                 $to = Carbon::make($request->task_created_from_date)->endOfDay();
             }
             $tasks->whereBetween('tasks.created_at', [$from, $to]);
-        } elseif ($request->task_done_from_date) {
+        }
+        if ($request->task_done_from_date) {
             $from = Carbon::make($request->task_done_from_date);
             if ($request->task_done_to_date != null) {
                 $to = Carbon::make($request->task_done_to_date)->endOfDay();
@@ -77,7 +99,8 @@ class TaskController extends Controller {
                 $to = Carbon::make($request->task_done_from_date)->endOfDay();
             }
             $tasks->whereBetween('tasks.done_datetime', [$from, $to]);
-        } elseif ($request->task_schedule_from_date) {
+        }
+        if ($request->task_schedule_from_date) {
             $from = Carbon::make($request->task_schedule_from_date);
             if ($request->task_schedule_to_date != null) {
                 $to = Carbon::make($request->task_schedule_to_date)->endOfDay();
@@ -85,7 +108,8 @@ class TaskController extends Controller {
                 $to = Carbon::make($request->task_schedule_from_date)->endOfDay();
             }
             $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to])->whereNull('tasks.done_datetime');
-        } elseif ($request->dashboard_filters != null) {
+        }
+        if ($request->dashboard_filters != null) {
             if ($request->dashboard_filters == "task_schedule_this_month") {
                 $from =  Carbon::today()->startOfMonth();
                 $to =  Carbon::today()->endOfMonth();
@@ -102,15 +126,6 @@ class TaskController extends Controller {
         $tasks = $tasks->get();
         return datatables($tasks)->toJson();
     }
-
-    // public function manage_ajax($task_id) {
-    //     $task = Task::where(['id' => $task_id, 'created_by' => Auth::guard('team')->user()->id, 'done_datetime' => null])->first();
-    //     if (!$task) {
-    //         return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.'], 500);
-    //     } else {
-    //         return response()->json(['success' => true, 'task' => $task]);
-    //     }
-    // }
 
     public function add_process(Request $request) {
         $validate = Validator::make($request->all(), [
