@@ -63,21 +63,21 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                         </h2>
                         <div id="collapse1" class="accordion-collapse collapse {{isset($filter_params['meeting_status']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
                             <div class="accordion-body pl-2 pb-4">
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="meeting_status_upcoming_radio" name="meeting_status" value="Upcoming" {{isset($filter_params['meeting_status']) && $filter_params['meeting_status'] == 'Upcoming'  ? 'checked' : ''}}>
-                                    <label for="meeting_status_upcoming_radio" class="custom-control-label">Upcoming</label>
+                                <div class="custom-control custom-checkbox my-1">
+                                    <input class="custom-control-input" type="checkbox" id="meeting_status_upcoming_checkbox" name="meeting_status[]" value="Upcoming" {{isset($filter_params['meeting_status']) && in_array('Upcoming', $filter_params['meeting_status'])  ? 'checked' : ''}}>
+                                    <label for="meeting_status_upcoming_checkbox" class="custom-control-label">Upcoming</label>
                                 </div>
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="meeting_status_today_radio" name="meeting_status" value="Today" {{isset($filter_params['meeting_status']) && $filter_params['meeting_status'] == 'Today'  ? 'checked' : ''}}>
-                                    <label for="meeting_status_today_radio" class="custom-control-label">Today</label>
+                                <div class="custom-control custom-checkbox my-1">
+                                    <input class="custom-control-input" type="checkbox" id="meeting_status_today_checkbox" name="meeting_status[]" value="Today" {{isset($filter_params['meeting_status']) && in_array('Today', $filter_params['meeting_status']) ? 'checked' : ''}}>
+                                    <label for="meeting_status_today_checkbox" class="custom-control-label">Today</label>
                                 </div>
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="meeting_status_overdue_radio" name="meeting_status" value="Overdue" {{isset($filter_params['meeting_status']) && $filter_params['meeting_status'] == 'Overdue'  ? 'checked' : ''}}>
-                                    <label for="meeting_status_overdue_radio" class="custom-control-label">Overdue</label>
+                                <div class="custom-control custom-checkbox my-1">
+                                    <input class="custom-control-input" type="checkbox" id="meeting_status_overdue_checkbox" name="meeting_status[]" value="Overdue" {{isset($filter_params['meeting_status']) && in_array('Overdue', $filter_params['meeting_status'])  ? 'checked' : ''}}>
+                                    <label for="meeting_status_overdue_checkbox" class="custom-control-label">Overdue</label>
                                 </div>
-                                <div class="custom-control custom-radio my-1">
-                                    <input class="custom-control-input" type="radio" id="meeting_status_done_radio" name="meeting_status" value="Done" {{isset($filter_params['meeting_status']) && $filter_params['meeting_status'] == 'Done'  ? 'checked' : ''}}>
-                                    <label for="meeting_status_done_radio" class="custom-control-label">Done</label>
+                                <div class="custom-control custom-checkbox my-1">
+                                    <input class="custom-control-input" type="checkbox" id="meeting_status_done_checkbox" name="meeting_status[]" value="Done" {{isset($filter_params['meeting_status']) && in_array('Done', $filter_params['meeting_status'])  ? 'checked' : ''}}>
+                                    <label for="meeting_status_done_checkbox" class="custom-control-label">Done</label>
                                 </div>
                             </div>
                         </div>
@@ -162,8 +162,8 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
         $('#serverTable').DataTable({
             pageLength: 10,
             language: {
-                "search": "_INPUT_", 
-                "searchPlaceholder": "Type here to search..", 
+                "search": "_INPUT_",
+                "searchPlaceholder": "Type here to search..",
                 processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
             },
             serverSide: true,
@@ -275,8 +275,8 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
        var dataTable = $('#serverTable').DataTable({
             pageLength: 10,
             language: {
-                "search": "_INPUT_", 
-                "searchPlaceholder": "Type here to search..", 
+                "search": "_INPUT_",
+                "searchPlaceholder": "Type here to search..",
                 processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
             },
             serverSide: true,
@@ -284,9 +284,16 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
             ajax: {
                 url: "{{ route('bdm.meeting.list.ajax') }}",
                 data: function(d) {
-                            var formData = $('#filters-form').serializeArray();
+                    let formData = $('#filters-form').serializeArray();
                             formData.forEach(function(item) {
-                                d[item.name] = item.value;
+                                if (item.name.endsWith('[]')) {
+                                    if (!d[item.name]) {
+                                        d[item.name] = [];
+                                    }
+                                    d[item.name].push(item.value);
+                                } else {
+                                    d[item.name] = item.value;
+                                }
                             });
                         },
                 headers: {
@@ -397,7 +404,7 @@ $dashfilters = isset($filter_params['dashboard_filters']) ? $filter_params['dash
                 document.querySelector('[data-widget="control-sidebar"]').click();
             });
     });
-    
+
 
     function handle_view_lead(forward_id) {
         window.open(`{{route('bdm.lead.view')}}/${forward_id}#meeting_card_container`);

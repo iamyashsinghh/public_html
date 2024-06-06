@@ -4,12 +4,12 @@
 @endsection
 @section('title', $page_heading . ' | BDM CRM')
 @section('navbar-right-links')
-        <li class="nav-item">
-            <a class="nav-link" title="Filters" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#"
-                role="button">
-                <i class="fas fa-filter"></i>
-            </a>
-        </li>
+    <li class="nav-item">
+        <a class="nav-link" title="Filters" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#"
+            role="button">
+            <i class="fas fa-filter"></i>
+        </a>
+    </li>
 @endsection
 @section('main')
     @php
@@ -21,16 +21,17 @@
                 <div class="d-flex justify-content-between mb-2">
                     <h1 class="m-0">{{ $page_heading }}</h1>
                     <div class="d-flex">
-                    <a href="{{ route('admin.bdm.lead.list') }}" class="btn btn-secondary btn-sm mx-2">Refresh</a>
+                        <a href="{{ route('admin.bdm.lead.list') }}" class="btn btn-secondary btn-sm mx-2">Refresh</a>
                         <button class="btn btn-sm text-light" onclick="send_what_msg_multiple()"
                             style="background-color: var(--wb-renosand);">Whatsapp</button>
                     </div>
                 </div>
                 <div class="d-flex">
-                <div class="button-group my-4">
-                    <button class="btn btn-sm text-light buttons-print" onclick="handle_create_bdm_lead()" style="background-color: var(--wb-renosand)"><i class="fa fa-plus"></i> Create Lead</a>
-                </div>
-                <a href="javascript:void(0);" class="btn my-4 text-light btn-sm buttons-print mx-1"
+                    <div class="button-group my-4">
+                        <button class="btn btn-sm text-light buttons-print" onclick="handle_create_bdm_lead()"
+                            style="background-color: var(--wb-renosand)"><i class="fa fa-plus"></i> Create Lead</a>
+                    </div>
+                    <a href="javascript:void(0);" class="btn my-4 text-light btn-sm buttons-print mx-1"
                         onclick="handle_forward_leads_to_bdm(this)" style="background-color: var(--wb-dark-red)"><i
                             class="fa fa-paper-plane"></i> Assign to Bdm</a>
                 </div>
@@ -69,89 +70,84 @@
                 <form action="{{ route('admin.bdm.lead.list') }}" method="post" id="filters-form">
                     @csrf
                     <div class="accordion text-sm" id="accordionExample">
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse41"
-                                        aria-expanded="true" aria-controls="collapse41">Lead assigned to BDM</button>
-                                </h2>
-                                <div id="collapse41"
-                                    class="accordion-collapse collapse {{ isset($filter_params['team_members']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        @foreach ($getBdm as $bdm)
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
-                                                    id="team_member_{{ $bdm->id }}" name="team_members"
-                                                    value="{{ $bdm->id }}"
-                                                    {{ isset($filter_params['team_members']) && $filter_params['team_members'] == $rm->id ? 'checked' : '' }}>
-                                                <label for="team_member_{{ $bdm->id }}"
-                                                    class="custom-control-label">{{ $bdm->name }}</label>
-                                            </div>
-                                        @endforeach
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse41"
+                                    aria-expanded="true" aria-controls="collapse41">Lead assigned to BDM</button>
+                            </h2>
+                            <div id="collapse41"
+                                class="accordion-collapse collapse {{ isset($filter_params['team_members']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    @foreach ($getBdm as $bdm)
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox"
+                                                id="team_member_{{ $bdm->id }}" name="team_members[]"
+                                                value="{{ $bdm->id }}"
+                                                {{ isset($filter_params['team_members']) && $filter_params['team_members'] == $rm->id ? 'checked' : '' }}>
+                                            <label for="team_member_{{ $bdm->id }}"
+                                                class="custom-control-label">{{ $bdm->name }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse941"
+                                    aria-expanded="true" aria-controls="collapse41">Lead Business Category</button>
+                            </h2>
+                            <div id="collapse941"
+                                class="accordion-collapse collapse {{ isset($filter_params['business_cat']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    @foreach ($vendor_categories as $vendor)
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox"
+                                                id="team_member_{{ $vendor->id }}" name="business_cat[]"
+                                                value="{{ $vendor->id }}"
+                                                {{ isset($filter_params['business_cat']) && $filter_params['business_cat'] == $vendor->id ? 'checked' : '' }}>
+                                            <label for="team_member_{{ $vendor->id }}"
+                                                class="custom-control-label">{{ $vendor->name }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse491"
+                                    aria-expanded="true" aria-controls="collapse491">Lead Source</button>
+                            </h2>
+                            <div id="collapse491"
+                                class="accordion-collapse collapse {{ isset($filter_params['lead_source']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_Team"
+                                            name="lead_source[]" value="WB|Team"
+                                            {{ isset($filter_params['lead_source']) && in_array('WB|FBCampaign', $filter_params['lead_source']) ? 'WB|Team' : '' }}>
+                                        <label for="lead_source_Team" class="custom-control-label">WB|Team</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_Site"
+                                            name="lead_source[]" value="WB|Site"
+                                            {{ isset($filter_params['lead_source']) && in_array('WB|Site', $filter_params['lead_source']) ? 'WB|Site' : '' }}>
+                                        <label for="lead_source_Site" class="custom-control-label">WB|Site</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_FBCampaign"
+                                            name="lead_source[]" value="WB|FBCampaign"
+                                            {{ isset($filter_params['lead_source']) && in_array('WB|FBCampaign', $filter_params['lead_source']) ? 'WB|FBCampaign' : '' }}>
+                                        <label for="lead_source_FBCampaign"
+                                            class="custom-control-label">WB|FBCampaign</label>
                                     </div>
                                 </div>
                             </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse941"
-                                        aria-expanded="true" aria-controls="collapse41">Lead Business Category</button>
-                                </h2>
-                                <div id="collapse941"
-                                    class="accordion-collapse collapse {{ isset($filter_params['business_cat']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        @foreach ($vendor_categories as $vendor)
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
-                                                    id="team_member_{{ $vendor->id }}" name="business_cat"
-                                                    value="{{ $vendor->id }}"
-                                                    {{ isset($filter_params['business_cat']) && $filter_params['business_cat'] == $vendor->id ? 'checked' : '' }}>
-                                                <label for="team_member_{{ $vendor->id }}"
-                                                    class="custom-control-label">{{ $vendor->name }}</label>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse491"
-                                        aria-expanded="true" aria-controls="collapse491">Lead Source</button>
-                                </h2>
-                                <div id="collapse491"
-                                    class="accordion-collapse collapse {{ isset($filter_params['lead_source']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="lead_source_Team" name="lead_source"
-                                                value="WB|Team"
-                                                {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Team' ? 'WB|Team' : '' }}>
-                                            <label for="lead_source_Team"
-                                                class="custom-control-label">WB|Team</label>
-                                        </div>
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="lead_source_Site" name="lead_source"
-                                                value="WB|Site"
-                                                {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|Site' ? 'WB|Site' : '' }}>
-                                            <label for="lead_source_Site"
-                                                class="custom-control-label">WB|Site</label>
-                                        </div>
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="lead_source_FBCampaign" name="lead_source"
-                                                value="WB|FBCampaign"
-                                                {{ isset($filter_params['lead_source']) && $filter_params['lead_source'] == 'WB|FBCampaign' ? 'WB|FBCampaign' : '' }}>
-                                            <label for="lead_source_FBCampaign"
-                                                class="custom-control-label">WB|FBCampaign</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header">
                                 <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
@@ -162,30 +158,30 @@
                                 class="accordion-collapse collapse {{ isset($filter_params['lead_status']) ? 'show' : '' }}"
                                 data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
-                                    <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio" id="lead_status_active_radio"
-                                            name="lead_status" value="Active"
-                                            {{ isset($filter_params['lead_status']) && $filter_params['lead_status'] == 'Active' ? 'checked' : '' }}>
-                                        <label for="lead_status_active_radio" class="custom-control-label">Active</label>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_status_active_checkbox"
+                                            name="lead_status[]" value="Active"
+                                            {{ isset($filter_params['lead_status']) && in_array('Active', $filter_params['lead_status']) ? 'checked' : '' }}>
+                                        <label for="lead_status_active_checkbox" class="custom-control-label">Active</label>
                                     </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio" id="lead_status_hot_radio"
-                                            name="lead_status" value="Hot"
-                                            {{ isset($filter_params['lead_status']) && $filter_params['lead_status'] == 'Hot' ? 'checked' : '' }}>
-                                        <label for="lead_status_hot_radio" class="custom-control-label">Hot</label>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_status_hot_checkbox"
+                                            name="lead_status[]" value="Hot"
+                                            {{ isset($filter_params['lead_status']) && in_array('Hot', $filter_params['lead_status']) ? 'checked' : '' }}>
+                                        <label for="lead_status_hot_checkbox" class="custom-control-label">Hot</label>
                                     </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio"
-                                            id="lead_status_super_hot_radio" name="lead_status" value="Super Hot"
-                                            {{ isset($filter_params['lead_status']) && $filter_params['lead_status'] == 'Super Hot' ? 'checked' : '' }}>
-                                        <label for="lead_status_super_hot_radio" class="custom-control-label">Super
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_status_super_hot_checkbox" name="lead_status[]" value="Super Hot"
+                                            {{ isset($filter_params['lead_status']) && in_array('Super Hot', $filter_params['lead_status']) ? 'checked' : '' }}>
+                                        <label for="lead_status_super_hot_checkbox" class="custom-control-label">Super
                                             Hot</label>
                                     </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio"
-                                            id="lead_status_done_radio" name="lead_status" value="Done"
-                                            {{ isset($filter_params['lead_status']) && $filter_params['lead_status'] == 'Done' ? 'checked' : '' }}>
-                                        <label for="lead_status_done_radio" class="custom-control-label">Done</label>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_status_done_checkbox"
+                                            name="lead_status[]" value="Done"
+                                            {{ isset($filter_params['lead_status']) && in_array('Done', $filter_params['lead_status']) ? 'checked' : '' }}>
+                                        <label for="lead_status_done_checkbox" class="custom-control-label">Done</label>
                                     </div>
                                 </div>
                             </div>
@@ -330,12 +326,13 @@
             console.log(selectedValues);
             let phonenum = document.getElementById('phone_inp_id_m');
             phonenum.value = selectedValues;
-            if(selectedValues.length > 0){
+            if (selectedValues.length > 0) {
                 manageWhatsappChatModal.show();
-            }else{
+            } else {
                 toastr.info("Select the lead's which you want to send messages.");
             }
         }
+
         function handle_whatsapp_msg(id) {
             const elementToUpdate = document.querySelector(`#what_id-${id}`);
             if (elementToUpdate) {
@@ -381,7 +378,10 @@
                         searchPlaceholder: "Type here to search..",
                         processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
                     },
-                    lengthMenu: [ [10, 25, 50, 100, 200, 500, 1000], [10, 25, 50, 100, 200, 500, 1000] ],
+                    lengthMenu: [
+                        [10, 25, 50, 100, 200, 500, 1000],
+                        [10, 25, 50, 100, 200, 500, 1000]
+                    ],
                     serverSide: true,
                     ajax: {
                         url: data_url,
@@ -459,35 +459,38 @@
                             data: "whatsapp_msg_time",
                         }
                     ],
-                    order : [
-                        [13, 'desc'],[3, 'desc']
+                    order: [
+                        [13, 'desc'],
+                        [3, 'desc']
                     ],
                     rowCallback: function(row, data, index) {
                         const td_elements = row.querySelectorAll('td');
-                        td_elements[0].innerHTML = `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data.enquiry_count}</span><br>
+                        td_elements[0].innerHTML =
+                            `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data.enquiry_count}</span><br>
                     <input type="checkbox" onchange="handle_select_single_lead(this)" class="forward_lead_checkbox" value="${data.lead_id}">`;
 
-                    td_elements[3].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
+                        td_elements[3].innerText = moment(data.lead_datetime).format(
+                            "DD-MMM-YYYY hh:mm a");
 
-                    if (data.is_whatsapp_msg === 1) {
-                        td_elements[7].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
-                    } else {
-                        td_elements[7].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
-                    }
-                    if (data.service_status == 1) {
-                                td_elements[10].innerHTML =
-                                    `<span class="badge badge-success">Contacted</span>`;
-                            } else {
-                                td_elements[10].innerHTML =
-                                    `<span class="badge badge-danger">Not-Contacted</span>`;
-                            }
+                        if (data.is_whatsapp_msg === 1) {
+                            td_elements[7].innerHTML =
+                                `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
+                        } else {
+                            td_elements[7].innerHTML =
+                                `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
+                        }
+                        if (data.service_status == 1) {
+                            td_elements[10].innerHTML =
+                                `<span class="badge badge-success">Contacted</span>`;
+                        } else {
+                            td_elements[10].innerHTML =
+                                `<span class="badge badge-danger">Not-Contacted</span>`;
+                        }
                         const action_btns =
-                        `<a href="{{ route('admin.bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
+                            `<a href="{{ route('admin.bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                         <a href="{{ route('admin.bdm.lead.delete') }}/${data.lead_id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>`;
-                    td_elements[13].classList.add('text-nowrap');
-                    td_elements[13].innerHTML = action_btns;
+                        td_elements[13].classList.add('text-nowrap');
+                        td_elements[13].innerHTML = action_btns;
                     }
                 });
             } else {
@@ -499,14 +502,24 @@
                         search: "_INPUT_", // Removes the 'Search' field label
                         searchPlaceholder: "Type here to search..", // Placeholder for the search box
                     },
-                    lengthMenu: [ [10, 25, 50, 100, 200, 500, 1000], [10, 25, 50, 100, 200, 500, 1000] ],
+                    lengthMenu: [
+                        [10, 25, 50, 100, 200, 500, 1000],
+                        [10, 25, 50, 100, 200, 500, 1000]
+                    ],
                     serverSide: true,
                     ajax: {
                         url: "{{ route('admin.bdm.lead.list.ajax') }}",
                         data: function(d) {
-                            var formData = $('#filters-form').serializeArray();
+                            let formData = $('#filters-form').serializeArray();
                             formData.forEach(function(item) {
-                                d[item.name] = item.value;
+                                if (item.name.endsWith('[]')) {
+                                    if (!d[item.name]) {
+                                        d[item.name] = [];
+                                    }
+                                    d[item.name].push(item.value);
+                                } else {
+                                    d[item.name] = item.value;
+                                }
                             });
                         },
                     },
@@ -583,35 +596,38 @@
                             data: "whatsapp_msg_time",
                         }
                     ],
-                    order : [
-                        [13, 'desc'],[3, 'desc']
+                    order: [
+                        [13, 'desc'],
+                        [3, 'desc']
                     ],
                     rowCallback: function(row, data, index) {
                         const td_elements = row.querySelectorAll('td');
-                        td_elements[0].innerHTML = `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data.enquiry_count}</span><br>
+                        td_elements[0].innerHTML =
+                            `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data.enquiry_count}</span><br>
                     <input type="checkbox" onchange="handle_select_single_lead(this)" class="forward_lead_checkbox" value="${data.lead_id}">`;
 
-                    td_elements[3].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
+                        td_elements[3].innerText = moment(data.lead_datetime).format(
+                            "DD-MMM-YYYY hh:mm a");
 
-                    if (data.is_whatsapp_msg === 1) {
-                        td_elements[7].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
-                    } else {
-                        td_elements[7].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
-                    }
-                    if (data.service_status == 1) {
-                                td_elements[10].innerHTML =
-                                    `<span class="badge badge-success">Contacted</span>`;
-                            } else {
-                                td_elements[10].innerHTML =
-                                    `<span class="badge badge-danger">Not-Contacted</span>`;
-                            }
-                            const action_btns =
-                        `<a href="{{ route('admin.bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
+                        if (data.is_whatsapp_msg === 1) {
+                            td_elements[7].innerHTML =
+                                `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
+                        } else {
+                            td_elements[7].innerHTML =
+                                `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
+                        }
+                        if (data.service_status == 1) {
+                            td_elements[10].innerHTML =
+                                `<span class="badge badge-success">Contacted</span>`;
+                        } else {
+                            td_elements[10].innerHTML =
+                                `<span class="badge badge-danger">Not-Contacted</span>`;
+                        }
+                        const action_btns =
+                            `<a href="{{ route('admin.bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                         <a href="{{ route('admin.bdm.lead.delete') }}/${data.lead_id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>`;
-                    td_elements[13].classList.add('text-nowrap');
-                    td_elements[13].innerHTML = action_btns;
+                        td_elements[13].classList.add('text-nowrap');
+                        td_elements[13].innerHTML = action_btns;
                     }
                 });
             }
@@ -650,6 +666,7 @@
         function handle_view_lead(lead_id) {
             window.open(`{{ route('admin.bdm.lead.view') }}/${lead_id}`);
         }
+
         function handle_forward_leads_to_bdm(elem) {
             var selectedValues = [];
             $('.forward_lead_checkbox:checked').each(function() {

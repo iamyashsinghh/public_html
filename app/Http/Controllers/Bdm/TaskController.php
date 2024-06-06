@@ -54,14 +54,33 @@ class TaskController extends Controller {
         ->where(['bdm_tasks.created_by' => $auth_user->id, 'bdm_tasks.deleted_at' => null]);
 
         $current_date = date('Y-m-d');
-        if ($request->task_status == "Upcoming") {
-            $tasks->where('bdm_tasks.task_schedule_datetime', '>', Carbon::today()->endOfDay());
-        } elseif ($request->task_status == "Today") {
-            $tasks->where('bdm_tasks.task_schedule_datetime', 'like', "%$current_date%");
-        } elseif ($request->task_status == "Overdue") {
-            $tasks->where('bdm_tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('bdm_tasks.done_datetime');
-        } elseif ($request->task_status == "Done") {
-            $tasks->whereNotNull('bdm_tasks.done_datetime');
+
+        if ($request->has('task_status')) {
+            $tasks->where(function ($query) use ($request) {
+                foreach ($request->task_status as $status) {
+                    switch ($status) {
+                        case 'Upcoming':
+                            $query->orWhere(function ($q) {
+                                $q->where('bdm_tasks.task_schedule_datetime', '>', Carbon::today()->endOfDay());
+                            });
+                            break;
+                        case 'Today':
+                            $current_date = date('Y-m-d');
+                            $query->orWhere(function ($q) use ($current_date) {
+                                $q->where('bdm_tasks.task_schedule_datetime', 'like', "%$current_date%");
+                            });
+                            break;
+                        case 'Overdue':
+                            $query->orWhere(function ($q) {
+                                $q->where('bdm_tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('bdm_tasks.done_datetime');
+                            });
+                            break;
+                        case 'Done':
+                            $query->orWhereNotNull('bdm_tasks.done_datetime');
+                            break;
+                    }
+                }
+            });
         }
         if ($request->task_created_from_date) {
             $from = Carbon::make($request->task_created_from_date);
@@ -142,7 +161,7 @@ class TaskController extends Controller {
         $getBdmLead = BdmLead::select('lead_id', 'read_status')->where('lead_id', $request->lead_id)->first();
         $getBdmLead->read_status = true;
         $getBdmLead->save();
-        
+
         $task = new BdmTask();
         $task->lead_id = $request->lead_id;
         $task->created_by = $auth_user->id;

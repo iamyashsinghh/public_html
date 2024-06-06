@@ -139,7 +139,7 @@ class NvLeadController extends Controller
         }
 
         if ($request->team_members != null) {
-            $leads->where('nvrm_lf.forward_to', $request->team_members);
+            $leads->whereIn('nvrm_lf.forward_to', $request->team_members);
         }
 
         // $leads->orderBy('nv_leads.lead_datetime', 'desc');

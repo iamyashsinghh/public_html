@@ -19,7 +19,7 @@ class GoogleSheetController extends Controller
         $service = new Sheets($client);
 
         $spreadsheetId = '1sX5LdXiLjwMftTRnrS2dSkpY3xhTi62XwqG71Dh8zmA';
-        $range = 'Sheet1!A1:Z100000';
+        $range = 'Sheet1!A1:R1000';
 
         try {
             $response = $service->spreadsheets_values->get($spreadsheetId, $range);

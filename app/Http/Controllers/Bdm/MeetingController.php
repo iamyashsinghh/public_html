@@ -54,16 +54,33 @@ class MeetingController extends Controller
         ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat')
         ->where(['bdm_meetings.created_by' => $auth_user->id, 'bdm_meetings.deleted_at' => null]);
 
-        $current_date = date('Y-m-d');
-        if ($request->meeting_status == "Upcoming") {
-            $meetings->where('bdm_meetings.meeting_schedule_datetime', '>', Carbon::today()->endOfDay());
-        } elseif ($request->meeting_status == "Today") {
-            $meetings->where('bdm_meetings.meeting_schedule_datetime', 'like', "%$current_date%");
-        } elseif ($request->meeting_status == "Overdue") {
-            $meetings->where('bdm_meetings.meeting_schedule_datetime', '<', Carbon::today())->whereNull('bdm_meetings.done_datetime');
-            // return $meetings->toSql();
-        } elseif ($request->meeting_status == "Done") {
-            $meetings->whereNotNull('bdm_meetings.done_datetime');
+
+        if ($request->has('meeting_status')) {
+            $meetings->where(function ($query) use ($request) {
+                foreach ($request->meeting_status as $status) {
+                    switch ($status) {
+                        case 'Upcoming':
+                            $query->orWhere(function ($q) {
+                                $q->where('bdm_meetings.meeting_schedule_datetime', '>', Carbon::today()->endOfDay());
+                            });
+                            break;
+                        case 'Today':
+                            $current_date = date('Y-m-d');
+                            $query->orWhere(function ($q) use ($current_date) {
+                                $q->where('bdm_meetings.meeting_schedule_datetime', 'like', "%$current_date%");
+                            });
+                            break;
+                        case 'Overdue':
+                            $query->orWhere(function ($q) {
+                                $q->where('bdm_meetings.meeting_schedule_datetime', '<', Carbon::today())->whereNull('bdm_meetings.done_datetime');
+                            });
+                            break;
+                        case 'Done':
+                            $query->orWhereNotNull('bdm_meetings.done_datetime');
+                            break;
+                    }
+                }
+            });
         }
         if ($request->meeting_created_from_date) {
             $from = Carbon::make($request->meeting_created_from_date);

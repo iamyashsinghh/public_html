@@ -88,15 +88,15 @@ class BdmLeadController extends Controller
             $leads->where('bdm_leads.deleted_at', null);
 
             if ($request->has('lead_status') && $request->lead_status != '') {
-                $leads->where('bdm_leads.lead_status', $request->lead_status);
+                $leads->whereIn('bdm_leads.lead_status', $request->lead_status);
             }
 
             if ($request->has('business_cat') && $request->business_cat != '') {
-                $leads->where('bdm_leads.business_cat', $request->business_cat);
+                $leads->whereIn('bdm_leads.business_cat', $request->business_cat);
             }
 
             if ($request->has('lead_source') && $request->lead_source != '') {
-                $leads->where('bdm_leads.source', $request->lead_source);
+                $leads->whereIn('bdm_leads.source', $request->lead_source);
             }
 
             if ($request->has('lead_from_date') && $request->lead_from_date != '') {
@@ -124,7 +124,7 @@ class BdmLeadController extends Controller
             }
 
             if ($request->team_members != null) {
-                $leads->where('bdm_leads.assign_id', $request->team_members);
+                $leads->whereIn('bdm_leads.assign_id', $request->team_members);
             }
         return datatables($leads)->toJson();
     }
