@@ -62,10 +62,10 @@ class BookingController extends Controller
             $booking->whereBetween('bdm_bookings.created_at', [$from, $to]);
         }
         if ($request->payment_method) {
-            $booking->where('bdm_bookings.payment_method' ,$request->payment_method);
+            $booking->whereIn('bdm_bookings.payment_method' ,$request->payment_method);
         }
         if ($request->package_name) {
-            $booking->where('bdm_bookings.package_name' ,$request->package_name);
+            $booking->whereIn('bdm_bookings.package_name' ,$request->package_name);
         }
         $booking = $booking->get();
         return datatables($booking)->toJson();
