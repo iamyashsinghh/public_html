@@ -29,7 +29,7 @@ class LeadController extends Controller
 
     public function list(Request $request, $dashboard_filters = null)
     {
-        $getRm = TeamMember::select('id', 'name')->where('venue_name', 'RM >< Venue')->where('status', 1)->get();
+        $getRm = TeamMember::select('id', 'name')->where('role_id', '4')->get();
         $filter_params = "";
         if ($request->lead_read_status != null) {
             $filter_params = ['lead_read_status' => $request->lead_read_status];
@@ -98,7 +98,7 @@ class LeadController extends Controller
             $leads->where('leads.deleted_at', null)->groupBy('leads.mobile');
 
             if ($request->has('lead_status') && $request->lead_status != '') {
-                $leads->where('leads.lead_status', $request->lead_status);
+                $leads->whereIn('leads.lead_status', $request->lead_status);
             }
 
             if ($request->has('event_from_date') && $request->event_from_date != '') {
@@ -158,7 +158,7 @@ class LeadController extends Controller
             }
 
             if ($request->team_members != null) {
-                $leads->where('leads.assign_id', $request->team_members);
+                $leads->whereIn('leads.assign_id', $request->team_members);
             }
         } else {
             $leads = DB::table('lead_forwards as leads')->select(
@@ -173,7 +173,7 @@ class LeadController extends Controller
                 'ne.pax as pax',
             )->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'leads.lead_id')->where('leads.forward_to', $auth_user->id)->whereNull('leads.deleted_at')->groupBy('leads.lead_id');
             if ($request->has('lead_status') && $request->lead_status != '') {
-                $leads->where('leads.lead_status', $request->lead_status);
+                $leads->whereIn('leads.lead_status', $request->lead_status);
             }
             if ($request->pax_min_value != null) {
                 $min =  $request->pax_min_value;

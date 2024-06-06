@@ -59,7 +59,7 @@ class LeadController extends Controller
         }
 
         $rm_members = TeamMember::select('id', 'name')->where('role_id', 4)->orderBy('name', 'asc')->get();
-        $getRm = TeamMember::select('id', 'name')->where('venue_name', 'RM >< Venue')->get();
+        $getRm = TeamMember::select('id', 'name')->where('role_id', '4')->get();
         $page_heading = $filter_params ? "Leads - Filtered" : "Leads";
         $whatsapp_campaigns = WhatsappCampain::where('status', 1)->get();
         return view('admin.venueCrm.lead.list', compact('page_heading', 'filter_params', 'rm_members', 'getRm', 'whatsapp_campaigns'));

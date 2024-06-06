@@ -58,33 +58,32 @@
                         <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                             <tr>
                                 @if ($auth_user->role_id == 4)
-                                <th class="text-nowrap"> <input type="checkbox" id="select-all-checkbox"></th>
-                                <th class="text-nowrap">Lead ID</th>
-                                <th class="">Assigned Rm Name</th>
-                                <th class="text-nowrap">Lead Date</th>
-                                <th class="">Name</th>
-                                <th class="text-nowrap">Mobile</th>
-                                <th class="">Source</th>
-                                <th class="text-nowrap">Event Date</th>
-                                <th class="">Service Status</th>
-                                <th class="">Catagory</th>
-                                <th class="">Preference</th>
-                                <th class="">Locality</th>
-                                <th class="">Created or Done By</th>
-                                <th class="">Last Forwarded By</th>
-                                <th class="text-nowrap">Lead Status</th>
-                                <th class="">Action</th>
-
+                                    <th class="text-nowrap"> <input type="checkbox" id="select-all-checkbox"></th>
+                                    <th class="text-nowrap">Lead ID</th>
+                                    <th class="">Assigned Rm Name</th>
+                                    <th class="text-nowrap">Lead Date</th>
+                                    <th class="">Name</th>
+                                    <th class="text-nowrap">Mobile</th>
+                                    <th class="">Source</th>
+                                    <th class="text-nowrap">Event Date</th>
+                                    <th class="">Service Status</th>
+                                    <th class="">Catagory</th>
+                                    <th class="">Preference</th>
+                                    <th class="">Locality</th>
+                                    <th class="">Created or Done By</th>
+                                    <th class="">Last Forwarded By</th>
+                                    <th class="text-nowrap">Lead Status</th>
+                                    <th class="">Action</th>
                                 @endif
                                 @if ($auth_user->role_id == 5)
-                                <th class="text-nowrap"> <input type="checkbox" id="select-all-checkbox"></th>
-                                <th class="text-nowrap">Lead ID</th>
-                                <th class="text-nowrap">Lead Date</th>
-                                <th class="">Name</th>
-                                <th class="text-nowrap">Mobile</th>
-                                <th class="text-nowrap">Event Date</th>
-                                <th class="text-nowrap">Lead Status</th>
-                                <th class="">Service Status</th>
+                                    <th class="text-nowrap"> <input type="checkbox" id="select-all-checkbox"></th>
+                                    <th class="text-nowrap">Lead ID</th>
+                                    <th class="text-nowrap">Lead Date</th>
+                                    <th class="">Name</th>
+                                    <th class="text-nowrap">Mobile</th>
+                                    <th class="text-nowrap">Event Date</th>
+                                    <th class="text-nowrap">Lead Status</th>
+                                    <th class="">Service Status</th>
                                 @endif
                             </tr>
                         </thead>
@@ -145,11 +144,11 @@
                                     data-bs-parent="#accordionExample">
                                     <div class="accordion-body pl-2 pb-4">
                                         @foreach ($getRm as $rm)
-                                            <div class="custom-control custom-radio my-1">
-                                                <input class="custom-control-input" type="radio"
-                                                    id="team_member_{{ $rm->id }}" name="team_members"
+                                            <div class="custom-control custom-checkbox my-1">
+                                                <input class="custom-control-input" type="checkbox"
+                                                    id="team_member_{{ $rm->id }}" name="team_members[]"
                                                     value="{{ $rm->id }}"
-                                                    {{ isset($filter_params['team_members']) && $filter_params['team_members'] == $rm->id ? 'checked' : '' }}>
+                                                    {{ isset($filter_params['team_members']) && in_array($rm->id, $filter_params['team_members']) ? 'checked' : '' }}>
                                                 <label for="team_member_{{ $rm->id }}"
                                                     class="custom-control-label">{{ $rm->name }}</label>
                                             </div>
@@ -168,24 +167,31 @@
                                 class="accordion-collapse collapse {{ isset($filter_params['lead_status']) ? 'show' : '' }}"
                                 data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
-                                    <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio" id="lead_status_active_radio"
-                                            name="lead_status" value="Active"
-                                            {{ isset($filter_params['lead_status']) && $filter_params['lead_status'] == 'Active' ? 'checked' : '' }}>
-                                        <label for="lead_status_active_radio" class="custom-control-label">Active</label>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_status_active_checkbox" name="lead_status[]" value="Active"
+                                            {{ isset($filter_params['lead_status']) && in_array('Active', $filter_params['lead_status']) ? 'checked' : '' }}>
+                                        <label for="lead_status_active_checkbox"
+                                            class="custom-control-label">Active</label>
                                     </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio" id="lead_status_hot_radio"
-                                            name="lead_status" value="Hot"
-                                            {{ isset($filter_params['lead_status']) && $filter_params['lead_status'] == 'Hot' ? 'checked' : '' }}>
-                                        <label for="lead_status_hot_radio" class="custom-control-label">Hot</label>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_status_hot_checkbox"
+                                            name="lead_status[]" value="Hot"
+                                            {{ isset($filter_params['lead_status']) && in_array('Hot', $filter_params['lead_status']) ? 'checked' : '' }}>
+                                        <label for="lead_status_hot_checkbox" class="custom-control-label">Hot</label>
                                     </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input class="custom-control-input" type="radio"
-                                            id="lead_status_super_hot_radio" name="lead_status" value="Super Hot"
-                                            {{ isset($filter_params['lead_status']) && $filter_params['lead_status'] == 'Super Hot' ? 'checked' : '' }}>
-                                        <label for="lead_status_super_hot_radio" class="custom-control-label">Super
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_status_super_hot_checkbox" name="lead_status[]" value="Super Hot"
+                                            {{ isset($filter_params['lead_status']) && in_array('Super Hot', $filter_params['lead_status']) ? 'checked' : '' }}>
+                                        <label for="lead_status_super_hot_checkbox" class="custom-control-label">Super
                                             Hot</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_status_done_checkbox" name="lead_status[]" value="Done"
+                                            {{ isset($filter_params['lead_status']) && in_array('Done', $filter_params['lead_status']) ? 'checked' : '' }}>
+                                        <label for="lead_status_done_checkbox" class="custom-control-label">Done</label>
                                     </div>
                                 </div>
                             </div>
@@ -272,17 +278,25 @@
                         @endif
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse55" aria-expanded="true" aria-controls="collapse55">Pax</button>
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse55"
+                                    aria-expanded="true" aria-controls="collapse55">Pax</button>
                             </h2>
-                            <div id="collapse55" class="accordion-collapse collapse {{isset($filter_params['pax_min_value']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
+                            <div id="collapse55"
+                                class="accordion-collapse collapse {{ isset($filter_params['pax_min_value']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
                                     <div class="form-group">
                                         <label for="pax_min_value">MIN</label>
-                                        <input type="text" class="form-control" id="pax_min_value" name="pax_min_value" value="{{isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : ''}}">
+                                        <input type="text" class="form-control" id="pax_min_value"
+                                            name="pax_min_value"
+                                            value="{{ isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : '' }}">
                                     </div>
                                     <div class="form-group">
                                         <label for="pax_max_value">MAX</label>
-                                        <input type="text" class="form-control" id="pax_max_value" name="pax_max_value" value="{{isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : ''}}">
+                                        <input type="text" class="form-control" id="pax_max_value"
+                                            name="pax_max_value"
+                                            value="{{ isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : '' }}">
                                     </div>
                                 </div>
                             </div>
@@ -417,51 +431,56 @@
         var isUserRole4 = @json($auth_user->role_id == 4);
         var dashfilters = @json($dashfilters);
         const data_url = `{{ route('team.lead.list.ajax') }}?{!! $filter !!}`;
-        if(isUserRole4){
+        if (isUserRole4) {
             var roleID = @json($auth_user->role_id);
-        var columnsConfig = [null, null, null, null, null, null, null, null, null, null, null, null, null, null,];
-        if(roleID == 4) {
-            orderConfig = [[14, 'desc']];
-        columnsConfig.push({target: 14, data: 17 });
-        }
+            var columnsConfig = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, ];
+            if (roleID == 4) {
+                orderConfig = [
+                    [14, 'desc']
+                ];
+                columnsConfig.push({
+                    target: 14,
+                    data: 17
+                });
+            }
             $(document).ready(function() {
-            var dataTable;
-            if (dashfilters) {
-                $('#serverTable').DataTable({
-                    pageLength: 10,
-                    processing: true,
-                    loading: true,
-                    language: {
-                        search: "_INPUT_", // Removes the 'Search' field label
-                        searchPlaceholder: "Type here to search..", // Placeholder for the search box
-                        // processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
-                    },
-                    serverSide: true,
-                    ajax: {
-                        url: data_url,
-                    },
-                    columns: columnsConfig,
-                    order: orderConfig,
-                    columnDefs: [{
-                        targets: 0,
-                        orderable: false
-                    },{
-                        targets: 15,
-                        orderable: false
-                    },
-                ],
-                    rowCallback: function(row, data, index) {
-                        const td_elements = row.querySelectorAll('td');
-                        if (isUserRole4) {
-                            td_elements[0].innerHTML =
-                                `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data[16]}</span><br/><input type="checkbox" class="forward_lead_checkbox" value="${data[3]}">`
-                        } else {
-                            td_elements[0].innerHTML =
-                                `<input type="checkbox" class="forward_lead_checkbox" value="">`;
-                        }
+                var dataTable;
+                if (dashfilters) {
+                    $('#serverTable').DataTable({
+                        pageLength: 10,
+                        processing: true,
+                        loading: true,
+                        language: {
+                            search: "_INPUT_", // Removes the 'Search' field label
+                            searchPlaceholder: "Type here to search..", // Placeholder for the search box
+                            // processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
+                        },
+                        serverSide: true,
+                        ajax: {
+                            url: data_url,
+                        },
+                        columns: columnsConfig,
+                        order: orderConfig,
+                        columnDefs: [{
+                            targets: 0,
+                            orderable: false
+                        }, {
+                            targets: 15,
+                            orderable: false
+                        }, ],
+                        rowCallback: function(row, data, index) {
+                            const td_elements = row.querySelectorAll('td');
+                            if (isUserRole4) {
+                                td_elements[0].innerHTML =
+                                    `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data[16]}</span><br/><input type="checkbox" class="forward_lead_checkbox" value="${data[3]}">`
+                            } else {
+                                td_elements[0].innerHTML =
+                                    `<input type="checkbox" class="forward_lead_checkbox" value="">`;
+                            }
 
                             td_elements[1].innerText = data[0];
-                            td_elements[3].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a")?? 'N/A';
+                            td_elements[3].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a") ??
+                                'N/A';
                             td_elements[4].innerText = data[2] ?? 'N/A';
                             td_elements[2].innerText = data[9] ? data[9] : 'N/A';
 
@@ -506,55 +525,63 @@
                                 `<button onclick="handle_get_forward_info(${data[0]})" class="btn mx-2 p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data[18]}</button>`
 
 
-                        for (let i = 1; i < 12; i++) {
-                            if (i !== 5 && td_elements[i]) {
-                                td_elements[i].style.cursor = "pointer";
-                                td_elements[i].setAttribute('onclick', `handle_view_lead(${data[0]})`);
+                            for (let i = 1; i < 12; i++) {
+                                if (i !== 5 && td_elements[i]) {
+                                    td_elements[i].style.cursor = "pointer";
+                                    td_elements[i].setAttribute('onclick',
+                                        `handle_view_lead(${data[0]})`);
+                                }
                             }
                         }
-                    }
-                });
-            } else {
-                dataTable = $('#serverTable').DataTable({
-                    pageLength: 10,
-                    processing: true,
-                    loading: true,
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Type here to search..",
-                    },
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('team.lead.list.ajax') }}",
-                        data: function(d) {
-                            var formData = $('#filters-form').serializeArray();
-                            formData.forEach(function(item) {
-                                d[item.name] = item.value;
-                            });
+                    });
+                } else {
+                    dataTable = $('#serverTable').DataTable({
+                        pageLength: 10,
+                        processing: true,
+                        loading: true,
+                        language: {
+                            search: "_INPUT_",
+                            searchPlaceholder: "Type here to search..",
                         },
-                    },
-                    columns: columnsConfig,
-                    order: orderConfig,
-                    columnDefs: [{
-                        targets: 0,
-                        orderable: false
-                    },{
-                        targets: 15,
-                        orderable: false
-                    },
-                ],
-                    rowCallback: function(row, data, index) {
-                        const td_elements = row.querySelectorAll('td');
-                        if (isUserRole4) {
-                            td_elements[0].innerHTML =
-                                `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data[16]}</span><br/><input type="checkbox" class="forward_lead_checkbox" value="${data[3]}">`
-                        } else {
-                            td_elements[0].innerHTML =
-                                `<input type="checkbox" class="forward_lead_checkbox" value="">`;
-                        }
+                        serverSide: true,
+                        ajax: {
+                            url: "{{ route('team.lead.list.ajax') }}",
+                            data: function(d) {
+                                let formData = $('#filters-form').serializeArray();
+                                formData.forEach(function(item) {
+                                    if (item.name.endsWith('[]')) {
+                                        if (!d[item.name]) {
+                                            d[item.name] = [];
+                                        }
+                                        d[item.name].push(item.value);
+                                    } else {
+                                        d[item.name] = item.value;
+                                    }
+                                });
+                            },
+                        },
+                        columns: columnsConfig,
+                        order: orderConfig,
+                        columnDefs: [{
+                            targets: 0,
+                            orderable: false
+                        }, {
+                            targets: 15,
+                            orderable: false
+                        }, ],
+                        rowCallback: function(row, data, index) {
+                            const td_elements = row.querySelectorAll('td');
+                            if (isUserRole4) {
+                                td_elements[0].innerHTML =
+                                    `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data[16]}</span><br/><input type="checkbox" class="forward_lead_checkbox" value="${data[3]}">`
+                            } else {
+                                td_elements[0].innerHTML =
+                                    `<input type="checkbox" class="forward_lead_checkbox" value="">`;
+                            }
 
                             td_elements[1].innerText = data[0];
-                            td_elements[3].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a")?? 'N/A';
+                            td_elements[3].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a") ??
+                                'N/A';
                             td_elements[4].innerText = data[2] ?? 'N/A';
                             td_elements[2].innerText = data[9] ? data[9] : 'N/A';
 
@@ -598,180 +625,128 @@
                                 `<button onclick="handle_get_forward_info(${data[0]})" class="btn mx-2 p-0 px-2 btn-info d-flex align-items-center" title="Forward info" style="column-gap: 5px;"><i class="fa fa-share-alt" style="font-size: 15px;"></i>${data[18] ? data[18] : 0}</button>`
 
 
-                        for (let i = 1; i < 12; i++) {
-                            if (i !== 5 && td_elements[i]) {
-                                td_elements[i].style.cursor = "pointer";
-                                td_elements[i].setAttribute('onclick', `handle_view_lead(${data[0]})`);
+                            for (let i = 1; i < 12; i++) {
+                                if (i !== 5 && td_elements[i]) {
+                                    td_elements[i].style.cursor = "pointer";
+                                    td_elements[i].setAttribute('onclick',
+                                        `handle_view_lead(${data[0]})`);
+                                }
                             }
                         }
-                    }
+                    });
+                }
+
+                $('#filters-form').on('submit', function(e) {
+                    e.preventDefault();
+                    dataTable.ajax.reload();
+                    document.querySelector('[data-widget="control-sidebar"]').click();
                 });
+            });
+
+            $('#select-all-checkbox').on('change', function() {
+                var isChecked = $(this).prop('checked');
+                $('.forward_lead_checkbox').prop('checked', isChecked);
+            });
+            $('.forward_lead_checkbox').on('change', function() {
+                $('#select-all-checkbox').prop('checked', $('.forward_lead_checkbox:checked').length === $(
+                    '.forward_lead_checkbox').length);
+            });
+
+            function getSelectedCheckboxValues() {
+                const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg_multiple'));
+                var selectedValues = [];
+                $('.forward_lead_checkbox:checked').each(function() {
+                    selectedValues.push($(this).val());
+                });
+                console.log(selectedValues);
+                let phonenum = document.getElementById('phone_inp_id_m');
+                phonenum.value = selectedValues;
+                if (selectedValues.length > 0) {
+                    manageWhatsappChatModal.show();
+                } else {
+                    toastr.info("Select the lead's which you want to send messages.");
+                }
             }
 
-            $('#filters-form').on('submit', function(e) {
-                e.preventDefault();
-                dataTable.ajax.reload();
-                document.querySelector('[data-widget="control-sidebar"]').click();
-            });
-        });
-
-        $('#select-all-checkbox').on('change', function() {
-            var isChecked = $(this).prop('checked');
-            $('.forward_lead_checkbox').prop('checked', isChecked);
-        });
-        $('.forward_lead_checkbox').on('change', function() {
-            $('#select-all-checkbox').prop('checked', $('.forward_lead_checkbox:checked').length === $(
-                '.forward_lead_checkbox').length);
-        });
-
-        function getSelectedCheckboxValues() {
-            const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg_multiple'));
-            var selectedValues = [];
-            $('.forward_lead_checkbox:checked').each(function() {
-                selectedValues.push($(this).val());
-            });
-            console.log(selectedValues);
-            let phonenum = document.getElementById('phone_inp_id_m');
-            phonenum.value = selectedValues;
-            if (selectedValues.length > 0) {
-                manageWhatsappChatModal.show();
-            } else {
-                toastr.info("Select the lead's which you want to send messages.");
+            function handle_view_lead(lead_id) {
+                window.open(`{{ route('team.lead.view') }}/${lead_id}`);
             }
-        }
 
-        function handle_view_lead(lead_id) {
-            window.open(`{{ route('team.lead.view') }}/${lead_id}`);
-        }
-
-        function handle_get_forward_info(lead_id) {
-            fetch(`{{ route('team.lead.getForwardInfo') }}/${lead_id}`).then(response => response.json()).then(data => {
-                const forward_info_table_body = document.getElementById('forward_info_table_body');
-                const modal = new bootstrap.Modal("#leadForwardedMemberInfo")
-                forward_info_table_body.innerHTML = "";
-                if (data.success == true) {
-                    last_forwarded_info_paragraph.innerText = data.last_forwarded_info;
-                    if (data.lead_forwards.length > 0) {
-                        let i = 1;
-                        for(let item of data.lead_forwards){
-                       let updated_at = moment(item.updated_at).format("DD-MMM-YYYY hh:mm a")
-                        let tr = document.createElement('tr');
-                        let tds = `<td>${i}</td>
+            function handle_get_forward_info(lead_id) {
+                fetch(`{{ route('team.lead.getForwardInfo') }}/${lead_id}`).then(response => response.json()).then(
+                    data => {
+                        const forward_info_table_body = document.getElementById('forward_info_table_body');
+                        const modal = new bootstrap.Modal("#leadForwardedMemberInfo")
+                        forward_info_table_body.innerHTML = "";
+                        if (data.success == true) {
+                            last_forwarded_info_paragraph.innerText = data.last_forwarded_info;
+                            if (data.lead_forwards.length > 0) {
+                                let i = 1;
+                                for (let item of data.lead_forwards) {
+                                    let updated_at = moment(item.updated_at).format("DD-MMM-YYYY hh:mm a")
+                                    let tr = document.createElement('tr');
+                                    let tds =
+                                        `<td>${i}</td>
                         <td>${updated_at}</td>
                         <td>${item.from_name}</td>
                         <td>${item.to_name}</td>
                         <td>${item.venue_name}</td>
                         <td><span class="badge badge-${item.read_status == 0 ? 'danger' : 'success'}">${item.read_status == 0 ? 'Unread': 'Read'}</span></td>`;
-                        tr.innerHTML = tds;
-                        forward_info_table_body.appendChild(tr);
-                        i++;
-                    }
-                    } else {
-                        forward_info_table_body.innerHTML = `<tr>
+                                    tr.innerHTML = tds;
+                                    forward_info_table_body.appendChild(tr);
+                                    i++;
+                                }
+                            } else {
+                                forward_info_table_body.innerHTML = `<tr>
                         <td colspan="5">No data available in table</td>
                     </tr>`
-                    }
-                    modal.show();
-                } else {
-                    toastr[data.alert_type](data.message);
-                }
-            })
-        }
-        }else{
+                            }
+                            modal.show();
+                        } else {
+                            toastr[data.alert_type](data.message);
+                        }
+                    })
+            }
+        } else {
+
+
 
             // vm start
             $(document).ready(function() {
-            var dataTable;
-            if (dashfilters) {
-                $('#serverTable').DataTable({
-                    pageLength: 10,
-                    processing: true,
-                    loading: true,
-                    language: {
-                        search: "_INPUT_", // Removes the 'Search' field label
-                        searchPlaceholder: "Type here to search..", // Placeholder for the search box
-                        // processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
-                    },
-                    serverSide: true,
-                    ajax: {
-                        url: data_url,
-                    },
-                    order: [
-                        [1, 'desc']
-                    ],
-                    columnDefs: [{
-                        targets: 0,
-                        orderable: false
-                    }],
-                    rowCallback: function(row, data, index) {
-                        const td_elements = row.querySelectorAll('td');
-
-                            td_elements[0].innerHTML =
-                                `<input type="checkbox" class="forward_lead_checkbox" value="">`;
-
-                            td_elements[1].innerText = data[0];
-                        td_elements[3].innerText = data[2] ?? 'N/A';
-                            td_elements[2].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a");
-                            td_elements[4].innerText = data[3];
-                            td_elements[5].innerText = data[4] ? moment(data[4]).format("DD-MMM-YYYY") : 'N/A';
-                            if (data[6] == 1) {
-                                td_elements[7].innerHTML =
-                                    `<span class="badge badge-success">Contacted</span>`;
-                            } else {
-                                td_elements[7].innerHTML =
-                                    `<span class="badge badge-danger">Not-Contacted</span>`;
-                            }
-                            td_elements[6].innerText = data[5];
-                            if (data[7] == 1) {
-                                row.style.background = "#3636361f";
-                            }
-
-                        for (let i = 1; i < 7; i++) {
-                            if (i !== 4 && td_elements[i]) {
-                                td_elements[i].style.cursor = "pointer";
-                                td_elements[i].setAttribute('onclick', `handle_view_lead(${data[0]})`);
-                            }
-                        }
-                    }
-                });
-            } else {
-                dataTable = $('#serverTable').DataTable({
-                    pageLength: 10,
-                    processing: true,
-                    loading: true,
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Type here to search..",
-                    },
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('team.lead.list.ajax') }}",
-                        data: function(d) {
-                            var formData = $('#filters-form').serializeArray();
-                            formData.forEach(function(item) {
-                                d[item.name] = item.value;
-                            });
+                var dataTable;
+                if (dashfilters) {
+                    $('#serverTable').DataTable({
+                        pageLength: 10,
+                        processing: true,
+                        loading: true,
+                        language: {
+                            search: "_INPUT_", // Removes the 'Search' field label
+                            searchPlaceholder: "Type here to search..", // Placeholder for the search box
+                            // processing: `<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>`, // loader
                         },
-                    },
-                    order: [
-                        [1, 'desc']
-                    ],
-                    columnDefs: [{
-
-                        targets: 0,
-                        orderable: false
-                    }],
-                    rowCallback: function(row, data, index) {
-                        const td_elements = row.querySelectorAll('td');
+                        serverSide: true,
+                        ajax: {
+                            url: data_url,
+                        },
+                        order: [
+                            [1, 'desc']
+                        ],
+                        columnDefs: [{
+                            targets: 0,
+                            orderable: false
+                        }],
+                        rowCallback: function(row, data, index) {
+                            const td_elements = row.querySelectorAll('td');
 
                             td_elements[0].innerHTML =
                                 `<input type="checkbox" class="forward_lead_checkbox" value="">`;
 
                             td_elements[1].innerText = data[0];
-                        td_elements[3].innerText = data[2] ?? 'N/A';
+                            td_elements[3].innerText = data[2] ?? 'N/A';
                             td_elements[2].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a");
                             td_elements[4].innerText = data[3];
-                            td_elements[5].innerText = data[4] ? moment(data[4]).format("DD-MMM-YYYY") : 'N/A';
+                            td_elements[5].innerText = data[4] ? moment(data[4]).format("DD-MMM-YYYY") :
+                                'N/A';
                             if (data[6] == 1) {
                                 td_elements[7].innerHTML =
                                     `<span class="badge badge-success">Contacted</span>`;
@@ -784,30 +759,98 @@
                                 row.style.background = "#3636361f";
                             }
 
-                        for (let i = 1; i < 7; i++) {
+                            for (let i = 1; i < 7; i++) {
+                                if (i !== 4 && td_elements[i]) {
+                                    td_elements[i].style.cursor = "pointer";
+                                    td_elements[i].setAttribute('onclick',
+                                        `handle_view_lead(${data[0]})`);
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    dataTable = $('#serverTable').DataTable({
+                        pageLength: 10,
+                        processing: true,
+                        loading: true,
+                        language: {
+                            search: "_INPUT_",
+                            searchPlaceholder: "Type here to search..",
+                        },
+                        serverSide: true,
+                        ajax: {
+                            url: "{{ route('team.lead.list.ajax') }}",
+                            data: function(d) {
+                                let formData = $('#filters-form').serializeArray();
+                                formData.forEach(function(item) {
+                                    if (item.name.endsWith('[]')) {
+                                        if (!d[item.name]) {
+                                            d[item.name] = [];
+                                        }
+                                        d[item.name].push(item.value);
+                                    } else {
+                                        d[item.name] = item.value;
+                                    }
+                                });
+                            },
+                        },
+                        order: [
+                            [1, 'desc']
+                        ],
+                        columnDefs: [{
+
+                            targets: 0,
+                            orderable: false
+                        }],
+                        rowCallback: function(row, data, index) {
+                            const td_elements = row.querySelectorAll('td');
+
+                            td_elements[0].innerHTML =
+                                `<input type="checkbox" class="forward_lead_checkbox" value="">`;
+
+                            td_elements[1].innerText = data[0];
+                            td_elements[3].innerText = data[2] ?? 'N/A';
+                            td_elements[2].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a");
+                            td_elements[4].innerText = data[3];
+                            td_elements[5].innerText = data[4] ? moment(data[4]).format("DD-MMM-YYYY") :
+                                'N/A';
+                            if (data[6] == 1) {
+                                td_elements[7].innerHTML =
+                                    `<span class="badge badge-success">Contacted</span>`;
+                            } else {
+                                td_elements[7].innerHTML =
+                                    `<span class="badge badge-danger">Not-Contacted</span>`;
+                            }
+                            td_elements[6].innerText = data[5];
+                            if (data[7] == 1) {
+                                row.style.background = "#3636361f";
+                            }
+
+                            for (let i = 1; i < 7; i++) {
                                 td_elements[i].style.cursor = "pointer";
                                 td_elements[i].setAttribute('onclick', `handle_view_lead(${data[0]})`);
+                            }
                         }
-                    }
+                    });
+                }
+                $('#filters-form').on('submit', function(e) {
+                    e.preventDefault();
+                    dataTable.ajax.reload();
+                    document.querySelector('[data-widget="control-sidebar"]').click();
                 });
-            }
-            $('#filters-form').on('submit', function(e) {
-                e.preventDefault();
-                dataTable.ajax.reload();
-                document.querySelector('[data-widget="control-sidebar"]').click();
             });
-        });
-        $('#select-all-checkbox').on('change', function() {
-            var isChecked = $(this).prop('checked');
-            $('.forward_lead_checkbox').prop('checked', isChecked);
-        });
-        $('.forward_lead_checkbox').on('change', function() {
-            $('#select-all-checkbox').prop('checked', $('.forward_lead_checkbox:checked').length === $(
-                '.forward_lead_checkbox').length);
-        });
-        function handle_view_lead(lead_id) {
-            window.open(`{{ route('team.lead.view') }}/${lead_id}`);
-        }
+            $('#select-all-checkbox').on('change', function() {
+                var isChecked = $(this).prop('checked');
+                $('.forward_lead_checkbox').prop('checked', isChecked);
+            });
+            $('.forward_lead_checkbox').on('change', function() {
+                $('#select-all-checkbox').prop('checked', $('.forward_lead_checkbox:checked').length === $(
+                    '.forward_lead_checkbox').length);
+            });
+
+            function handle_view_lead(lead_id) {
+                window.open(`{{ route('team.lead.view') }}/${lead_id}`);
+            }
 
         }
     </script>
