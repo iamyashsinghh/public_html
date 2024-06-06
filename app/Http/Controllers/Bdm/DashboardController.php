@@ -31,22 +31,7 @@ class DashboardController extends Controller
         $currentDateEnd = Carbon::now()->endOfDay();
         $currentMonthStart = Carbon::now()->startOfMonth();
         $currentMonthEnd = Carbon::now()->endOfMonth();
-        $bdm_unfollowed_leads = BdmLead::query()
-        ->where('lead_status', '!=', 'Done')
-        ->whereNull('deleted_at')
-        ->whereExists(function ($query) use ($auth_user) {
-            $query->select(DB::raw(1))
-                  ->from('bdm_tasks')
-                  ->whereColumn('bdm_tasks.lead_id', 'bdm_leads.lead_id')
-                  ->whereNotNull('bdm_tasks.done_datetime')
-                  ->whereNull('bdm_tasks.deleted_at')
-                  ->where('bdm_tasks.created_by', $auth_user->id);
-        })
-        ->whereDoesntHave('get_tasks', function ($query) {
-            $query->whereNull('done_datetime');
-        })
-        ->distinct('lead_id')
-        ->count();
+
 
         $bdm_task_overdue_leads = BdmLead::join('bdm_tasks', 'bdm_leads.lead_id', '=', 'bdm_tasks.lead_id')
             ->where('bdm_leads.lead_status', '!=', 'Done')
@@ -110,11 +95,29 @@ class DashboardController extends Controller
         ->get(['bdm_bookings.*'])
         ->count();
 
-        $total_leads_received_this_month = BdmLead::where('lead_datetime', 'like', "%$current_month%")->where('assign_id', $auth_user->id)->count();
-        $total_leads_received_today = BdmLead::where('lead_datetime', 'like', "%$current_date%")->where('assign_id', $auth_user->id)->count();
-        $unread_leads_this_month = BdmLead::where('lead_datetime', 'like', "%$current_month%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
-        $unread_leads_today = BdmLead::where('lead_datetime', 'like', "%$current_date%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
-        $total_unread_leads_overdue = BdmLead::where('read_status', false)->where('assign_id', $auth_user->id)->count();
+        $start_date = '2024-06-06';
+        $total_leads_received_this_month = BdmLead::where('lead_datetime', 'like', "%$current_month%")->where('assign_id', $auth_user->id)->where('lead_datetime', '>=', $start_date)->count();
+        $total_leads_received_today = BdmLead::where('lead_datetime', 'like', "%$current_date%")->where('assign_id', $auth_user->id)->where('lead_datetime', '>=', $start_date)->count();
+        $unread_leads_this_month = BdmLead::where('lead_datetime', 'like', "%$current_month%")->where('read_status', false)->where('assign_id', $auth_user->id)->where('lead_datetime', '>=', $start_date)->count();
+        $unread_leads_today = BdmLead::where('lead_datetime', 'like', "%$current_date%")->where('read_status', false)->where('assign_id', $auth_user->id)->where('lead_datetime', '>=', $start_date)->count();
+        $total_unread_leads_overdue = BdmLead::where('read_status', false)->where('assign_id', $auth_user->id)->where('lead_datetime', '>=', $start_date)->count();
+        $bdm_unfollowed_leads = BdmLead::query()
+        ->where('lead_datetime', '>=', $start_date)
+        ->where('lead_status', '!=', 'Done')
+        ->whereNull('deleted_at')
+        ->whereExists(function ($query) use ($auth_user) {
+            $query->select(DB::raw(1))
+                  ->from('bdm_tasks')
+                  ->whereColumn('bdm_tasks.lead_id', 'bdm_leads.lead_id')
+                  ->whereNotNull('bdm_tasks.done_datetime')
+                  ->whereNull('bdm_tasks.deleted_at')
+                  ->where('bdm_tasks.created_by', $auth_user->id);
+        })
+        ->whereDoesntHave('get_tasks', function ($query) {
+            $query->whereNull('done_datetime');
+        })
+        ->distinct('lead_id')
+        ->count();
 
         $l = (int) $total_leads_received_this_month;
             $r = (int) $meeting_done_this_month;

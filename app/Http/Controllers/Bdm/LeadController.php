@@ -132,10 +132,11 @@ class LeadController extends Controller
                 $current_month = date('Y-m');
                 $current_date = date('Y-m-d');
                 $currentDateTime = Carbon::today();
+                $new_lead_start_date = '2024-06-06';
                 if ($request->dashboard_filters == "total_leads_received_this_month") {
-                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_month%")->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
+                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_month%")->where('bdm_leads.lead_datetime', '>=', $new_lead_start_date)->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
                 } elseif ($request->dashboard_filters == "total_leads_received_today") {
-                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_date%")->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
+                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_date%")->where('bdm_leads.lead_datetime', '>=', $new_lead_start_date)->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
                 } elseif ($request->dashboard_filters == "bdm_unfollowed_leads") {
                     $currentDateTime = Carbon::now();
                     $leads = DB::table('bdm_leads')->select(
@@ -167,14 +168,15 @@ class LeadController extends Controller
                         HAVING COUNT(CASE WHEN bdm_tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
                     "), 'completed_tasks.lead_id', '=', 'bdm_leads.lead_id')
                     ->whereNotNull('completed_tasks.lead_id')
+                    ->where('bdm_leads.lead_datetime', '>=', $new_lead_start_date)
                     ->where('bdm_leads.lead_status', '!=', 'Done');
                 }elseif($request->dashboard_filters == "unread_leads_this_month"){
-                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_month%")->whereNull('bdm_leads.deleted_at')->where(['bdm_leads.read_status' => false])->where('bdm_leads.assign_id', $auth_user->id);
+                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_month%")->where('bdm_leads.lead_datetime', '>=', $new_lead_start_date)->whereNull('bdm_leads.deleted_at')->where(['bdm_leads.read_status' => false])->where('bdm_leads.assign_id', $auth_user->id);
                 }elseif($request->dashboard_filters == "unread_leads_today"){
-                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_date%")->where(['bdm_leads.read_status' => false])->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
+                    $leads->where('bdm_leads.lead_datetime', 'like', "%$current_date%")->where('bdm_leads.lead_datetime', '>=', $new_lead_start_date)->where(['bdm_leads.read_status' => false])->whereNull('bdm_leads.deleted_at')->where('bdm_leads.assign_id', $auth_user->id);
                 }elseif($request->dashboard_filters == "total_unread_leads_overdue"){
                     $leads->where('bdm_leads.read_status', false)
-                    ->where('bdm_leads.assign_id', $auth_user->id);
+                    ->where('bdm_leads.assign_id', $auth_user->id)->where('bdm_leads.lead_datetime', '>=', $new_lead_start_date);
                 }
             }
         return datatables($leads)->toJson();
