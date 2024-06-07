@@ -13,6 +13,8 @@ Route::get('/fool', function () {
 Route::post('/store-token', [Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
 Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->name('send.token');
 Route::get('/sheet-makeup', [Controllers\GoogleSheetController::class, 'getSheetDataMakeup'])->name('get.sheet');
+Route::get('/sheet-photo', [Controllers\GoogleSheetController::class, 'getSheetDataPhotograher'])->name('get.sheetphoto');
+
 
 
 Route::get('/optimize', function () {

@@ -108,6 +108,103 @@ class GoogleSheetController extends Controller
             return response()->json(['error' => $e->getMessage()]);
         }
     }
+
+    public function getSheetDataPhotograher()
+    {
+        $client = new Google_Client();
+        $client->setApplicationName('Google Sheets API Laravel');
+        $client->setScopes(Sheets::SPREADSHEETS);
+        $client->setAuthConfig(storage_path('app/google/credentials.json'));
+        $client->setAccessType('offline');
+
+        $service = new Sheets($client);
+
+        $spreadsheetId = '1sX5LdXiLjwMftTRnrS2dSkpY3xhTi62XwqG71Dh8zmA';
+        $range = 'MakeupLeads!A1:S1000';
+
+        try {
+            $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+            $values = $response->getValues();
+
+            if (empty($values)) {
+                return response()->json(['message' => 'No data found.']);
+            } else {
+                $headers = array_shift($values);
+                $nameIndex = array_search('full_name', $headers);
+                $phoneIndex = array_search('phone_number', $headers);
+                $cityIndex = array_search('enter_your_location_area_name_(only_within_delhi).', $headers);
+                $processedIndex = array_search('Processed', $headers);
+                $VendorbussinessnameIndex = array_search("what's_your_business_name_?_", $headers);
+
+                $updatedValues = [];
+                $updatedValue = [];
+                $source = "WB|FBCampaign";
+                $current_timestamp = date('Y-m-d H:i:s');
+                foreach ($values as $index => $row) {
+                    if (isset($row[$processedIndex]) && $row[$processedIndex] === 'Processed') {
+                        continue;
+                    }
+
+                    $name = $row[$nameIndex] ?? null;
+                    $phone = $row[$phoneIndex] ?? null;
+                    $city = $row[$cityIndex] ?? null;
+                    $bussnesName = $row[$VendorbussinessnameIndex] ?? null;
+
+                    if ($phone) {
+                        $phone = substr($phone, -10);
+                    }
+
+                    if ($name && $phone && $city) {
+                        $updatedValue[] = [
+                            'name' => $name,
+                            'phone' => $phone,
+                            'city' => $city,
+                            'bussnesName' => $bussnesName,
+                        ];
+
+                        $lead = BdmLead::where('mobile', $phone)->first();
+                        if ($lead) {
+                            $lead->enquiry_count = $lead->enquiry_count + 1;
+                        } else {
+                            $lead = new BdmLead();
+                            $lead->name = $name;
+                            $lead->mobile = $phone;
+                            $lead->business_cat = '1';
+                            $lead->business_name = $bussnesName;
+                        }
+                        $lead->lead_datetime = $current_timestamp;
+                        $lead->source = $source;
+                        $lead->lead_status = 'Hot';
+                        $lead->city = $city;
+                        $get_bdm = getAssigningBdm();
+                        $lead->assign_to = $get_bdm->name;
+                        $lead->assign_id = $get_bdm->id;
+                        $lead->whatsapp_msg_time = $current_timestamp;
+                        $lead->lead_color = "#0066ff33";
+                        $lead->save();
+
+                        $updatedValues[] = [
+                            'range' => "MakeupLeads!S" . ($index + 2),
+                            'values' => [['Processed']]
+                        ];
+                    }
+                }
+
+                if (!empty($updatedValues)) {
+                    $body = new BatchUpdateValuesRequest([
+                        'valueInputOption' => 'RAW',
+                        'data' => $updatedValues
+                    ]);
+                    $service->spreadsheets_values->batchUpdate($spreadsheetId, $body);
+                }
+
+                return response()->json(['message' => 'Data processed successfully.', 'data' => $updatedValue]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+
     function getAssigningBdm()
     {
         DB::beginTransaction();
