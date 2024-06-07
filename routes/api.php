@@ -5,8 +5,6 @@ use App\Models\CrmMeta;
 use App\Models\Lead;
 use App\Models\nvLead;
 use App\Models\nvrmLeadForward;
-use App\Models\LeadForward;
-use App\Models\BlockedIp;
 use App\Models\whatsappMessages;
 use App\Models\TeamMember;
 use Illuminate\Http\Request;
@@ -14,15 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Response;
 use GuzzleHttp\Client;
-use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Vendor;
-
-
-
+use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,7 +75,7 @@ if (!function_exists('getAssigningRm')) {
             DB::commit();
             return $firstRmWithIsNext;
         } catch (Exception $e) {
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             DB::rollback();
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -137,7 +131,7 @@ if (!function_exists('getAssigningBdm')) {
             DB::commit();
             return $firstRmWithIsNext;
         } catch (Exception $e) {
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             DB::rollback();
             return response()->json(['error' => $e->getMessage()], 500);
         }
