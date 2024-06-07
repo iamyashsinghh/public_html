@@ -131,7 +131,7 @@ class GoogleSheetController extends Controller
             } else {
                 $headers = array_shift($values);
                 $nameIndex = array_search('full_name', $headers);
-                $phoneIndex = array_search('phone_number', $headers);
+                $phoneIndex = array_search('enter_phone_number', $headers);
                 $cityIndex = array_search('enter_your_location_area_name_(only_within_delhi).', $headers);
                 $processedIndex = array_search('Processed', $headers);
                 $VendorbussinessnameIndex = array_search("what's_your_business_name_?_", $headers);
