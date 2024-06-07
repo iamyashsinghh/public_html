@@ -58,23 +58,37 @@ class VisitController extends Controller {
         ->where(['lead_forwards.forward_to' => $auth_user->id, 'visits.deleted_at' => null])->groupBy('lead_forwards.lead_id');
 
         $current_date = date('Y-m-d');
-        if ($request->visit_status == "Upcoming") {
-            $visits->where('visits.visit_schedule_datetime', '>', Carbon::today()->endOfDay())->whereNull('visits.done_datetime');
-        } elseif ($request->visit_status == "Today") {
-            $visits->where('visits.visit_schedule_datetime', 'like', "%$current_date%")->whereNull('visits.done_datetime');
-        } elseif ($request->visit_status == "Overdue") {
-            $visits->where('visits.visit_schedule_datetime', '<', Carbon::today())->whereNull('visits.done_datetime');
-        } elseif ($request->visit_status == "Done") {
-            $visits->whereNotNull('visits.done_datetime');
-        } elseif ($request->visit_created_from_date) {
-            $from = Carbon::make($request->visit_created_from_date);
-            if ($request->visit_created_to_date != null) {
-                $to = Carbon::make($request->visit_created_to_date)->endOfDay();
-            } else {
-                $to = Carbon::make($request->visit_created_from_date)->endOfDay();
-            }
-            $visits->whereBetween('visits.created_at', [$from, $to]);
-        }elseif ($request->pax_min_value != null) {
+        if ($request->has('visit_status')) {
+            $visits->where(function ($query) use ($request) {
+                foreach ($request->visit_status as $status) {
+                    switch ($status) {
+                        case 'Upcoming':
+                            $query->orWhere(function ($q) {
+                                $q->where('visits.visit_schedule_datetime', '>', Carbon::today()->endOfDay())
+                                    ->whereNull('visits.done_datetime');
+                            });
+                            break;
+                        case 'Today':
+                            $current_date = date('Y-m-d');
+                            $query->orWhere(function ($q) use ($current_date) {
+                                $q->where('visits.visit_schedule_datetime', 'like', "%$current_date%")
+                                    ->whereNull('visits.done_datetime');
+                            });
+                            break;
+                        case 'Overdue':
+                            $query->orWhere(function ($q) {
+                                $q->where('visits.visit_schedule_datetime', '<', Carbon::today())
+                                    ->whereNull('visits.done_datetime');
+                            });
+                            break;
+                        case 'Done':
+                            $query->orWhereNotNull('visits.done_datetime');
+                            break;
+                    }
+                }
+            });
+        }
+        if ($request->pax_min_value != null) {
             $min = $request->pax_min_value;
             if ($request->pax_max_value != null) {
                 $max = $request->pax_max_value;

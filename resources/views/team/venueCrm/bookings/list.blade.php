@@ -84,36 +84,18 @@
                                 class="accordion-collapse collapse {{ isset($filter_params['booking_source']) ? 'show' : '' }}"
                                 data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
-                                    <div class="custom-control custom-radio my-1">
-                                        <input id="checkbox1" class="custom-control-input" type="radio"
-                                            name="booking_source" value="WB|Team"
-                                            {{ isset($filter_params['booking_source']) && $filter_params['booking_source'] == 'WB|Team' ? 'checked' : '' }}>
-                                        <label for="checkbox1" class="custom-control-label">WB|Team</label>
+                                    <?php
+                                    $sources = ['WB|Team', 'VM|Reference', 'WB|Call', 'Walk-in', 'Other'];
+                                    foreach ($sources as $source) {
+                                    ?>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input id="checkbox_<?php echo $source; ?>" class="custom-control-input"
+                                            type="checkbox" name="booking_source[]" value="<?php echo $source; ?>"
+                                            <?php echo isset($filter_params['booking_source']) && in_array($source, $filter_params['booking_source']) ? 'checked' : ''; ?>>
+                                        <label for="checkbox_<?php echo $source; ?>"
+                                            class="custom-control-label"><?php echo $source; ?></label>
                                     </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input id="checkbox1" class="custom-control-input" type="radio"
-                                            name="booking_source" value="VM|Reference"
-                                            {{ isset($filter_params['booking_source']) && $filter_params['booking_source'] == 'VM|Reference' ? 'checked' : '' }}>
-                                        <label for="checkbox1" class="custom-control-label">VM|Reference</label>
-                                    </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input id="checkbox2" class="custom-control-input" type="radio"
-                                            name="booking_source" value="WB|Call"
-                                            {{ isset($filter_params['booking_source']) && $filter_params['booking_source'] == 'WB|Call' ? 'checked' : '' }}>
-                                        <label for="checkbox2" class="custom-control-label">WB|Call</label>
-                                    </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input id="checkbox3" class="custom-control-input" type="radio"
-                                            name="booking_source" value="Walk-in"
-                                            {{ isset($filter_params['booking_source']) && $filter_params['booking_source'] == 'Walk-in' ? 'checked' : '' }}>
-                                        <label for="checkbox3" class="custom-control-label">Walk-in</label>
-                                    </div>
-                                    <div class="custom-control custom-radio my-1">
-                                        <input id="checkbox4" class="custom-control-input" type="radio"
-                                            name="booking_source" value="Other"
-                                            {{ isset($filter_params['booking_source']) && $filter_params['booking_source'] == 'Other' ? 'checked' : '' }}>
-                                        <label for="checkbox4" class="custom-control-label">Other</label>
-                                    </div>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </div>
@@ -231,32 +213,40 @@
 @endsection
 @section('footer-script')
     @php
-        $filter = '';
-        if (isset($filter_params['booking_source'])) {
-            $filter = 'booking_source=' . $filter_params['booking_source'];
-        } elseif (isset($filter_params['quarter_advance_collected'])) {
-            $filter = 'quarter_advance_collected=' . $filter_params['quarter_advance_collected'];
-        } elseif (isset($filter_params['booking_from_date'])) {
-            $filter =
-                'booking_from_date=' .
-                $filter_params['booking_from_date'] .
-                '&booking_to_date=' .
-                $filter_params['booking_to_date'];
-        } elseif (isset($filter_params['pax_min_value'])) {
-            $filter =
-                'pax_min_value=' .
-                $filter_params['pax_min_value'] .
-                '&pax_max_value=' .
-                $filter_params['pax_max_value'];
-        } elseif (isset($filter_params['event_from_date'])) {
-            $filter =
-                'event_from_date=' .
-                $filter_params['event_from_date'] .
-                '&event_to_date=' .
-                $filter_params['event_to_date'];
-        } elseif (isset($filter_params['dashboard_filters'])) {
-            $filter = 'dashboard_filters=' . $filter_params['dashboard_filters'];
+    $filters = [];
+    if (isset($filter_params['booking_source']) && is_array($filter_params['booking_source'])) {
+        foreach ($filter_params['booking_source'] as $source) {
+            $filters[] = 'booking_source[]=' . urlencode($source);
         }
+    }
+    if (isset($filter_params['quarter_advance_collected'])) {
+        $filters[] = 'quarter_advance_collected=' . $filter_params['quarter_advance_collected'];
+    }
+    if (isset($filter_params['booking_from_date'])) {
+        $filters[] =
+            'booking_from_date=' .
+            $filter_params['booking_from_date'] .
+            '&booking_to_date=' .
+            $filter_params['booking_to_date'];
+    }
+    if (isset($filter_params['pax_min_value'])) {
+        $filters[] =
+            'pax_min_value=' .
+            $filter_params['pax_min_value'] .
+            '&pax_max_value=' .
+            $filter_params['pax_max_value'];
+    }
+    if (isset($filter_params['event_from_date'])) {
+        $filters[] =
+            'event_from_date=' .
+            $filter_params['event_from_date'] .
+            '&event_to_date=' .
+            $filter_params['event_to_date'];
+    }
+    if (isset($filter_params['dashboard_filters'])) {
+        $filters[] = 'dashboard_filters=' . $filter_params['dashboard_filters'];
+    }
+    $filter = implode('&', $filters);
     @endphp
     <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>

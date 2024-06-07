@@ -60,10 +60,12 @@ class BookingController extends Controller {
             ->where(['lead_forwards.forward_to' => $auth_user->id, 'bookings.deleted_at' => null]);
 
         if ($request->booking_source != null) {
-            $bookings->where('bookings.booking_source', $request->booking_source);
-        } else if ($request->quarter_advance_collected != null) {
+            $bookings->whereIn('bookings.booking_source', $request->booking_source);
+        }
+         if ($request->quarter_advance_collected != null) {
             $bookings->where('bookings.quarter_advance_collected', $request->quarter_advance_collected);
-        } elseif ($request->booking_from_date != null) {
+        }
+        if ($request->booking_from_date != null) {
             $from =  Carbon::make($request->booking_from_date);
             if ($request->booking_to_date != null) {
                 $to = Carbon::make($request->booking_to_date)->endOfDay();
@@ -71,7 +73,8 @@ class BookingController extends Controller {
                 $to = Carbon::make($request->booking_from_date)->endOfDay();
             }
             $bookings->whereBetween('bookings.created_at', [$from, $to]);
-        }elseif ($request->pax_min_value != null) {
+        }
+        if ($request->pax_min_value != null) {
             $min = $request->pax_min_value;
             if ($request->pax_max_value != null) {
                 $max = $request->pax_max_value;
@@ -79,7 +82,8 @@ class BookingController extends Controller {
                 $max = $request->pax_min_value;
             }
             $bookings->whereBetween('events.pax', [$min, $max]);
-        }  elseif ($request->event_from_date != null) {
+        }
+        if ($request->event_from_date != null) {
             $from =  Carbon::make($request->event_from_date);
             if ($request->event_to_date != null) {
                 $to = Carbon::make($request->event_to_date)->endOfDay();
@@ -87,7 +91,8 @@ class BookingController extends Controller {
                 $to = Carbon::make($request->event_from_date)->endOfDay();
             }
             $bookings->whereBetween('events.event_datetime', [$from, $to]);
-        } elseif ($request->dashboard_filters != null) {
+        }
+        if ($request->dashboard_filters != null) {
             if ($request->dashboard_filters == "bookings_this_month") {
                 $from =  Carbon::today()->startOfMonth();
                 $to =  Carbon::today()->endOfMonth();
