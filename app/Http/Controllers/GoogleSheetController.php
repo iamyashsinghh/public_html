@@ -42,7 +42,7 @@ class GoogleSheetController extends Controller
 
                 $updatedValues = [];
                 $updatedValue = [];
-                $source = "WB|Site";
+                $source = "WB|FBCampaign";
                 $current_timestamp = date('Y-m-d H:i:s');
                 foreach ($values as $index => $row) {
                     if (isset($row[$processedIndex]) && $row[$processedIndex] === 'Processed') {
