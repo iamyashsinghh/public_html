@@ -26,7 +26,6 @@ class TaskController extends Controller {
         if ($request->task_schedule_from_date != null) {
             $filter_params = ['task_schedule_from_date' => $request->task_schedule_from_date, 'task_schedule_to_date' => $request->task_schedule_to_date];
         }
-
         $page_heading = $filter_params ? "Tasks - Filtered" : "Tasks";
 
         if ($dashboard_filters !== null) {
