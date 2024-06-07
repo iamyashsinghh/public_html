@@ -7,23 +7,22 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'admin.login');
-Route::get('/fool', function () {
-    Artisan::call('storage:link');
-});
+
+
 Route::post('/store-token', [Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
 Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->name('send.token');
-Route::get('/sheet-makeup', [Controllers\GoogleSheetController::class, 'getSheetDataMakeup'])->name('get.sheet');
-Route::get('/sheet-photo', [Controllers\GoogleSheetController::class, 'getSheetDataPhotograher'])->name('get.sheetphoto');
+
+// google sheet bdm lead fetch
+Route::get('/sheet', [Controllers\GoogleSheetController::class, 'processAllSheetData'])->name('get.sheet');
 
 
-
-Route::get('/optimize', function () {
-    Artisan::call('cache:clear');
-    Artisan::call('route:clear');
-    Artisan::call('config:clear');
-    Artisan::call('view:clear');
-    return redirect()->route('admin.editEnv');
-})->name('admin.optimize.crm');
+// Route::get('/optimize', function () {
+//     Artisan::call('cache:clear');
+//     Artisan::call('route:clear');
+//     Artisan::call('config:clear');
+//     Artisan::call('view:clear');
+//     return redirect()->route('admin.editEnv');
+// })->name('admin.optimize.crm');
 
 // send and get
 Route::get('admin/ajax_tasks', [Controllers\WhatsappMsgController::class, 'ajax_tasks'])->name('whatsapp_chat.ajax');
@@ -98,6 +97,9 @@ Route::middleware('verify_token')->group(function () {
 
     Route::prefix('/admin')->middleware('admin')->group(function () {
         Route::get('/dashboard', [Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
+
+
+
 
         //Team member Routes
         Route::prefix('/venue-crm')->group(function () {

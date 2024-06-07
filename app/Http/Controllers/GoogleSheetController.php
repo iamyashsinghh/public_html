@@ -184,7 +184,7 @@ class GoogleSheetController extends Controller
                         $lead->save();
 
                         $updatedValues[] = [
-                            'range' => "MakeupLeads!S" . ($index + 2),
+                            'range' => "PhotoghrapherLeads!S" . ($index + 2),
                             'values' => [['Processed']]
                         ];
                     }
@@ -204,6 +204,18 @@ class GoogleSheetController extends Controller
             return response()->json(['error' => $e->getMessage()]);
         }
     }
+
+    public function processAllSheetData()
+    {
+        $makeupResponse = $this->getSheetDataMakeup();
+        $photographerResponse = $this->getSheetDataPhotograher();
+
+        return response()->json([
+            'makeup_data' => $makeupResponse->getData(),
+            'photographer_data' => $photographerResponse->getData()
+        ]);
+    }
+
 
     function getAssigningBdm()
     {
