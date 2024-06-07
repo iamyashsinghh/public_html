@@ -285,7 +285,7 @@
                     <div class="my-5">
                         <button type="submit" class="btn btn-sm text-light btn-block"
                             style="background-color: var(--wb-renosand);">Apply</button>
-                        <a href="{{ route('team.lead.list') }}" type="submit"
+                        <a href="{{ route('bdm.lead.list') }}" type="submit"
                             class="btn btn-sm btn-secondary btn-block">Reset</a>
                     </div>
                 </form>
