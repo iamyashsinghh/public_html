@@ -38,6 +38,7 @@ class GoogleSheetController extends Controller
 
                 $updatedValues = [];
                 $updatedValue = [];
+
                 foreach ($values as $index => $row) {
                     if (isset($row[$processedIndex]) && $row[$processedIndex] === 'Processed') {
                         continue;
@@ -52,25 +53,16 @@ class GoogleSheetController extends Controller
                     }
 
                     if ($name && $phone && $city) {
-                        // $existingLead = BdmLead::where('phone', $phone)->first();
+                        $updatedValue[] = [
+                            'name' => $name,
+                            'phone' => $phone,
+                            'city' => $city,
+                        ];
 
-                        // if (!$existingLead) {
-                            // BdmLead::create([
-                            //     'name' => $name,
-                            //     'phone' => $phone,
-                            //     'city' => $city,
-                            // ]);
-                            $updatedValue[]=[
-                                    'name' => $name,
-                                    'phone' => $phone,
-                                    'city' => $city,
-                            ];
-
-                            $updatedValues[] = [
-                                'range' => "MakeupLeads!S" . ($index + 2),
-                                'values' => [['Processed']]
-                            ];
-                        // }
+                        $updatedValues[] = [
+                            'range' => "MakeupLeads!S" . ($index + 2),
+                            'values' => [['Processed']]
+                        ];
                     }
                 }
 
@@ -82,9 +74,7 @@ class GoogleSheetController extends Controller
                     $service->spreadsheets_values->batchUpdate($spreadsheetId, $body);
                 }
 
-                // return response()->json(['message' => 'Data processed and saved successfully.']);
-                return response()->json(['message' => $updatedValue]);
-
+                return response()->json(['message' => 'Data processed successfully.', 'data' => $updatedValue]);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()]);
