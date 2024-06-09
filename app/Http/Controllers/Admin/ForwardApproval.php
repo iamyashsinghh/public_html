@@ -44,7 +44,7 @@ class ForwardApproval extends Controller
             $vm_id = $values->forward_to;
             $old_vm = $values->forward_from;
 
-            return $vm_id;
+            // return $vm_id;
 
                 $exist_lead_forward = LeadForward::where(['lead_id' => $lead->lead_id, 'forward_to' => $old_vm])->first();
                 $exist_lead_forward->forward_to = $vm_id;
