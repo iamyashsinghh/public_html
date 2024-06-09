@@ -47,10 +47,15 @@ class ForwardApproval extends Controller
             // return $vm_id;
 
                 $exist_lead_forward = LeadForward::where(['lead_id' => $lead->lead_id, 'forward_to' => $old_vm])->first();
-                $exist_lead_forward->forward_to = $vm_id;
-                $exist_lead_forward->is_manager_forwarded = '1';
-                $exist_lead_forward->manager_forwarded_by = $auth_user;
-                $exist_lead_forward->save();
+                if($exist_lead_forward){
+                    $exist_lead_forward->forward_to = $vm_id;
+                    $exist_lead_forward->is_manager_forwarded = '1';
+                    $exist_lead_forward->manager_forwarded_by = $auth_user;
+                    $exist_lead_forward->save();
+                }else{
+                    return redirect()->back()->with('status', ['success' => false, 'alert_type' => 'error', 'message' => 'This lead is alredy forwarded.']);
+                }
+
 
             $values->is_approved = $status;
             $values->save();
