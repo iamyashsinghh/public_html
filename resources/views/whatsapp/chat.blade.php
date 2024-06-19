@@ -101,6 +101,7 @@ $userName = 'Ritu';
                 <div class="modal-footer text-sm">
                     <div class="mx-5">
                     <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnGreetMsg" title="Hi (Name of person in lead), I'm {{ $userName }} your Wedding Planning assistant. Would you like me to help you find venues and wedding vendors for your wedding? (Some btns)">Rm Greet Msg</a>
+                    <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnHi" title="Hi">Hi</a>
                     </div>
                     <a href="javascript:void(0);" class="btn btn-sm btn-secondary m-1" data-bs-dismiss="modal">Close</a>
                     <a href="javascript:void(0);" class="btn btn-sm text-light m-1"
@@ -123,6 +124,32 @@ $userName = 'Ritu';
     var messageSendElement = document.getElementById("what_msg_send");
     $('#close-whatsapp-chatmodal').on('click', function() {
         resetChat();
+    });
+    
+    $("#sendMessageBtnHi").click(function() {
+        var $btn = $(this);
+        var originalText = $btn.html();
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $btn.prop('disabled', true);
+        var recipient = $("#phone_inp_id").val();
+        var data = {
+            recipient: recipient,
+        };
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send.hi') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
+            }
+        });
     });
 
     $("#sendMessageBtnHey").click(function() {
