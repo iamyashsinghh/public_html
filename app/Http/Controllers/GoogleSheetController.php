@@ -24,7 +24,7 @@ class GoogleSheetController extends Controller
         $service = new Sheets($client);
 
         $spreadsheetId = '1sX5LdXiLjwMftTRnrS2dSkpY3xhTi62XwqG71Dh8zmA';
-        $range = 'MakeupLeads!A1:T1000';
+        $range = 'MakeupArtist-Leads!A1:T1000';
 
         try {
             $response = $service->spreadsheets_values->get($spreadsheetId, $range);
@@ -75,20 +75,20 @@ class GoogleSheetController extends Controller
                             $lead->mobile = $phone;
                             $lead->business_cat = '2';
                             $lead->business_name = $bussnesName;
+                            $get_bdm = getAssigningBdm();
+                            $lead->assign_to = $get_bdm->name;
+                            $lead->assign_id = $get_bdm->id;
                         }
                         $lead->lead_datetime = $current_timestamp;
                         $lead->source = $source;
                         $lead->lead_status = 'Hot';
                         $lead->city = $city;
-                        $get_bdm = getAssigningBdm();
-                        $lead->assign_to = $get_bdm->name;
-                        $lead->assign_id = $get_bdm->id;
                         $lead->whatsapp_msg_time = $current_timestamp;
                         $lead->lead_color = "#0066ff33";
                         $lead->save();
 
                         $updatedValues[] = [
-                            'range' => "MakeupLeads!T" . ($index + 2),
+                            'range' => "MakeupArtist-Leads!T" . ($index + 2),
                             'values' => [['Processed']]
                         ];
                     }
@@ -120,7 +120,7 @@ class GoogleSheetController extends Controller
         $service = new Sheets($client);
 
         $spreadsheetId = '1sX5LdXiLjwMftTRnrS2dSkpY3xhTi62XwqG71Dh8zmA';
-        $range = 'PhotoghrapherLeads!A1:S1000';
+        $range = 'Photoghrapher-Leads!A1:T1000';
 
         try {
             $response = $service->spreadsheets_values->get($spreadsheetId, $range);
@@ -171,20 +171,20 @@ class GoogleSheetController extends Controller
                             $lead->mobile = $phone;
                             $lead->business_cat = '1';
                             $lead->business_name = $bussnesName;
+                            $get_bdm = getAssigningBdm();
+                        $lead->assign_to = $get_bdm->name;
+                        $lead->assign_id = $get_bdm->id;
                         }
                         $lead->lead_datetime = $current_timestamp;
                         $lead->source = $source;
                         $lead->lead_status = 'Hot';
                         $lead->city = $city;
-                        $get_bdm = getAssigningBdm();
-                        $lead->assign_to = $get_bdm->name;
-                        $lead->assign_id = $get_bdm->id;
                         $lead->whatsapp_msg_time = $current_timestamp;
                         $lead->lead_color = "#0066ff33";
                         $lead->save();
 
                         $updatedValues[] = [
-                            'range' => "PhotoghrapherLeads!S" . ($index + 2),
+                            'range' => "MakeupArtist-Leads!T" . ($index + 2),
                             'values' => [['Processed']]
                         ];
                     }
