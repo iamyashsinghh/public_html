@@ -81,7 +81,7 @@ class AuthController extends Controller
 
             if ($user->email != null && env('MAIL_STATUS') === true) {
                 $res_data = ['name' => $user->name, 'otp' => $verification_code];
-                // Mail::to($user->email)->send(new LoginMail($res_data));
+                Mail::to($user->email)->send(new LoginMail($res_data));
             }
 
             return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
