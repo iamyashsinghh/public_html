@@ -63,6 +63,18 @@
                                                                     class="fa fa-comment-dots"
                                                                     style="color: var(--wb-renosand);"></i></button>
                                                         </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary"
+                                                                onclick="handleEditRmMessage( '{{ $list->id }}', '{{ $list->title }}', '{{ $list->message }}' )"><i
+                                                                    class="fa fa-edit"></i> Edit</button>
+                                                            <form
+                                                                action="{{ route('admin.team.rm_message.delete') }}/{{$list->id}}"
+                                                                method="POST" style="display:inline-block;">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                                    onclick="return confirm('Are you sure you want to delete this message?')"><i class="fa fa-trash"></i></button>
+                                                            </form>
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             @else
@@ -646,6 +658,38 @@
                 </div>
             </div>
         </section>
+        <div class="modal fade" id="updateRmMessageModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit RM Message</h4>
+                        <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
+                                class="fa fa-times"></i></button>
+                    </div>
+                    <form method="post">
+                        @csrf
+                        <div class="modal-body text-sm">
+                            <div class="form-group">
+                                <label for="msg_title_inp">Title</label>
+                                <input type="hidden" name="rm_msg_id">
+                                <input type="text" class="form-control" id="msg_title_inp" placeholder="Enter title"
+                                    name="title">
+                            </div>
+                            <div class="form-group">
+                                <label for="msg_desc_inp">Message</label>
+                                <textarea type="text" class="form-control" id="msg_desc_inp" placeholder="Type message" name="message"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-sm text-light"
+                                style="background-color: var(--wb-dark-red);">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="leadForwardedMemberInfo" tabindex="-1">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
@@ -873,6 +917,19 @@
                 .then(response => response.json())
                 .then(data => {})
                 .catch((error) => {});
+        }
+
+        function handleEditRmMessage(rm_msg_id, title, message) {
+            const updateRmMessageModal = new bootstrap.Modal('#updateRmMessageModal');
+
+            const form = document.querySelector('#updateRmMessageModal form');
+            form.action = `{{ route('admin.team.rm_message.update.process') }}/${rm_msg_id}`;
+
+            form.querySelector('input[name="rm_msg_id"]').value = rm_msg_id;
+            form.querySelector('input[name="title"]').value = title;
+            form.querySelector('textarea[name="message"]').value = message;
+
+            updateRmMessageModal.show();
         }
     </script>
 @endsection

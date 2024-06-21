@@ -41,4 +41,36 @@ class NvrmMessageController extends Controller {
         }
         return redirect()->back();
     }
+
+    public function edit(Request $request, $rm_msg_id)
+    {
+        $auth_user = Auth::guard('nonvenue')->user();
+        $msg = nvrmMessage::where(['id' => $rm_msg_id, 'created_by' => $auth_user->id])->first();
+        if ($msg) {
+            $msg->title = $request->title;
+            $msg->message = $request->message;
+            $msg->budget = $request->budget;
+            $msg->save();
+            session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'RM message Updated.']);
+        } else {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong, please try again later.']);
+        }
+        return redirect()->back();
+    }
+
+
+    public function delete($rm_msg_id)
+    {
+        $auth_user = Auth::guard('nonvenue')->user();
+        $msg = nvrmMessage::where(['id' => $rm_msg_id, 'created_by' => $auth_user->id])->first();
+        if ($msg) {
+            $msg->delete();
+            session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'RM message Deleted.']);
+        } else {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong, please try again later.']);
+        }
+        return redirect()->back();
+    }
+
+
 }

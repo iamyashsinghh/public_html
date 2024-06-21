@@ -86,7 +86,7 @@ Route::middleware('verify_token')->group(function () {
     Route::get('/bookings/fetch/{booking_id}', [Controllers\Admin\BookingController::class, 'fetch_booking'])->name('booking.fetch');
     Route::get('/vm_event/fetch/{event_id?}', [Controllers\Admin\BookingController::class, 'fetch_vm_event'])->name('vm_event.fetch');
 
-    
+
 
 
     Route::prefix('/admin')->middleware('admin')->group(function () {
@@ -158,6 +158,10 @@ Route::middleware('verify_token')->group(function () {
             // leadforwardapproval routes
             Route::get('/leadforwardapproval/list', [Controllers\Admin\ForwardApproval::class, 'list'])->name('admin.leadforwardapproval.list');
             Route::get('/leadforwardapproval/status_update/{id?}/{status?}', [Controllers\Admin\ForwardApproval::class, 'manage_process'])->name('admin.leadforwardapproval.status_update');
+
+            // rm msg controller
+            Route::post('/rm-message/update-process/{rm_msg_id?}', [Controllers\Admin\RmMessageController::class, 'edit_rm'])->name('admin.team.rm_message.update.process');
+            Route::post('/rm_messages/delete-process/{rm_msg_id?}', [Controllers\Admin\RmMessageController::class, 'delete_rm'])->name('admin.team.rm_message.delete');
         });
 
         Route::prefix('nonvenue-crm')->group(function () {
@@ -192,7 +196,12 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/nv-leads/get_forward_info/{lead_id?}', [Controllers\Admin\NvLeadController::class, 'get_forward_info'])->name('admin.nvlead.getForwardInfo');
             //Bypass login: Via admin to vendor crm
             Route::get('/vendor/bypass-login/{team_id?}', [AuthController::class, 'vendor_login_via_admin'])->name('admin.vendor.bypass.login');
+
+            // nvrm msg controller
+            Route::post('/rm-message/update-process/{rm_msg_id?}', [Controllers\Admin\RmMessageController::class, 'edit_nvrm'])->name('admin.nonvenue.rm_message.update.process');
+            Route::post('/rm_messages/delete-process/{rm_msg_id?}', [Controllers\Admin\RmMessageController::class, 'delete_nvrm'])->name('admin.nonvenue.rm_message.delete');
         });
+
         Route::prefix('whastsapp-crm')->group(function () {
             //whastsapp routes
             Route::view('/tasks', 'admin.whatsapp.campain.list')->name('whatsapp.campain.list');
@@ -206,7 +215,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/campaign/delete/{campaign_id?}', [Controllers\Admin\WhatsappController::class, 'delete'])->name('admin.campaign.delete');
             Route::get('/logs_ajax', [Controllers\Admin\WhatsappController::class, 'whatsappLogs_ajax'])->name('whatsapp_chat.logs_ajax');
 
-            // tempupdate
+            // temp update
             Route::get('/get_temp_img/{temp_name?}', [Controllers\Admin\WhatsappController::class, 'get_temo_img'])->name('get.whatsapp.temp.img');
             Route::post('/update_temp_img/update', [Controllers\Admin\WhatsappController::class, 'update_temp_image'])->name('set.whatsapp.temp.img');
         });
@@ -348,6 +357,8 @@ Route::middleware('verify_token')->group(function () {
 
             //RM message Routes
             Route::post('/rm_messages/manage-process', [Controllers\Team\RmMessageController::class, 'manage_process'])->name('team.rm_message.manage.process');
+            Route::post('/rm-message/update-process/{rm_msg_id?}', [Controllers\Team\RmMessageController::class, 'edit'])->name('team.rm_message.update.process');
+            Route::post('/rm_messages/delete-process/{rm_msg_id?}', [Controllers\Team\RmMessageController::class, 'delete'])->name('team.rm_message.delete');
 
             //Event Routes
             Route::get('events/manage_ajax/{event_id?}', [Controllers\Team\EventController::class, 'manage_ajax'])->name('team.event.manage_ajax');
@@ -412,6 +423,8 @@ Route::middleware('verify_token')->group(function () {
 
             //RM message Routes
             Route::post('/rm_messages/manage-process', [Controllers\NonVenue\NvrmMessageController::class, 'manage_process'])->name('nonvenue.rm_message.manage.process');
+            Route::post('/rm-message/update-process/{rm_msg_id?}', [Controllers\NonVenue\NvrmMessageController::class, 'edit'])->name('nonvenue.rm_message.update.process');
+            Route::post('/rm_messages/delete-process/{rm_msg_id?}', [Controllers\NonVenue\NvrmMessageController::class, 'delete'])->name('nonvenue.rm_message.delete');
 
             //Event Routes
             Route::post('/events/add-process/', [Controllers\NonVenue\NvEventController::class, 'add_process'])->name('nonvenue.event.add.process');
