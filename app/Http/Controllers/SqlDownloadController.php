@@ -13,7 +13,7 @@ class SqlDownloadController extends Controller
         // Database connection details
         $dbHost ='localhost';
         $dbName = 'wb_crm';
-        $dbUser ='wb';
+        $dbUser ='wb_crm';
         $dbPassword = '1234567890';
 
         // Generate a unique file name
