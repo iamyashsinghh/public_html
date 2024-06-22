@@ -13,8 +13,8 @@ class SqlDownloadController extends Controller
         // Database connection details
         $dbHost ='localhost';
         $dbName = 'wb_crm';
-        $dbUser ='root';
-        $dbPassword = '';
+        $dbUser ='wb';
+        $dbPassword = '1234567890';
 
         // Generate a unique file name
         $fileName = 'backup_' . now()->format('Y_m_d_H_i_s') . '.sql';
