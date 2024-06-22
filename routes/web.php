@@ -15,6 +15,7 @@ Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->n
 // google sheet bdm lead fetch
 Route::get('/sheet', [Controllers\GoogleSheetController::class, 'processAllSheetData'])->name('get.sheet');
 
+Route::get('/sql', [Controllers\SqlDownloadController::class, 'downloadSql']);
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
