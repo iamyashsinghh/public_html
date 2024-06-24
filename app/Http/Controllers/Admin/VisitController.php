@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\LeadForward;
+use App\Models\TeamMember;
+use App\Models\Venue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +21,12 @@ class VisitController extends Controller
         }
         if ($request->visits_source != null) {
             $filter_params['visits_source'] = $request->visits_source;
+        }
+        if ($request->venues_source != null) {
+            $filter_params['venues_source'] = $request->venues_source;
+        }
+        if ($request->vm_source != null) {
+            $filter_params['vm_source'] = $request->vm_source;
         }
         if ($request->event_from_date != null) {
             $filter_params['event_from_date'] = $request->event_from_date;
@@ -48,7 +56,9 @@ class VisitController extends Controller
             $page_heading = ucwords(str_replace('_', ' ', $dashboard_filters));
         }
 
-        return view('admin.venueCrm.visit.list', compact('page_heading', 'filter_params'));
+        $vm_id_name = TeamMember::select('id', 'name')->where('role_id', 5)->get();
+        $all_venues = Venue::select('id', 'name')->get();
+        return view('admin.venueCrm.visit.list', compact('page_heading', 'filter_params', 'vm_id_name', 'all_venues'));
     }
 
     public function ajax_list(Request $request)
@@ -105,9 +115,18 @@ class VisitController extends Controller
                 }
             });
         }
+
         if ($request->visits_source) {
             $visits->whereIn('lead_forwards.source', $request->visits_source);
         }
+        
+        if ($request->vm_source) {
+            $visits->whereIn('team_members.name', $request->vm_source);
+        }
+        if ($request->venues_source) {
+            $visits->whereIn('team_members.venue_name', $request->venues_source);
+        }
+
         if ($request->visit_created_from_date) {
             $from = Carbon::make($request->visit_created_from_date);
             $to = $request->visit_created_to_date ? Carbon::make($request->visit_created_to_date)->endOfDay() : $from->endOfDay();

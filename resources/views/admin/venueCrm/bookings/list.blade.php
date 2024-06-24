@@ -88,6 +88,51 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header">
                                 <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse111"
+                                    aria-expanded="true" aria-controls="collapse111">VMs</button>
+                            </h2>
+                            <div id="collapse111"
+                                class="accordion-collapse collapse {{ isset($filter_params['vm_source']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <?php foreach ($vm_id_name as $vm) {?>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input id="checkbox_<?php echo $vm->name; ?>" class="custom-control-input"
+                                            type="checkbox" name="vm_source[]" value="<?php echo $vm->name; ?>"
+                                            <?php echo isset($filter_params['vm_source']) && in_array($vm->name, $filter_params['vm_source']) ? 'checked' : ''; ?>>
+                                        <label for="checkbox_<?php echo $vm->name; ?>"
+                                            class="custom-control-label"><?php echo $vm->name; ?></label>
+                                    </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse112"
+                                    aria-expanded="true" aria-controls="collapse112">Venue's</button>
+                            </h2>
+                            <div id="collapse112"
+                                class="accordion-collapse collapse {{ isset($filter_params['venues_source']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <?php foreach ($all_venues as $venue) {?>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input id="checkbox_<?php echo $venue->name; ?>" class="custom-control-input"
+                                            type="checkbox" name="venues_source[]" value="<?php echo $venue->name; ?>"
+                                            <?php echo isset($filter_params['venues_source']) && in_array($venue->name, $filter_params['venues_source']) ? 'checked' : ''; ?>>
+                                        <label for="checkbox_<?php echo $venue->name; ?>"
+                                            class="custom-control-label"><?php echo $venue->name; ?></label>
+                                    </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
                                     type="button" data-bs-toggle="collapse" data-bs-target="#collapse1"
                                     aria-expanded="true" aria-controls="collapse1">Booking Source</button>
                             </h2>
@@ -224,40 +269,50 @@
 @endsection
 @section('footer-script')
     @php
-    $filters = [];
-    if (isset($filter_params['booking_source']) && is_array($filter_params['booking_source'])) {
-        foreach ($filter_params['booking_source'] as $source) {
-            $filters[] = 'booking_source[]=' . urlencode($source);
+        $filters = [];
+        if (isset($filter_params['booking_source']) && is_array($filter_params['booking_source'])) {
+            foreach ($filter_params['booking_source'] as $source) {
+                $filters[] = 'booking_source[]=' . urlencode($source);
+            }
         }
-    }
-    if (isset($filter_params['quarter_advance_collected'])) {
-        $filters[] = 'quarter_advance_collected=' . $filter_params['quarter_advance_collected'];
-    }
-    if (isset($filter_params['booking_from_date'])) {
-        $filters[] =
-            'booking_from_date=' .
-            $filter_params['booking_from_date'] .
-            '&booking_to_date=' .
-            $filter_params['booking_to_date'];
-    }
-    if (isset($filter_params['pax_min_value'])) {
-        $filters[] =
-            'pax_min_value=' .
-            $filter_params['pax_min_value'] .
-            '&pax_max_value=' .
-            $filter_params['pax_max_value'];
-    }
-    if (isset($filter_params['event_from_date'])) {
-        $filters[] =
-            'event_from_date=' .
-            $filter_params['event_from_date'] .
-            '&event_to_date=' .
-            $filter_params['event_to_date'];
-    }
-    if (isset($filter_params['dashboard_filters'])) {
-        $filters[] = 'dashboard_filters=' . $filter_params['dashboard_filters'];
-    }
-    $filter = implode('&', $filters);
+        if (isset($filter_params['vm_source']) && is_array($filter_params['vm_source'])) {
+            foreach ($filter_params['vm_source'] as $source) {
+                $filters[] = 'vm_source[]=' . urlencode($source);
+            }
+        }
+        if (isset($filter_params['venues_source']) && is_array($filter_params['venues_source'])) {
+            foreach ($filter_params['venues_source'] as $source) {
+                $filters[] = 'venues_source[]=' . urlencode($source);
+            }
+        }
+        if (isset($filter_params['quarter_advance_collected'])) {
+            $filters[] = 'quarter_advance_collected=' . $filter_params['quarter_advance_collected'];
+        }
+        if (isset($filter_params['booking_from_date'])) {
+            $filters[] =
+                'booking_from_date=' .
+                $filter_params['booking_from_date'] .
+                '&booking_to_date=' .
+                $filter_params['booking_to_date'];
+        }
+        if (isset($filter_params['pax_min_value'])) {
+            $filters[] =
+                'pax_min_value=' .
+                $filter_params['pax_min_value'] .
+                '&pax_max_value=' .
+                $filter_params['pax_max_value'];
+        }
+        if (isset($filter_params['event_from_date'])) {
+            $filters[] =
+                'event_from_date=' .
+                $filter_params['event_from_date'] .
+                '&event_to_date=' .
+                $filter_params['event_to_date'];
+        }
+        if (isset($filter_params['dashboard_filters'])) {
+            $filters[] = 'dashboard_filters=' . $filter_params['dashboard_filters'];
+        }
+        $filter = implode('&', $filters);
 
     @endphp
     <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>

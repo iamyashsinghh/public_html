@@ -93,6 +93,52 @@
                 <form action="{{ route('admin.visit.list') }}" method="post">
                     @csrf
                     <div class="accordion text-sm" id="accordionExample">
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse111"
+                                    aria-expanded="true" aria-controls="collapse111">VMs</button>
+                            </h2>
+                            <div id="collapse111"
+                                class="accordion-collapse collapse {{ isset($filter_params['vm_source']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <?php foreach ($vm_id_name as $vm) {?>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input id="checkbox_<?php echo $vm->name; ?>" class="custom-control-input"
+                                                type="checkbox" name="vm_source[]" value="<?php echo $vm->name; ?>"
+                                                <?php echo isset($filter_params['vm_source']) && in_array($vm->name, $filter_params['vm_source']) ? 'checked' : ''; ?>>
+                                            <label for="checkbox_<?php echo $vm->name; ?>" class="custom-control-label"><?php echo $vm->name; ?></label>
+                                        </div>
+                                        <?php } ?>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse112"
+                                    aria-expanded="true" aria-controls="collapse112">Venue's</button>
+                            </h2>
+                            <div id="collapse112"
+                                class="accordion-collapse collapse {{ isset($filter_params['venues_source']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <?php foreach ($all_venues as $venue) {?>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input id="checkbox_<?php echo $venue->name; ?>" class="custom-control-input"
+                                                type="checkbox" name="venues_source[]" value="<?php echo $venue->name; ?>"
+                                                <?php echo isset($filter_params['venues_source']) && in_array($venue->name, $filter_params['venues_source']) ? 'checked' : ''; ?>>
+                                            <label for="checkbox_<?php echo $venue->name; ?>"
+                                                class="custom-control-label"><?php echo $venue->name; ?></label>
+                                        </div>
+                                        <?php } ?>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="accordion-item">
                             <h2 class="accordion-header">
                                 <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
@@ -319,6 +365,16 @@
         if (isset($filter_params['visit_status']) && is_array($filter_params['visit_status'])) {
             foreach ($filter_params['visit_status'] as $source) {
                 $filters[] = 'visit_status[]=' . urlencode($source);
+            }
+        }
+        if (isset($filter_params['vm_source']) && is_array($filter_params['vm_source'])) {
+            foreach ($filter_params['vm_source'] as $source) {
+                $filters[] = 'vm_source[]=' . urlencode($source);
+            }
+        }
+        if (isset($filter_params['venues_source']) && is_array($filter_params['venues_source'])) {
+            foreach ($filter_params['venues_source'] as $source) {
+                $filters[] = 'venues_source[]=' . urlencode($source);
             }
         }
         if (isset($filter_params['visit_created_from_date'])) {

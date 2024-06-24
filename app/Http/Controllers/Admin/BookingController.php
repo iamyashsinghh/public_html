@@ -9,6 +9,8 @@ use App\Models\foodPreference;
 use App\Models\Lead;
 use App\Models\LeadForward;
 use App\Models\partyArea;
+use App\Models\TeamMember;
+use App\Models\Venue;
 use App\Models\VmEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -19,6 +21,12 @@ class BookingController extends Controller {
         $filter_params = [];
         if ($request->booking_source != null) {
             $filter_params['booking_source'] = $request->booking_source;
+        }
+        if ($request->venues_source != null) {
+            $filter_params['venues_source'] = $request->venues_source;
+        }
+        if ($request->vm_source != null) {
+            $filter_params['vm_source'] = $request->vm_source;
         }
         if ($request->quarter_advance_collected != null) {
             $filter_params['quarter_advance_collected'] = $request->quarter_advance_collected;
@@ -40,7 +48,10 @@ class BookingController extends Controller {
             $filter_params['dashboard_filters'] = $dashboard_filters;
             $page_heading = ucwords(str_replace("_", " ", $dashboard_filters));
         }
-        return view('admin.venueCrm.bookings.list', compact('page_heading', 'filter_params'));
+        $vm_id_name = TeamMember::select('id', 'name')->where('role_id', 5)->get();
+        $all_venues = Venue::select('id', 'name')->get();
+
+        return view('admin.venueCrm.bookings.list', compact('page_heading', 'filter_params', 'vm_id_name', 'all_venues'));
     }
 
     public function ajax_list(Request $request) {
@@ -65,6 +76,12 @@ class BookingController extends Controller {
 
         if ($request->booking_source != null) {
             $bookings->whereIn('bookings.booking_source', $request->booking_source);
+        }
+        if ($request->vm_source) {
+            $bookings->whereIn('team_members.name', $request->vm_source);
+        }
+        if ($request->venues_source) {
+            $bookings->whereIn('team_members.venue_name', $request->venues_source);
         }
          if ($request->quarter_advance_collected != null) {
             $bookings->where('bookings.quarter_advance_collected', $request->quarter_advance_collected);
