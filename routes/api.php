@@ -448,94 +448,8 @@ if (!function_exists('get_business_cat')) {
     }
 }
 
-
-// Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
-//     try {
-//         // Log::info('Received Tata call data:', $request->all());
-
-//         $mobile = $request->input('caller_id_number');
-//         $pattern = "/^\d{10}$/";
-
-//         $caller_agent_name = null;
-//         $lead_cat_data = null;
-//         $get_rm = null;
-//         $recording_url = $request->input('recording_url');
-
-//         if ($request->input('answered_agent') !== null) {
-//             $caller_agent_name = $request->input('answered_agent.name');
-//         } elseif ($request->input('missed_agent') !== null) {
-//             $missed_agents = $request->input('missed_agent');
-//             if (!empty($missed_agents)) {
-//                 $caller_agent_name = $missed_agents[0]['name'];
-//             }
-//         }
-
-//         if (!$caller_agent_name) {
-//             $get_rm = getAssigningRm();
-//         } else {
-//             $get_rm = getRmName($caller_agent_name);
-//         }
-
-//         if (!preg_match($pattern, $mobile)) {
-//             return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
-//         }
-//         $current_timestamp = now();
-//         $call_to_wb_api_virtual_number = $request->input('call_to_number');
-//         $lead_source = "WB|Call";
-
-//         $crm_meta = CrmMeta::find(1);
-//         $preference = $crm_meta ? $crm_meta->meta_value : 'la-fortuna-banquets-mayapuri';
-
-//         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
-//         if (!$listing_data) {
-//             $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
-//             if ($listing_data) {
-//                 $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
-//                 $lead_cat_data = $cat_data_cms ? $cat_data_cms->name : null;
-//             }
-//         }
-
-//         $locality = DB::connection('mysql2')->table('locations')->where('id', optional($listing_data)->location_id)->first();
-//         $lead = Lead::where('mobile', $mobile)->first();
-//         if ($lead) {
-//             if ($recording_url !== null) {
-//                 $lead->recording_url .= ',' . $recording_url;
-//             }
-//             $lead->enquiry_count += 1;
-//         } else {
-//             $lead = new Lead();
-//             $lead->name = $request->input('name');
-//             $lead->email = $request->input('email');
-//             $lead->mobile = $mobile;
-//             if ($recording_url !== null) {
-//                 $lead->recording_url = $recording_url;
-//             }
-//         }
-//         $lead->lead_datetime = $current_timestamp;
-//         $lead->source = $lead_source;
-//         $lead->lead_catagory = $lead_cat_data;
-//         $lead->preference = $preference;
-//         $lead->locality = optional($locality)->name;
-//         $lead->lead_status = "Super Hot Lead";
-//         $lead->read_status = false;
-//         $lead->service_status = false;
-//         $lead->done_title = null;
-//         $lead->done_message = null;
-//         $lead->lead_color = "#4bff0033";
-//         $lead->virtual_number = $call_to_wb_api_virtual_number;
-//         $lead->whatsapp_msg_time = $current_timestamp;
-//         $lead->assign_to = $get_rm ? $get_rm->name : null;
-//         $lead->assign_id = $get_rm ? $get_rm->id : null;
-//         $lead->save();
-//         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with the best price..!']);
-//     } catch (\Throwable $th) {
-//         Log::error('Error processing Tata call data: ' . $th->getMessage());
-//         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
-//     }
-// });
 Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
     try {
-        // Log::info('Received Tata call data:', $request->all());
         $mobile = $request->input('caller_id_number');
         $pattern = "/^\d{10}$/";
 
@@ -552,7 +466,6 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
                 $caller_agent_name = $missed_agents[0]['name'];
             }
         }
-
         if (!$caller_agent_name) {
             $get_rm = getAssigningRm();
         } else {
@@ -702,7 +615,7 @@ Route::post('/new_lead', function (Request $request) {
                 $preference = $cleaned_url;
             }
 
-            $lead_cat_data = "Venue";  // Default category name
+            $lead_cat_data = "Venue";
             $listing_data = null;
 
 

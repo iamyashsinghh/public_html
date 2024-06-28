@@ -4,17 +4,17 @@
 @endsection
 @section('title', $page_heading . ' | BDM CRM')
 @section('navbar-right-links')
-        <li class="nav-item">
-            <a class="nav-link" title="Filters" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#"
-                role="button">
-                <i class="fas fa-filter"></i>
-            </a>
-        </li>
+    <li class="nav-item">
+        <a class="nav-link" title="Filters" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#"
+            role="button">
+            <i class="fas fa-filter"></i>
+        </a>
+    </li>
 @endsection
 @section('navbar-left-links')
-<li class="nav-item">
-    <a href="javascript:void(0);" class="nav-link" onclick="handle_create_lead()">Create New Lead</a>
-</li>
+    <li class="nav-item">
+        <a href="javascript:void(0);" class="nav-link" onclick="handle_create_lead()">Create New Lead</a>
+    </li>
 @endsection
 @section('main')
     @php
@@ -25,7 +25,11 @@
             <div class="container-fluid">
                 <div class="d-flex justify-content-between mb-2">
                     <h1 class="m-0">{{ $page_heading }}</h1>
-                    <a href="{{ route('bdm.lead.list') }}" class="btn btn-secondary btn-sm">Refresh</a>
+                    <div>
+                        <a href="{{ route('bdm.lead.list') }}" class="btn btn-secondary btn-sm">Refresh</a>
+                        <button class="btn btn-sm text-light" onclick="send_what_msg_multiple()"
+                            style="background-color: var(--wb-renosand);">Whatsapp</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -151,10 +155,11 @@
                                 data-bs-parent="#accordionExample">
                                 <div class="accordion-body pl-2 pb-4">
                                     <div class="custom-control custom-checkbox my-1">
-                                        <input class="custom-control-input" type="checkbox" id="lead_status_active_checkbox"
-                                            name="lead_status[]" value="Active"
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_status_active_checkbox" name="lead_status[]" value="Active"
                                             {{ isset($filter_params['lead_status']) && in_array('Active', $filter_params['lead_status']) ? 'checked' : '' }}>
-                                        <label for="lead_status_active_checkbox" class="custom-control-label">Active</label>
+                                        <label for="lead_status_active_checkbox"
+                                            class="custom-control-label">Active</label>
                                     </div>
                                     <div class="custom-control custom-checkbox my-1">
                                         <input class="custom-control-input" type="checkbox" id="lead_status_hot_checkbox"
@@ -170,8 +175,8 @@
                                             Hot</label>
                                     </div>
                                     <div class="custom-control custom-checkbox my-1">
-                                        <input class="custom-control-input" type="checkbox" id="lead_status_done_checkbox"
-                                            name="lead_status[]" value="Done"
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_status_done_checkbox" name="lead_status[]" value="Done"
                                             {{ isset($filter_params['lead_status']) && in_array('Done', $filter_params['lead_status']) ? 'checked' : '' }}>
                                         <label for="lead_status_done_checkbox" class="custom-control-label">Done</label>
                                     </div>
@@ -295,7 +300,7 @@
 @endsection
 @section('footer-script')
     @include('whatsapp.bdmchat');
-    @include('whatsapp.multiplemsg');
+    @include('whatsapp.bdm_wa_multi_msg');
     @include('bdm.lead.manage_lead_modal');
     @php
         $filter = '';
@@ -307,6 +312,24 @@
     <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
     <script>
+        function send_what_msg_multiple() {
+            const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg_multiple'));
+
+            var selectedValues = [];
+            $('.forward_lead_checkbox:checked').each(function() {
+                selectedValues.push($(this).val());
+            });
+            console.log(selectedValues);
+            let phonenum = document.getElementById('phone_inp_id_m');
+            phonenum.value = selectedValues;
+            if (selectedValues.length > 0) {
+                manageWhatsappChatModal.show();
+            } else {
+                toastr.info("Select the lead's which you want to send messages.");
+            }
+        }
+
+
         function handle_whatsapp_msg(id) {
             const elementToUpdate = document.querySelector(`#what_id-${id}`);
             if (elementToUpdate) {
@@ -426,38 +449,42 @@
                             data: "whatsapp_msg_time",
                         }
                     ],
-                    order : [
-                        [13, 'desc'],[3, 'desc']
+                    order: [
+                        [13, 'desc'],
+                        [3, 'desc']
                     ],
                     rowCallback: function(row, data, index) {
                         const td_elements = row.querySelectorAll('td');
-                        td_elements[0].innerHTML = `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data.enquiry_count}</span><br>
+                        td_elements[0].innerHTML =
+                            `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data.enquiry_count}</span><br>
                     <input type="checkbox" onchange="handle_select_single_lead(this)" class="forward_lead_checkbox" value="${data.lead_id}">`;
 
-                    td_elements[3].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
+                        td_elements[3].innerText = moment(data.lead_datetime).format(
+                            "DD-MMM-YYYY hh:mm a");
 
-                    if (data.is_whatsapp_msg === 1) {
-                        td_elements[7].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
-                    } else {
-                        td_elements[7].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
-                    }
-                    if (data.service_status == 1) {
-                                td_elements[10].innerHTML =
-                                    `<span class="badge badge-success">Contacted</span>`;
-                            } else {
-                                td_elements[10].innerHTML =
-                                    `<span class="badge badge-danger">Not-Contacted</span>`;
-                            }
+                        if (data.is_whatsapp_msg === 1) {
+                            td_elements[7].innerHTML =
+                                `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
+                        } else {
+                            td_elements[7].innerHTML =
+                                `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
+                        }
+                        if (data.service_status == 1) {
+                            td_elements[10].innerHTML =
+                                `<span class="badge badge-success">Contacted</span>`;
+                        } else {
+                            td_elements[10].innerHTML =
+                                `<span class="badge badge-danger">Not-Contacted</span>`;
+                        }
                         const action_btns =
-                        `<a href="{{ route('bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>`;
-                    td_elements[13].classList.add('text-nowrap');
-                    td_elements[13].innerHTML = action_btns;
-                    for (let i = 1; i < 12; i++) {
+                            `<a href="{{ route('bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>`;
+                        td_elements[13].classList.add('text-nowrap');
+                        td_elements[13].innerHTML = action_btns;
+                        for (let i = 1; i < 12; i++) {
                             if (i !== 7 && td_elements[i]) {
                                 td_elements[i].style.cursor = "pointer";
-                                td_elements[i].setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
+                                td_elements[i].setAttribute('onclick',
+                                    `handle_view_lead(${data.lead_id})`);
                             }
                         }
                     }
@@ -562,38 +589,42 @@
                             data: "whatsapp_msg_time",
                         }
                     ],
-                    order : [
-                        [13, 'desc'],[3, 'desc']
+                    order: [
+                        [13, 'desc'],
+                        [3, 'desc']
                     ],
                     rowCallback: function(row, data, index) {
                         const td_elements = row.querySelectorAll('td');
-                        td_elements[0].innerHTML = `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data.enquiry_count}</span><br>
+                        td_elements[0].innerHTML =
+                            `<i class="fa fa-arrow-rotate-right"></i><span class="mx-1">${data.enquiry_count}</span><br>
                     <input type="checkbox" onchange="handle_select_single_lead(this)" class="forward_lead_checkbox" value="${data.lead_id}">`;
 
-                    td_elements[3].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
+                        td_elements[3].innerText = moment(data.lead_datetime).format(
+                            "DD-MMM-YYYY hh:mm a");
 
-                    if (data.is_whatsapp_msg === 1) {
-                        td_elements[7].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
-                    } else {
-                        td_elements[7].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
-                    }
-                    if (data.service_status == 1) {
-                                td_elements[10].innerHTML =
-                                    `<span class="badge badge-success">Contacted</span>`;
-                            } else {
-                                td_elements[10].innerHTML =
-                                    `<span class="badge badge-danger">Not-Contacted</span>`;
-                            }
+                        if (data.is_whatsapp_msg === 1) {
+                            td_elements[7].innerHTML =
+                                `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
+                        } else {
+                            td_elements[7].innerHTML =
+                                `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
+                        }
+                        if (data.service_status == 1) {
+                            td_elements[10].innerHTML =
+                                `<span class="badge badge-success">Contacted</span>`;
+                        } else {
+                            td_elements[10].innerHTML =
+                                `<span class="badge badge-danger">Not-Contacted</span>`;
+                        }
                         const action_btns =
-                        `<a href="{{ route('bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>`;
-                    td_elements[13].classList.add('text-nowrap');
-                    td_elements[13].innerHTML = action_btns;
-                    for (let i = 1; i < 12; i++) {
+                            `<a href="{{ route('bdm.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>`;
+                        td_elements[13].classList.add('text-nowrap');
+                        td_elements[13].innerHTML = action_btns;
+                        for (let i = 1; i < 12; i++) {
                             if (i !== 7 && td_elements[i]) {
                                 td_elements[i].style.cursor = "pointer";
-                                td_elements[i].setAttribute('onclick', `handle_view_lead(${data.lead_id})`);
+                                td_elements[i].setAttribute('onclick',
+                                    `handle_view_lead(${data.lead_id})`);
                             }
                         }
                     }
@@ -635,6 +666,5 @@
         function handle_view_lead(lead_id) {
             window.open(`{{ route('bdm.lead.view') }}/${lead_id}`);
         }
-
     </script>
 @endsection

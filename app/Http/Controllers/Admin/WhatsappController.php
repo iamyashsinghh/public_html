@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 class WhatsappController extends Controller
 {
     public function index(){
-        $teamdata = TeamMember::whereIn('role_id', [3, 4])->get();
+        $teamdata = TeamMember::whereIn('role_id', [3, 4, 6])->get();
         $templates = WhatsappTemplates::select('template_name')->get();
         return view("admin.whatsapp.campain.campain", compact('teamdata','templates'));
     }
