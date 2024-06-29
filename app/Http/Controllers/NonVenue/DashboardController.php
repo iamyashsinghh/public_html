@@ -75,6 +75,7 @@ class DashboardController extends Controller
             })
             ->distinct('lead_id')
             ->count();
+            
         $nvrm_task_overdue_leads = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
             ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
             ->where('nvrm_tasks.task_schedule_datetime', '<', $currentDateTime)
@@ -83,6 +84,7 @@ class DashboardController extends Controller
             ->whereNull('nvrm_tasks.deleted_at')
             ->where('nvrm_tasks.created_by', $auth_user->id)
             ->count();
+
         $nvrm_today_task_leads = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
             ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
             ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentDateStart, $currentDateEnd])
@@ -91,6 +93,7 @@ class DashboardController extends Controller
             ->whereNull('nvrm_tasks.deleted_at')
             ->where('nvrm_tasks.created_by', $auth_user->id)
             ->count();
+
         $nvrm_month_task_leads = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
             ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
             ->whereNull('nvrm_lead_forwards.deleted_at')

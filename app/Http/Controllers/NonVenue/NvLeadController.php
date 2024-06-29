@@ -55,7 +55,9 @@ class NvLeadController extends Controller
         }
 
         $page_heading = $filter_params ? "Leads - Filtered" : "Leads";
-
+        if($request->category){
+            $filter_params = ['dashboard_filters' => $request->category];
+            }
         if ($dashboard_filters !== null) {
             $filter_params = ['dashboard_filters' => $dashboard_filters];
             $page_heading = ucwords(str_replace("_", " ", $dashboard_filters));
@@ -180,7 +182,6 @@ class NvLeadController extends Controller
         if ($request->dashboard_filters != null) {
             $current_month = date('Y-m');
             $current_date = date('Y-m-d');
-            $currentDateTime = Carbon::today();
             if ($request->dashboard_filters == "leads_received_this_month") {
                 $leads->where('nvrm_lead_forwards.lead_datetime', 'like', "%$current_month%")->whereNull('nvrm_lead_forwards.deleted_at')->where('nvrm_lead_forwards.forward_to', $auth_user->id);
             } elseif ($request->dashboard_filters == "leads_received_today") {
@@ -214,6 +215,16 @@ class NvLeadController extends Controller
                 $leads->join('nv_lead_forward_infos', 'nvrm_lead_forwards.lead_id', '=', 'nv_lead_forward_infos.lead_id')
                 ->where('nv_lead_forward_infos.updated_at', 'like', "%$current_date%")
                 ->where('nv_lead_forward_infos.forward_from', $auth_user->id);
+            }else{
+                $category = VendorCategory::where('name', $request->dashboard_filters)->first();
+                if ($category) {
+                    $leads->join('nv_lead_forward_infos', 'nvrm_lead_forwards.lead_id', '=', 'nv_lead_forward_infos.lead_id')
+                        ->join('vendors', 'nv_lead_forward_infos.forward_to', '=', 'vendors.id')
+                        ->where('vendors.category_id', $category->id)
+                        ->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")
+                        ->where('nv_lead_forward_infos.forward_from', $auth_user->id)
+                        ->groupBy('nv_lead_forward_infos.lead_id');
+                }
             }
         }
 
