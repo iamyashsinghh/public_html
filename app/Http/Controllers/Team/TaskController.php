@@ -140,7 +140,7 @@ class TaskController extends Controller {
         $auth_user = Auth::guard('team')->user();
 
         if ($auth_user->role_id == 4) {
-            $exist_task = Task::join('team_members as tm', ['tm.id' => 'tasks.created_by'])->where(['tasks.lead_id' => $request->lead_id, 'tasks.done_datetime' => null, 'tm.role_id' => 4])->first();
+            $exist_task = Task::join('team_members as tm', ['tm.id' => 'tasks.created_by'])->where(['tasks.lead_id' => $request->lead_id,'tasks.created_by' => $auth_user->id, 'tasks.done_datetime' => null, 'tm.role_id' => 4])->first();
         } else {
             $exist_task = Task::where(['lead_id' => $request->lead_id, 'created_by' => $auth_user->id, 'done_datetime' => null])->first();
         }
