@@ -167,7 +167,7 @@
                     <div class="card text-xs mb-5">
                         <div class="card-header card-header-mod text-light"
                             style="background: linear-gradient(48deg, #8e0000e6, #dfa930b5);">
-                            <h6 class="mb-0 text-bold">VM Productivity - {{ date('F') }}</h5>
+                            <h6 class="mb-0 text-bold">VM Productivity - {{ date('F') }}</h6>
                         </div>
                         <div class="card-body p-0">
                             <table class="table-bordered">
@@ -194,16 +194,43 @@
                                         $total_task_overdue = 0;
                                         $total_unfollowed_leads = 0;
                                         $grand_total_unactioned = 0;
+                                        $total_recce_done_this_month = 0;
+                                        $total_bookings_this_month = 0;
+                                        $total_leads_received_this_month = 0;
+                                        $total_wb_targets = 0;
+                                        $total_wb_recce_percentage = 0;
+                                        $total_l2r = 0;
+                                        $total_r2c = 0;
+                                        $number_of_vms = 0;
                                     @endphp
                                     @foreach ($vm_members as $vm)
+                                        @php
+                                            $number_of_vms += 1;
+                                            $total_recce_done_this_month += $vm->recce_done_this_month;
+                                            $total_bookings_this_month += $vm->bookings_this_month;
+                                            $total_leads_received_this_month += $vm->leads_received_this_month;
+                                            $total_wb_targets += $vm->wb_recce_target;
+
+                                            $total_unactioned = $vm->unread_leads_overdue + $vm->task_overdue + $vm->unfollowed_leads;
+                                            $grand_total_unactioned += $total_unactioned;
+
+                                            $total_unread_leads_overdue += $vm->unread_leads_overdue;
+                                            $total_task_overdue += $vm->task_overdue;
+                                            $total_unfollowed_leads += $vm->unfollowed_leads;
+                                            $total_wb_recce_percentage += $vm->wb_recce_percentage;
+                                            $total_l2r += $vm->l2r;
+                                            $total_r2c += $vm->r2c;
+                                        @endphp
                                         <tr class="text-center" style="font-weight: bold;">
                                             <td class="text-nowrap text-left px-2">
-                                                {{ $vm->get_manager ? $vm->get_manager->name : 'N/A' }}</td>
-                                            <td class="text-left text-nowrap px-2">{{ $vm->name }} /<br />
-                                                {{ $vm->venue_name }}</td>
-                                            <td><input type="number" style="width: 50px;"
-                                                    data-vm_id="{{ $vm->id }}" value="{{ $vm->wb_recce_target }}"
-                                                    onchange="wb_recce_target(this)"></td>
+                                                {{ $vm->get_manager ? $vm->get_manager->name : 'N/A' }}
+                                            </td>
+                                            <td class="text-left text-nowrap px-2">
+                                                {{ $vm->name }} /<br /> {{ $vm->venue_name }}
+                                            </td>
+                                            <td>
+                                                <input type="number" style="width: 50px;" data-vm_id="{{ $vm->id }}" value="{{ $vm->wb_recce_target }}" onchange="wb_recce_target(this)">
+                                            </td>
                                             <td class="recce_done_this_month_td">{{ $vm->recce_done_this_month }}</td>
                                             @php
                                                 $val = $vm->wb_recce_percentage;
@@ -218,42 +245,47 @@
                                                 } else {
                                                     $bg_color = null;
                                                 }
-
-                                                $total_unactioned =
-                                                    $vm->unread_leads_overdue +
-                                                    $vm->task_overdue +
-                                                    $vm->unfollowed_leads;
-                                                $grand_total_unactioned += $total_unactioned;
-
-                                                $total_unread_leads_overdue += $vm->unread_leads_overdue;
-                                                $total_task_overdue += $vm->task_overdue;
-                                                $total_unfollowed_leads += $vm->unfollowed_leads;
                                             @endphp
                                             <td class="text-nowrap wb_recce_percentage_td {{ $bg_color != null ? 'text-white' : '' }}"
                                                 style="background-color: {{ $bg_color }}">
-                                                {{ $vm->wb_recce_percentage }} %</td>
+                                                {{ $vm->wb_recce_percentage }} %
+                                            </td>
                                             <td>{{ $vm->bookings_this_month }}</td>
                                             <td class="text-nowrap">{{ $vm->l2r }} %</td>
                                             <td class="text-nowrap">{{ $vm->r2c }} %</td>
                                             <td>{{ $vm->leads_received_this_month }}</td>
-                                            @php
-
-                                            @endphp
-                                            <td data-value="{{ $vm->unread_leads_overdue }}"
-                                                class="unread_leads_overdue_td">{{ $vm->unread_leads_overdue }}</td>
-                                            <td data-value="{{ $vm->task_overdue }}" class="task_overdue_td">
-                                                {{ $vm->task_overdue }}</td>
-                                            <td data-value="{{ $vm->unfollowed_leads }}" class="unfollowed_leads_td">
-                                                {{ $vm->unfollowed_leads }}</td>
-                                            <td data-value="{{ $total_unactioned }}" class="total_unactioned_td">
-                                                {{ $total_unactioned }}</td>
+                                            <td data-value="{{ $vm->unread_leads_overdue }}" class="unread_leads_overdue_td">{{ $vm->unread_leads_overdue }}</td>
+                                            <td data-value="{{ $vm->task_overdue }}" class="task_overdue_td">{{ $vm->task_overdue }}</td>
+                                            <td data-value="{{ $vm->unfollowed_leads }}" class="unfollowed_leads_td">{{ $vm->unfollowed_leads }}</td>
+                                            <td data-value="{{ $total_unactioned }}" class="total_unactioned_td">{{ $total_unactioned }}</td>
                                         </tr>
                                     @endforeach
+                                    @php
+                                        $average_wb_recce_percentage = $total_wb_targets > 0 ? ($total_recce_done_this_month / $total_wb_targets) * 100 : 0;
+                                        $average_l2r = $number_of_vms > 0 ? $total_l2r / $number_of_vms : 0;
+                                        $average_r2c = $number_of_vms > 0 ? $total_r2c / $number_of_vms : 0;
+                                    @endphp
+                                    <tr class="text-center" style="font-weight: bold;">
+                                        <td class="text-nowrap text-left px-2">Summary</td>
+                                        <td class="text-left text-nowrap px-2">All VMs /<br /> All Venues</td>
+                                        <td class="px-2">{{ $total_wb_targets }}</td>
+                                        <td class="recce_done_this_month_td">{{ $total_recce_done_this_month }}</td>
+                                        <td class="px-2">{{ round($average_wb_recce_percentage, 2) }} %</td>
+                                        <td>{{ $total_bookings_this_month }}</td>
+                                        <td class="px-2">{{ round($average_l2r, 2) }} %</td>
+                                        <td class="px-2">{{ round($average_r2c, 2) }} %</td>
+                                        <td>{{ $total_leads_received_this_month }}</td>
+                                        <td>{{ $total_unread_leads_overdue }}</td>
+                                        <td>{{ $total_task_overdue }}</td>
+                                        <td>{{ $total_unfollowed_leads }}</td>
+                                        <td>{{ $grand_total_unactioned }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+
 
                 <div class="my-2">
                     <div class="card text-xs mb-5">
