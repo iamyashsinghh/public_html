@@ -452,15 +452,12 @@ class NvLeadController extends Controller
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
             return redirect()->back();
         }
-
-
         $auth_user = Auth::guard('nonvenue')->user();
         $forward = nvrmLeadForward::where(['id' => $request->forward_id])->first();
         if (!$forward) {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
             return redirect()->back();
         }
-
         foreach ($request->forward_vendors_id as $vendor_id) {
             $exist_lead_forward = nvLeadForward::where(['lead_id' => $forward->lead_id, 'forward_to' => $vendor_id])->first();
             if ($exist_lead_forward) {
@@ -496,6 +493,19 @@ class NvLeadController extends Controller
 
             $vendor = Vendor::find($vendor_id);
 
+            if (count($request->forward_vendors_id) == 1) {
+                if ($vendor) {
+                    Vendor::where(['is_lead_forwaded' => 1, 'status' => 1, 'category_id' => $request->nvrm_msg_id])->update(['last_lead_forwaded_value' => '']);
+                    $vendor->is_lead_forwaded = 1;
+                    $vendor->last_lead_forwaded_value = "--- Last Forward At ==> $this->current_timestamp By $auth_user->name";
+                    $vendor->save();
+                    $vendorsNotHavingForwardedLeadsCount = Vendor::where(['is_lead_forwaded' => 0, 'status' => 1, 'category_id' => $request->nvrm_msg_id])->count();
+                    if ($vendorsNotHavingForwardedLeadsCount == 0) {
+                        Vendor::where(['status' => 1, 'category_id' => $request->nvrm_msg_id])->update(['is_lead_forwaded' => 0]);
+                    }
+                }
+            }
+
             $message = substr($forward->mobile, 0, -2) . "XX";
             $lead_id = $forward->lead_id;
 
@@ -503,15 +513,15 @@ class NvLeadController extends Controller
                 $event = nvEvent::where(['lead_id' => $forward->lead_id])->orderBy('id', 'desc')->first();
                 $eventdate = $forward->event_datetime ? date('d-M-Y', strtotime($forward->event_datetime)) : 'N/A';
                 $pax = $event ? $event->pax : 'N/A';
-                $this->notify_wbvendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
+                // $this->notify_wbvendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
                 if($vendor->alt_mobile_number){
-                    $this->notify_wbvendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
+                    // $this->notify_wbvendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
                 }
             }else{
                 if($vendor->alt_mobile_number){
-                    $this->notify_vendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $lead_id);
+                    // $this->notify_vendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $lead_id);
                 }
-                $this->notify_vendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $lead_id);
+                // $this->notify_vendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $lead_id);
             }
 
             if ($vendor->email != null) {
@@ -524,11 +534,9 @@ class NvLeadController extends Controller
                     'lead_email' => $forward->email ?: 'N/A',
                     'lead_mobile' => $forward->mobile ?: 'N/A',
                 ];
-                // if($request->nvrm_msg_id == 4){
-                //     $data['pax'] = $event->pax;
-                // }
+
                 if (env('MAIL_STATUS') === true) {
-                    Mail::mailer('smtp2')->to($vendor->email)->send(new NotifyVendorLead($data));
+                    // Mail::mailer('smtp2')->to($vendor->email)->send(new NotifyVendorLead($data));
                 }
             }
         }
@@ -542,7 +550,7 @@ class NvLeadController extends Controller
 
     public function get_vendor_by_category($category_id)
     {
-        $vendors = Vendor::select('id', 'name', 'business_name', 'group_name')->where(['category_id' => $category_id, 'status' => 1])->orderBy('group_name')->get();
+        $vendors = Vendor::select('id', 'name', 'business_name', 'group_name', 'is_lead_forwaded', 'last_lead_forwaded_value')->where(['category_id' => $category_id, 'status' => 1])->orderBy('group_name')->get();
         if ($vendors && sizeof($vendors) > 0) {
             return response()->json(['success' => true, 'vendors' => $vendors]);
         } else {
