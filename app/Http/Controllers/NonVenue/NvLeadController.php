@@ -513,15 +513,15 @@ class NvLeadController extends Controller
                 $event = nvEvent::where(['lead_id' => $forward->lead_id])->orderBy('id', 'desc')->first();
                 $eventdate = $forward->event_datetime ? date('d-M-Y', strtotime($forward->event_datetime)) : 'N/A';
                 $pax = $event ? $event->pax : 'N/A';
-                // $this->notify_wbvendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
+                $this->notify_wbvendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
                 if($vendor->alt_mobile_number){
-                    // $this->notify_wbvendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
+                    $this->notify_wbvendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
                 }
             }else{
                 if($vendor->alt_mobile_number){
-                    // $this->notify_vendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $lead_id);
+                    $this->notify_vendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $lead_id);
                 }
-                // $this->notify_vendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $lead_id);
+                $this->notify_vendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $lead_id);
             }
 
             if ($vendor->email != null) {
@@ -536,7 +536,7 @@ class NvLeadController extends Controller
                 ];
 
                 if (env('MAIL_STATUS') === true) {
-                    // Mail::mailer('smtp2')->to($vendor->email)->send(new NotifyVendorLead($data));
+                    Mail::mailer('smtp2')->to($vendor->email)->send(new NotifyVendorLead($data));
                 }
             }
         }
