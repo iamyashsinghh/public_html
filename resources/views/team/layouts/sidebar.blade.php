@@ -4,6 +4,16 @@ $auth_user_role = $auth_user->get_role;
 
 $uri = Route::currentRouteName();
 @endphp
+@if ($auth_user->role_id == 5)
+<style>
+    body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+</style>
+@endif
 <aside class="main-sidebar sidebar-dark-danger" style="background: var(--wb-dark-red);">
     <a href="{{route('team.dashboard')}}" class="brand-link text-center">
         <img src="{{asset('wb-logo2.webp')}}" alt="AdminLTE Logo" style="width: 80% !important;">
