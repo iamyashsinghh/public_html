@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers;
 use App\Http\Controllers\Controller;
+use App\Models\whatsappMessages;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -61,6 +62,11 @@ Route::post('whatsapp_msg_send_hello', [Controllers\WhatsappMsgController::class
 Route::post('whatsapp_msg_send_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_greet_btn'])->name('whatsapp_chat.send.greet_btn');
 // nv great msg
 Route::post('whatsapp_msg_send_nv_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_greet_btn'])->name('whatsapp_chat.send.nv_greet_btn');
+// whatsappMessages msg nv subscription renewal msg 1
+Route::post('whatsapp_msg_send_nv_subscription_btn_one', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_one'])->name('whatsapp_chat.send.nv_subscription_btn_one');
+Route::post('whatsapp_msg_send_nv_subscription_btn_two', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_two'])->name('whatsapp_chat.send.nv_subscription_btn_two');
+
+
 // bdm great msg
 Route::post('whatsapp_msg_send_bdm_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_bdm_greet_btn'])->name('whatsapp_chat.send.bdm_greet_btn');
 // bdm documnet send

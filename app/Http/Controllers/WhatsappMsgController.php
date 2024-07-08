@@ -116,17 +116,17 @@ class WhatsappMsgController extends Controller
         $response = curl_exec($curl);
         $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if (curl_errno($curl)) {
-            Log::error("Curl error: " . curl_error($curl));
+            // Log::error("Curl error: " . curl_error($curl));
             curl_close($curl);
             return null;
         }
         curl_close($curl);
         if ($httpcode >= 200 && $httpcode < 300) {
             $data = json_decode($response, true);
-            Log::info("Media URL for message: " . $response);
+            // Log::info("Media URL for message: " . $response);
             return $data['url'] ?? null;
         } else {
-            Log::error("Request failed with HTTP status $httpcode and response: $response");
+            // Log::error("Request failed with HTTP status $httpcode and response: $response");
             return null;
         }
     }
@@ -173,7 +173,7 @@ class WhatsappMsgController extends Controller
                 $headerVariableCount = 0;
                 $bodyVariableCount = 0;
                 foreach ($template['components'] as $component) {
-                    if ($component['type'] === 'HEADER' && isset ($component['text'])) {
+                    if ($component['type'] === 'HEADER' && isset($component['text'])) {
                         $headerVariableCount += $this->countVariables($component['text']);
                     } elseif ($component['type'] === 'BODY') {
                         $bodyVariableCount += $this->countVariables($component['text']);
@@ -251,16 +251,16 @@ class WhatsappMsgController extends Controller
             'Authorization' => "Bearer $authKey",
             'Content-Type' => 'application/json'
         ])->post($url, [
-                    "messaging_product" => "whatsapp",
-                    "recipient_type" => "individual",
-                    "to" => "91$request->recipient",
-                    "type" => "text",
-                    "text" => [
-                        "body" => "$request->message"
-                    ]
-                ]);
+            "messaging_product" => "whatsapp",
+            "recipient_type" => "individual",
+            "to" => "91$request->recipient",
+            "type" => "text",
+            "text" => [
+                "body" => "$request->message"
+            ]
+        ]);
         if ($response->successful()) {
-            Log::info($response);
+            // Log::info($response);
             $currentTimestamp = Carbon::now();
             $newWaMsg = new whatsappMessages();
             $newWaMsg->msg_id = "$request->recipient";
@@ -329,7 +329,6 @@ class WhatsappMsgController extends Controller
                     if (isset($number) && !in_array(trim($number), $loggedNumbers)) {
                         $phoneNumbers[] = trim($number);
                     }
-
                 }
             }
         }
@@ -363,38 +362,38 @@ class WhatsappMsgController extends Controller
                 'Authorization' => $authToken,
                 'Content-Type' => 'application/json',
             ])->post($url, [
-                        "to" => "91{$phoneNumber}",
-                        "type" => "template",
-                        "source" => "external",
-                        "template" => [
-                            "name" => "$WhatsappBulkMsgTask->template_name",
-                            "language" => [
-                                "code" => "en"
-                            ],
-                            "components" => [
+                "to" => "91{$phoneNumber}",
+                "type" => "template",
+                "source" => "external",
+                "template" => [
+                    "name" => "$WhatsappBulkMsgTask->template_name",
+                    "language" => [
+                        "code" => "en"
+                    ],
+                    "components" => [
+                        [
+                            "type" => "header",
+                            "parameters" => [
                                 [
-                                    "type" => "header",
-                                    "parameters" => [
-                                        [
-                                            "type" => "image",
-                                            "image" => [
-                                                "link" => "$WhatsappBulkMsgTask->img"
-                                            ]
-                                        ]
-                                    ]
-                                ],
-                                [
-                                    "type" => "body",
-                                    "parameters" => [
-                                        [
-                                            "type" => "text",
-                                            "text" => "$var_name",
-                                        ]
+                                    "type" => "image",
+                                    "image" => [
+                                        "link" => "$WhatsappBulkMsgTask->img"
                                     ]
                                 ]
                             ]
+                        ],
+                        [
+                            "type" => "body",
+                            "parameters" => [
+                                [
+                                    "type" => "text",
+                                    "text" => "$var_name",
+                                ]
+                            ]
                         ]
-                    ]);
+                    ]
+                ]
+            ]);
 
             $tempMsg = WhatsappTemplates::where('template_name', $WhatsappBulkMsgTask->template_name)->first()->msg;
             $bodyMsg = Str::replace('{{1}}', $var_name, $tempMsg);
@@ -540,7 +539,7 @@ class WhatsappMsgController extends Controller
             "text" => [
                 "body" => "hi"
             ]
-        ]:[
+        ] : [
             "to" => "91$request->recipient",
             "type" => "template",
             "template" => [
@@ -578,19 +577,19 @@ class WhatsappMsgController extends Controller
             'Authorization' => "Bearer $authKey",
             'Content-Type' => 'application/json'
         ])->post($url, [
-                    "to" => "91$request->recipient",
-                    "type" => "template",
-                    "template" => [
-                        "name" => "hello",
-                        "language" => [
-                            "code" => "en"
-                        ],
-                        "components" => [],
-                    ]
-                ]);
+            "to" => "91$request->recipient",
+            "type" => "template",
+            "template" => [
+                "name" => "hello",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [],
+            ]
+        ]);
         Log::info($response);
         if ($response->successful()) {
-            Log::info($response);
+            // Log::info($response);
             $currentTimestamp = Carbon::now();
             $newWaMsg = new whatsappMessages();
             $newWaMsg->msg_id = "$request->recipient";
@@ -622,44 +621,44 @@ class WhatsappMsgController extends Controller
             'Authorization' => "Bearer $authKey",
             'Content-Type' => 'application/json'
         ])->post($url, [
-                    "to" => "91$request->recipient",
-                    "type" => "template",
-                    "template" => [
-                        "name" => "chat_section_btn_01",
-                        "language" => [
-                            "code" => "en"
-                        ],
-                        "components" => [
+            "to" => "91$request->recipient",
+            "type" => "template",
+            "template" => [
+                "name" => "chat_section_btn_01",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "header",
+                        "parameters" => [
                             [
-                                "type" => "header",
-                                "parameters" => [
-                                    [
-                                        "type" => "image",
-                                        "image" => [
-                                            "link" => "$img"
-                                        ]
-                                    ]
-                                ]
-                            ],
-                            [
-                                "type" => "body",
-                                "parameters" => [
-                                    [
-                                        "type" => "text",
-                                        "text" => "$nameOfRecipient",
-                                    ],
-                                    [
-                                        "type" => "text",
-                                        "text" => "$request->greetmsg",
-                                    ]
+                                "type" => "image",
+                                "image" => [
+                                    "link" => "$img"
                                 ]
                             ]
-                        ],
+                        ]
+                    ],
+                    [
+                        "type" => "body",
+                        "parameters" => [
+                            [
+                                "type" => "text",
+                                "text" => "$nameOfRecipient",
+                            ],
+                            [
+                                "type" => "text",
+                                "text" => "$request->greetmsg",
+                            ]
+                        ]
                     ]
-                ]);
-        Log::info($response);
+                ],
+            ]
+        ]);
+        // Log::info($response);
         if ($response->successful()) {
-            Log::info($response);
+            // Log::info($response);
             $currentTimestamp = Carbon::now();
             $newWaMsg = new whatsappMessages();
             $newWaMsg->msg_id = "$request->recipient";
@@ -690,37 +689,37 @@ class WhatsappMsgController extends Controller
             'Authorization' => "Bearer $authKey",
             'Content-Type' => 'application/json'
         ])->post($url, [
-                    "to" => "91$request->recipient",
-                    "type" => "template",
-                    "template" => [
-                        "name" => "nv_vendor_chat_inisiate_btn",
-                        "language" => [
-                            "code" => "en"
-                        ],
-                        "components" => [
+            "to" => "91$request->recipient",
+            "type" => "template",
+            "template" => [
+                "name" => "nv_vendor_chat_inisiate_btn",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "header",
+                        "parameters" => [
                             [
-                                "type" => "header",
-                                "parameters" => [
-                                    [
-                                        "type" => "text",
-                                        "text" => "$nameOfRecipient",
-                                    ]
-                                ]
-                            ],
-                            [
-                                "type" => "body",
-                                "parameters" => [
-                                    [
-                                        "type" => "text",
-                                        "text" => "$request->greetmsg",
-                                    ]
-                                ]
+                                "type" => "text",
+                                "text" => "$nameOfRecipient",
                             ]
-                        ],
+                        ]
+                    ],
+                    [
+                        "type" => "body",
+                        "parameters" => [
+                            [
+                                "type" => "text",
+                                "text" => "$request->greetmsg",
+                            ]
+                        ]
                     ]
-                ]);
+                ],
+            ]
+        ]);
         if ($response->successful()) {
-            Log::info($response);
+            // Log::info($response);
             $currentTimestamp = Carbon::now();
             $newWaMsg = new whatsappMessages();
             $newWaMsg->msg_id = "$request->recipient";
@@ -750,37 +749,37 @@ class WhatsappMsgController extends Controller
             'Authorization' => "Bearer $authKey",
             'Content-Type' => 'application/json'
         ])->post($url, [
-                    "to" => "91$request->recipient",
-                    "type" => "template",
-                    "template" => [
-                        "name" => "bdm_nv_chat_btn_re",
-                        "language" => [
-                            "code" => "en"
-                        ],
-                        "components" => [
+            "to" => "91$request->recipient",
+            "type" => "template",
+            "template" => [
+                "name" => "bdm_nv_chat_btn_re",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "header",
+                        "parameters" => [
                             [
-                                "type" => "header",
-                                "parameters" => [
-                                    [
-                                        "type" => "text",
-                                        "text" => "$nameOfRecipient",
-                                    ]
-                                ]
-                            ],
-                            [
-                                "type" => "body",
-                                "parameters" => [
-                                    [
-                                        "type" => "text",
-                                        "text" => "$request->greetmsg",
-                                    ]
-                                ]
+                                "type" => "text",
+                                "text" => "$nameOfRecipient",
                             ]
-                        ],
+                        ]
+                    ],
+                    [
+                        "type" => "body",
+                        "parameters" => [
+                            [
+                                "type" => "text",
+                                "text" => "$request->greetmsg",
+                            ]
+                        ]
                     ]
-                ]);
+                ],
+            ]
+        ]);
         if ($response->successful()) {
-            Log::info($response);
+            // Log::info($response);
             $currentTimestamp = Carbon::now();
             $newWaMsg = new whatsappMessages();
             $newWaMsg->msg_id = "$request->recipient";
@@ -824,13 +823,13 @@ class WhatsappMsgController extends Controller
                 'Authorization' => "Bearer $authKey",
                 'Content-Type' => 'application/json'
             ])->post($url, [
-                        "to" => "91$recipent",
-                        "type" => "document",
-                        "document" => [
-                            "link" => $doc_url,
-                            "caption" => $documentTitle
-                        ]
-                    ]);
+                "to" => "91$recipent",
+                "type" => "document",
+                "document" => [
+                    "link" => $doc_url,
+                    "caption" => $documentTitle
+                ]
+            ]);
 
             if ($response->successful()) {
                 $currentTimestamp = Carbon::now();
@@ -852,6 +851,107 @@ class WhatsappMsgController extends Controller
         }
     }
 
+    public function whatsapp_msg_send_nv_subscription_btn_one(Request $request)
+    {
+        if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+            return false;
+        }
+        $nameOfVendor = Vendor::where('mobile', $request->recipient)->first();
 
+        $nameOfRecipient = $nameOfVendor ? $nameOfVendor->name : 'Sir/Madam';
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $authKey = env('TATA_AUTH_KEY');
 
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer $authKey",
+            'Content-Type' => 'application/json'
+        ])->post($url, [
+            "to" => "91$request->recipient",
+            "type" => "template",
+            "template" => [
+                "name" => "subscription_reminder_1",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "header",
+                        "parameters" => [
+                            [
+                                "type" => "text",
+                                "text" => "$nameOfRecipient",
+                            ]
+                        ]
+                    ],
+                ],
+            ]
+        ]);
+        if ($response->successful()) {
+            // Log::info($response);
+            $currentTimestamp = Carbon::now();
+            $newWaMsg = new whatsappMessages();
+            $newWaMsg->msg_id = "$request->recipient";
+            $newWaMsg->msg_from = "$request->recipient";
+            $newWaMsg->time = $currentTimestamp;
+            $newWaMsg->type = 'text';
+            $newWaMsg->is_sent = "1";
+            $newWaMsg->body = "*Hi $nameOfRecipient*, \n\nHope you're doing well !! \n\n This is a reminder that your Premium Membership Subscription with Wedding Banquets is due for renewal in 5 days. To ensure the continued benefits of your Premium Listing and avoid any disruption to your business visibility, we kindly request you to make the payment at your earliest convenience. \n\nKindly feel free to reach out to me at 8882198989 for any questions. \n\nBest Regards, \nWedding Banquets \ninfo@weddingbanquets.in \n\n(Call Us Btn)";
+            $newWaMsg->save();
+            return response()->json(['message' => 'Message sent successfully.'], 200);
+        } else {
+            return response()->json(['error' => 'Failed to send message.'], $response->status());
+        }
+    }
+
+    public function whatsapp_msg_send_nv_subscription_btn_two(Request $request)
+    {
+        if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+            return false;
+        }
+        $nameOfVendor = Vendor::where('mobile', $request->recipient)->first();
+
+        $nameOfRecipient = $nameOfVendor ? $nameOfVendor->name : 'Sir/Madam';
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $authKey = env('TATA_AUTH_KEY');
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer $authKey",
+            'Content-Type' => 'application/json'
+        ])->post($url, [
+            "to" => "91$request->recipient",
+            "type" => "template",
+            "template" => [
+                "name" => "subscription_reminder_2",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "header",
+                        "parameters" => [
+                            [
+                                "type" => "text",
+                                "text" => "$nameOfRecipient",
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        if ($response->successful()) {
+            // Log::info($response);
+            $currentTimestamp = Carbon::now();
+            $newWaMsg = new whatsappMessages();
+            $newWaMsg->msg_id = "$request->recipient";
+            $newWaMsg->msg_from = "$request->recipient";
+            $newWaMsg->time = $currentTimestamp;
+            $newWaMsg->type = 'text';
+            $newWaMsg->is_sent = "1";
+            $newWaMsg->body = "*Hi $nameOfRecipient*, \n\nHope you're doing well !!\n\nPlease note that your CRM profile has been temporarily suspended due to the non-payment. This suspension has impacted your business operations, and you will not receive any new business leads until the payment is made. \n\nWe’re sorry to see you go! As you know, Our Premium showcases are invite-only memberships on Wedding Banquets that offer significantly higher visibility compared to Lite vendors on average, 9-10 times more. This increased visibility helps you attract more leads, allowing you to fill up your future wedding dates efficiently. \n\nWe hope you’ve had a great association with us so far and will reconnect as soon as you deem fit. Given that we're in the middle of the wedding season, we hope for a mutual benefit that the right time is very very soon. \n\nKindly feel free to reach out to me at *8882198989* for any questions. \n\nBest Regards,\nWedding Banquets \ninfo@weddingbanquets.in \n\n(Call Us Btn)";
+            $newWaMsg->save();
+            return response()->json(['message' => 'Message sent successfully.'], 200);
+        } else {
+            return response()->json(['error' => 'Failed to send message.'], $response->status());
+        }
+    }
 }
