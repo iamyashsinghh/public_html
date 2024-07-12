@@ -55,6 +55,10 @@
                                         <span>Manager: &nbsp;</span>
                                         <strong class="text-dark">{{$member->get_manager ?$member->get_manager->name : 'N/A'}}</strong>
                                     </li>
+                                    <li class="list-group-item border-0 ps-0 pt-0 text-sm">
+                                        <span>Created At: &nbsp;</span>
+                                        <strong class="text-dark">{{date('d-m-Y h:i a', strtotime($member->created_at))}}</strong>
+                                    </li>
                                     <li class="list-group-item border-0 ps-0 pt-0 text-sm d-flex align-items-center" style="column-gap: 2rem">
                                         <span>Status: &nbsp;</span>
                                         <a href="{{route('admin.team.update.status', [$member->id, $member->status == 1 ? 0 : 1])}}" style="font-size: 22px;"><i class="fa {{$member->status == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'}}"></i></a>
@@ -95,7 +99,7 @@
                                         @else
                                             <tr>
                                                 <td class="text-center" colspan="4">No data available in table</td>
-                                            </tr>    
+                                            </tr>
                                         @endif
                                      </tbody>
                                 </table>
@@ -134,7 +138,45 @@
                                          @else
                                             <tr>
                                                 <td class="text-center" colspan="4">No data available in table</td>
-                                            </tr>    
+                                            </tr>
+                                     @endif
+                                     </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0 float-left">Registered Devices</h4>
+                            <a class="float-right text-dark" title="{{$member->can_add_device == 1 ? 'Remove permision to add device': 'Give permision to add device'}}" href="{{route('admin.registered.device.permission_manage', ['team', $member->id, $member->can_add_device == 1 ? 0 : 1])}}" style="font-size: 22px;"><i class="fa {{$member->can_add_device == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'}}"></i></a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                     <thead>
+                                         <tr>
+                                             <th>S.No.</th>
+                                             <th>Devices Name</th>
+                                             <th class="text-nowrap">Created At</th>
+                                             <th class="text-center">Action</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody>
+                                        @if(sizeof($member->get_registered_devices) > 0)
+                                            @foreach ($member->get_registered_devices as $key => $list)
+                                            <tr>
+                                                <td>{{$key+1}}</td>
+                                                <td>{{$list->device_name}}</td>
+                                                <td class="text-nowrap">{{date('d-m-Y h:i a', strtotime($list->created_at))}}</td>
+                                                <td class="text-center">
+                                                    <a href="{{route('admin.registered.device.delete', $list->id)}}" onclick="return confirm('Are you sure want to delete.')" class="text-danger mx-2"><i class="fa fa-trash-alt"></i></a>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                         @else
+                                            <tr>
+                                                <td class="text-center" colspan="4">No data available in table</td>
+                                            </tr>
                                      @endif
                                      </tbody>
                                 </table>
@@ -175,7 +217,7 @@
                     @csrf
                     <input type="hidden" name="member_id" value="{{$member->id}}">
                     <div id="food_preference_input_container" class="modal-body">
-                        
+
                     </div>
                     <div class="modal-footer text-sm">
                         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
@@ -192,7 +234,7 @@
     function add_more_party_area(){
         const div = document.createElement('div');
         div.classList.add('form-group');
-    
+
         const elem = `<div class="d-flex align-items-center justify-content-between">
             <input type="text" style="width: 95%" class="form-control" placeholder="Enter name" name="party_area_name[]" required>
             <a href="javascript:void(0);" onclick="remove_party_area(this)" class="text-danger"><i class="fa fa-times"></i></a>
@@ -260,7 +302,7 @@
     function add_more_food_preference(){
         const div = document.createElement('div');
         div.classList.add('form-group');
-    
+
         const elem = `<div class="d-flex align-items-center justify-content-between">
             <input type="text" style="width: 95%" class="form-control" placeholder="Enter name" name="food_preference_name[]" required>
             <a href="javascript:void(0);" onclick="remove_food_preference(this)" class="text-danger"><i class="fa fa-times"></i></a>

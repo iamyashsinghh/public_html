@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Mail\LoginMail;
+use App\Models\Device;
 use App\Models\LoginInfo;
 use App\Models\TeamMember;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Jenssegers\Agent\Agent;
@@ -39,8 +41,17 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Invalid credentials.'], 400);
         } else if ($user->status == 0) {
-            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Profile is inactive, kindly contact to your manager.'], 400);
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Profile is inactive, kindly contact your manager.'], 400);
         }
+
+        $device_id = Cookie::get("device_id_$request->login_type-$user->mobile");
+        $datetime= date('Y-m-d H:i:s');
+        $cookie_val = md5("$user->mobile-$datetime");
+        $can_user_login = 0;
+
+        $verified_device = Device::where(['device_id' => $device_id, 'type' => $request->login_type])->where('team_member_id', $user->id)->first();
+
+        $device = Device::where('type', $request->login_type)->where('team_member_id', $user->id)->first();
 
         try {
             $verification_code = rand(111111, 999999);
@@ -54,39 +65,79 @@ class AuthController extends Controller
 
             $login_info = LoginInfo::where(['login_type' => $request->login_type, 'user_id' => $user->id])->first();
 
-            if ($login_info) {
-                $last_request_otp_date = date('Y-m-d', strtotime($login_info->request_otp_at));
-                $current_date = date('Y-m-d');
-                if ($current_date > $last_request_otp_date) {
-                    $login_info->request_otp_count = 1;
-                } else {
-                    $login_info->request_otp_count = $login_info->request_otp_count + 1;
+            if (!$device) {
+                if ($user->can_add_device === 1) {
+                    $device = new Device();
+                    $device->team_member_id = $user->id;
+                    $device->type = $request->login_type;
+                    $device->device_name = "$browser_name Ver:$browser_version / $platform";
+                    $device->device_id = $cookie_val;
+                    if ($device->save()) {
+                        $user->can_add_device = 0;
+                        $user->save();
+                        $can_user_login = 1;
+                        Cookie::queue(Cookie::make("device_id_$request->login_type-$user->mobile", $cookie_val, 60 * 24 * 30));
+                    }
                 }
             } else {
-                $login_info = new LoginInfo();
-                $login_info->user_id = $user->id;
-                $login_info->login_type = $request->login_type;
-                $login_info->request_otp_count = 1;
+                if ($user->can_add_device === 1) {
+                    $device = new Device();
+                    $device->team_member_id = $user->id;
+                    $device->type = $request->login_type;
+                    $device->device_name = "$browser_name Ver:$browser_version / Platform: $platform";
+                    $device->device_id = $cookie_val;
+                    $device->save();
+                    if ($device->save()) {
+                        $user->can_add_device = 0;
+                        $user->save();
+                        $can_user_login = 1;
+                        Cookie::queue(Cookie::make("device_id_$request->login_type-$user->mobile", $cookie_val, 60 * 24 * 30));
+                    }
+                }
+                if ($verified_device) {
+                    $can_user_login = 1;
+                    $verified_device->device_id  = $cookie_val;
+                    $verified_device->save();
+                    Cookie::queue(Cookie::make("device_id_$request->login_type-$user->mobile", $cookie_val, 60 * 24 * 30));
+                }
             }
 
-            $login_info->otp_code = $verification_code;
-            $login_info->request_otp_at = date('Y-m-d H:i:s');
-            $login_info->ip_address = $client_ip;
-            $login_info->browser = "$browser_name Ver:$browser_version";
-            $login_info->platform = $platform;
-            $login_info->status = 0;
-            $login_info->save();
+            if ($can_user_login === 1) {
+                if ($login_info) {
+                    $last_request_otp_date = date('Y-m-d', strtotime($login_info->request_otp_at));
+                    $current_date = date('Y-m-d');
+                    if ($current_date > $last_request_otp_date) {
+                        $login_info->request_otp_count = 1;
+                    } else {
+                        $login_info->request_otp_count = $login_info->request_otp_count + 1;
+                    }
+                } else {
+                    $login_info = new LoginInfo();
+                    $login_info->user_id = $user->id;
+                    $login_info->login_type = $request->login_type;
+                    $login_info->request_otp_count = 1;
+                }
 
-            $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'login_otp_new');
+                $login_info->otp_code = $verification_code;
+                $login_info->request_otp_at = date('Y-m-d H:i:s');
+                $login_info->ip_address = $client_ip;
+                $login_info->browser = "$browser_name Ver:$browser_version";
+                $login_info->platform = $platform;
+                $login_info->status = 0;
+                $login_info->save();
 
-            if ($user->email != null && env('MAIL_STATUS') === true) {
-                $res_data = ['name' => $user->name, 'otp' => $verification_code];
-                Mail::to($user->email)->send(new LoginMail($res_data));
+                $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'login_otp_new');
+
+                if ($user->email != null && env('MAIL_STATUS') === true) {
+                    $res_data = ['name' => $user->name, 'otp' => $verification_code];
+                    Mail::to($user->email)->send(new LoginMail($res_data));
+                }
+                return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
+            } else {
+                return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Your device is not registed please ask admin for the registration'], 500);
             }
-
-            return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong. internal server error.', 'error' => $th->getMessage()], 500);
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong. Internal server error.', 'error' => $th->getMessage()], 500);
         }
     }
 
@@ -167,7 +218,7 @@ class AuthController extends Controller
             } else if ($user->role_id == 7) {
                 Auth::guard('vendormanager')->login($user);
                 return redirect()->route('vendormanager.dashboard');
-            }else if ($user->role_id == 8) {
+            } else if ($user->role_id == 8) {
                 Auth::guard('seomanager')->login($user);
                 return redirect()->route('seomanager.dashboard');
             } else {
@@ -294,8 +345,8 @@ class AuthController extends Controller
         try {
             if (Auth::guard('vendormanager')->hasUser()) {
                 $member = Vendor::find($team_id);
-                    Auth::guard('vendor')->login($member);
-                    return redirect()->route('vendor.dashboard');
+                Auth::guard('vendor')->login($member);
+                return redirect()->route('vendor.dashboard');
             }
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
             return redirect()->back();

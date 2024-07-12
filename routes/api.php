@@ -320,7 +320,6 @@ Route::post('/save_wa', function (Request $request) {
         $current_timestamp = date('Y-m-d H:i:s');
         $lead = new Lead();
         $lead->name = $name;
-        $lead->email = '';
         $lead->mobile = $number;
         $lead->lead_datetime = $current_timestamp;
         $lead->source = "WB|WhatsApp";

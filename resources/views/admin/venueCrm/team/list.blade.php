@@ -36,7 +36,7 @@
                             <th class="text-nowrap">Venue</th>
                             <th class="text-nowrap">Role</th>
                             <th class="text-nowrap">Status</th>
-                            <th class="text-nowrap">Created At</th>
+                            <th class="text-nowrap">Is Active</th>
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
@@ -153,23 +153,11 @@
                 const td_elements = row.querySelectorAll('td');
                 td_elements[1].classList.add('py-1');
 
-                // if (data.profile_image) {
-                //     profile_view_attr = `onclick="handle_view_image('${data.profile_image}')"`;
-                // } else {
-                //     profile_view_attr = "";
-                // }
                 td_elements[1].innerHTML = `<a onclick="handle_view_image('${data.profile_image}', '{{route('admin.team.updateProfileImage')}}/${data.id}')" href="javascript:void(0);"><img class="img-thumbnail" src="${data.profile_image}" style="width: 50px;" onerror="this.onerror=null; this.src='{{asset('images/default-user.png')}}'"></a>`;
-                // if (data.is_whatsapp_msg === 1) {
-                //         td_elements[5].innerHTML =
-                //             `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
-                //     } else {
-                        td_elements[3].innerHTML =
-                            `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
-                    // }
+
+                td_elements[3].innerHTML =`<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
 
                 td_elements[4].innerHTML = data.venue_name ? data.venue_name : 'N/A';
-
-
 
                 status_action_elem = `<a href="{{route('admin.team.update.status')}}/${data.id}/${data.status == 1 ? 0 : 1}" style="font-size: 22px;"><i class="fa ${data.status == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'} "></i></a>`;
 
@@ -189,13 +177,15 @@
                     </div>
                 </td>`
 
-                td_elements[7].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
+                diable_action_elem = `<a href="{{route('admin.team.update.is_active')}}/${data.id}/${data.is_active == 1 ? 0 : 1}" style="font-size: 22px;"><i class="fa ${data.is_active == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'} "></i></a>`;
+
+                td_elements[7].innerHTML = diable_action_elem;
                 td_elements[8].innerHTML = action_btns;
             }
         });
     }
     initializeDataTable("{{ route('admin.team.list.ajax', ['role_id' => 0]) }}");
-    
+
     $('.filter-btn').on('click', function() {
         var role_id = $(this).data('role-id'); // Corrected to 'role-id'
         var url = "{{ route('admin.team.list.ajax') }}?role_id=" + role_id;

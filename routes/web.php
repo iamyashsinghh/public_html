@@ -99,6 +99,12 @@ Route::middleware('verify_token')->group(function () {
     Route::prefix('/admin')->middleware('admin')->group(function () {
         Route::get('/dashboard', [Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
+
+
+        // Registered Device Routes
+        Route::get('registered/device/permission/{venue_or_vendor?}/{member_id?}/{value?}', [Controllers\Admin\RegisteredDevicesController::class, 'permit_or_not_more_device_for_login_for_an_account'])->name('admin.registered.device.permission_manage');
+        Route::get('registered/device/delete/{device_id?}', [Controllers\Admin\RegisteredDevicesController::class, 'delete_device'])->name('admin.registered.device.delete');
+
         //Team member Routes
         Route::prefix('/venue-crm')->group(function () {
             Route::get('/team', [Controllers\Admin\TeamMemberController::class, 'list'])->name('admin.team.list');
@@ -108,6 +114,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/team/view/{member_id?}', [Controllers\Admin\TeamMemberController::class, 'view'])->name('admin.team.view');
             Route::post('/team/manage-process/{member_id}', [Controllers\Admin\TeamMemberController::class, 'manage_process'])->name('admin.team.manage.process');
             Route::get('/team/update-status/{member_id?}/{status?}', [Controllers\Admin\TeamMemberController::class, 'update_status'])->name('admin.team.update.status');
+            Route::get('/team/update-is-active/{member_id?}/{status?}', [Controllers\Admin\TeamMemberController::class, 'update_is_active'])->name('admin.team.update.is_active');
             Route::get('/team/delete/{member_id?}', [Controllers\Admin\TeamMemberController::class, 'delete'])->name('admin.team.delete');
             Route::post('/team/update-profile-image/{member_id?}', [Controllers\Admin\TeamMemberController::class, 'update_profile_image'])->name('admin.team.updateProfileImage');
             Route::get('/team_login_info', [Controllers\Admin\TeamMemberController::class, 'get_member_login_info'])->name('admin.team.login_info');
@@ -180,6 +187,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/vendors/manage_ajax/{id?}', [Controllers\Admin\VendorController::class, 'manage_ajax'])->name('admin.vendor.edit');
             Route::post('/vendors/manage-process/{id?}', [Controllers\Admin\VendorController::class, 'manage_process'])->name('admin.vendor.manage.process');
             Route::get('/vendors/update-status/{vendor_id?}/{status?}', [Controllers\Admin\VendorController::class, 'update_status'])->name('admin.vendor.update.status');
+            Route::get('/vendors/view/{vendor_id?}', [Controllers\Admin\VendorController::class, 'view'])->name('admin.vendor.view');
             Route::get('/vendors/delete/{vendor_id?}', [Controllers\Admin\VendorController::class, 'delete'])->name('admin.vendor.delete');
             Route::post('/vendors/update-profile-image/{vendor_id?}', [Controllers\Admin\VendorController::class, 'update_profile_image'])->name('admin.vendor.updateProfileImage');
 
@@ -194,6 +202,7 @@ Route::middleware('verify_token')->group(function () {
             //NvLead Routes
             Route::match(['get', 'post'], '/nv-leads', [Controllers\Admin\NvLeadController::class, 'list'])->name('admin.nvlead.list');
             Route::get('/nv-leads/ajax_list', [Controllers\Admin\NvLeadController::class, 'ajax_list'])->name('admin.nvlead.list.ajax');
+
             // Route::get('/nv-leads/manage_ajax/{id}', [Controllers\Admin\NvLeadController::class, 'ajax_list'])->name('admin.nvlead.list.ajax');
             Route::post('/nv-leads/add-process', [Controllers\Admin\NvLeadController::class, 'add_process'])->name('admin.nvlead.add.process');
             Route::post('/nv-leads/edit-process/{id}', [Controllers\Admin\NvLeadController::class, 'edit_process'])->name('admin.nvlead.edit.process');
@@ -201,6 +210,7 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/nv-leads/delete/{lead_id?}', [Controllers\Admin\NvLeadController::class, 'delete'])->name('admin.nvlead.delete');
             Route::post('/nv-leads/forward', [Controllers\Admin\NvLeadController::class, 'lead_forward'])->name('admin.nvlead.forward');
             Route::get('/nv-leads/get_forward_info/{lead_id?}', [Controllers\Admin\NvLeadController::class, 'get_forward_info'])->name('admin.nvlead.getForwardInfo');
+
             //Bypass login: Via admin to vendor crm
             Route::get('/vendor/bypass-login/{team_id?}', [AuthController::class, 'vendor_login_via_admin'])->name('admin.vendor.bypass.login');
 
@@ -245,8 +255,6 @@ Route::middleware('verify_token')->group(function () {
             Route::post('/leads/add-process', [Controllers\Admin\BdmLeadController::class, 'add_process'])->name('admin.bdm.lead.add.process');
             Route::get('/delete_lead/{lead_id?}', [Controllers\Admin\BdmLeadController::class, 'delete'])->name('admin.bdm.lead.delete');
             Route::post('/assign_to_bdm_lead', [Controllers\Admin\BdmLeadController::class, 'lead_forward'])->name('admin.bdm.lead.forward');
-
-
             Route::match(['get', 'post'], '/leads/status-update/{lead_id}/{status?}', [Controllers\Admin\BdmLeadController::class, 'status_update'])->name('admin.bdm.lead.status.update');
 
             // bdm booking routes

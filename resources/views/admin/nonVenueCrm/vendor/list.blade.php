@@ -331,6 +331,7 @@
                     td_elements[8].innerHTML = status_action_elem;
                     td_elements[9].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
                     const action_btns = `<td class="d-flex justify-content-around">
+                    <a href="{{route('admin.vendor.view')}}/${data.id}" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                     <a href="javascript:void(0);" class="text-success mx-2" title="Edit"><i class="fa fa-edit" style="font-size: 15px;" onclick="handle_manage_vendor(${data.id})"></i></a>
                     <a href="{{ route('admin.vendor.delete') }}/${data.id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>
                     <div class="dropdown d-inline-block mx-2">

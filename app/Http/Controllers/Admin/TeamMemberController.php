@@ -21,7 +21,7 @@ class TeamMemberController extends Controller {
 
     public function ajax_list(Request $request) {
         $role_id = $request->input('role_id');
-    
+
         $membersQuery = TeamMember::select(
             'team_members.id',
             'team_members.profile_image',
@@ -33,15 +33,16 @@ class TeamMemberController extends Controller {
             'r.name as role_name',
             'team_members.status',
             'team_members.created_at',
+            'team_members.is_active',
         )->leftJoin("roles as r", 'team_members.role_id', '=', 'r.id');
-    
+
         if ($role_id) {
             $membersQuery->where('team_members.role_id', $role_id);
         }
         $members = $membersQuery->get();
         return datatables($members)->toJson();
     }
-    
+
 
     public function manage($id = 0) {
         $roles = Role::select('id', 'name')->get();
@@ -135,6 +136,19 @@ class TeamMemberController extends Controller {
         }
 
         $member->status = $status;
+        $member->save();
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Status updated."]);
+        return redirect()->back();
+    }
+
+    public function update_is_active($member_id, $status) {
+        $member = TeamMember::find($member_id);
+        if (!$member) {
+            return abort(404);
+        }
+
+        $member->is_active = $status;
         $member->save();
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Status updated."]);

@@ -608,7 +608,7 @@ class LeadController extends Controller
     {
         $auth_user = Auth::guard('team')->user();
         if ($auth_user->role_id == 4) {
-            $all_vm_members = TeamMember::select('id', 'name', 'venue_name')->where(['role_id' => 5, 'status' => 1])->orderBy('venue_name', 'asc')->get();
+            $all_vm_members = TeamMember::select('id', 'name', 'venue_name')->where(['role_id' => 5, 'status' => 1, 'is_active' => 1])->orderBy('venue_name', 'asc')->get();
 
             $current_lead_having_vm_members = LeadForward::select(
                 'tm.id',
