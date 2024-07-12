@@ -207,7 +207,7 @@ class VendorController extends Controller
 
     public function view($vendor_id) {
         $vendor = Vendor::find($vendor_id);
-        return view('admin.nonvenueCrm.vendor.view', compact('vendor'));
+        return view('admin.nonVenueCrm.vendor.view', compact('vendor'));
     }
 
     public function update_profile_image($vendor_id, Request $request)
