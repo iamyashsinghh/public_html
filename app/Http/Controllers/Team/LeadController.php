@@ -263,6 +263,7 @@ class LeadController extends Controller
                     "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
                     ->whereNotNull('completed_tasks.lead_id')
                     ->where('leads.lead_status', '!=', 'Done');
+                    
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
                     $to = Carbon::today()->endOfMonth();
@@ -340,15 +341,6 @@ class LeadController extends Controller
                     $from = Carbon::today()->startOfDay();
                     $to = Carbon::today()->endOfDay();
                     $leads->whereBetween('leads.lead_datetime', [$from, $to]);
-                } elseif ($request->dashboard_filters == "rm_unfollowed_leads") {
-                    $currentDateTime = Carbon::now();
-                    $leads->join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
-                        ->where('leads.lead_status', '!=', 'Done')
-                        ->where('tasks.task_schedule_datetime', '<', $currentDateTime)
-                        ->whereNotNull('tasks.done_datetime')
-                        ->whereNull('leads.deleted_at')
-                        ->distinct('leads.lead_id')
-                        ->where('tasks.created_by', $auth_user->id);
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
                     $to = Carbon::today()->endOfMonth();

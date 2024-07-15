@@ -33,22 +33,39 @@ class DashboardController extends Controller
         $currentMonthStart = Carbon::now()->startOfMonth();
         $currentMonthEnd = Carbon::now()->endOfMonth();
 
-        $rm_unfollowed_leads = Lead::query()
-        ->where('lead_status', '!=', 'Done')
-        ->whereNull('deleted_at')
-        ->whereExists(function ($query) use ($auth_user) {
-            $query->select(DB::raw(1))
-                  ->from('tasks')
-                  ->whereColumn('tasks.lead_id', 'leads.lead_id')
-                  ->whereNotNull('tasks.done_datetime')
-                  ->whereNull('tasks.deleted_at')
-                  ->where('tasks.created_by', $auth_user->id);
-        })
-        ->whereDoesntHave('get_tasks', function ($query) {
-            $query->whereNull('done_datetime');
-        })
-        ->distinct('lead_id')
-        ->count();
+        // $rm_unfollowed_leads = Lead::query()
+        // ->where('lead_status', '!=', 'Done')
+        // ->whereNull('deleted_at')
+        // ->whereExists(function ($query) use ($auth_user) {
+        //     $query->select(DB::raw(1))
+        //           ->from('tasks')
+        //           ->whereColumn('tasks.lead_id', 'leads.lead_id')
+        //           ->whereNotNull('tasks.done_datetime')
+        //           ->whereNull('tasks.deleted_at')
+        //           ->where('tasks.created_by', $auth_user->id);
+        // })
+        // ->whereDoesntHave('get_tasks', function ($query) {
+        //     $query->whereNull('done_datetime');
+        // })
+        // ->distinct('lead_id')
+        // ->count();
+
+        $rm_unfollowed_leads = DB::table('leads')
+        ->leftJoin('team_members as tm', 'tm.id', '=', 'leads.created_by')
+        ->whereNull('leads.deleted_at')
+        ->leftJoin(DB::raw("
+            (SELECT tasks.lead_id
+            FROM tasks
+            WHERE tasks.deleted_at IS NULL
+            AND tasks.created_by = $auth_user->id
+            GROUP BY tasks.lead_id
+            HAVING COUNT(CASE WHEN tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
+        "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
+        ->whereNotNull('completed_tasks.lead_id')
+        ->where('leads.lead_status', '!=', 'Done')
+            ->count();
+
+
         $rm_task_overdue_leads = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
             ->where('leads.lead_status', '!=', 'Done')
             ->where('tasks.task_schedule_datetime', '<', $currentDateTime)
@@ -76,7 +93,7 @@ class DashboardController extends Controller
             $total_leads_received_today = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where('forward_to', $auth_user->id)->count();
             $unread_leads_this_month = LeadForward::where('lead_datetime', 'like', "%$current_month%")->where(['forward_to' => $auth_user->id, 'read_status' => false])->count();
             $unread_leads_today = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where(['forward_to' => $auth_user->id, 'read_status' => false])->count();
-            $total_unread_leads_overdue = LeadForward::where('read_status', false)->where('lead_datetime', '<', Carbon::today())->where('forward_to' , $auth_user->id)->count();
+            $total_unread_leads_overdue = LeadForward::where('read_status', false)->where('lead_datetime', '<', Carbon::today())->where('forward_to', $auth_user->id)->count();
 
             $task_schedule_this_month = Task::selectRaw('count(distinct(lead_id)) as count')->where('task_schedule_datetime', 'like', "%$current_month%")->where(['created_by' => $auth_user->id, 'done_datetime' => null])->first()->count;
             $task_schedule_today = Task::selectRaw('count(distinct(lead_id)) as count')->where('task_schedule_datetime', 'like', "%$current_date%")->where(['created_by' => $auth_user->id, 'done_datetime' => null])->first()->count;

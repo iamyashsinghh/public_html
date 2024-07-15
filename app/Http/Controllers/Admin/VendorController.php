@@ -32,7 +32,6 @@ class VendorController extends Controller
     public function vendor_list_update(Request $request)
     {
         $allData = $request->input('allData');
-        // Log::info($allData);
         $i = 1;
         foreach ($allData as $key => $value) {
             Vendor::where('id', $value)
@@ -42,22 +41,6 @@ class VendorController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // public function ajax_list()
-    // {
-    //     $vendors = Vendor::select(
-    //         'vendors.id',
-    //         'vendors.profile_image',
-    //         'vendors.name',
-    //         'vendors.mobile',
-    //         'vendors.email',
-    //         'vendors.business_name',
-    //         'vc.name as category_name',
-    //         'vendors.status',
-    //         'vendors.created_at',
-    //         'vendors.group_name',
-    //     )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')->orderBy('group_name')->get();
-    //     return datatables($vendors)->toJson();
-    // }
 
     public function ajax_list($vendor_cat_id)
     {
