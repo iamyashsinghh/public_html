@@ -553,6 +553,8 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         if ($lead->last_forwarded_by == null) {
             $lead->assign_to = $get_rm ? $get_rm->name : null;
             $lead->assign_id = $get_rm ? $get_rm->id : null;
+        $lead->save();
+
         }
         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with the best price..!']);
     } catch (\Throwable $th) {
