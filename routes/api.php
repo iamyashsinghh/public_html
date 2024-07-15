@@ -549,9 +549,11 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->lead_color = "#4bff0033";
         $lead->virtual_number = $call_to_wb_api_virtual_number;
         $lead->whatsapp_msg_time = $current_timestamp;
-        $lead->assign_to = $get_rm ? $get_rm->name : null;
-        $lead->assign_id = $get_rm ? $get_rm->id : null;
         $lead->save();
+        if ($lead->last_forwarded_by == null) {
+            $lead->assign_to = $get_rm ? $get_rm->name : null;
+            $lead->assign_id = $get_rm ? $get_rm->id : null;
+        }
         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with the best price..!']);
     } catch (\Throwable $th) {
         Log::error('Error processing Tata call data: ' . $th->getMessage());
