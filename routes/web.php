@@ -64,6 +64,7 @@ Route::post('whatsapp_msg_send_greet_btn', [Controllers\WhatsappMsgController::c
 Route::post('whatsapp_msg_send_nv_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_greet_btn'])->name('whatsapp_chat.send.nv_greet_btn');
 // whatsappMessages msg nv subscription renewal msg 1
 Route::post('whatsapp_msg_send_nv_subscription_btn_one', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_one'])->name('whatsapp_chat.send.nv_subscription_btn_one');
+Route::post('whatsapp_msg_send_nv_subscription_btn_reminder', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_reminder'])->name('whatsapp_chat.send.nv_subscription_btn_reminder');
 Route::post('whatsapp_msg_send_nv_subscription_btn_two', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_two'])->name('whatsapp_chat.send.nv_subscription_btn_two');
 
 

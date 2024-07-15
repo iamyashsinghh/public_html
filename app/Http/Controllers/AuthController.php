@@ -70,7 +70,7 @@ class AuthController extends Controller
                     $device = new Device();
                     $device->team_member_id = $user->id;
                     $device->type = $request->login_type;
-                    $device->device_name = "$browser_name Ver:$browser_version / $platform";
+                    $device->device_name = "$browser_name Ver:$browser_version /  Platform:$platform";
                     $device->device_id = $cookie_val;
                     if ($device->save()) {
                         $user->can_add_device = 0;

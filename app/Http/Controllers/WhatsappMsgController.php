@@ -903,6 +903,58 @@ class WhatsappMsgController extends Controller
         }
     }
 
+    public function whatsapp_msg_send_nv_subscription_btn_reminder(Request $request)
+    {
+        if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+            return false;
+        }
+        $nameOfVendor = Vendor::where('mobile', $request->recipient)->first();
+
+        $nameOfRecipient = $nameOfVendor ? $nameOfVendor->name : 'Sir/Madam';
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $authKey = env('TATA_AUTH_KEY');
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer $authKey",
+            'Content-Type' => 'application/json'
+        ])->post($url, [
+            "to" => "91$request->recipient",
+            "type" => "template",
+            "template" => [
+                "name" => "subscription_reminder_reminder",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "header",
+                        "parameters" => [
+                            [
+                                "type" => "text",
+                                "text" => "$nameOfRecipient",
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        if ($response->successful()) {
+            // Log::info($response);
+            $currentTimestamp = Carbon::now();
+            $newWaMsg = new whatsappMessages();
+            $newWaMsg->msg_id = "$request->recipient";
+            $newWaMsg->msg_from = "$request->recipient";
+            $newWaMsg->time = $currentTimestamp;
+            $newWaMsg->type = 'text';
+            $newWaMsg->is_sent = "1";
+            $newWaMsg->body = "*Hi $nameOfRecipient*, \n\n This is your final reminder that your Premium Membership Subscription with Wedding Banquets is due for renewal. To ensure the continued benefits of your premium listing and avoid any disruption to your business visibility, we kindly request you to make the payment at your earliest convenience.";
+            $newWaMsg->save();
+            return response()->json(['message' => 'Message sent successfully.'], 200);
+        } else {
+            return response()->json(['error' => 'Failed to send message.'], $response->status());
+        }
+    }
+
     public function whatsapp_msg_send_nv_subscription_btn_two(Request $request)
     {
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
@@ -947,7 +999,7 @@ class WhatsappMsgController extends Controller
             $newWaMsg->time = $currentTimestamp;
             $newWaMsg->type = 'text';
             $newWaMsg->is_sent = "1";
-            $newWaMsg->body = "*Hi $nameOfRecipient*, \n\nHope you're doing well !!\n\nPlease note that your CRM profile has been temporarily suspended due to the non-payment. This suspension has impacted your business operations, and you will not receive any new business leads until the payment is made. \n\nWe’re sorry to see you go! As you know, Our Premium showcases are invite-only memberships on Wedding Banquets that offer significantly higher visibility compared to Lite vendors on average, 9-10 times more. This increased visibility helps you attract more leads, allowing you to fill up your future wedding dates efficiently. \n\nWe hope you’ve had a great association with us so far and will reconnect as soon as you deem fit. Given that we're in the middle of the wedding season, we hope for a mutual benefit that the right time is very very soon. \n\nKindly feel free to reach out to me at *8882198989* for any questions. \n\nBest Regards,\nWedding Banquets \ninfo@weddingbanquets.in \n\n(Call Us Btn)";
+            $newWaMsg->body = "*Hi $nameOfRecipient*, \n\n Hope you're doing well !! \n\nPlease note that your CRM profile has been temporarily suspended due to the non-payment. This suspension has impacted your business operations, and you will not receive any new business leads until the payment is made. \n\nWe’re sorry to see you go! As you know, Our Premium showcases are invite-only memberships on Wedding Banquets that offer significantly higher visibility compared to Lite vendors on average, 9-10 times more. This increased visibility helps you attract more leads, allowing you to fill up your future wedding dates efficiently. \n\nWe hope you’ve had a great association with us so far and will reconnect as soon as you deem fit. Given that we're in the middle of the wedding season, we hope for a mutual benefit that the right time is very very soon. \n\nKindly feel free to reach out to me at *8882198989* for any questions. \n\nBest Regards,\nWedding Banquets \ninfo@weddingbanquets.in \n\n(Call Us Btn)";
             $newWaMsg->save();
             return response()->json(['message' => 'Message sent successfully.'], 200);
         } else {

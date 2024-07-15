@@ -107,9 +107,14 @@
                             Subscription Remainder 1</a>
 
                             <a href="javascript:void(0);" class="btn btn-sm m-1 text-light"
+                            style="background-color: var(--wb-dark-red)" id="whatsapp_msg_send_nv_subscription_btn_reminder"
+                            title="Hi (Name of Vendor),  \n\n This is your final reminder that your Premium Membership Subscription with Wedding Banquets is due for renewal. To ensure the continued benefits of your premium listing and avoid any disruption to your business visibility, we kindly request you to make the payment at your earliest convenience.">
+                            Subscription Remainder 2</a>
+
+                            <a href="javascript:void(0);" class="btn btn-sm m-1 text-light"
                             style="background-color: var(--wb-dark-red)" id="whatsapp_msg_send_nv_subscription_btn_two"
                             title="Hi (Name of Vendor), Hope you're doing well !!\n\nPlease note that your CRM profile has been temporarily suspended due to the non-payment. This suspension has impacted your business operations, and you will not receive any new business leads until the payment is made. \n\nWe’re sorry to see you go! As you know, Our Premium showcases are invite-only memberships on Wedding Banquets that offer significantly higher visibility compared to Lite vendors on average, 9-10 times more. This increased visibility helps you attract more leads, allowing you to fill up your future wedding dates efficiently. \n\nWe hope you’ve had a great association with us so far and will reconnect as soon as you deem fit. Given that we're in the middle of the wedding season, we hope for a mutual benefit that the right time is very very soon. \n\nKindly feel free to reach out to me at *8882198989* for any questions. \n\nBest Regards,\nWedding Banquets \ninfo@weddingbanquets.in \n\n(Call Us Btn)">
-                            Subscription Remainder 2</a>
+                            Subscription Remainder 3</a>
 
                             <a href="javascript:void(0);" class="btn btn-sm m-1 text-light"
                             style="background-color: var(--wb-dark-red)" id="sendMessageBtnnvGreetMsg"
@@ -168,6 +173,7 @@
         });
     });
 
+
     $("#whatsapp_msg_send_nv_subscription_btn_one").click(function() {
         var $btn = $(this);
         var originalText = $btn.html();
@@ -181,6 +187,34 @@
         };
         $.ajax({
             url: '{{ route('whatsapp_chat.send.nv_subscription_btn_one') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
+            }
+        });
+    });
+
+    $("#whatsapp_msg_send_nv_subscription_btn_reminder").click(function() {
+        var $btn = $(this);
+        var originalText = $btn.html();
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $btn.prop('disabled', true);
+        var recipient = $("#phone_inp_id").val();
+        var greetMsg = `{{ $userName }}`;
+        var data = {
+            recipient: recipient,
+            greetmsg: greetMsg,
+        };
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send.nv_subscription_btn_reminder') }}',
             type: 'POST',
             data: data,
             dataType: 'json',
