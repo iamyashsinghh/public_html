@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Http;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -81,6 +82,7 @@ if (!function_exists('getAssigningRm')) {
         }
     }
 }
+
 if (!function_exists('getRmName')) {
     function getRmName($name)
     {
@@ -255,14 +257,14 @@ Route::post('/save_wa', function (Request $request) {
                 'Authorization' => "Bearer $authKey",
                 'Content-Type' => 'application/json'
             ])->post($url, [
-                        "messaging_product" => "whatsapp",
-                        "recipient_type" => "individual",
-                        "to" => "91$number",
-                        "type" => "text",
-                        "text" => [
-                            "body" => "Thanks for reaching out to us. We are glad to have you with us and committed to delivering a superior customer experience. \n \n *Have a great day!*"
-                        ]
-                    ]);
+                "messaging_product" => "whatsapp",
+                "recipient_type" => "individual",
+                "to" => "91$number",
+                "type" => "text",
+                "text" => [
+                    "body" => "Thanks for reaching out to us. We are glad to have you with us and committed to delivering a superior customer experience. \n \n *Have a great day!*"
+                ]
+            ]);
             if ($response->successful()) {
                 $current_timestamp = date('Y-m-d H:i:s');
                 $newWaMsgSave = new whatsappMessages();
@@ -363,14 +365,14 @@ Route::get('/manupulate_csrf', function () {
 
 Route::get('/csrf-token', function () {
     $randompassvalue = DB::connection('mysql')->table('randomnes')->where('id', 1)->value('random_pass');
-    $yash = md5(sha1(md5($randompassvalue)));
+    $hashvalue = md5(sha1(md5($randompassvalue)));
     $randomnum = rand(74365874, 74365874);
     $randomnum2 = rand(1, 19);
-    $maincode = "$randomnum2-546674$yash@$randomnum";
+    $maincode = "$randomnum2-546674$hashvalue@$randomnum";
     $out = base64_encode(base64_encode($maincode));
     return json_encode(['csrfToken' => $out]);
-
 });
+
 if (!function_exists('simpleDecrypt')) {
 
     function simpleDecrypt($encoded)
@@ -385,6 +387,7 @@ if (!function_exists('simpleDecrypt')) {
         return base64_decode(base64_decode($decoded));
     }
 }
+
 if (!function_exists('notify_users_about_lead_interakt_async')) {
     function notify_users_about_lead_interakt_async($mobile, $name)
     {
@@ -403,26 +406,26 @@ if (!function_exists('notify_users_about_lead_interakt_async')) {
             'Authorization' => $authToken,
             'Content-Type' => 'application/json',
         ])->post($url, [
-                    "to" => "91{$mobile}",
-                    "type" => "template",
-                    "template" => [
-                        "name" => "notify_users_about_lead",
-                        "language" => [
-                            "code" => "en"
-                        ],
-                        "components" => [
+            "to" => "91{$mobile}",
+            "type" => "template",
+            "template" => [
+                "name" => "notify_users_about_lead",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "header",
+                        "parameters" => [
                             [
-                                "type" => "header",
-                                "parameters" => [
-                                    [
-                                        "type" => "text",
-                                        "text" => "$name",
-                                    ]
-                                ]
+                                "type" => "text",
+                                "text" => "$name",
                             ]
                         ]
                     ]
-                ]);
+                ]
+            ]
+        ]);
         return $response;
     }
 }
@@ -461,7 +464,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
             $caller_agent_name = $request->input('answered_agent.name');
         } elseif ($request->input('missed_agent') !== null) {
             $missed_agents = $request->input('missed_agent');
-            if (!empty ($missed_agents)) {
+            if (!empty($missed_agents)) {
                 $caller_agent_name = $missed_agents[0]['name'];
             }
         }
@@ -568,9 +571,9 @@ Route::post('/new_lead', function (Request $request) {
     $endPos = strpos($string, $endSubstring, $startPos);
     $finalValue = substr($string, $startPos + strlen($startSubstring), $endPos - $startPos - strlen($startSubstring));
     $randompassvalue = DB::connection('mysql')->table('randomnes')->where('id', 1)->value('random_pass');
-    $yash = md5(sha1(md5($randompassvalue)));
+    $outvalue = md5(sha1(md5($randompassvalue)));
 
-    if ($finalValue == $yash) {
+    if ($finalValue == $outvalue) {
         try {
             $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
             $is_email_valid = $request->post('email') != null ? "required|email" : "";
@@ -617,19 +620,18 @@ Route::post('/new_lead', function (Request $request) {
             $lead_cat_data = "Venue";
             $listing_data = null;
 
-
             $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
             if (!$listing_data) {
                 $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
-                if ($listing_data && isset ($listing_data->vendor_category_id)) {
+                if ($listing_data && isset($listing_data->vendor_category_id)) {
                     $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
-                    if ($cat_data_cms && isset ($cat_data_cms->name)) {
+                    if ($cat_data_cms && isset($cat_data_cms->name)) {
                         $lead_cat_data = $cat_data_cms->name;
                     }
                 }
             }
             $locality = null;
-            if ($listing_data && isset ($listing_data->location_id)) {
+            if ($listing_data && isset($listing_data->location_id)) {
                 $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data->location_id)->first();
             } else {
                 $lead_cat_data = "Phone Nav";
@@ -644,6 +646,7 @@ Route::post('/new_lead', function (Request $request) {
                 $lead->email = $request->post('email');
                 $lead->mobile = $mobile;
             }
+
             $lead->lead_datetime = $current_timestamp;
             $lead->source = $lead_source;
             $lead->lead_catagory = $lead_cat_data;
@@ -659,10 +662,13 @@ Route::post('/new_lead', function (Request $request) {
             $lead->lead_color = "#4bff0033"; //green color
             $lead->virtual_number = $call_to_wb_api_virtual_number;
             $lead->user_ip = $request->post('user_ip');
-            $get_rm = getAssigningRm();
-            $lead->assign_to = $get_rm->name;
-            $lead->assign_id = $get_rm->id;
             $lead->save();
+            if ($lead->last_forwarded_by == null) {
+                $get_rm = getAssigningRm();
+                $lead->assign_to = $get_rm->name;
+                $lead->assign_id = $get_rm->id;
+                $lead->save();
+            }
             return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
