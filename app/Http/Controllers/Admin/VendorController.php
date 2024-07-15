@@ -23,24 +23,6 @@ class VendorController extends Controller
         $team_members = TeamMember::where('role_id', '7')->get();
         return view('admin.nonVenueCrm.vendor.list', compact('page_heading', 'vendor_categories', 'localities', 'team_members'));
     }
-    public function listedit()
-    {
-        $page_heading = "Vendors";
-        $vendor_categories = VendorCategory::select('id', 'name')->get();
-        return view('admin.nonVenueCrm.vendor.listedit', compact('page_heading', 'vendor_categories'));
-    }
-    public function vendor_list_update(Request $request)
-    {
-        $allData = $request->input('allData');
-        $i = 1;
-        foreach ($allData as $key => $value) {
-            Vendor::where('id', $value)
-                ->update(['display_order' => $i]);
-            $i++;
-        }
-        return response()->json(['success' => true]);
-    }
-
 
     public function ajax_list($vendor_cat_id)
     {

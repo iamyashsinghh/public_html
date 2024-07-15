@@ -18,8 +18,6 @@
                 <div class="button-group my-4">
                     <button class="btn text-light btn-sm buttons-print" onclick="handle_manage_vendor()"
                         style="background-color: var(--wb-renosand)"><i class="fa fa-plus"></i> New</button>
-                    <a href="{{ route('admin.vendor.list.edit') }}"><button class="btn text-light btn-sm buttons-print"
-                            style="background-color: var(--wb-renosand)"><i class="fa fa-edit"></i> Edit</button></a>
                 </div>
                 <div class="button-group vendor-categories my-4">
                     @foreach ($vendor_categories as $category)

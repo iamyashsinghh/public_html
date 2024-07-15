@@ -181,10 +181,8 @@ Route::middleware('verify_token')->group(function () {
 
         Route::prefix('nonvenue-crm')->group(function () {
             //Vendor routes
-            Route::get('/vendors/edit', [Controllers\Admin\VendorController::class, 'listedit'])->name('admin.vendor.list.edit');
             Route::get('/vendors', [Controllers\Admin\VendorController::class, 'list'])->name('admin.vendor.list');
             Route::get('/vendors/ajax_list/{vendor_cat_id}', [Controllers\Admin\VendorController::class, 'ajax_list'])->name('admin.vendor.list.ajax');
-            Route::post('/vendors/vendor_list_update', [Controllers\Admin\VendorController::class, 'vendor_list_update'])->name('admin.vendor.vendorlistupdate');
             Route::get('/vendors/manage_ajax/{id?}', [Controllers\Admin\VendorController::class, 'manage_ajax'])->name('admin.vendor.edit');
             Route::post('/vendors/manage-process/{id?}', [Controllers\Admin\VendorController::class, 'manage_process'])->name('admin.vendor.manage.process');
             Route::get('/vendors/update-status/{vendor_id?}/{status?}', [Controllers\Admin\VendorController::class, 'update_status'])->name('admin.vendor.update.status');
