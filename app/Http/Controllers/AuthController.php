@@ -66,8 +66,8 @@ class AuthController extends Controller
         $device = Device::where('type', $request->login_type)->where('team_member_id', $user->id)->first();
 
         try {
-            // $verification_code = rand(111111, 999999);
-            $verification_code = 999999;
+            $verification_code = rand(111111, 999999);
+            // $verification_code = 999999;
 
             $agent = new Agent();
             $browser_name = $agent->browser();
@@ -138,11 +138,11 @@ class AuthController extends Controller
                 $login_info->status = 0;
                 $login_info->save();
 
-                // $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'login_otp_new');
+                $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'login_otp_new');
 
                 if ($user->email != null && env('MAIL_STATUS') === true) {
                     $res_data = ['name' => $user->name, 'otp' => $verification_code];
-                    // Mail::to($user->email)->send(new LoginMail($res_data));
+                    Mail::to($user->email)->send(new LoginMail($res_data));
                 }
                 return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
             } else {
