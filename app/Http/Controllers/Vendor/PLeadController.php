@@ -63,7 +63,7 @@ class PLeadController extends Controller
             'p_vendor_leads.read_status',
             'ne.pax as pax',
         )->leftJoin('p_vendor_events as ne', 'ne.lead_id', 'p_vendor_leads.id')
-        ->where(['forward_to' => $auth_user->id])->groupBy('nv_lead_forwards.mobile');
+        ->where(['forward_to' => $auth_user->id])->groupBy('p_vendor_leads.mobile');
 
         if ($request->lead_status != null) {
             $leads->where('p_vendor_leads.lead_status', $request->lead_status);
