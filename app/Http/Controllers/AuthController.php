@@ -45,7 +45,8 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Profile is inactive, kindly contact your manager.'], 400);
         }
 
-        $role = Role::find($user->role_id);
+        if($request->login_type === "team"){
+            $role = Role::find($user->role_id);
         $currentTime = date('H:i:s');
         if ($role->is_all_time_login === 0) {
             if ($role->login_start_time && $role->login_end_time) {
@@ -53,6 +54,7 @@ class AuthController extends Controller
                     return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'You are not allowed to login at this time.'], 400);
                 }
             }
+        }
         }
 
 
