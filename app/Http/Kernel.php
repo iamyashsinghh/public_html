@@ -67,7 +67,7 @@ class Kernel extends HttpKernel {
         'seomanager' => \App\Http\Middleware\SEOManagerAuth::class,
         'verify_token' =>  \App\Http\Middleware\VerifyCsrfToken::class,
         'verify_vendor_token' =>  \App\Http\Middleware\VerifyVendorCsrfToken::class,
-
+        'checkLoginTime' => \App\Http\Middleware\CheckLoginTime::class,
 
 
         'auth' => \App\Http\Middleware\Authenticate::class,

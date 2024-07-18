@@ -74,7 +74,6 @@ Route::post('whatsapp_msg_send_bdm_greet_btn', [Controllers\WhatsappMsgControlle
 Route::post('upload_document_bdm', [Controllers\WhatsappMsgController::class, 'uploadDocumentbdm'])->name('whatsapp_chat.send.bdm_doc_send');
 
 
-
 // update status
 Route::post('whatsapp_msg_status', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status'])->name('whatsapp_chat.status');
 Route::post('whatsapp_msg_status_vendor', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status_vendor'])->name('whatsapp_chat.status_nv');
@@ -89,7 +88,7 @@ Route::post('whatsapp_msg_status_nv_team_vendor', [Controllers\WhatsappMsgContro
 | For Admin Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware('verify_token')->group(function () {
+Route::middleware(['verify_token', 'checkLoginTime'])->group(function () {
     Route::post('/bookings/manage_process/{booking_id}', [Controllers\Admin\BookingController::class, 'manage_process'])->name('booking.manage_process');
     Route::get('/bookings/fetch/{booking_id}', [Controllers\Admin\BookingController::class, 'fetch_booking'])->name('booking.fetch');
     Route::get('/vm_event/fetch/{event_id?}', [Controllers\Admin\BookingController::class, 'fetch_vm_event'])->name('vm_event.fetch');
@@ -124,6 +123,8 @@ Route::middleware('verify_token')->group(function () {
             Route::get('/roles', [Controllers\Admin\RoleController::class, 'list'])->name('admin.role.list');
             Route::get('/roles/manage_ajax/{role_id?}', [Controllers\Admin\RoleController::class, 'manage_ajax'])->name('admin.role.edit');
             Route::post('/roles/manage-process/{role_id?}', [Controllers\Admin\RoleController::class, 'manage_process'])->name('admin.role.manage.process');
+            Route::post('/roles/update-login-time', [Controllers\Admin\RoleController::class, 'updateLoginTime'])->name('admin.role.updateLoginTime');
+            Route::get('/roles/update-is-all-time-login/{role_id?}/{value?}', [Controllers\Admin\RoleController::class, 'updateIsAllTimeLogin'])->name('admin.role.update.isAllTimeLogin');
 
             //Lead Routes
             Route::match(['get', 'post'], '/leads', [Controllers\Admin\LeadController::class, 'list'])->name('admin.lead.list');

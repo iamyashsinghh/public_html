@@ -10,14 +10,14 @@ use Illuminate\Support\Facades\Validator;
 class RoleController extends Controller {
     public function list() {
         $page_heading = "Roles & Permissions";
-        $roles = Role::select('id', 'name', 'permissions', 'created_at')->get();
+        $roles = Role::select('id', 'name', 'permissions', 'login_start_time', 'login_end_time', 'is_all_time_login', 'created_at')->get();
         return view('admin.venueCrm.role.list', compact('page_heading', 'roles'));
     }
 
     // Ajax function
     public function manage_ajax($role_id = null) {
         $role = Role::find($role_id);
-       
+
         if ($role) {
             if (sizeof($role->get_assigned_members) > 0) {
                 $role_assigned = true;
@@ -55,5 +55,34 @@ class RoleController extends Controller {
         $role->save();
 
         return response()->json(['success' => true, 'alert_type' => 'success', 'message' => $msg], 200);
+    }
+
+    public function updateLoginTime(Request $request)
+    {
+        $role = Role::find($request->role_id);
+
+        if ($request->type == 'start') {
+            $role->login_start_time = $request->value;
+        } else if ($request->type == 'end') {
+            $role->login_end_time = $request->value;
+        }
+
+        $role->save();
+
+        return response()->json(['success' => true, 'message' => 'Login time updated successfully.']);
+    }
+
+
+    public function updateIsAllTimeLogin($role_id, $value) {
+        $role = Role::find($role_id);
+        if (!$role) {
+            return abort(404);
+        }
+
+        $role->is_all_time_login = $value;
+        $role->save();
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Is all time login updated."]);
+        return redirect()->back();
     }
 }

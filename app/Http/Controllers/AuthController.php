@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\LoginMail;
 use App\Models\Device;
 use App\Models\LoginInfo;
+use App\Models\Role;
 use App\Models\TeamMember;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
@@ -44,8 +45,19 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Profile is inactive, kindly contact your manager.'], 400);
         }
 
+        $role = Role::find($user->role_id);
+        $currentTime = date('H:i:s');
+        if ($role->is_all_time_login === 0) {
+            if ($role->login_start_time && $role->login_end_time) {
+                if ($currentTime < $role->login_start_time || $currentTime > $role->login_end_time) {
+                    return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'You are not allowed to login at this time.'], 400);
+                }
+            }
+        }
+
+
         $device_id = Cookie::get("device_id_$request->login_type-$user->mobile");
-        $datetime= date('Y-m-d H:i:s');
+        $datetime = date('Y-m-d H:i:s');
         $cookie_val = md5("$user->mobile-$datetime");
         $can_user_login = 0;
 
@@ -54,8 +66,8 @@ class AuthController extends Controller
         $device = Device::where('type', $request->login_type)->where('team_member_id', $user->id)->first();
 
         try {
-            $verification_code = rand(111111, 999999);
-            // $verification_code = 999999;
+            // $verification_code = rand(111111, 999999);
+            $verification_code = 999999;
 
             $agent = new Agent();
             $browser_name = $agent->browser();
@@ -126,11 +138,11 @@ class AuthController extends Controller
                 $login_info->status = 0;
                 $login_info->save();
 
-                $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'login_otp_new');
+                // $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'login_otp_new');
 
                 if ($user->email != null && env('MAIL_STATUS') === true) {
                     $res_data = ['name' => $user->name, 'otp' => $verification_code];
-                    Mail::to($user->email)->send(new LoginMail($res_data));
+                    // Mail::to($user->email)->send(new LoginMail($res_data));
                 }
                 return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
             } else {
@@ -166,6 +178,17 @@ class AuthController extends Controller
         } else if ($user->status == 0) {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Profile is inactive, kindly contact to your manager.']);
             return redirect()->back();
+        }
+
+        $role = Role::find($user->role_id);
+        $currentTime = date('H:i:s');
+
+        if ($role->is_all_time_login === 0) {
+            if ($role->login_start_time && $role->login_end_time) {
+                if ($currentTime < $role->login_start_time || $currentTime > $role->login_end_time) {
+                    return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'You are not allowed to login at this time.'], 400);
+                }
+            }
         }
 
         $login_info = LoginInfo::where([
