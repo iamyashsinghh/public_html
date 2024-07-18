@@ -182,15 +182,16 @@ class AuthController extends Controller
             return redirect()->back();
         }
 
-        $role = Role::find($user->role_id);
+        if($request->verified_login_type === "team"){
+            $role = Role::find($user->role_id);
         $currentTime = date('H:i:s');
-
         if ($role->is_all_time_login === 0) {
             if ($role->login_start_time && $role->login_end_time) {
                 if ($currentTime < $role->login_start_time || $currentTime > $role->login_end_time) {
                     return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'You are not allowed to login at this time.'], 400);
                 }
             }
+        }
         }
 
         $login_info = LoginInfo::where([
