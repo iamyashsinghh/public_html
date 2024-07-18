@@ -37,7 +37,7 @@ $uri = Route::currentRouteName();
                 <li class="nav-item">
                     <a href="{{route('pvendor.lead.list')}}" class="nav-link w-100 {{$uri == "pvendor.lead.list" ? 'active' : ''}}">
                         <i class="nav-icon fas fa-star"></i>
-                        <p>My Leads</p>
+                        <p>Self Leads</p>
                     </a>
                 </li>
                 <li class="nav-item">
