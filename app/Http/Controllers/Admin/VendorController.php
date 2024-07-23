@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\nvLeadForward;
 use App\Models\nvLeadForwardInfo;
 use App\Models\TeamMember;
 use App\Models\Vendor;
@@ -282,24 +283,18 @@ public function download_nv_lead_data_download(Request $request)
             ->whereBetween('updated_at', [$fromDate, $toDate])
             ->pluck('lead_id');
 
-        $leads = DB::table('nv_leads')->select(
-            'nv_leads.id',
-            'nv_leads.lead_datetime',
-            'nv_leads.name',
-            'nv_leads.mobile',
-            'nv_leads.event_datetime',
-            'tm.name as team_name',
-            'roles.name as team_role',
-            DB::raw("(select tm_forward_to.name from team_members as tm_forward_to where tm_forward_to.id = nvrm_lf.forward_to) as forward_to"),
-            'nvrm_lf.last_forwarded_by',
-            'nvrm_lf.service_status',
-            'nvrm_lf.lead_status'
-        )->leftJoin('team_members as tm', 'nv_leads.created_by', 'tm.id')
-            ->leftJoin('roles', 'tm.role_id', 'roles.id')
-            ->leftJoin('nvrm_lead_forwards as nvrm_lf', 'nv_leads.id', 'nvrm_lf.lead_id')
-            ->groupBy('nv_leads.mobile')
-            ->whereIn('nv_leads.id', $leads_ids)
-            ->get();
+        $leads = nvLeadForward::select(
+            'nv_lead_forwards.lead_id',
+            'nv_lead_forwards.lead_datetime as lead_date',
+            'nv_lead_forwards.name',
+            'nv_lead_forwards.mobile',
+            'nv_lead_forwards.lead_status',
+            'nv_lead_forwards.event_datetime as event_date',
+            'nv_lead_forwards.read_status',
+            'ne.pax as pax',
+        )->leftJoin('nv_events as ne', 'ne.lead_id', 'nv_lead_forwards.lead_id')
+        ->whereIn('nv_leads.id', $leads_ids)
+        ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile');
 
         Log::info('Leads Data: ', ['leads' => $leads]);
 
@@ -308,8 +303,7 @@ public function download_nv_lead_data_download(Request $request)
 
         $headers = [
             'ID', 'Lead Datetime', 'Name', 'Mobile', 'Event Datetime',
-            'Team Name', 'Team Role', 'Forward To', 'Last Forwarded By',
-            'Service Status', 'Lead Status'
+            'Pax' ,'Lead Status'
         ];
 
         $column = 'A';
@@ -321,16 +315,12 @@ public function download_nv_lead_data_download(Request $request)
         $row = 2;
         foreach ($leads as $data) {
             $column = 'A';
-            $sheet->setCellValue($column++ . $row, $data->id);
-            $sheet->setCellValue($column++ . $row, $data->lead_datetime);
+            $sheet->setCellValue($column++ . $row, $data->lead_id);
+            $sheet->setCellValue($column++ . $row, $data->lead_date);
             $sheet->setCellValue($column++ . $row, $data->name);
             $sheet->setCellValue($column++ . $row, $data->mobile);
-            $sheet->setCellValue($column++ . $row, $data->event_datetime);
-            $sheet->setCellValue($column++ . $row, $data->team_name);
-            $sheet->setCellValue($column++ . $row, $data->team_role);
-            $sheet->setCellValue($column++ . $row, $data->forward_to);
-            $sheet->setCellValue($column++ . $row, $data->last_forwarded_by);
-            $sheet->setCellValue($column++ . $row, $data->service_status);
+            $sheet->setCellValue($column++ . $row, $data->event_date);
+            $sheet->setCellValue($column++ . $row, $data->pax);
             $sheet->setCellValue($column++ . $row, $data->lead_status);
             $row++;
         }
