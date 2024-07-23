@@ -194,6 +194,53 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="manageDownloadVendorData" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="manageDownloadVendorDataHeading">Download Vendor Data</h4>
+                        <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
+                                class="fa fa-times"></i></button>
+                    </div>
+                    <form id="manageDownloadVendorDataForm" method="post" enctype="multipart/form-data">
+                        <div class="modal-body text-sm">
+                            @csrf
+                            <input type="text" class="d-none" name="vendor_id" id="download_form_vendor_id">
+                            <input type="text" class="d-none" name="vendor_name" id="download_form_vendor_name">
+                            <input type="text" class="d-none" name="business_name" id="download_form_vendor_business_name">
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <div class="form-group">
+                                        <label for="fromDateVendorData">From <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="fromDateVendorData" name="from"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <div class="form-group">
+                                        <label for="toDateVendorData">To <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="toDateVendorData" name="to"
+                                            required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer text-sm">
+                            <div class="col">
+                                <p>
+                                    <span class="text-danger">*</span>
+                                    Fields are required.
+                                </p>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-sm text-light m-1"
+                                style="background-color: var(--wb-dark-red);">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 @section('footer-script')
@@ -331,6 +378,7 @@
                     const action_btns = `<td class="d-flex justify-content-around">
                     <a href="{{route('admin.vendor.view')}}/${data.id}" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                     <a href="javascript:void(0);" class="text-success mx-2" title="Edit"><i class="fa fa-edit" style="font-size: 15px;" onclick="handle_manage_vendor(${data.id})"></i></a>
+                    <a href="javascript:void(0);" class="text-info mx-2" title="Download"><i class="fa fa-download" style="font-size: 15px;" onclick="handle_download_vendor_data(${data.id}, '${data.name}', '${data.business_name}')"></i></a>
                     <a href="{{ route('admin.vendor.delete') }}/${data.id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>
                     <div class="dropdown d-inline-block mx-2">
                         <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
@@ -402,6 +450,16 @@
                 }
                 modal.show();
             }
+        }
+
+        function handle_download_vendor_data(vendor_id, vendor_name, business_name) {
+            const manageDownloadVendorData = document.getElementById('manageDownloadVendorData');
+            const modal = new bootstrap.Modal(manageDownloadVendorData);
+            const submit_url = `{{ route('admin.vendor.download.data') }}`;
+            manageDownloadVendorDataForm.action = submit_url;
+            manageDownloadVendorDataHeading.innerText = `Download ${vendor_name}'s (${business_name}) Data`;
+            download_form_vendor_id.value = vendor_id;
+            modal.show();
         }
     </script>
     <script>

@@ -44,7 +44,7 @@ class NvLeadController extends Controller
         $page_heading = $filter_params ? "NV Leads - Filtered" : "NV Leads";
         $getRm = TeamMember::select('id', 'name')->where('venue_name', 'RM >< Non Venue')->get();
         $whatsapp_campaigns = WhatsappCampain::where('status', 1)->get();
-        return view('admin.nonVenueCrm.nvlead.list', compact('page_heading', 'filter_params', 'nvrm_members','whatsapp_campaigns', 'getRm'));
+        return view('admin.nonVenueCrm.nvlead.list', compact('page_heading', 'filter_params', 'nvrm_members', 'whatsapp_campaigns', 'getRm'));
     }
 
     public function ajax_list(Request $request)
@@ -196,24 +196,24 @@ class NvLeadController extends Controller
         $lead->event_datetime = $request->event_date ? $request->event_date . " " . date('H:i:s') : '';
         if ($lead->save()) {
             $nvrmIds = $request->nvrm_id;
-                $exist_lead_forward = nvrmLeadForward::where(['lead_id' => $lead->id, 'forward_to' => $nvrmIds])->first();
-                if (!$exist_lead_forward) {
-                    $lead_forward = new nvrmLeadForward();
-                    $lead_forward->lead_id = $lead->id;
-                    $lead_forward->forward_to = $nvrmIds;
-                    $lead_forward->lead_datetime = $this->current_timestamp;
-                    $lead_forward->name = $lead->name;
-                    $lead_forward->email = $lead->email;
-                    $lead_forward->mobile = $lead->mobile;
-                    $lead_forward->alternate_mobile = $lead->alternate_mobile;
-                    $lead_forward->address = $lead->address;
-                    $lead_forward->lead_status = "Active";
-                    $lead_forward->read_status = false;
-                    $lead_forward->done_title = null;
-                    $lead_forward->done_message = null;
-                    $lead_forward->event_datetime = $lead->event_datetime;
-                    $lead_forward->save();
-                }
+            $exist_lead_forward = nvrmLeadForward::where(['lead_id' => $lead->id, 'forward_to' => $nvrmIds])->first();
+            if (!$exist_lead_forward) {
+                $lead_forward = new nvrmLeadForward();
+                $lead_forward->lead_id = $lead->id;
+                $lead_forward->forward_to = $nvrmIds;
+                $lead_forward->lead_datetime = $this->current_timestamp;
+                $lead_forward->name = $lead->name;
+                $lead_forward->email = $lead->email;
+                $lead_forward->mobile = $lead->mobile;
+                $lead_forward->alternate_mobile = $lead->alternate_mobile;
+                $lead_forward->address = $lead->address;
+                $lead_forward->lead_status = "Active";
+                $lead_forward->read_status = false;
+                $lead_forward->done_title = null;
+                $lead_forward->done_message = null;
+                $lead_forward->event_datetime = $lead->event_datetime;
+                $lead_forward->save();
+            }
             session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Lead added and forwarded successfully."]);
         } else {
         }
@@ -315,17 +315,17 @@ class NvLeadController extends Controller
             )->leftJoin('team_members as tm', 'nvrm_lead_forwards.forward_to', '=', 'tm.id')->leftJoin('roles as r', 'tm.role_id', '=', 'r.id')
                 ->where(['nvrm_lead_forwards.lead_id' => $lead_id])->groupBy('nvrm_lead_forwards.forward_to')->orderBy('nvrm_lead_forwards.lead_datetime', 'desc')->get()->toArray();
 
-                $nv_forwards =  nvLeadForwardInfo::select(
-                    'v.name as name',
-                    'v.business_name',
-                    'nvrm.name as from_name',
-                    'nv_lead_forwards.read_status',
-                    'nv_lead_forward_infos.updated_at'
-                )->join('vendors as v', 'nv_lead_forward_infos.forward_to', '=', 'v.id')
+            $nv_forwards =  nvLeadForwardInfo::select(
+                'v.name as name',
+                'v.business_name',
+                'nvrm.name as from_name',
+                'nv_lead_forwards.read_status',
+                'nv_lead_forward_infos.updated_at'
+            )->join('vendors as v', 'nv_lead_forward_infos.forward_to', '=', 'v.id')
                 ->join('team_members as nvrm', 'nv_lead_forward_infos.forward_from', '=', 'nvrm.id')
-                ->join('nv_lead_forwards', function($join) use ($lead_id) {
+                ->join('nv_lead_forwards', function ($join) use ($lead_id) {
                     $join->on('nv_lead_forwards.forward_to', '=', 'v.id')
-                         ->where('nv_lead_forwards.lead_id', '=', $lead_id);
+                        ->where('nv_lead_forwards.lead_id', '=', $lead_id);
                 })
                 ->where('nv_lead_forward_infos.lead_id', $lead_id)
                 ->orderBy('nv_lead_forwards.updated_at', 'desc')

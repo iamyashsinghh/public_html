@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\nvLeadForwardInfo;
 use App\Models\TeamMember;
 use App\Models\Vendor;
 use App\Models\VendorCategory;
@@ -10,7 +11,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\VendorLocalities;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
@@ -26,24 +30,7 @@ class VendorController extends Controller
 
     public function ajax_list($vendor_cat_id)
     {
-        if($vendor_cat_id == 0){
-        $vendors = Vendor::select(
-            'vendors.id',
-            'vendors.profile_image',
-            'vendors.name',
-            'vendors.mobile',
-            'vendors.email',
-            'vendors.business_name',
-            'vc.name as category_name',
-            'vendors.status',
-            'vendors.is_whatsapp_msg',
-            'vendors.created_at',
-            'vendors.group_name',
-            DB::raw('(SELECT COUNT(*) FROM nv_lead_forwards WHERE nv_lead_forwards.forward_to = vendors.id AND (nv_lead_forwards.lead_datetime BETWEEN vendors.start_date AND COALESCE(vendors.end_date, NOW()) OR (vendors.start_date IS NULL AND vendors.end_date IS NULL))) as total_leads')
-            )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
-            ->orderBy('group_name', 'asc')
-            ->get();
-        }else{
+        if ($vendor_cat_id == 0) {
             $vendors = Vendor::select(
                 'vendors.id',
                 'vendors.profile_image',
@@ -57,7 +44,24 @@ class VendorController extends Controller
                 'vendors.created_at',
                 'vendors.group_name',
                 DB::raw('(SELECT COUNT(*) FROM nv_lead_forwards WHERE nv_lead_forwards.forward_to = vendors.id AND (nv_lead_forwards.lead_datetime BETWEEN vendors.start_date AND COALESCE(vendors.end_date, NOW()) OR (vendors.start_date IS NULL AND vendors.end_date IS NULL))) as total_leads')
-                )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
+            )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
+                ->orderBy('group_name', 'asc')
+                ->get();
+        } else {
+            $vendors = Vendor::select(
+                'vendors.id',
+                'vendors.profile_image',
+                'vendors.name',
+                'vendors.mobile',
+                'vendors.email',
+                'vendors.business_name',
+                'vc.name as category_name',
+                'vendors.status',
+                'vendors.is_whatsapp_msg',
+                'vendors.created_at',
+                'vendors.group_name',
+                DB::raw('(SELECT COUNT(*) FROM nv_lead_forwards WHERE nv_lead_forwards.forward_to = vendors.id AND (nv_lead_forwards.lead_datetime BETWEEN vendors.start_date AND COALESCE(vendors.end_date, NOW()) OR (vendors.start_date IS NULL AND vendors.end_date IS NULL))) as total_leads')
+            )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
                 ->orderBy('group_name', 'asc')
                 ->where('vendors.category_id', $vendor_cat_id)
                 ->get();
@@ -146,9 +150,9 @@ class VendorController extends Controller
             return abort(404);
         }
 
-        if($status == 1){
+        if ($status == 1) {
             $vendor->end_date = null;
-        }else{
+        } else {
             $vendor->end_date = Carbon::now()->toDateString();
         }
         $vendor->status = $status;
@@ -170,7 +174,8 @@ class VendorController extends Controller
         return redirect()->back();
     }
 
-    public function view($vendor_id) {
+    public function view($vendor_id)
+    {
         $vendor = Vendor::find($vendor_id);
         return view('admin.nonVenueCrm.vendor.view', compact('vendor'));
     }
@@ -209,4 +214,142 @@ class VendorController extends Controller
 
         return redirect()->back();
     }
+
+    // public function download_nv_lead_data_download(Request $request)
+    // {
+    // $leads_ids = nvLeadForwardInfo::where('forward_to', $request->vendor_id)->whereBetween('updated_at', [$request->from, $request->to])->pluck('lead_id');
+    // $leads = DB::table('nv_leads')->select(
+    //     'nv_leads.id',
+    //     'nv_leads.lead_datetime',
+    //     'nv_leads.name',
+    //     'nv_leads.mobile',
+    //     'nv_leads.event_datetime',
+    //     'tm.name as team_name',
+    //     'roles.name as team_role',
+    //     DB::raw("(select tm_forward_to.name from team_members as tm_forward_to where tm_forward_to.id = nvrm_lf.forward_to) as forward_to"),
+    //     'nvrm_lf.last_forwarded_by',
+    //     'nvrm_lf.service_status',
+    //     'nvrm_lf.lead_status',
+    // )->leftJoin('team_members as tm', 'nv_leads.created_by', 'tm.id')
+    //     ->leftJoin('roles', 'tm.role_id', 'roles.id')
+    //     ->leftJoin('nvrm_lead_forwards as nvrm_lf', 'nv_leads.id', 'nvrm_lf.lead_id')
+    //     ->groupBy('nv_leads.mobile')
+    //     ->where('nv_leads.id', $leads_ids);
+
+    // $dataArray = $leads->get();
+
+    // $spreadsheet = new Spreadsheet();
+    // $sheet = $spreadsheet->getActiveSheet();
+    // $row = 1;
+    // foreach ($dataArray as $data) {
+    //     $column = 'A';
+    //     foreach ($data as $value) {
+    //         $sheet->setCellValue($column.$row, $value);
+    //         $column++;
+    //     }
+    //     $row++;
+    // }
+
+    // $tempFile = tempnam(sys_get_temp_dir(), 'excel');
+    // $writer = new Xlsx($spreadsheet);
+    // $writer->save($tempFile);
+
+    // return response()->download($tempFile, 'data.xlsx')->deleteFileAfterSend(true);
+
+
+// }
+
+
+public function download_nv_lead_data_download(Request $request)
+{
+    try {
+        $vendorId = $request->vendor_id;
+        $fromDate = $request->from;
+        $toDate = $request->to;
+
+        $vendor = DB::table('vendors')->select('name', 'business_name')->where('id', $vendorId)->first();
+
+        if (!$vendor) {
+            return response()->json(['error' => 'Vendor not found'], 404);
+        }
+
+        $vendorName = str_replace(' ', '_', $vendor->name);
+        $businessName = str_replace(' ', '_', $vendor->business_name);
+
+        $fileName = "{$vendorName}-{$businessName}-{$fromDate}-to-{$toDate}.xlsx";
+
+        $leads_ids = nvLeadForwardInfo::where('forward_to', $vendorId)
+            ->whereBetween('updated_at', [$fromDate, $toDate])
+            ->pluck('lead_id');
+
+        $leads = DB::table('nv_leads')->select(
+            'nv_leads.id',
+            'nv_leads.lead_datetime',
+            'nv_leads.name',
+            'nv_leads.mobile',
+            'nv_leads.event_datetime',
+            'tm.name as team_name',
+            'roles.name as team_role',
+            DB::raw("(select tm_forward_to.name from team_members as tm_forward_to where tm_forward_to.id = nvrm_lf.forward_to) as forward_to"),
+            'nvrm_lf.last_forwarded_by',
+            'nvrm_lf.service_status',
+            'nvrm_lf.lead_status'
+        )->leftJoin('team_members as tm', 'nv_leads.created_by', 'tm.id')
+            ->leftJoin('roles', 'tm.role_id', 'roles.id')
+            ->leftJoin('nvrm_lead_forwards as nvrm_lf', 'nv_leads.id', 'nvrm_lf.lead_id')
+            ->groupBy('nv_leads.mobile')
+            ->whereIn('nv_leads.id', $leads_ids)
+            ->get();
+
+        Log::info('Leads Data: ', ['leads' => $leads]);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headers = [
+            'ID', 'Lead Datetime', 'Name', 'Mobile', 'Event Datetime',
+            'Team Name', 'Team Role', 'Forward To', 'Last Forwarded By',
+            'Service Status', 'Lead Status'
+        ];
+
+        $column = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . '1', $header);
+            $column++;
+        }
+
+        $row = 2;
+        foreach ($leads as $data) {
+            $column = 'A';
+            $sheet->setCellValue($column++ . $row, $data->id);
+            $sheet->setCellValue($column++ . $row, $data->lead_datetime);
+            $sheet->setCellValue($column++ . $row, $data->name);
+            $sheet->setCellValue($column++ . $row, $data->mobile);
+            $sheet->setCellValue($column++ . $row, $data->event_datetime);
+            $sheet->setCellValue($column++ . $row, $data->team_name);
+            $sheet->setCellValue($column++ . $row, $data->team_role);
+            $sheet->setCellValue($column++ . $row, $data->forward_to);
+            $sheet->setCellValue($column++ . $row, $data->last_forwarded_by);
+            $sheet->setCellValue($column++ . $row, $data->service_status);
+            $sheet->setCellValue($column++ . $row, $data->lead_status);
+            $row++;
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($tempFile);
+
+        // Validate the saved file
+        if (!file_exists($tempFile) || filesize($tempFile) == 0) {
+            throw new \Exception("Failed to save the Excel file.");
+        }
+
+        return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
+
+    } catch (\Exception $e) {
+        Log::error('Error generating Excel file: ' . $e->getMessage());
+        return response()->json(['error' => 'An error occurred while generating the Excel file.'], 500);
+    }
+}
+
 }
