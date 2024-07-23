@@ -342,6 +342,4 @@ public function download_nv_lead_data_download(Request $request)
     }
 }
 
-
-
 }
