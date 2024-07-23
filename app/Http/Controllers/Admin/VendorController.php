@@ -218,8 +218,8 @@ class VendorController extends Controller
     {
         try {
             $vendorId = $request->vendor_id;
-            $fromDate = $request->from;
-            $toDate = $request->to;
+            $fromDate = \Carbon\Carbon::parse($request->from)->startOfDay();
+            $toDate = \Carbon\Carbon::parse($request->to)->endOfDay();
 
             $vendor = DB::table('vendors')->select('name', 'business_name')->where('id', $vendorId)->first();
 
