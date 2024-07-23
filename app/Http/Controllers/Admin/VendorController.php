@@ -291,55 +291,75 @@ public function download_nv_lead_data_download(Request $request)
             'nv_lead_forwards.lead_status',
             'nv_lead_forwards.event_datetime as event_date',
             'nv_lead_forwards.read_status',
-            'ne.pax as pax',
+            'ne.pax as pax'
         )->leftJoin('nv_events as ne', 'ne.lead_id', 'nv_lead_forwards.lead_id')
-        ->whereIn('nv_leads.id', $leads_ids)
-        ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile');
+        ->whereIn('nv_lead_forwards.lead_id', $leads_ids)
+        ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile')
+        ->get();
 
         Log::info('Leads Data: ', ['leads' => $leads]);
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        // Create a CSV file
+        $tempCsvFile = tempnam(sys_get_temp_dir(), 'csv') . '.csv';
+        $csvFile = fopen($tempCsvFile, 'w');
 
+        // Set the headers for CSV
         $headers = [
             'ID', 'Lead Datetime', 'Name', 'Mobile', 'Event Datetime',
-            'Pax' ,'Lead Status'
+            'Pax', 'Lead Status'
         ];
+        fputcsv($csvFile, $headers);
 
-        $column = 'A';
-        foreach ($headers as $header) {
-            $sheet->setCellValue($column . '1', $header);
-            $column++;
-        }
-
-        $row = 2;
+        // Add the data to CSV
         foreach ($leads as $data) {
-            $column = 'A';
-            $sheet->setCellValue($column++ . $row, $data->lead_id);
-            $sheet->setCellValue($column++ . $row, $data->lead_date);
-            $sheet->setCellValue($column++ . $row, $data->name);
-            $sheet->setCellValue($column++ . $row, $data->mobile);
-            $sheet->setCellValue($column++ . $row, $data->event_date);
-            $sheet->setCellValue($column++ . $row, $data->pax);
-            $sheet->setCellValue($column++ . $row, $data->lead_status);
-            $row++;
+            fputcsv($csvFile, [
+                $data->lead_id,
+                $data->lead_date,
+                $data->name,
+                $data->mobile,
+                $data->event_date,
+                $data->pax,
+                $data->lead_status
+            ]);
         }
 
-        $tempFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
-        $writer = new Xlsx($spreadsheet);
-        $writer->save($tempFile);
+        fclose($csvFile);
+
+        // Convert CSV to Excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        if (($csvFile = fopen($tempCsvFile, 'r')) !== false) {
+            $row = 1;
+            while (($data = fgetcsv($csvFile, 1000, ',')) !== false) {
+                $column = 'A';
+                foreach ($data as $cell) {
+                    $sheet->setCellValue($column . $row, $cell);
+                    $column++;
+                }
+                $row++;
+            }
+            fclose($csvFile);
+        }
+
+        // Write to a temporary Excel file
+        $tempExcelFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save($tempExcelFile);
 
         // Validate the saved file
-        if (!file_exists($tempFile) || filesize($tempFile) == 0) {
+        if (!file_exists($tempExcelFile) || filesize($tempExcelFile) == 0) {
             throw new \Exception("Failed to save the Excel file.");
         }
 
-        return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
+        // Return the Excel file as download response
+        return response()->download($tempExcelFile, $fileName)->deleteFileAfterSend(true);
 
     } catch (\Exception $e) {
         Log::error('Error generating Excel file: ' . $e->getMessage());
         return response()->json(['error' => 'An error occurred while generating the Excel file.'], 500);
     }
 }
+
 
 }
