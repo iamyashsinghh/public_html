@@ -14,8 +14,6 @@ use App\Models\VendorLocalities;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
@@ -216,130 +214,83 @@ class VendorController extends Controller
         return redirect()->back();
     }
 
-    // public function download_nv_lead_data_download(Request $request)
-    // {
-    // $leads_ids = nvLeadForwardInfo::where('forward_to', $request->vendor_id)->whereBetween('updated_at', [$request->from, $request->to])->pluck('lead_id');
-    // $leads = DB::table('nv_leads')->select(
-    //     'nv_leads.id',
-    //     'nv_leads.lead_datetime',
-    //     'nv_leads.name',
-    //     'nv_leads.mobile',
-    //     'nv_leads.event_datetime',
-    //     'tm.name as team_name',
-    //     'roles.name as team_role',
-    //     DB::raw("(select tm_forward_to.name from team_members as tm_forward_to where tm_forward_to.id = nvrm_lf.forward_to) as forward_to"),
-    //     'nvrm_lf.last_forwarded_by',
-    //     'nvrm_lf.service_status',
-    //     'nvrm_lf.lead_status',
-    // )->leftJoin('team_members as tm', 'nv_leads.created_by', 'tm.id')
-    //     ->leftJoin('roles', 'tm.role_id', 'roles.id')
-    //     ->leftJoin('nvrm_lead_forwards as nvrm_lf', 'nv_leads.id', 'nvrm_lf.lead_id')
-    //     ->groupBy('nv_leads.mobile')
-    //     ->where('nv_leads.id', $leads_ids);
+    public function download_nv_lead_data_download(Request $request)
+    {
+        try {
+            $vendorId = $request->vendor_id;
+            $fromDate = $request->from;
+            $toDate = $request->to;
 
-    // $dataArray = $leads->get();
+            $vendor = DB::table('vendors')->select('name', 'business_name')->where('id', $vendorId)->first();
 
-    // $spreadsheet = new Spreadsheet();
-    // $sheet = $spreadsheet->getActiveSheet();
-    // $row = 1;
-    // foreach ($dataArray as $data) {
-    //     $column = 'A';
-    //     foreach ($data as $value) {
-    //         $sheet->setCellValue($column.$row, $value);
-    //         $column++;
-    //     }
-    //     $row++;
-    // }
+            if (!$vendor) {
+                return response()->json(['error' => 'Vendor not found'], 404);
+            }
 
-    // $tempFile = tempnam(sys_get_temp_dir(), 'excel');
-    // $writer = new Xlsx($spreadsheet);
-    // $writer->save($tempFile);
+            $vendorName = str_replace(' ', '_', $vendor->name);
+            $businessName = str_replace(' ', '_', $vendor->business_name);
 
-    // return response()->download($tempFile, 'data.xlsx')->deleteFileAfterSend(true);
+            $fileName = "{$vendorName}-{$businessName}-{$fromDate}-to-{$toDate}.xlsx";
 
+            $leads_ids = nvLeadForwardInfo::where('forward_to', $vendorId)
+                ->whereBetween('updated_at', [$fromDate, $toDate])
+                ->pluck('lead_id');
 
-// }
+            $leads = nvLeadForward::select(
+                'nv_lead_forwards.lead_id',
+                'nv_lead_forwards.lead_datetime as lead_date',
+                'nv_lead_forwards.name',
+                'nv_lead_forwards.mobile',
+                'nv_lead_forwards.lead_status',
+                'nv_lead_forwards.event_datetime as event_date',
+                'nv_lead_forwards.read_status',
+                'ne.pax as pax'
+            )->leftJoin('nv_events as ne', 'ne.lead_id', 'nv_lead_forwards.lead_id')
+                ->whereIn('nv_lead_forwards.lead_id', $leads_ids)
+                ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile')
+                ->get();
 
+            Log::info('Leads Data: ', ['leads' => $leads]);
 
-public function download_nv_lead_data_download(Request $request)
-{
-    try {
-        $vendorId = $request->vendor_id;
-        $fromDate = $request->from;
-        $toDate = $request->to;
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
 
-        $vendor = DB::table('vendors')->select('name', 'business_name')->where('id', $vendorId)->first();
+            $headers = [
+                'ID', 'Lead Datetime', 'Name', 'Mobile', 'Event Datetime',
+                'Pax', 'Lead Status'
+            ];
 
-        if (!$vendor) {
-            return response()->json(['error' => 'Vendor not found'], 404);
-        }
-
-        $vendorName = str_replace(' ', '_', $vendor->name);
-        $businessName = str_replace(' ', '_', $vendor->business_name);
-
-        $fileName = "{$vendorName}-{$businessName}-{$fromDate}-to-{$toDate}.xlsx";
-
-        $leads_ids = nvLeadForwardInfo::where('forward_to', $vendorId)
-            ->whereBetween('updated_at', [$fromDate, $toDate])
-            ->pluck('lead_id');
-
-        $leads = nvLeadForward::select(
-            'nv_lead_forwards.lead_id',
-            'nv_lead_forwards.lead_datetime as lead_date',
-            'nv_lead_forwards.name',
-            'nv_lead_forwards.mobile',
-            'nv_lead_forwards.lead_status',
-            'nv_lead_forwards.event_datetime as event_date',
-            'nv_lead_forwards.read_status',
-            'ne.pax as pax'
-        )->leftJoin('nv_events as ne', 'ne.lead_id', 'nv_lead_forwards.lead_id')
-        ->whereIn('nv_lead_forwards.lead_id', $leads_ids)
-        ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile')
-        ->get();
-
-        Log::info('Leads Data: ', ['leads' => $leads]);
-
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $headers = [
-            'ID', 'Lead Datetime', 'Name', 'Mobile', 'Event Datetime',
-            'Pax', 'Lead Status'
-        ];
-
-        $column = 'A';
-        foreach ($headers as $header) {
-            $sheet->setCellValue($column . '1', $header);
-            $column++;
-        }
-
-        $row = 2;
-        foreach ($leads as $data) {
             $column = 'A';
-            $sheet->setCellValue($column++ . $row, $data->lead_id);
-            $sheet->setCellValue($column++ . $row, $data->lead_date);
-            $sheet->setCellValue($column++ . $row, $data->name);
-            $sheet->setCellValue($column++ . $row, $data->mobile);
-            $sheet->setCellValue($column++ . $row, $data->event_date);
-            $sheet->setCellValue($column++ . $row, $data->pax);
-            $sheet->setCellValue($column++ . $row, $data->lead_status);
-            $row++;
+            foreach ($headers as $header) {
+                $sheet->setCellValue($column . '1', $header);
+                $column++;
+            }
+
+            $row = 2;
+            foreach ($leads as $data) {
+                $column = 'A';
+                $sheet->setCellValue($column++ . $row, $data->lead_id);
+                $sheet->setCellValue($column++ . $row, \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(\Carbon\Carbon::parse($data->lead_date)));
+                $sheet->setCellValue($column++ . $row, $data->name);
+                $sheet->setCellValue($column++ . $row, $data->mobile);
+                $sheet->setCellValue($column++ . $row, \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(\Carbon\Carbon::parse($data->event_date)));
+                $sheet->setCellValue($column++ . $row, $data->pax);
+                $sheet->setCellValue($column++ . $row, $data->lead_status);
+                $row++;
+            }
+
+            $tempExcelFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save($tempExcelFile);
+
+            if (!file_exists($tempExcelFile) || filesize($tempExcelFile) == 0) {
+                throw new \Exception("Failed to save the Excel file.");
+            }
+
+            return response()->download($tempExcelFile, $fileName)->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            Log::error('Error generating Excel file: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while generating the Excel file.'], 500);
         }
-
-        $tempExcelFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save($tempExcelFile);
-
-        if (!file_exists($tempExcelFile) || filesize($tempExcelFile) == 0) {
-            throw new \Exception("Failed to save the Excel file.");
-        }
-
-        return response()->download($tempExcelFile, $fileName)->deleteFileAfterSend(true);
-
-    } catch (\Exception $e) {
-        Log::error('Error generating Excel file: ' . $e->getMessage());
-        return response()->json(['error' => 'An error occurred while generating the Excel file.'], 500);
     }
-}
-
 }
