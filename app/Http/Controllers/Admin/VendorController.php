@@ -299,60 +299,41 @@ public function download_nv_lead_data_download(Request $request)
 
         Log::info('Leads Data: ', ['leads' => $leads]);
 
-        // Create a CSV file
-        $tempCsvFile = tempnam(sys_get_temp_dir(), 'csv') . '.csv';
-        $csvFile = fopen($tempCsvFile, 'w');
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
 
-        // Set the headers for CSV
         $headers = [
             'ID', 'Lead Datetime', 'Name', 'Mobile', 'Event Datetime',
             'Pax', 'Lead Status'
         ];
-        fputcsv($csvFile, $headers);
 
-        // Add the data to CSV
+        $column = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . '1', $header);
+            $column++;
+        }
+
+        $row = 2;
         foreach ($leads as $data) {
-            fputcsv($csvFile, [
-                $data->lead_id,
-                $data->lead_date,
-                $data->name,
-                $data->mobile,
-                $data->event_date,
-                $data->pax,
-                $data->lead_status
-            ]);
+            $column = 'A';
+            $sheet->setCellValue($column++ . $row, $data->lead_id);
+            $sheet->setCellValue($column++ . $row, $data->lead_date);
+            $sheet->setCellValue($column++ . $row, $data->name);
+            $sheet->setCellValue($column++ . $row, $data->mobile);
+            $sheet->setCellValue($column++ . $row, $data->event_date);
+            $sheet->setCellValue($column++ . $row, $data->pax);
+            $sheet->setCellValue($column++ . $row, $data->lead_status);
+            $row++;
         }
 
-        fclose($csvFile);
-
-        // Convert CSV to Excel
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        if (($csvFile = fopen($tempCsvFile, 'r')) !== false) {
-            $row = 1;
-            while (($data = fgetcsv($csvFile, 1000, ',')) !== false) {
-                $column = 'A';
-                foreach ($data as $cell) {
-                    $sheet->setCellValue($column . $row, $cell);
-                    $column++;
-                }
-                $row++;
-            }
-            fclose($csvFile);
-        }
-
-        // Write to a temporary Excel file
         $tempExcelFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save($tempExcelFile);
 
-        // Validate the saved file
         if (!file_exists($tempExcelFile) || filesize($tempExcelFile) == 0) {
             throw new \Exception("Failed to save the Excel file.");
         }
 
-        // Return the Excel file as download response
         return response()->download($tempExcelFile, $fileName)->deleteFileAfterSend(true);
 
     } catch (\Exception $e) {
@@ -360,6 +341,7 @@ public function download_nv_lead_data_download(Request $request)
         return response()->json(['error' => 'An error occurred while generating the Excel file.'], 500);
     }
 }
+
 
 
 }
