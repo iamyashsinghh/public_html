@@ -279,6 +279,14 @@ class VendorController extends Controller
                 $row++;
             }
 
+            $sheet->getStyle('B2:B' . ($row - 1))
+            ->getNumberFormat()
+            ->setFormatCode('DD-MMM-YYYY');
+        $sheet->getStyle('E2:E' . ($row - 1))
+            ->getNumberFormat()
+            ->setFormatCode('DD-MMM-YYYY');
+
+
             $tempExcelFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
             $writer->save($tempExcelFile);
