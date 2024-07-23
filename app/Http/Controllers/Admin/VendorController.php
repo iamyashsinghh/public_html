@@ -42,8 +42,17 @@ class VendorController extends Controller
                 'vendors.is_whatsapp_msg',
                 'vendors.created_at',
                 'vendors.group_name',
-                DB::raw('(SELECT COUNT(*) FROM nv_lead_forwards WHERE nv_lead_forwards.forward_to = vendors.id AND (nv_lead_forwards.lead_datetime BETWEEN vendors.start_date AND COALESCE(vendors.end_date, NOW()) OR (vendors.start_date IS NULL AND vendors.end_date IS NULL))) as total_leads')
-            )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
+                DB::raw('
+                (SELECT COUNT(*)
+                 FROM nv_lead_forwards
+                 WHERE nv_lead_forwards.forward_to = vendors.id
+                   AND (
+                     nv_lead_forwards.lead_datetime BETWEEN DATE_FORMAT(vendors.start_date, "%Y-%m-%d 00:00:00")
+                     AND DATE_FORMAT(COALESCE(vendors.end_date, NOW()), "%Y-%m-%d 23:59:59")
+                     OR (vendors.start_date IS NULL AND vendors.end_date IS NULL)
+                   )
+                ) as total_leads
+            '))->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
                 ->orderBy('group_name', 'asc')
                 ->get();
         } else {
@@ -59,8 +68,17 @@ class VendorController extends Controller
                 'vendors.is_whatsapp_msg',
                 'vendors.created_at',
                 'vendors.group_name',
-                DB::raw('(SELECT COUNT(*) FROM nv_lead_forwards WHERE nv_lead_forwards.forward_to = vendors.id AND (nv_lead_forwards.lead_datetime BETWEEN vendors.start_date AND COALESCE(vendors.end_date, NOW()) OR (vendors.start_date IS NULL AND vendors.end_date IS NULL))) as total_leads')
-            )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
+                DB::raw('
+                (SELECT COUNT(*)
+                 FROM nv_lead_forwards
+                 WHERE nv_lead_forwards.forward_to = vendors.id
+                   AND (
+                     nv_lead_forwards.lead_datetime BETWEEN DATE_FORMAT(vendors.start_date, "%Y-%m-%d 00:00:00")
+                     AND DATE_FORMAT(COALESCE(vendors.end_date, NOW()), "%Y-%m-%d 23:59:59")
+                     OR (vendors.start_date IS NULL AND vendors.end_date IS NULL)
+                   )
+                ) as total_leads
+            '))->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
                 ->orderBy('group_name', 'asc')
                 ->where('vendors.category_id', $vendor_cat_id)
                 ->get();
