@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class VendorController extends Controller
 {
@@ -52,7 +53,8 @@ class VendorController extends Controller
                      OR (vendors.start_date IS NULL AND vendors.end_date IS NULL)
                    )
                 ) as total_leads
-            '))->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
+            ')
+            )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
                 ->orderBy('group_name', 'asc')
                 ->get();
         } else {
@@ -78,7 +80,8 @@ class VendorController extends Controller
                      OR (vendors.start_date IS NULL AND vendors.end_date IS NULL)
                    )
                 ) as total_leads
-            '))->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
+            ')
+            )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
                 ->orderBy('group_name', 'asc')
                 ->where('vendors.category_id', $vendor_cat_id)
                 ->get();
@@ -234,89 +237,136 @@ class VendorController extends Controller
 
     public function download_nv_lead_data_download(Request $request)
     {
+
         try {
-            $vendorId = $request->vendor_id;
-            $fromDate = \Carbon\Carbon::parse($request->from)->startOfDay();
-            $toDate = \Carbon\Carbon::parse($request->to)->endOfDay();
+            if ($request->file_type == 'exel') {
+                $vendorId = $request->vendor_id;
+                $fromDate = \Carbon\Carbon::parse($request->from)->startOfDay();
+                $toDate = \Carbon\Carbon::parse($request->to)->endOfDay();
 
-            $vendor = DB::table('vendors')->select('name', 'business_name')->where('id', $vendorId)->first();
+                $vendor = DB::table('vendors')->select('name', 'business_name')->where('id', $vendorId)->first();
 
-            if (!$vendor) {
-                return response()->json(['error' => 'Vendor not found'], 404);
-            }
+                if (!$vendor) {
+                    return response()->json(['error' => 'Vendor not found'], 404);
+                }
 
-            $vendorName = str_replace(' ', '_', $vendor->name);
-            $businessName = str_replace(' ', '_', $vendor->business_name);
+                $vendorName = str_replace(' ', '_', $vendor->name);
+                $businessName = str_replace(' ', '_', $vendor->business_name);
 
-            $fileName = "{$vendorName}-{$businessName}-{$fromDate}-to-{$toDate}.xlsx";
+                $fileName = "{$vendorName}-{$businessName}-{$fromDate}-to-{$toDate}.xlsx";
 
-            $leads_ids = nvLeadForwardInfo::where('forward_to', $vendorId)
-                ->whereBetween('updated_at', [$fromDate, $toDate])
-                ->pluck('lead_id');
+                $leads_ids = nvLeadForwardInfo::where('forward_to', $vendorId)
+                    ->whereBetween('updated_at', [$fromDate, $toDate])
+                    ->pluck('lead_id');
 
                 Log::info("Vendor ID: $vendorId, From Date: $fromDate, To Date: $toDate");
-            Log::info($leads_ids);
+                Log::info($leads_ids);
 
-            $leads = nvLeadForward::select(
-                'nv_lead_forwards.lead_id',
-                'nv_lead_forwards.lead_datetime as lead_date',
-                'nv_lead_forwards.name',
-                'nv_lead_forwards.mobile',
-                'nv_lead_forwards.lead_status',
-                'nv_lead_forwards.event_datetime as event_date',
-                'nv_lead_forwards.read_status',
-                'ne.pax as pax'
-            )->leftJoin('nv_events as ne', 'ne.lead_id', 'nv_lead_forwards.lead_id')
-                ->whereIn('nv_lead_forwards.lead_id', $leads_ids)
-                ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile')
-                ->get();
+                $leads = nvLeadForward::select(
+                    'nv_lead_forwards.lead_id',
+                    'nv_lead_forwards.lead_datetime as lead_date',
+                    'nv_lead_forwards.name',
+                    'nv_lead_forwards.mobile',
+                    'nv_lead_forwards.lead_status',
+                    'nv_lead_forwards.event_datetime as event_date',
+                    'nv_lead_forwards.read_status',
+                    'ne.pax as pax'
+                )->leftJoin('nv_events as ne', 'ne.lead_id', 'nv_lead_forwards.lead_id')
+                    ->whereIn('nv_lead_forwards.lead_id', $leads_ids)
+                    ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile')
+                    ->get();
 
-            Log::info('Leads Data: ', ['leads' => $leads]);
+                Log::info('Leads Data: ', ['leads' => $leads]);
 
-            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
+                $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
 
-            $headers = [
-                'ID', 'Lead Datetime', 'Name', 'Mobile', 'Event Datetime',
-                'Pax', 'Lead Status'
-            ];
+                $headers = [
+                    'ID', 'Lead Datetime', 'Name', 'Mobile', 'Event Datetime',
+                    'Pax', 'Lead Status'
+                ];
 
-            $column = 'A';
-            foreach ($headers as $header) {
-                $sheet->setCellValue($column . '1', $header);
-                $column++;
-            }
-
-            $row = 2;
-            foreach ($leads as $data) {
                 $column = 'A';
-                $sheet->setCellValue($column++ . $row, $data->lead_id);
-                $sheet->setCellValue($column++ . $row, \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(\Carbon\Carbon::parse($data->lead_date)));
-                $sheet->setCellValue($column++ . $row, $data->name);
-                $sheet->setCellValue($column++ . $row, $data->mobile);
-                $sheet->setCellValue($column++ . $row, \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(\Carbon\Carbon::parse($data->event_date)));
-                $sheet->setCellValue($column++ . $row, $data->pax);
-                $sheet->setCellValue($column++ . $row, $data->lead_status);
-                $row++;
+                foreach ($headers as $header) {
+                    $sheet->setCellValue($column . '1', $header);
+                    $column++;
+                }
+
+                $row = 2;
+                foreach ($leads as $data) {
+                    $column = 'A';
+                    $sheet->setCellValue($column++ . $row, $data->lead_id);
+                    $sheet->setCellValue($column++ . $row, \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(\Carbon\Carbon::parse($data->lead_date)));
+                    $sheet->setCellValue($column++ . $row, $data->name);
+                    $sheet->setCellValue($column++ . $row, $data->mobile);
+                    $sheet->setCellValue($column++ . $row, \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(\Carbon\Carbon::parse($data->event_date)));
+                    $sheet->setCellValue($column++ . $row, $data->pax);
+                    $sheet->setCellValue($column++ . $row, $data->lead_status);
+                    $row++;
+                }
+
+                $sheet->getStyle('B2:B' . ($row - 1))
+                    ->getNumberFormat()
+                    ->setFormatCode('DD-MMM-YYYY');
+                $sheet->getStyle('E2:E' . ($row - 1))
+                    ->getNumberFormat()
+                    ->setFormatCode('DD-MMM-YYYY');
+
+
+                $tempExcelFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+                $writer->save($tempExcelFile);
+
+                if (!file_exists($tempExcelFile) || filesize($tempExcelFile) == 0) {
+                    throw new \Exception("Failed to save the Excel file.");
+                }
+
+                return response()->download($tempExcelFile, $fileName)->deleteFileAfterSend(true);
+            } else {
+                $vendorId = $request->vendor_id;
+                $fromDate = \Carbon\Carbon::parse($request->from)->startOfDay();
+                $toDate = \Carbon\Carbon::parse($request->to)->endOfDay();
+
+                $vendor = DB::table('vendors')->select('name', 'business_name')->where('id', $vendorId)->first();
+
+                if (!$vendor) {
+                    return response()->json(['error' => 'Vendor not found'], 404);
+                }
+
+                $vendorName = str_replace(' ', '_', $vendor->name);
+                $businessName = str_replace(' ', '_', $vendor->business_name);
+
+                $fileName = "{$vendorName}-{$businessName}-{$fromDate}-to-{$toDate}.pdf";
+
+                $leads_ids = nvLeadForwardInfo::where('forward_to', $vendorId)
+                    ->whereBetween('updated_at', [$fromDate, $toDate])
+                    ->pluck('lead_id');
+
+                $leads = nvLeadForward::select(
+                    'nv_lead_forwards.lead_id',
+                    'nv_lead_forwards.lead_datetime as lead_date',
+                    'nv_lead_forwards.name',
+                    'nv_lead_forwards.mobile',
+                    'nv_lead_forwards.lead_status',
+                    'nv_lead_forwards.event_datetime as event_date',
+                    'nv_lead_forwards.read_status',
+                    'ne.pax as pax'
+                )->leftJoin('nv_events as ne', 'ne.lead_id', 'nv_lead_forwards.lead_id')
+                    ->whereIn('nv_lead_forwards.lead_id', $leads_ids)
+                    ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile')
+                    ->get();
+
+                $data = [
+                    'leads' => $leads,
+                    'vendorName' => $vendor->name,
+                    'businessName' => $vendor->business_name,
+                    'fromDate' => $fromDate->format('d-M-Y'),
+                    'toDate' => $toDate->format('d-M-Y')
+                ];
+
+                $pdf = PDF::loadView('pdf.leads_report', $data);
+                return $pdf->download($fileName);
             }
-
-            $sheet->getStyle('B2:B' . ($row - 1))
-                ->getNumberFormat()
-                ->setFormatCode('DD-MMM-YYYY');
-            $sheet->getStyle('E2:E' . ($row - 1))
-                ->getNumberFormat()
-                ->setFormatCode('DD-MMM-YYYY');
-
-
-            $tempExcelFile = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
-            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-            $writer->save($tempExcelFile);
-
-            if (!file_exists($tempExcelFile) || filesize($tempExcelFile) == 0) {
-                throw new \Exception("Failed to save the Excel file.");
-            }
-
-            return response()->download($tempExcelFile, $fileName)->deleteFileAfterSend(true);
         } catch (\Exception $e) {
             Log::error('Error generating Excel file: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while generating the Excel file.'], 500);

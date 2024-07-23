@@ -209,6 +209,18 @@
                             <input type="text" class="d-none" name="vendor_name" id="download_form_vendor_name">
                             <input type="text" class="d-none" name="business_name" id="download_form_vendor_business_name">
                             <div class="row">
+                                <div class="col-sm-12 mb-3">
+                                    <div class="form-group">
+                                        <label for="file_type">File Type<span class="text-danger">*</span></label>
+                                    <select name="file_type" class="form-control" id="file_type" required>
+                                        <option value="">Select File Type</option>
+                                        <option value="exel">Exel</option>
+                                        <option value="pdf">Pdf</option>
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-sm-6 mb-3">
                                     <div class="form-group">
                                         <label for="fromDateVendorData">From <span class="text-danger">*</span></label>
