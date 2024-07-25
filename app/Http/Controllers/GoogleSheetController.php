@@ -24,7 +24,7 @@ class GoogleSheetController extends Controller
         $service = new Sheets($client);
 
         $spreadsheetId = '1sX5LdXiLjwMftTRnrS2dSkpY3xhTi62XwqG71Dh8zmA';
-        $range = 'makeup-leads!A1:T1000';
+        $range = 'makeup-leads new!A1:T1000';
 
         try {
             $response = $service->spreadsheets_values->get($spreadsheetId, $range);
@@ -88,7 +88,7 @@ class GoogleSheetController extends Controller
                         $lead->save();
 
                         $updatedValues[] = [
-                            'range' => "makeup-leads!T" . ($index + 2),
+                            'range' => "makeup-leads new!T" . ($index + 2),
                             'values' => [['Processed']]
                         ];
                     }
