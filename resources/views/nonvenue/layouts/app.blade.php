@@ -45,6 +45,14 @@
     @endphp
     @yield('footer-script')
     <script>
+        document.addEventListener('keydown', function(event) {
+            if ((event.ctrlKey || event.metaKey) && (event.key === 'p' || event.key === 's')) {
+                event.preventDefault();
+                console.log(`Default action for Ctrl+${event.key.toUpperCase()} has been disabled.`);
+            }
+        });
+    </script>
+    <script>
         // global function: this is used for client side datatable non server processing.
         function initialize_datatable() {
             document.getElementById("clientTable").DataTable({

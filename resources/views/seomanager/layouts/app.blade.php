@@ -33,6 +33,14 @@
         @show
         @include('includes.footer')
     </div>
+    <script>
+        document.addEventListener('keydown', function(event) {
+            if ((event.ctrlKey || event.metaKey) && (event.key === 'p' || event.key === 's')) {
+                event.preventDefault();
+                console.log(`Default action for Ctrl+${event.key.toUpperCase()} has been disabled.`);
+            }
+        });
+    </script>
 
     <script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('adminlte/js/adminlte.js')}}"></script>
