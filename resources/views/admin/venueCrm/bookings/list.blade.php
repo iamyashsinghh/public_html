@@ -330,11 +330,12 @@
                 pageLength: 10,
                 lengthMenu: [10, 25, 50, 100],
                 processing: true,
+                processing: true,
                 dom: '<""lfB>rtip',
                 buttons: [{
                     extend: 'excelHtml5',
                     text: '<i class="fas fa-file-excel"></i> Export to Excel',
-                    className: 'btn text-light btn-sm buttons-prints mx-1'
+                    className: 'btn text-light btn-sm buttons-prints mx-1',
                 }],
                 loading: true,
                 language: {
@@ -352,12 +353,12 @@
                     const td_elements = row.querySelectorAll('td');
                     td_elements[1].innerText = moment(data[1]).format("DD-MMM-YYYY hh:mm a");
                     td_elements[2].innerText = data[2] ?? 'N/A';
-                    td_elements[7].innerText = data[12] ?? 'N/A';
-                    td_elements[8].innerText = data[7] ? moment(data[7]).format("DD-MMM-YYYY") : 'N/A';
-                    td_elements[9].innerText = data[8];
-                    td_elements[10].innerText = Intl.NumberFormat('en-US').format(data[9]);
-                    td_elements[11].innerText = Intl.NumberFormat('en-US').format(data[10]);
-                    if (data[11] == 0) {
+                    td_elements[7].innerText = data[7] ?? 'N/A';
+                    td_elements[8].innerText = data[8] ? moment(data[8]).format("DD-MMM-YYYY") : 'N/A';
+                    td_elements[9].innerText = data[9];
+                    td_elements[10].innerText = Intl.NumberFormat('en-US').format(data[10]);
+                    td_elements[11].innerText = Intl.NumberFormat('en-US').format(data[11]);
+                    if (data[12] == 0) {
                         td_elements[12].innerHTML =
                             `<span class="badge badge-danger">Not Completed</span>`;
                     } else {

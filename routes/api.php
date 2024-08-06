@@ -836,6 +836,7 @@ Route::post('/business_lead', function (Request $request) {
         $lead->assign_to = $get_bdm->name;
         $lead->assign_id = $get_bdm->id;
         $lead->whatsapp_msg_time = $current_timestamp;
+        $lead->user_ip = $request->post('user_ip');;
         $lead->lead_color = "#0066ff33";
         $lead->save();
         return response()->json(['status' => true, 'msg' => 'Thank you for SignUp. Our team will reach you soon with best price..!'], 200);

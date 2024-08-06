@@ -63,12 +63,12 @@ class BookingController extends Controller {
             'team_members.name as vm_name',
             'lead_forwards.name',
             'lead_forwards.mobile',
+            'events.event_name',
             'events.event_datetime',
             'events.pax',
             'bookings.total_gmv',
             'bookings.advance_amount',
             'bookings.quarter_advance_collected',
-            'events.event_name',
         )->join('bookings', 'bookings.id', 'lead_forwards.booking_id')
             ->join('vm_events as events', 'events.id', 'bookings.event_id')
             ->join('team_members', 'team_members.id', 'lead_forwards.forward_to')
@@ -83,7 +83,7 @@ class BookingController extends Controller {
         if ($request->venues_source) {
             $bookings->whereIn('team_members.venue_name', $request->venues_source);
         }
-         if ($request->quarter_advance_collected != null) {
+        if ($request->quarter_advance_collected != null) {
             $bookings->where('bookings.quarter_advance_collected', $request->quarter_advance_collected);
         }
         if ($request->booking_from_date != null) {
