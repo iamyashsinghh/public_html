@@ -106,7 +106,7 @@
                         toastr[data.alert_type](data.message);
                         custom_spinner.classList.add('d-none');
                         submit_btn.disabled = false;
-                        
+
                         if (data.success == true) {
                             verification_code_col.classList.remove('d-none');
                             submit_btn.innerHTML = `Login`;
@@ -124,7 +124,7 @@
             }
         }
 
-      
+
     </script>
 </body>
 
