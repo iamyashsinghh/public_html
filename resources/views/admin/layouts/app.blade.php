@@ -15,6 +15,16 @@
     @yield('header-css')
     @yield('header-script')
 </head>
+<style>
+.table-responsive{
+    overflow-x: visible !important;
+}
+
+.table-responsive #serverTable thead{
+    position: sticky !important;
+    top: 0;
+}
+</style>
 
 <body class="sidebar-mini layout-fixed">
     @include('includes.preloader')

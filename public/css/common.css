@@ -76,13 +76,3 @@
 .bg_light_dark{
     background: rgba(54, 54, 54, 0.12) !important;
 }
-
-
-.table-responsive{
-    overflow-x: visible !important;
-}
-
-.table-responsive #serverTable thead{
-    position: sticky !important;
-    top: 0;
-}
