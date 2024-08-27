@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Traits\HasAuthenticatedUser;
+use Illuminate\Support\Facades\DB;
+
 class nvLead extends Model {
     use HasFactory, HasAuthenticatedUser, SoftDeletes,LogsActivity;
     public function getActivitylogOptions(): LogOptions
@@ -41,6 +43,18 @@ class nvLead extends Model {
     }
     public function get_tasks_vendor() {
         return $this->hasMany(nvTask::class, 'lead_id', 'id');
+    }
+    public function get_vendors_for_lead()
+    {
+        return DB::table('nv_lead_forwards as lf')
+            ->join('vendors as v', 'lf.forward_to', '=', 'v.id')
+            ->leftJoin('nv_lead_forward_infos as lfi', function($join) {
+                $join->on('lf.lead_id', '=', 'lfi.lead_id')
+                     ->on('v.id', '=', 'lfi.forward_to');
+            })
+            ->where('lf.lead_id', $this->id)
+            ->select('v.name', 'v.category_id', 'lfi.updated_at')
+            ->get();
     }
 
 

@@ -176,6 +176,17 @@
                                             200KB.</span>
                                     </div>
                                 </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="subscription_select">Type <i>(Subscription)</i></label>
+                                        <select class="form-control" id="subscription_select" name="subscription_type">
+                                            <option value="" disabled selected>Selected Subscription</option>
+                                            <option value="premium">Premium</option>
+                                            <option value="gold">Gold</option>
+                                            <option value="elite">Elite</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer text-sm">
@@ -207,16 +218,17 @@
                             @csrf
                             <input type="text" class="d-none" name="vendor_id" id="download_form_vendor_id">
                             <input type="text" class="d-none" name="vendor_name" id="download_form_vendor_name">
-                            <input type="text" class="d-none" name="business_name" id="download_form_vendor_business_name">
+                            <input type="text" class="d-none" name="business_name"
+                                id="download_form_vendor_business_name">
                             <div class="row">
                                 <div class="col-sm-12 mb-3">
                                     <div class="form-group">
                                         <label for="file_type">File Type<span class="text-danger">*</span></label>
-                                    <select name="file_type" class="form-control" id="file_type" required>
-                                        <option value="">Select File Type</option>
-                                        <option value="exel">Exel</option>
-                                        <option value="pdf">Pdf</option>
-                                    </select>
+                                        <select name="file_type" class="form-control" id="file_type" required>
+                                            <option value="">Select File Type</option>
+                                            <option value="exel">Exel</option>
+                                            <option value="pdf">Pdf</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -224,8 +236,8 @@
                                 <div class="col-sm-6 mb-3">
                                     <div class="form-group">
                                         <label for="fromDateVendorData">From <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="fromDateVendorData" name="from"
-                                            required>
+                                        <input type="date" class="form-control" id="fromDateVendorData"
+                                            name="from" required>
                                     </div>
                                 </div>
                                 <div class="col-sm-6 mb-3">
@@ -388,7 +400,7 @@
                     td_elements[8].innerHTML = status_action_elem;
                     td_elements[9].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
                     const action_btns = `<td class="d-flex justify-content-around">
-                    <a href="{{route('admin.vendor.view')}}/${data.id}" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
+                    <a href="{{ route('admin.vendor.view') }}/${data.id}" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                     <a href="javascript:void(0);" class="text-success mx-2" title="Edit"><i class="fa fa-edit" style="font-size: 15px;" onclick="handle_manage_vendor(${data.id})"></i></a>
                     <a href="javascript:void(0);" class="text-info mx-2" title="Download"><i class="fa fa-download" style="font-size: 15px;" onclick="handle_download_vendor_data(${data.id}, '${data.name}', '${data.business_name}')"></i></a>
                     <a href="{{ route('admin.vendor.delete') }}/${data.id}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete"><i class="fa fa-trash-alt" style="font-size: 15px;"></i></a>
@@ -439,7 +451,16 @@
                         group_name_select.value = data.vendor.group_name;
                         vendor_altmobile_inp.value = data.vendor.alt_mobile_number;
                         category_select.querySelector(`option[value="${data.vendor.category_id}"]`).selected = true;
+
+                        const subscriptionElement = subscription_select.querySelector(`option[value="${data.vendor.subscription_type}"]`);
+                        if (subscriptionElement) {
+                            subscriptionElement.selected = true;
+                        } else {
+                            console.error('Option element not found for value:', data.vendor.parent_id);
+                        }
+                        
                         updateGroupDropdown(data.vendor.category_id, localities, data.vendor.group_name);
+
                         const optionElement = parent_member_select.querySelector(
                             `option[value="${data.vendor.parent_id}"]`);
                         if (optionElement) {

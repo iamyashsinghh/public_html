@@ -90,6 +90,7 @@ class VendorController extends Controller
             return $vendor->total_leads ?: 'No leads found';
         })->toJson();
     }
+
     public function manage_ajax($vendor_id)
     {
         $vendor = Vendor::find($vendor_id);
@@ -158,6 +159,7 @@ class VendorController extends Controller
         $vendor->group_name = $request->group_name;
         $vendor->alt_mobile_number = $request->alt_mobile_number;
         $vendor->parent_id = $request->parent_id;
+        $vendor->subscription_type = $request->subscription_type;
         $vendor->save();
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $msg]);
         return redirect()->back();

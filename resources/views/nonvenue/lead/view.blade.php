@@ -98,7 +98,7 @@
                                         </thead>
 
                                         <body>
-                                            @if (sizeof($lead->get_nvrm_messages) > 0)
+                                            @if ($lead->get_nvrm_messages->count() > 0)
                                                 @foreach ($lead->get_nvrm_messages as $key => $list)
                                                     <tr>
                                                         <td>{{ $key + 1 }}</td>
@@ -107,9 +107,10 @@
                                                         <td>{{ $list->title }}</td>
                                                         <td>
                                                             <button class="btn"
-                                                                onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)"><i
-                                                                    class="fa fa-comment-dots"
-                                                                    style="color: var(--wb-renosand);"></i></button>
+                                                                onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)">
+                                                                <i class="fa fa-comment-dots"
+                                                                    style="color: var(--wb-renosand);"></i>
+                                                            </button>
                                                         </td>
                                                         <td>₹ {{ $list->budget ? number_format($list->budget) : 'N/A' }}
                                                         </td>
@@ -118,30 +119,62 @@
                                                             <button
                                                                 onclick="handle_lead_forward({{ $list->get_service_category->id }}, `{{ $list->get_service_category->name }}`)"
                                                                 class="btn p-0 mx-2" title="Forward"
-                                                                style="color: var(--wb-dark-red);"><i
-                                                                    class="fa fa-paper-plane"></i></button>
-                                                            {{-- <button onclick="handle_get_nvlead_forwarded_info(${data.id})" class="btn mx-2 p-0 px-2 btn-info" title="Forwarded info"><i class="fa fa-share-alt" style="font-size: 15px;"></i> 0</button> --}}
+                                                                style="color: var(--wb-dark-red);">
+                                                                <i class="fa fa-paper-plane"></i>
+                                                            </button>
                                                         </td>
                                                         <td>
                                                             <button class="btn btn-sm btn-primary"
-                                                                onclick="handleEditNvrmMessage( '{{ $list->id }}', '{{ $list->title }}', '{{ $list->message }}' , '{{ $list->budget }}')"><i
-                                                                    class="fa fa-edit"></i> Edit</button>
-                                                            <form
-                                                                action="{{ route('nonvenue.rm_message.delete') }}/{{ $list->id }}"
+                                                                onclick="handleEditNvrmMessage( '{{ $list->id }}', '{{ $list->title }}', '{{ $list->message }}' , '{{ $list->budget }}')">
+                                                                <i class="fa fa-edit"></i> Edit
+                                                            </button>
+                                                            @php
+                                                            $filteredVendors = $lead->get_vendors_for_lead()->filter(function($vendor) use ($list) {
+                                                                return $vendor->category_id == $list->vendor_category_id;
+                                                            });
+                                                        @endphp
+@if ($filteredVendors->count() > 0)                                                            <form
+                                                            action="{{ route('nonvenue.rm_message.delete', $list->id) }}"
+                                                            method="POST" style="display:inline-block;">
+                                                            @csrf
+                                                            <button type="submit" disabled class="btn btn-sm btn-danger"
+                                                                onclick="return confirm('Are you sure you want to delete this message?')">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                        @else
+                                                        <form
+                                                                action="{{ route('nonvenue.rm_message.delete', $list->id) }}"
                                                                 method="POST" style="display:inline-block;">
                                                                 @csrf
                                                                 <button type="submit" class="btn btn-sm btn-danger"
-                                                                    onclick="return confirm('Are you sure you want to delete this message?')"><i
-                                                                        class="fa fa-trash"></i></button>
+                                                                    onclick="return confirm('Are you sure you want to delete this message?')">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
                                                             </form>
+                                                            @endif
+
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="9">
+                                                            <div class="vendor-list">
+                                                                @foreach ($lead->get_vendors_for_lead() as $vendorList)
+                                                                    @if ($vendorList->category_id == $list->vendor_category_id)
+                                                                        <div class="vendor-badge" title="{{ date('d-M-Y h:i a', strtotime($vendorList->updated_at))}}">
+                                                                            {{ $vendorList->name }}
+                                                                        </div>
+                                                                    @endif
+                                                                @endforeach
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 @endforeach
                                             @else
-                                                <tr>
-                                                    <td class="text-center text-muted" colspan="8">No data available in
-                                                        table</td>
-                                                </tr>
+                                            <tr>
+                                                <td class="text-center text-muted" colspan="8">No data available in
+                                                    table</td>
+                                            </tr>
                                             @endif
                                         </body>
                                     </table>
@@ -849,10 +882,11 @@
                                 aria-label="Close"><i class="fa fa-times"></i></button>
                         </div>
                     </div>
-                    <form action="{{ route('nonvenue.lead.forward') }}" method="post">
+                    <form action="{{ route('nonvenue.lead.forward') }}" id="forwardLeadModalForm" method="post">
                         @csrf
                         <input type="hidden" name="forward_id" value="{{ $lead->id }}">
                         <input type="hidden" name="nvrm_msg_id" id="nvrm_msg_id" value="">
+                        <input type="hidden" name="tier" id="tier" value="">
                         <div class="modal-body text-sm">
 
                         </div>
@@ -1086,6 +1120,8 @@
                 const modalHeader = forwardLeadModal.querySelector('.modal-header');
                 const closeBtnWithToogleBtn = forwardLeadModal.querySelector('.close-btn-with-toogle-btn');
                 const nvrm_msg_id = document.getElementById('nvrm_msg_id');
+                const tier = document.getElementById('tier');
+                const forwardLeadModalForm = document.getElementById('forwardLeadModalForm');
                 modalBody.innerHTML = "";
                 const existingToggleButton = modalHeader.querySelector('.toggle-multiple-selection');
                 if (existingToggleButton) {
@@ -1094,7 +1130,6 @@
                 modalHeading.innerHTML =
                     `Forward Lead to <span style="color: var(--wb-renosand);">${category_name} Vendors</span>`;
                 nvrm_msg_id.value = vendor_category_id;
-
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
@@ -1103,71 +1138,97 @@
 
                             vendors.sort((a, b) => b.is_lead_forwaded - a.is_lead_forwaded);
 
-                            let selectElem = document.createElement('select');
-                            selectElem.classList.add('form-control');
-                            selectElem.name = "forward_vendors_id[]";
-                            selectElem.required = true;
-
-                            let defaultOption = document.createElement('option');
-                            defaultOption.value = '';
-                            defaultOption.text = 'Select vendor';
-                            defaultOption.disabled = true;
-                            defaultOption.selected = true;
-                            selectElem.appendChild(defaultOption);
-
-                            vendors.forEach(vendor => {
-                                let optionElem = document.createElement('option');
-                                optionElem.value = vendor.id;
-                                if(vendor.last_lead_forwaded_value != null){
-                                    optionElem.text = `${vendor.name} (${vendor.business_name}) ${vendor.last_lead_forwaded_value}`;
-                                }else{
-                                    optionElem.text = `${vendor.name} (${vendor.business_name})`;
-                                }
-                                if (vendor.is_lead_forwaded == 1) {
-                                    optionElem.disabled = true;
-                                    optionElem.classList.add('disabled-option');
-                                }
-                                selectElem.appendChild(optionElem);
+                            const premiumBtn = document.createElement('button');
+                            premiumBtn.classList.add('btn', 'btn-success', 'mr-2', 'px-5', 'premium-btn');
+                            premiumBtn.textContent = 'Premium';
+                            premiumBtn.type = 'button';
+                            premiumBtn.addEventListener('click', function() {
+                                tier.value = 'premium';
+                                forwardLeadModalForm.submit();
                             });
-                            modalBody.appendChild(selectElem);
+
+
+
+                            const goldBtn = document.createElement('button');
+                            goldBtn.classList.add('btn', 'btn-success', 'mr-2', 'px-5', 'gold-btn');
+                            goldBtn.textContent = 'Gold';
+                            goldBtn.type = 'button';
+                            goldBtn.style.backgroundColor = 'var(--wb-renosand)';
+                            goldBtn.style.border = 'var(--wb-renosand)';
+                            goldBtn.addEventListener('click', function() {
+                                tier.value = 'gold';
+                                forwardLeadModalForm.submit();
+
+                            });
+
+                            const eliteBtn = document.createElement('button');
+                            eliteBtn.classList.add('btn', 'btn-success', 'mr-2', 'px-5', 'elite-btn');
+                            eliteBtn.textContent = 'Elite';
+                            eliteBtn.type = 'button';
+                            eliteBtn.style.backgroundColor = 'var(--wb-dark-red)';
+                            eliteBtn.style.border = 'var(--wb-dark-red)';
+                            eliteBtn.addEventListener('click', function() {
+                                tier.value = 'elite';
+                                forwardLeadModalForm.submit();
+
+                            });
+
+                            modalBody.appendChild(premiumBtn);
+                            modalBody.appendChild(goldBtn);
+                            modalBody.appendChild(eliteBtn);
 
                             let toggleButton = document.createElement('button');
                             toggleButton.classList.add('btn', 'btn-secondary', 'mt-2', 'toggle-multiple-selection');
                             toggleButton.textContent = 'Select Multiple Vendors';
                             toggleButton.type = 'button';
-                            toggleButton.onclick = () => {
-                                if (selectElem.multiple) {
-                                    $(selectElem).select2('destroy');
-                                    selectElem.multiple = false;
-                                    toggleButton.textContent = 'Select Multiple Vendors';
 
-                                    const options = selectElem.querySelectorAll('option');
-                                    options.forEach(option => {
-                                        if (option.value !== '') {
-                                            option.disabled = false;
-                                            option.classList.remove('disabled-option');
-                                        }
-                                        const vendor = vendors.find(v => v.id == option.value);
-                                        if (vendor && vendor.is_lead_forwaded == 1) {
-                                            option.disabled = true;
-                                            option.classList.add('disabled-option');
-                                        }
-                                    });
+
+                            let selectElem = document.createElement('select');
+                            selectElem.classList.add('form-control');
+                            selectElem.name = "forward_vendors_id[]";
+                            selectElem.multiple = true;
+                            selectElem.required = true;
+                            selectElem.style.display = 'none';
+
+                            let defaultOption = document.createElement('option');
+                            defaultOption.value = '';
+                            defaultOption.text = 'Select vendors';
+                            defaultOption.disabled = true;
+                            selectElem.appendChild(defaultOption);
+
+                            vendors.forEach(vendor => {
+                                let optionElem = document.createElement('option');
+                                optionElem.value = vendor.id;
+                                if (vendor.last_lead_forwaded_value != null) {
+                                    optionElem.text =
+                                        `${vendor.name} (${vendor.business_name}) ${vendor.last_lead_forwaded_value}`;
                                 } else {
-                                    selectElem.multiple = true;
-                                    toggleButton.textContent = 'Select Single Vendor';
-                                    $(selectElem).find('option[value=""]').prop('selected', false);
-                                    const options = selectElem.querySelectorAll('option');
-                                    options.forEach(option => {
-                                        const vendor = vendors.find(v => v.id == option.value);
-                                        if (vendor && vendor.is_lead_forwaded == 1) {
-                                            option.disabled = false;
-                                            option.classList.remove('disabled-option');
-                                        }
-                                    });
+                                    optionElem.text = `${vendor.name} (${vendor.business_name})`;
+                                }
+                                selectElem.appendChild(optionElem);
+                            });
+
+                            modalBody.appendChild(selectElem);
+
+                            toggleButton.onclick = () => {
+                                if (selectElem.style.display === 'none') {
+                                    selectElem.style.display = 'block';
                                     $(selectElem).select2({
                                         width: '100%'
                                     });
+                                    premiumBtn.style.display = 'none';
+                                    goldBtn.style.display = 'none';
+                                    eliteBtn.style.display = 'none';
+                                    tier.value = '';
+                                    toggleButton.textContent = 'Select Single Vendor';
+                                } else {
+                                    $(selectElem).select2('destroy');
+                                    selectElem.style.display = 'none';
+                                    premiumBtn.style.display = 'inline-block';
+                                    goldBtn.style.display = 'inline-block';
+                                    eliteBtn.style.display = 'inline-block';
+                                    tier.value = '';
+                                    toggleButton.textContent = 'Select Multiple Vendors';
                                 }
                             };
                             closeBtnWithToogleBtn.insertBefore(toggleButton, closeBtnWithToogleBtn.firstChild);
@@ -1235,6 +1296,7 @@
         //         }
         //     });
         // }
+
 
         function handle_group_selection(checkbox, groupName) {
             const groupDiv = checkbox.closest('div');
