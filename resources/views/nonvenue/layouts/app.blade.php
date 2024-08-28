@@ -15,6 +15,25 @@
     <title>@yield('title') | {{env('APP_NAME')}}</title>
     @yield('header-css')
     @yield('header-script')
+    <style>
+        .vendor-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.vendor-badge {
+    background-color: var(--wb-dark-red);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #fff;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+
+    </style>
 </head>
 
 <body class="sidebar-mini layout-fixed">
