@@ -53,7 +53,8 @@ class VendorController extends Controller
                      OR (vendors.start_date IS NULL AND vendors.end_date IS NULL)
                    )
                 ) as total_leads
-            ')
+            '),
+            'vendors.subscription_type'
             )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
                 ->orderBy('group_name', 'asc')
                 ->get();
@@ -80,7 +81,8 @@ class VendorController extends Controller
                      OR (vendors.start_date IS NULL AND vendors.end_date IS NULL)
                    )
                 ) as total_leads
-            ')
+            '),
+            'vendors.subscription_type'
             )->leftJoin("vendor_categories as vc", 'vendors.category_id', '=', 'vc.id')
                 ->orderBy('group_name', 'asc')
                 ->where('vendors.category_id', $vendor_cat_id)

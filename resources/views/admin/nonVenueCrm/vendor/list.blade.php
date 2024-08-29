@@ -34,6 +34,7 @@
                         <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                             <tr>
                                 <th class="text-nowrap">&nbsp;&nbsp;ID&nbsp;&nbsp;</th>
+                                <th class="text-nowrap">Subscription Type</th>
                                 <th class="text-nowrap">Profile Image</th>
                                 <th class="">Name</th>
                                 <th class="text-nowrap">Mobile</th>
@@ -319,52 +320,57 @@
                     },
                     {
                         targets: 1,
+                        name: "subscription_type",
+                        data: "subscription_type",
+                    },
+                    {
+                        targets: 2,
                         name: "profile_image",
                         data: "profile_image",
                     },
                     {
-                        targets: 2,
+                        targets: 3,
                         name: "name",
                         data: "name",
                     },
                     {
-                        targets: 3,
+                        targets: 4,
                         name: "mobile",
                         data: "mobile",
                     },
                     {
-                        targets: 4,
+                        targets: 5,
                         name: "email",
                         data: "email",
                     },
                     {
-                        targets: 5,
+                        targets: 6,
                         name: "business_name",
                         data: "business_name",
                     },
                     {
-                        targets: 6,
+                        targets: 7,
                         name: "total_leads",
                         data: "total_leads",
                         defaultContent: 'No leads found',
                     },
                     {
-                        targets: 7,
+                        targets: 8,
                         name: "category_name",
                         data: "category_name",
                     },
                     {
-                        targets: 8,
+                        targets: 9,
                         name: "status",
                         data: "status",
                     },
                     {
-                        targets: 9,
+                        targets: 10,
                         name: "created_at",
                         data: "created_at",
                     },
                     {
-                        targets: 11,
+                        targets: 12,
                         name: "id",
                         data: "id",
                         orderable: false,
@@ -377,28 +383,32 @@
                 ],
                 rowCallback: function(row, data, index) {
                     row.setAttribute('id', data.id);
-
                     const td_elements = row.querySelectorAll('td');
                     td_elements[0].innerHTML = `${data.id}-${data.group_name}`;
                     td_elements[1].classList.add('py-1');
-                    td_elements[1].innerHTML = `<a onclick="handle_view_image('${data.profile_image}', '{{ route('admin.vendor.updateProfileImage') }}/${data.id}')" href="javascript:void(0);">
+                    td_elements[1].innerHTML = `
+                                    <img src="{{asset('/images/packages/${data.subscription_type}.png')}}"  style="height: 50px; width:150px;">
+                    `;
+
+                        td_elements[2].classList.add('py-1');
+                    td_elements[2].innerHTML = `<a onclick="handle_view_image('${data.profile_image}', '{{ route('admin.vendor.updateProfileImage') }}/${data.id}')" href="javascript:void(0);">
                     <img class="img-thumbnail" src="${data.profile_image}" style="width: 50px;" onerror="this.onerror=null; this.src='{{ asset('images/default-user.png') }}'">
                 </a>`;
                     if (data.is_whatsapp_msg === 1) {
-                        td_elements[3].innerHTML =
+                        td_elements[4].innerHTML =
                             `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
                     } else {
-                        td_elements[3].innerHTML =
+                        td_elements[4].innerHTML =
                             `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
                     }
-                    td_elements[4].innerHTML = data.group_name;
-                    td_elements[4].innerHTML = data.email ? data.email : 'N/A';
-                    td_elements[5].innerHTML = data.business_name ? data.business_name : 'N/A';
+                    td_elements[5].innerHTML = data.group_name;
+                    td_elements[5].innerHTML = data.email ? data.email : 'N/A';
+                    td_elements[6].innerHTML = data.business_name ? data.business_name : 'N/A';
                     status_action_elem =
                         `<a href="{{ route('admin.vendor.update.status') }}/${data.id}/${data.status == 1 ? 0 : 1}" style="font-size: 22px;"><i class="fa ${data.status == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'} "></i></a>`;
-                    td_elements[7].classList.add('text-nowrap');
-                    td_elements[8].innerHTML = status_action_elem;
-                    td_elements[9].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
+                    td_elements[8].classList.add('text-nowrap');
+                    td_elements[9].innerHTML = status_action_elem;
+                    td_elements[10].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
                     const action_btns = `<td class="d-flex justify-content-around">
                     <a href="{{ route('admin.vendor.view') }}/${data.id}" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                     <a href="javascript:void(0);" class="text-success mx-2" title="Edit"><i class="fa fa-edit" style="font-size: 15px;" onclick="handle_manage_vendor(${data.id})"></i></a>
@@ -413,8 +423,8 @@
                         </ul>
                     </div>
                 </td>`
-                    td_elements[10].classList.add('text-nowrap');
-                    td_elements[10].innerHTML = action_btns;
+                    td_elements[11].classList.add('text-nowrap');
+                    td_elements[11].innerHTML = action_btns;
                 }
             });
             $('.filter-btn').on('click', function() {
@@ -458,7 +468,7 @@
                         } else {
                             console.error('Option element not found for value:', data.vendor.parent_id);
                         }
-                        
+
                         updateGroupDropdown(data.vendor.category_id, localities, data.vendor.group_name);
 
                         const optionElement = parent_member_select.querySelector(
