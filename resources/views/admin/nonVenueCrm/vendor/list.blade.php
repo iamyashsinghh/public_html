@@ -387,7 +387,7 @@
 
                     td_elements[0].classList.add('py-1');
                     td_elements[0].innerHTML = `
-                                    <img src="{{asset('/images/packages/${data.subscription_type}.png')}}"  style="height: 50px; width:150px;">
+                                    <img src="{{asset('/images/packages/${data.subscription_type}.png')}}"  style="height: 50px; width:130px;">
                     `;
 
                         td_elements[1].classList.add('py-1');
