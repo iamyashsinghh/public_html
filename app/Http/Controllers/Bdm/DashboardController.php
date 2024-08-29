@@ -85,6 +85,7 @@ class DashboardController extends Controller
         ->whereNull('bdm_meetings.deleted_at')
         ->whereNotNull('bdm_meetings.done_with')
         ->where('bdm_meetings.created_by', $auth_user->id)
+        ->where('bdm_meetings.meeting_done_status', '!=', 'Dropped')
         ->count();
 
         $order_signed_this_month = BdmLead::join('bdm_bookings', 'bdm_leads.lead_id', '=', 'bdm_bookings.lead_id')
