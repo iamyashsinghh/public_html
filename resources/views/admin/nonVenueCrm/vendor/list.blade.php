@@ -33,9 +33,9 @@
                     <table id="serverTable" class="table text-sm">
                         <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
                             <tr>
-                                <th class="text-nowrap">&nbsp;&nbsp;ID&nbsp;&nbsp;</th>
                                 <th class="text-nowrap">Subscription Type</th>
                                 <th class="text-nowrap">Profile Image</th>
+                                <th class="text-nowrap">&nbsp;&nbsp;ID&nbsp;&nbsp;</th>
                                 <th class="">Name</th>
                                 <th class="text-nowrap">Mobile</th>
                                 <th class="text-nowrap">Email</th>
@@ -384,16 +384,19 @@
                 rowCallback: function(row, data, index) {
                     row.setAttribute('id', data.id);
                     const td_elements = row.querySelectorAll('td');
-                    td_elements[0].innerHTML = `${data.id}-${data.group_name}`;
-                    td_elements[1].classList.add('py-1');
-                    td_elements[1].innerHTML = `
+
+                    td_elements[0].classList.add('py-1');
+                    td_elements[0].innerHTML = `
                                     <img src="{{asset('/images/packages/${data.subscription_type}.png')}}"  style="height: 50px; width:150px;">
                     `;
 
-                        td_elements[2].classList.add('py-1');
-                    td_elements[2].innerHTML = `<a onclick="handle_view_image('${data.profile_image}', '{{ route('admin.vendor.updateProfileImage') }}/${data.id}')" href="javascript:void(0);">
+                        td_elements[1].classList.add('py-1');
+                    td_elements[1].innerHTML = `<a onclick="handle_view_image('${data.profile_image}', '{{ route('admin.vendor.updateProfileImage') }}/${data.id}')" href="javascript:void(0);">
                     <img class="img-thumbnail" src="${data.profile_image}" style="width: 50px;" onerror="this.onerror=null; this.src='{{ asset('images/default-user.png') }}'">
                 </a>`;
+                td_elements[2].innerHTML = `${data.id}-${data.group_name}`;
+
+
                     if (data.is_whatsapp_msg === 1) {
                         td_elements[4].innerHTML =
                             `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;

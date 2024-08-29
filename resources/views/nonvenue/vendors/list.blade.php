@@ -20,8 +20,9 @@
                     <table id="serverTable" class="table text-sm">
                         <thead>
                             <tr>
-                                <th class="text-nowrap">&nbsp;&nbsp;ID&nbsp;&nbsp;</th>
+                                <th class="text-nowrap">Subscription Type</th>
                                 <th class="text-nowrap">Profile Image</th>
+                                <th class="text-nowrap">&nbsp;&nbsp;ID&nbsp;&nbsp;</th>
                                 <th class="">Name</th>
                                 <th class="text-nowrap">Mobile</th>
                                 <th class="text-nowrap">Business Name</th>
@@ -100,37 +101,42 @@
                     },
                     {
                         targets: 1,
+                        name: "subscription_type",
+                        data: "subscription_type",
+                    },
+                    {
+                        targets: 2,
                         name: "profile_image",
                         data: "profile_image",
                     },
                     {
-                        targets: 2,
+                        targets: 3,
                         name: "name",
                         data: "name",
                     },
                     {
-                        targets: 3,
+                        targets: 4,
                         name: "mobile",
                         data: "mobile",
                     },
                     {
-                        targets: 4,
+                        targets: 5,
                         name: "business_name",
                         data: "business_name",
                     },
                     {
-                        targets: 5,
+                        targets: 6,
                         name: "total_leads",
                         data: "total_leads",
                         defaultContent: 'No leads found',
                     },
                     {
-                        targets: 6,
+                        targets: 7,
                         name: "category_name",
                         data: "category_name",
                     },
                     {
-                        targets: 7,
+                        targets: 8,
                         name: "created_at",
                         data: "created_at",
                     },
@@ -141,15 +147,23 @@
                         orderable: false,
                         searchable: false,
                     },
-
                 ],
                 rowCallback: function(row, data, index) {
                     row.setAttribute('id', data.id);
                     const td_elements = row.querySelectorAll('td');
-                    td_elements[0].innerHTML = `${data.id}-${data.group_name}`;
+
+                    td_elements[0].classList.add('py-1');
+                    td_elements[0].innerHTML = `
+                                    <img src="{{asset('/images/packages/${data.subscription_type}.png')}}"  style="height: 50px; width:150px;">
+                    `;
+
                     td_elements[1].classList.add('py-1');
                     td_elements[1].innerHTML =
                         `<img class="img-thumbnail" src="${data.profile_image}" style="width: 50px;" onerror="this.onerror=null; this.src='{{ asset('images/default-user.png') }}'">`;
+
+                        td_elements[2].innerHTML = `${data.id}-${data.group_name}`;
+
+
                         if (data.is_whatsapp_msg === 1) {
                             td_elements[3].innerHTML =
                                 `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
