@@ -379,7 +379,7 @@
 
                 ],
                 order: [
-                    [8, 'desc']
+                    [9, 'desc']
                 ],
                 rowCallback: function(row, data, index) {
                     row.setAttribute('id', data.id);
