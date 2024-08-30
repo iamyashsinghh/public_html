@@ -114,6 +114,7 @@ class DashboardController extends Controller
             'nv_notes.*',
             'nvrm_lead_forwards.lead_id',
             'nvrm_lead_forwards.lead_status',
+            'nvrm_lead_forwards.deleted_at',
             'vendors.name as created_by_name',
             'vendor_categories.name as category_name',
             'team_members.name as done_by_name'
@@ -123,6 +124,7 @@ class DashboardController extends Controller
         ->whereBetween('nv_notes.created_at',  [$currentDateStart, $currentDateEnd])
         ->groupBy('nv_notes.id')
         ->whereNull('nv_notes.done_by')
+        ->whereNull('nvrm_lead_forwards.deleted_at')
         ->get()
         ->count();
 
@@ -147,6 +149,7 @@ class DashboardController extends Controller
         ->where('nv_notes.created_at', '<', $currentDateStart)
         ->groupBy('nv_notes.id')
         ->whereNull('nv_notes.done_by')
+        ->whereNull('nvrm_lead_forwards.deleted_at')
         ->get()
         ->count();
 

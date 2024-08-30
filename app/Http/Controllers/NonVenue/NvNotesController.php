@@ -46,6 +46,7 @@ class NvNotesController extends Controller
         )
         ->where('nv_notes.id', '>', 1706)
         ->where('nvrm_messages.created_by', $auth_user->id)
+        ->whereNull('nvrm_lead_forwards.deleted_at')
         ->groupBy('nv_notes.id');
 
         if (!empty($request->dashboard_filters)) {
