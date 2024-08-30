@@ -41,7 +41,7 @@ class DashboardController extends Controller
         $venue_leads_for_this_month = [];
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
-            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->count();
+            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->whereIn('source', ['WB|Call', 'WB|Form', 'WB|WhatsApp'])->count();
             array_push($venue_leads_for_this_month, $count);
         }
         $venue_leads_for_this_month = implode(",", $venue_leads_for_this_month);
@@ -89,7 +89,7 @@ class DashboardController extends Controller
         $venue_leads_for_this_year = [];
         for ($i = 12; $i >= 0; $i--) {
             $datetime = date("Y-m", strtotime("-$i month"));
-            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->count();
+            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->whereIn('source', ['WB|Call', 'WB|Form', 'WB|WhatsApp'])->count();
             array_push($venue_leads_for_this_year, $count);
         }
         $venue_leads_for_this_year = implode(",", $venue_leads_for_this_year);
