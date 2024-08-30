@@ -50,9 +50,7 @@
                                 <label for="lead_source_select">Lead Source</label>
                                 <select class="form-control" id="lead_source_select" name="lead_source" required>
                                     <option value="VM|Reference">VM|Reference</option>
-                                    <option value="WB|Call">WB|Call</option>
                                     <option value="Walk-in">Walk-in</option>
-                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                         </div>
