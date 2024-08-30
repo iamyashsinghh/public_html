@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\nvNote;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class NvNotesController extends Controller
 {
@@ -23,24 +25,35 @@ class NvNotesController extends Controller
     }
 
     public function ajax_list(Request $request){
+        $currentDateStart = Carbon::now()->startOfDay();
+        $currentDateEnd = Carbon::now()->endOfDay();
         $auth_user = Auth::guard('nonvenue')->user();
-        $vendor_help = nvNote::leftJoin('nvrm_lead_forwards', 'nvrm_lead_forwards.lead_id', '=', 'nv_notes.lead_id')
-            ->leftJoin('vendors', 'vendors.id', '=', 'nv_notes.created_by')
-            ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
-            ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
-            ->select(
-                'nv_notes.*',
-                'nvrm_lead_forwards.lead_id',
-                'nvrm_lead_forwards.lead_status',
-                'vendors.name as created_by_name',
-                'vendor_categories.name as category_name',
-                'team_members.name as done_by_name'
-            )->where('nv_notes.id', '>', 592);
+        $vendor_help = nvNote::join('nvrm_messages', 'nv_notes.lead_id', '=', 'nvrm_messages.lead_id')
+        ->join('vendors', function($join) {
+            $join->on('nvrm_messages.vendor_category_id', '=', 'vendors.category_id')
+                 ->on('nv_notes.created_by', '=', 'vendors.id');
+        })
+        ->leftJoin('nvrm_lead_forwards', 'nvrm_lead_forwards.lead_id', '=', 'nv_notes.lead_id')
+        ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
+        ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
+        ->select(
+            'nv_notes.*',
+            'nvrm_lead_forwards.lead_id',
+            'nvrm_lead_forwards.lead_status',
+            'vendors.name as created_by_name',
+            'vendor_categories.name as category_name',
+            'team_members.name as done_by_name'
+        )
+        ->where('nv_notes.id', '>', 1706)
+        ->where('nvrm_messages.created_by', $auth_user->id)
+        ->groupBy('nv_notes.id');
+
         if (!empty($request->dashboard_filters)) {
-            if ($request->dashboard_filters == "vendor_non_responsed_help") {
-                $vendor_help->whereNull('nv_notes.done_by');
-            } else if ($request->dashboard_filters == "vendor_total_helped") {
-                $vendor_help->where('nv_notes.done_by',$auth_user->id);
+            if ($request->dashboard_filters == "vendor_today_issue") {
+                $vendor_help->whereBetween('nv_notes.created_at',  [$currentDateStart, $currentDateEnd])->whereNull('nv_notes.done_by');             ;
+            } else if ($request->dashboard_filters == "vendor_overdue_issue") {
+                $vendor_help->where('nv_notes.created_at', '<', $currentDateStart)->whereNull('nv_notes.done_by');
+
             }
         }
         return datatables($vendor_help->get())->toJson();

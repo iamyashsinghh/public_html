@@ -75,7 +75,7 @@ class DashboardController extends Controller
             })
             ->distinct('lead_id')
             ->count();
-            
+
         $nvrm_task_overdue_leads = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
             ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
             ->where('nvrm_tasks.task_schedule_datetime', '<', $currentDateTime)
@@ -101,10 +101,54 @@ class DashboardController extends Controller
             ->where('nvrm_tasks.created_by', $auth_user->id)
             ->count();
 
-        // vendor help counts
-        $vendor_all_help = nvNote::where('id', '>', 592)->count();
-        $vendor_non_responsed_help = nvNote::where('id', '>', 592)->whereNull('done_by')->count();
-        $vendor_total_helped = nvNote::where('id', '>', 592)->where('done_by', $auth_user->id)->count();
+
+        $vendor_today_issue = nvNote::join('nvrm_messages', 'nv_notes.lead_id', '=', 'nvrm_messages.lead_id')
+        ->join('vendors', function($join) {
+            $join->on('nvrm_messages.vendor_category_id', '=', 'vendors.category_id')
+                 ->on('nv_notes.created_by', '=', 'vendors.id');
+        })
+        ->leftJoin('nvrm_lead_forwards', 'nvrm_lead_forwards.lead_id', '=', 'nv_notes.lead_id')
+        ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
+        ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
+        ->select(
+            'nv_notes.*',
+            'nvrm_lead_forwards.lead_id',
+            'nvrm_lead_forwards.lead_status',
+            'vendors.name as created_by_name',
+            'vendor_categories.name as category_name',
+            'team_members.name as done_by_name'
+        )
+        ->where('nv_notes.id', '>', 1706)
+        ->where('nvrm_messages.created_by', $auth_user->id)
+        ->whereBetween('nv_notes.created_at',  [$currentDateStart, $currentDateEnd])
+        ->groupBy('nv_notes.id')
+        ->whereNull('nv_notes.done_by')
+        ->get()
+        ->count();
+
+        $vendor_overdue_issue = nvNote::join('nvrm_messages', 'nv_notes.lead_id', '=', 'nvrm_messages.lead_id')
+        ->join('vendors', function($join) {
+            $join->on('nvrm_messages.vendor_category_id', '=', 'vendors.category_id')
+                 ->on('nv_notes.created_by', '=', 'vendors.id');
+        })
+        ->leftJoin('nvrm_lead_forwards', 'nvrm_lead_forwards.lead_id', '=', 'nv_notes.lead_id')
+        ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
+        ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
+        ->select(
+            'nv_notes.*',
+            'nvrm_lead_forwards.lead_id',
+            'nvrm_lead_forwards.lead_status',
+            'vendors.name as created_by_name',
+            'vendor_categories.name as category_name',
+            'team_members.name as done_by_name'
+        )
+        ->where('nv_notes.id', '>', 1706)
+        ->where('nvrm_messages.created_by', $auth_user->id)
+        ->where('nv_notes.created_at', '<', $currentDateStart)
+        ->groupBy('nv_notes.id')
+        ->whereNull('nv_notes.done_by')
+        ->get()
+        ->count();
 
         $response_data = compact(
             'total_leads_received_this_month',
@@ -118,9 +162,8 @@ class DashboardController extends Controller
             'nvrm_today_task_leads',
             'nvrm_task_overdue_leads',
             'nvrm_unfollowed_leads',
-            'vendor_all_help',
-            'vendor_non_responsed_help',
-            'vendor_total_helped',
+            'vendor_overdue_issue',
+            'vendor_today_issue',
             'forward_leads_by_category'
         );
         return view('nonvenue.dashboard', $response_data);

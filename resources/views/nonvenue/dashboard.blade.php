@@ -160,12 +160,12 @@
                         <h3>Vendors Help Support</h3>
                     </div>
                     <div class="col-lg-3 col-6">
-                        <a target="_blank" href="{{ route('nonvenue.vendor.help.list', 'vendor_total_helped') }}"
+                        <a target="_blank" href="{{ route('nonvenue.vendor.help.list', 'vendor_overdue_issue') }}"
                             class="text-light">
-                            <div class="small-box text-sm bg-success">
+                            <div class="small-box text-sm bg-warning">
                                 <div class="inner">
-                                    <h3>{{ $vendor_total_helped }}</h3>
-                                    <p>Vendors Issue Resolved</p>
+                                    <h3>{{ $vendor_overdue_issue }}</h3>
+                                    <p>Vendors Overdue Issue</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-bag"></i>
@@ -175,26 +175,12 @@
                         </a>
                     </div>
                     <div class="col-lg-3 col-6">
-                        <a target="_blank" href="{{ route('nonvenue.vendor.help.list', 'vendor_non_responsed_help') }}"
+                        <a target="_blank" href="{{ route('nonvenue.vendor.help.list', 'vendor_today_issue') }}"
                             class="text-light">
                             <div class="small-box text-sm" style="background-color: cadetblue;">
                                 <div class="inner">
-                                    <h3>{{ $vendor_non_responsed_help }}</h3>
-                                    <p>Need to be Responsed</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="ion ion-bag"></i>
-                                </div>
-                                <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-lg-3 col-6">
-                        <a target="_blank" href="{{ route('nonvenue.vendor.help.list') }}" class="text-light">
-                            <div class="small-box text-sm bg-secondary">
-                                <div class="inner">
-                                    <h3>{{ $vendor_all_help }}</h3>
-                                    <p>Total Vendors Help Support</p>
+                                    <h3>{{ $vendor_today_issue }}</h3>
+                                    <p>Vendors Issue Today</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-bag"></i>
