@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers;
 use App\Http\Controllers\Controller;
+use App\Models\Lead;
 use App\Models\whatsappMessages;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,14 @@ Route::view('/', 'admin.login');
 
 Route::post('/store-token', [Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
 Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->name('send.token');
+
+Route::get('/set_lead_source', function(){
+    Lead::whereBetween('lead_datetime', ['2023-09-01', '2023-11-30'])
+        ->update(['source' => 'WB|form']);
+
+    return 'Lead source updated successfully!';
+});
+
 
 // google sheet bdm lead fetch
 Route::get('/sheet', [Controllers\GoogleSheetController::class, 'processAllSheetData'])->name('get.sheet');
@@ -42,6 +51,8 @@ Route::get('/login_mail', function () {
 });
 
 
+
+
 // send and get
 Route::get('admin/ajax_tasks', [Controllers\WhatsappMsgController::class, 'ajax_tasks'])->name('whatsapp_chat.ajax');
 Route::get('admin/ajax_templates', [Controllers\WhatsappMsgController::class, 'fetchTemplates'])->name('whatsapp_chat.ajax_templates');
@@ -67,12 +78,10 @@ Route::post('whatsapp_msg_send_nv_subscription_btn_one', [Controllers\WhatsappMs
 Route::post('whatsapp_msg_send_nv_subscription_btn_reminder', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_reminder'])->name('whatsapp_chat.send.nv_subscription_btn_reminder');
 Route::post('whatsapp_msg_send_nv_subscription_btn_two', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_two'])->name('whatsapp_chat.send.nv_subscription_btn_two');
 
-
 // bdm great msg
 Route::post('whatsapp_msg_send_bdm_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_bdm_greet_btn'])->name('whatsapp_chat.send.bdm_greet_btn');
 // bdm documnet send
 Route::post('upload_document_bdm', [Controllers\WhatsappMsgController::class, 'uploadDocumentbdm'])->name('whatsapp_chat.send.bdm_doc_send');
-
 
 // update status
 Route::post('whatsapp_msg_status', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_status'])->name('whatsapp_chat.status');

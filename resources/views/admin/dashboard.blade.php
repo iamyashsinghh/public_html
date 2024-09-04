@@ -944,30 +944,6 @@
                         data: ("{{ $venue_leads_for_this_year }}").split(",")
                     },
                     {
-                        label: 'Call',
-                        fill: false,
-                        lineTension: 0,
-                        backgroundColor: "#a06b14",
-                        borderColor: "#a06b14",
-                        data: ("{{ $venue_call_leads_for_this_year }}").split(",")
-                    },
-                    {
-                        label: 'Form ',
-                        fill: false,
-                        lineTension: 0,
-                        backgroundColor: "#aa559f",
-                        borderColor: "#aa559f",
-                        data: ("{{ $venue_form_leads_for_this_year }}").split(",")
-                    },
-                    {
-                        label: 'Whatsapp',
-                        fill: false,
-                        lineTension: 0,
-                        backgroundColor: "#618200",
-                        borderColor: "#618200",
-                        data: ("{{ $venue_whatsapp_leads_for_this_year }}").split(",")
-                    },
-                    {
                         label: 'Ad Data',
                         fill: false,
                         lineTension: 0,

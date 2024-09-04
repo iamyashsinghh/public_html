@@ -94,14 +94,6 @@ class DashboardController extends Controller
         }
         $venue_leads_for_this_year = implode(",", $venue_leads_for_this_year);
 
-        $venue_call_leads_for_this_year = [];
-        for ($i = 12; $i >= 0; $i--) {
-            $datetime = date("Y-m", strtotime("-$i month"));
-            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->where('source', 'WB|Call')->count();
-            array_push($venue_call_leads_for_this_year, $count);
-        }
-        $venue_call_leads_for_this_year = implode(",", $venue_call_leads_for_this_year);
-
         $venue_organic_leads_for_this_year = [];
         for ($i = 12; $i >= 0; $i--) {
             $datetime = date("Y-m", strtotime("-$i month"));
@@ -117,22 +109,6 @@ class DashboardController extends Controller
             array_push($venue_ads_leads_for_this_year, $count);
         }
         $venue_ads_leads_for_this_year = implode(",", $venue_ads_leads_for_this_year);
-
-        $venue_whatsapp_leads_for_this_year = [];
-        for ($i = 12; $i >= 0; $i--) {
-            $datetime = date("Y-m", strtotime("-$i month"));
-            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->where('source', 'WB|WhatsApp')->count();
-            array_push($venue_whatsapp_leads_for_this_year, $count);
-        }
-        $venue_whatsapp_leads_for_this_year = implode(",", $venue_whatsapp_leads_for_this_year);
-
-        $venue_form_leads_for_this_year = [];
-        for ($i = 12; $i >= 0; $i--) {
-            $datetime = date("Y-m", strtotime("-$i month"));
-            $count = Lead::where('lead_datetime', 'like', "%$datetime%")->where('source', 'WB|Form')->count();
-            array_push($venue_form_leads_for_this_year, $count);
-        }
-        $venue_form_leads_for_this_year = implode(",", $venue_form_leads_for_this_year);
 
         $nv_leads_for_this_month = [];
         for ($i = 1; $i <= date('d'); $i++) {
@@ -398,6 +374,6 @@ class DashboardController extends Controller
         foreach ($nv_members as $list) {
             array_push($nv_id, $list->id);
         }
-        return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month', 'venue_form_leads_for_this_month', 'venue_ads_leads_for_this_month', 'venue_whatsapp_leads_for_this_year', 'venue_organic_leads_for_this_month', 'venue_form_leads_for_this_year', 'venue_call_leads_for_this_year', 'venue_ads_leads_for_this_year', 'venue_organic_leads_for_this_year', 'venue_call_leads_for_this_month', 'venue_whatsapp_leads_for_this_month', 'venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members','rm_members', 'yearly_calendar', 'v_members', 'nv_members', 'categories'));
+        return view('admin.dashboard', compact('total_vendors', 'total_team', 'total_venue_leads', 'total_nv_leads', 'venue_leads_for_this_month', 'venue_form_leads_for_this_month', 'venue_ads_leads_for_this_month', 'venue_organic_leads_for_this_month', 'venue_ads_leads_for_this_year', 'venue_organic_leads_for_this_year', 'venue_call_leads_for_this_month', 'venue_whatsapp_leads_for_this_month', 'venue_leads_for_this_year', 'nv_leads_for_this_month', 'nv_leads_for_this_year', 'vm_members','rm_members', 'yearly_calendar', 'v_members', 'nv_members', 'categories'));
     }
 }
