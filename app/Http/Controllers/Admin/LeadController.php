@@ -157,6 +157,10 @@ class LeadController extends Controller
             $leads->whereIn('leads.assign_id', $request->team_members);
         }
 
+        if ($request->lead_source != null) {
+            $leads->whereIn('leads.source', $request->lead_source);
+        }
+
         $leads->orderBy('leads.whatsapp_msg_time', 'desc');
 
         $leads->whereNull('leads.deleted_at');

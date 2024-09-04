@@ -179,8 +179,7 @@
                                             </div>
                                             <div class="custom-control custom-checkbox my-1">
                                                 <input class="custom-control-input" type="checkbox"
-                                                    id="lead_status_done_checkbox" name="lead_status[]"
-                                                    value="Done"
+                                                    id="lead_status_done_checkbox" name="lead_status[]" value="Done"
                                                     {{ isset($filter_params['lead_status']) && in_array('Done', $filter_params['lead_status']) ? 'checked' : '' }}>
                                                 <label for="lead_status_done_checkbox"
                                                     class="custom-control-label">Done</label>
@@ -341,6 +340,59 @@
                                             <input type="date" class="form-control" id="event_date_inp"
                                                 name="lead_done_to_date"
                                                 value="{{ isset($filter_params['lead_done_to_date']) ? $filter_params['lead_done_to_date'] : '' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse2soruce"
+                                        aria-expanded="true" aria-controls="collapse2soruce">Lead Source</button>
+                                </h2>
+                                <div id="collapse2soruce"
+                                    class="accordion-collapse collapse {{ isset($filter_params['lead_source']) ? 'show' : '' }}"
+                                    data-bs-parent="#accordionExample">
+                                    <div class="accordion-body pl-2 pb-4">
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_source_Team"
+                                                name="lead_source[]" value="WB|Team"
+                                                {{ isset($filter_params['lead_source']) && in_array('WB|Team', $filter_params['lead_source']) ? 'WB|Team' : '' }}>
+                                            <label for="lead_source_Team" class="custom-control-label">WB|Team</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_source_call"
+                                                name="lead_source[]" value="WB|Call"
+                                                {{ isset($filter_params['lead_source']) && in_array('WB|Call', $filter_params['lead_source']) ? 'WB|Call' : '' }}>
+                                            <label for="lead_source_call" class="custom-control-label">WB|Call</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_source_form"
+                                                name="lead_source[]" value="WB|form"
+                                                {{ isset($filter_params['lead_source']) && in_array('WB|form', $filter_params['lead_source']) ? 'WB|form' : '' }}>
+                                            <label for="lead_source_form"
+                                                class="custom-control-label">WB|form</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_source_whatsapp"
+                                                name="lead_source[]" value="WB|WhatsApp"
+                                                {{ isset($filter_params['lead_source']) && in_array('WB|WhatsApp', $filter_params['lead_source']) ? 'WB|WhatsApp' : '' }}>
+                                            <label for="lead_source_whatsapp"
+                                                class="custom-control-label">WB|WhatsApp</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_source_vm_refrence"
+                                                name="lead_source[]" value="VM|Reference"
+                                                {{ isset($filter_params['lead_source']) && in_array('VM|Reference', $filter_params['lead_source']) ? 'VM|Reference' : '' }}>
+                                            <label for="lead_source_vm_refrence"
+                                                class="custom-control-label">VM|Reference</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_source_walk_in"
+                                                name="lead_source[]" value="Walk-in"
+                                                {{ isset($filter_params['lead_source']) && in_array('Walk-in', $filter_params['lead_source']) ? 'Walk-in' : '' }}>
+                                            <label for="lead_source_walk_in"
+                                                class="custom-control-label">Walk-in</label>
                                         </div>
                                     </div>
                                 </div>
