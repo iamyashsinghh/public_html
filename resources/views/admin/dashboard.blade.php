@@ -935,14 +935,7 @@
             type: "bar",
             data: {
                 labels: ("{{ $yearly_calendar }}").split(','),
-                datasets: [{
-                        label: 'Total Leads',
-                        fill: false,
-                        lineTension: 0,
-                        backgroundColor: "#891010",
-                        borderColor: "#891010",
-                        data: ("{{ $venue_leads_for_this_year }}").split(",")
-                    },
+                datasets: [
                     {
                         label: 'Ad Data',
                         fill: false,
@@ -958,6 +951,14 @@
                         backgroundColor: "#cbe21d",
                         borderColor: "#cbe21d",
                         data: ("{{ $venue_organic_leads_for_this_year }}").split(",")
+                    },
+                    {
+                        label: 'Total Leads',
+                        fill: false,
+                        lineTension: 0,
+                        backgroundColor: "#891010",
+                        borderColor: "#891010",
+                        data: ("{{ $venue_leads_for_this_year }}").split(",")
                     }
                 ]
             },

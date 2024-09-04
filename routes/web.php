@@ -14,12 +14,6 @@ Route::view('/', 'admin.login');
 Route::post('/store-token', [Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
 Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->name('send.token');
 
-Route::get('/set_lead_source', function(){
-    Lead::whereBetween('lead_datetime', ['2023-09-01', '2023-11-30'])
-        ->update(['source' => 'WB|form']);
-
-    return 'Lead source updated successfully!';
-});
 
 
 // google sheet bdm lead fetch
