@@ -137,16 +137,53 @@ class DashboardController extends Controller
                         ->whereRaw('bookings.id = lead_forwards.booking_id');
                 })->get()->count();
 
-            $forward_leads_this_month = $forward_leads_today = 0;
+            $forward_leads_this_month = $forward_leads_today = $not_contacted_lead = 0;
         } else {
+
             $total_leads_received_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")->where('assign_id', $auth_user->id)->count();
             $total_leads_received_today = Lead::where('lead_datetime', 'like', "%$current_date%")->where('assign_id', $auth_user->id)->count();
-            $unread_leads_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
-            $unread_leads_today = Lead::where('lead_datetime', 'like', "%$current_date%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
-            $total_unread_leads_overdue = Lead::where('lead_datetime', '<', Carbon::today())->where('read_status', false)->where('assign_id', $auth_user->id)->count();
+            // $unread_leads_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
+            // $unread_leads_today = Lead::where('lead_datetime', 'like', "%$current_date%")->where('read_status', false)->where('assign_id', $auth_user->id)->count();
+            // $total_unread_leads_overdue = Lead::where('lead_datetime', '<', Carbon::today())->where('read_status', false)->where('assign_id', $auth_user->id)->count();
+
+            $seven_days_ago = Carbon::now()->subDays(7)->format('Y-m-d H:i:s');
+
+            $unread_leads_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")
+            ->where('read_status', false)
+            ->where('assign_id', $auth_user->id)
+            ->where(function($query) use ($seven_days_ago) {
+                $query->whereNull('last_forwarded_by')
+                      ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+            })
+            ->count();
+
+            $unread_leads_today = Lead::where('lead_datetime', 'like', "%$current_date%")
+            ->where('read_status', false)
+            ->where('assign_id', $auth_user->id)
+            ->where(function($query) use ($seven_days_ago) {
+                $query->whereNull('last_forwarded_by')
+                      ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+            })
+            ->count();
+
+            $total_unread_leads_overdue = Lead::where('lead_datetime', '<', Carbon::today())
+            ->where('read_status', false)
+            ->where('assign_id', $auth_user->id)
+            ->where('lead_id' , '>' , '54262')
+            ->where(function($query) use ($seven_days_ago) {
+                $query->whereNull('last_forwarded_by')
+                      ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+            })
+            ->count();
+
+            $not_contacted_lead = Lead::where('service_status' , 0)
+            ->where('lead_id' , '>' , '54262')
+            ->where('assign_id', $auth_user->id)
+            ->count();
 
             $forward_leads_this_month = LeadForwardInfo::whereBetween('updated_at', [$from, $to])->where('forward_from', $auth_user->id)->groupBy('lead_id')->get()->count();
             $forward_leads_today = LeadForwardInfo::where('updated_at', 'like', "%$current_date%")->where('forward_from', $auth_user->id)->groupBy('lead_id')->get()->count();
+
 
             $task_schedule_this_month = $task_schedule_today = $total_task_overdue = $recce_schedule_this_month = $recce_schedule_today = $total_recce_overdue = $unfollowed_leads = $recce_done_this_month = $l2r = $bookings_this_month = $r2c = 0;
         }
@@ -173,7 +210,8 @@ class DashboardController extends Controller
             'rm_today_task_leads',
             'rm_task_overdue_leads',
             'bookings_this_month',
-            'r2c'
+            'r2c',
+            'not_contacted_lead',
         );
 
         return view('team.dashboard', $response_data);

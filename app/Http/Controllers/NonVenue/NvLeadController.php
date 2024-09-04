@@ -187,7 +187,8 @@ class NvLeadController extends Controller
             } elseif ($request->dashboard_filters == "leads_received_today") {
                 $leads->where('nvrm_lead_forwards.lead_datetime', 'like', "%$current_date%")->whereNull('nvrm_lead_forwards.deleted_at')->where('nvrm_lead_forwards.forward_to', $auth_user->id);
             } elseif ($request->dashboard_filters == "nvrm_unfollowed_leads") {
-                $leads->whereHas('nvrm_tasks', function ($query) use ($auth_user) {
+                $leads->where('lead_status', '!=', 'Done')
+                ->whereHas('nvrm_tasks', function ($query) use ($auth_user) {
                     $query->whereNotNull('done_datetime')
                         ->whereNull('deleted_at')
                         ->where('created_by', $auth_user->id);

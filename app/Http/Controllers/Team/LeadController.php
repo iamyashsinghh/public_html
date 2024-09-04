@@ -218,6 +218,7 @@ class LeadController extends Controller
         }
 
         if ($auth_user->role_id === 4) {
+            $seven_days_ago = Carbon::now()->subDays(7)->format('Y-m-d H:i:s');
             if ($request->dashboard_filters != null) {
                 if ($request->dashboard_filters == "leads_received_this_month") {
                     $from = Carbon::today()->startOfMonth();
@@ -263,17 +264,40 @@ class LeadController extends Controller
                     "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
                     ->whereNotNull('completed_tasks.lead_id')
                     ->where('leads.lead_status', '!=', 'Done');
-                    
+
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
                     $to = Carbon::today()->endOfMonth();
-                    $leads->whereBetween('leads.lead_datetime', [$from, $to])->where('assign_id', $auth_user->id)->where('leads.read_status', false);
+                    $leads->whereBetween('leads.lead_datetime', [$from, $to])
+                    ->where('assign_id', $auth_user->id)
+                    ->where('leads.read_status', false)
+                    ->where(function($query) use ($seven_days_ago) {
+                        $query->whereNull('last_forwarded_by')
+                              ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                    });
                 } elseif ($request->dashboard_filters == "unread_leads_today") {
                     $from = Carbon::today()->startOfDay();
                     $to = Carbon::today()->endOfDay();
-                    $leads->whereBetween('leads.lead_datetime', [$from, $to])->where('assign_id', $auth_user->id)->where('leads.read_status', false);
+                    $leads->whereBetween('leads.lead_datetime', [$from, $to])
+                    ->where('assign_id', $auth_user->id)
+                    ->where('leads.read_status', false)
+                    ->where(function($query) use ($seven_days_ago) {
+                        $query->whereNull('last_forwarded_by')
+                              ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                    });
                 } elseif ($request->dashboard_filters == "total_unread_leads_overdue") {
-                    $leads->where('leads.read_status', false)->where('leads.lead_datetime', '<', Carbon::today())->where('assign_id', $auth_user->id);
+                    $leads->where('leads.read_status', false)
+                    ->where('leads.lead_datetime', '<', Carbon::today())
+                    ->where('assign_id', $auth_user->id)
+                    ->where('leads.lead_id' , '>' , '54262')
+                    ->where(function($query) use ($seven_days_ago) {
+                        $query->whereNull('last_forwarded_by')
+                              ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                    });
+                } elseif ($request->dashboard_filters == "not_contacted_lead") {
+                    $leads->where('leads.service_status' , 0)
+                    ->where('leads.lead_id' , '>' , '54262')
+                    ->where('leads.assign_id', $auth_user->id);
                 } elseif ($request->dashboard_filters == "forward_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
                     $to = Carbon::today()->endOfMonth();

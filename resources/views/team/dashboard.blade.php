@@ -102,6 +102,20 @@
                         </div>
                     </a>
                 </div>
+                <div class="col-lg-3 col-6">
+                    <a target="_blank" href="{{route('team.lead.list', 'not_contacted_lead')}}" class="text-light">
+                        <div class="small-box text-sm bg-warning">
+                            <div class="inner">
+                                <h3>{{$not_contacted_lead}}</h3>
+                                <p>Not Contacted Leads</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                            <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                        </div>
+                    </a>
+                </div>
                 <div class="col-lg-12 mt-3">
                     <h3>Tasks</h3>
                 </div>
