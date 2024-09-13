@@ -26,7 +26,7 @@ class LeadForwardApproval extends Model
 
     public static function getTeamMemberName($teamMemberId)
     {
-        $teamMember = TeamMember::find($teamMemberId);
+        $teamMember = TeamMember::withTrashed()->find($teamMemberId);
         return "$teamMember->name / $teamMember->venue_name ";
     }
 }
