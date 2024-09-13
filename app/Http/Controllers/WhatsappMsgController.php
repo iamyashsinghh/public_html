@@ -218,7 +218,6 @@ class WhatsappMsgController extends Controller
     }
 
 
-
     public function whatsapp_msg_get_new($id, Request $request)
     {
         $lastTimestamp = $request->input('lastTimestamp');
@@ -237,8 +236,6 @@ class WhatsappMsgController extends Controller
 
         return response()->json($messages);
     }
-
-
 
     public function whatsapp_msg_send(Request $request)
     {
@@ -458,6 +455,7 @@ class WhatsappMsgController extends Controller
             $getlead->save();
         }
     }
+
     public function whatsapp_msg_status_vendor(Request $request)
     {
         $getlead = nvLead::where('mobile', $request->mobile)->first();
@@ -604,6 +602,7 @@ class WhatsappMsgController extends Controller
             return response()->json(['error' => 'Failed to send message.'], $response->status());
         }
     }
+
     public function whatsapp_msg_send_greet_btn(Request $request)
     {
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
@@ -734,6 +733,7 @@ class WhatsappMsgController extends Controller
             return response()->json(['error' => 'Failed to send message.'], $response->status());
         }
     }
+
     public function whatsapp_msg_send_bdm_greet_btn(Request $request)
     {
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
