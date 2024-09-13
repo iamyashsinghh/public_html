@@ -706,6 +706,7 @@ Route::post('/new_lead', function (Request $request) {
                 'email' => $is_email_valid,
                 'preference' => $is_preference_valid,
             ]);
+            $lead_from = '';
             if ($validate->fails()) {
                 return response()->json(['status' => false, 'msg' => $validate->errors()->first()]);
             }
@@ -722,10 +723,12 @@ Route::post('/new_lead', function (Request $request) {
                 $lead_source = "WB|Call";
                 $crm_meta = CrmMeta::find(1);
                 $preference = $crm_meta->meta_value;
+                $lead_from = $crm_meta->lead_from;
             } else {
                 $call_to_wb_api_virtual_number = null;
                 $lead_source = "WB|Form";
                 $preference = $request->post('preference');
+                $lead_from = $request->post('lead_from');
             }
 
             $url_components = parse_url($preference);
@@ -768,7 +771,7 @@ Route::post('/new_lead', function (Request $request) {
                 $lead->email = $request->post('email');
                 $lead->mobile = $mobile;
             }
-
+            $lead->lead_from = $lead_from;
             $lead->lead_datetime = $current_timestamp;
             $lead->source = $lead_source;
             $lead->lead_catagory = $lead_cat_data;
@@ -856,6 +859,7 @@ Route::post('handle_calling_request', function (Request $request) {
         $crm_meta = CrmMeta::find(1);
         $crm_meta->meta_value = $request->slug;
         $crm_meta->is_ad = $request->is_ad;
+        $crm_meta->lead_from = $request->lead_from;
         $crm_meta->save();
         return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Data stored successfully.']);
     } catch (\Throwable $th) {
