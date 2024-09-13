@@ -36,7 +36,7 @@
                                     <td>{{ $list->lead_id }}</td>
                                     <td>{{ \App\Models\LeadForwardApproval::getTeamMemberName($list->forward_from) }}</td>
                                     <td>{{ \App\Models\LeadForwardApproval::getTeamMemberName($list->forward_to) }}</td>
-                                    <td>{{ \App\Models\LeadForwardApproval::getTeamMemberName($list->forward_by) }}</td>
+                                    <td>{{ \App\Models\LeadForwardApproval::getTeamMemberName($list->forward_by) }} <br /> {{ $list->created_at }}</td>
                                     <td>
                                         <button class="btn"
                                             onclick="handle_view_message(`{{ $list->reason ?: 'N/A' }}`)"><i
