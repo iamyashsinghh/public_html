@@ -300,7 +300,7 @@ class LeadController extends Controller
                     $join->on('tasks.lead_id', '=', 'leads.lead_id')
                         ->where('tasks.is_vm_recce_task', 1);
                 })
-                ->whereDate('visits.created_at', '>=', $startDate)
+                ->whereDate('visits.done_datetime', '>=', $startDate)
                 ->whereNotNull('visits.done_datetime')
                 ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'))
                 ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '=', $current_date)
@@ -343,7 +343,7 @@ class LeadController extends Controller
                             ->where('tasks.is_vm_recce_task', 1);
                     })
                     ->whereNotNull('visits.done_message')
-                    ->whereDate('visits.created_at', '>=', $startDate)
+                    ->whereDate('visits.done_datetime', '>=', $startDate)
                     ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '<', $current_date)
                     ->where(function ($query) {
                         $query->whereNull('tasks.created_at')
