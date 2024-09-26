@@ -70,6 +70,7 @@ class LeadController extends Controller
     public function ajax_list(Request $request)
     {
         $auth_user = Auth::guard('team')->user();
+        $current_date = date('Y-m-d');
         if ($auth_user->role_id === 4) {
             $leads = DB::table('leads')->select(
                 'leads.lead_id as lead_id',
@@ -263,6 +264,95 @@ class LeadController extends Controller
                         HAVING COUNT(CASE WHEN tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
                     "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
                     ->whereNotNull('completed_tasks.lead_id')
+                    ->where('leads.lead_status', '!=', 'Done');
+                } elseif ($request->dashboard_filters == "vm_recce_today") {
+                    $threeDaysAgo = Carbon::now()->subDays(3);
+                    $startDate = Carbon::createFromDate(2024, 8, 1);
+                    $leads = DB::table('leads')->select(
+                        'leads.lead_id as lead_id',
+                        'leads.lead_datetime',
+                        'leads.name',
+                        'leads.mobile',
+                        'leads.event_datetime as event_date',
+                        'leads.lead_status',
+                        'leads.service_status',
+                        'leads.read_status',
+                        'leads.lead_color',
+                        'leads.assign_to',
+                        'leads.source',
+                        'leads.preference',
+                        'leads.locality',
+                        'tm.name as created_by',
+                        'leads.whatsapp_msg_time',
+                        'leads.last_forwarded_by',
+                        'leads.enquiry_count',
+                        'leads.is_whatsapp_msg',
+                        DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
+                        'leads.lead_catagory',
+                        'ne.pax as pax',
+                    )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
+                    ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
+                    $leads->where('leads.deleted_at', null)
+                    ->groupBy('leads.mobile')
+                    ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
+                ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
+                ->leftJoin('tasks', function ($join) {
+                    $join->on('tasks.lead_id', '=', 'leads.lead_id')
+                        ->where('tasks.is_vm_recce_task', 1);
+                })
+                ->whereDate('visits.created_at', '>=', $startDate)
+                ->whereNotNull('visits.done_datetime')
+                ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'))
+                ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '=', $current_date)
+                ->where('rm_messages.created_by', '=', $auth_user->id)
+                ->orderBy('rm_messages.updated_at', 'desc')
+                ->groupBy('leads.lead_id')
+                ->where('leads.lead_status', '!=', 'Done');
+                } elseif ($request->dashboard_filters == "vm_recce_overdue") {
+                    $startDate = Carbon::createFromDate(2024, 8, 1);
+                    $leads = DB::table('leads')->select(
+                        'leads.lead_id as lead_id',
+                        'leads.lead_datetime',
+                        'leads.name',
+                        'leads.mobile',
+                        'leads.event_datetime as event_date',
+                        'leads.lead_status',
+                        'leads.service_status',
+                        'leads.read_status',
+                        'leads.lead_color',
+                        'leads.assign_to',
+                        'leads.source',
+                        'leads.preference',
+                        'leads.locality',
+                        'tm.name as created_by',
+                        'leads.whatsapp_msg_time',
+                        'leads.last_forwarded_by',
+                        'leads.enquiry_count',
+                        'leads.is_whatsapp_msg',
+                        DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
+                        'leads.lead_catagory',
+                        'ne.pax as pax',
+                    )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
+                    ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
+                    $leads->where('leads.deleted_at', null)
+                    ->groupBy('leads.mobile')
+                    ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
+                    ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
+                    ->leftJoin('tasks', function ($join) {
+                        $join->on('tasks.lead_id', '=', 'leads.lead_id')
+                            ->where('tasks.is_vm_recce_task', 1);
+                    })
+                    ->whereNotNull('visits.done_message')
+                    ->whereDate('visits.created_at', '>=', $startDate)
+                    ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '<', $current_date)
+                    ->where(function ($query) {
+                        $query->whereNull('tasks.created_at')
+                            ->orWhere(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'));
+                    })
+                    ->where('rm_messages.created_by', '=', $auth_user->id)
+                    ->orderBy('rm_messages.updated_at', 'desc')
+                    ->orderBy('visits.done_datetime', 'desc')
+                    ->groupBy('leads.lead_id')
                     ->where('leads.lead_status', '!=', 'Done');
 
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {

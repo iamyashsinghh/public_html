@@ -163,6 +163,40 @@
                 </div>
 
                 <div class="col-lg-12 mt-3">
+                    <h3 class="mt-3">Vm Recce Tasks</h3>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <a target="_blank" href="{{route('team.lead.list', 'vm_recce_overdue')}}" class="text-light">
+                        <div class="small-box text-sm bg-warning" >
+                            <div class="inner">
+                                <h3>{{$vm_recce_overdue}}</h3>
+                                <p>Vm Recce Overdue</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                            <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-3 col-6">
+                    <a target="_blank" href="{{route('team.lead.list', 'vm_recce_today')}}" class="text-light">
+                        <div class="small-box text-sm" style="background: cadetblue;">
+                            <div class="inner">
+                                <h3>{{$vm_recce_today}}</h3>
+                                <p>Vm Recce Today</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                            <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                        </div>
+                    </a>
+                </div>
+
+
+                <div class="col-lg-12 mt-3">
                     <h3 class="mt-3">Leads Forward</h3>
                 </div>
                 <div class="col-lg-3 col-6">

@@ -120,6 +120,21 @@ class MeetingController extends Controller
                 $meetings->whereBetween('bdm_meetings.meeting_schedule_datetime', [$from, $to])->whereNull('bdm_meetings.done_datetime');
             } elseif ($request->dashboard_filters == "total_meeting_overdue") {
                 $meetings->where('bdm_meetings.meeting_schedule_datetime', '<', Carbon::today())->whereNull('bdm_meetings.done_datetime');
+            } elseif ($request->dashboard_filters == "meeting_done_this_month") {
+                $from =  Carbon::today()->startOfMonth();
+                $to =  Carbon::today()->endOfMonth();
+                $meetings->whereBetween('bdm_meetings.done_datetime', [$from, $to])
+                ->whereNull('bdm_leads.deleted_at')
+                ->whereNull('bdm_meetings.deleted_at')
+                ->whereNotNull('bdm_meetings.done_with')
+                ->where('bdm_meetings.meeting_done_status', '!=', 'Dropped');
+            } elseif ($request->dashboard_filters == "order_signed_this_month") {
+                $from =  Carbon::today()->startOfMonth();
+                $to =  Carbon::today()->endOfMonth();
+                $meetings->join('bdm_bookings', 'bdm_leads.lead_id', '=', 'bdm_bookings.lead_id')->whereBetween('bdm_bookings.booking_date', [$from, $to])
+                ->whereNull('bdm_leads.deleted_at')
+                ->whereNull('bdm_bookings.deleted_at')
+                ->where('bdm_bookings.created_by', $auth_user->id);
             }
         }
 

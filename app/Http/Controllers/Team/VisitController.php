@@ -11,8 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class VisitController extends Controller {
-    public function list(Request $request, $dashboard_filters = null) {
+class VisitController extends Controller
+{
+    public function list(Request $request, $dashboard_filters = null)
+    {
         $filter_params = "";
         if ($request->visit_status != null) {
             $filter_params =  ['visit_status' => $request->visit_status];
@@ -36,11 +38,11 @@ class VisitController extends Controller {
             $filter_params = ['dashboard_filters' => $dashboard_filters];
             $page_heading = ucwords(str_replace("_", " ", $dashboard_filters));
         }
-
         return view('team.venueCrm.visit.list', compact('page_heading', 'filter_params'));
     }
 
-    public function ajax_list(Request $request) {
+    public function ajax_list(Request $request)
+    {
         $auth_user = Auth::guard('team')->user();
         $visits = LeadForward::select(
             'lead_forwards.lead_id',
@@ -54,8 +56,8 @@ class VisitController extends Controller {
             'visits.done_datetime as visit_done_datetime',
             'ne.pax as pax',
         )->join('visits', ['lead_forwards.visit_id' => 'visits.id'])
-        ->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'lead_forwards.lead_id')
-        ->where(['lead_forwards.forward_to' => $auth_user->id, 'visits.deleted_at' => null])->groupBy('lead_forwards.lead_id');
+            ->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'lead_forwards.lead_id')
+            ->where(['lead_forwards.forward_to' => $auth_user->id, 'visits.deleted_at' => null])->groupBy('lead_forwards.lead_id');
 
         $current_date = date('Y-m-d');
         if ($request->has('visit_status')) {
@@ -127,6 +129,14 @@ class VisitController extends Controller {
                 $from =  Carbon::today()->startOfMonth();
                 $to =  Carbon::today()->endOfMonth();
                 $visits->whereBetween('visits.done_datetime', [$from, $to]);
+            } elseif ($request->dashboard_filters == "vm_recce_today") {
+                $from =  Carbon::today()->startOfMonth();
+                $to =  Carbon::today()->endOfMonth();
+                $visits->whereBetween('visits.done_datetime', [$from, $to]);
+            } elseif ($request->dashboard_filters == "vm_recce_overdue") {
+                $from =  Carbon::today()->startOfMonth();
+                $to =  Carbon::today()->endOfMonth();
+                $visits->whereBetween('visits.done_datetime', [$from, $to]);
             }
         }
 
@@ -135,7 +145,8 @@ class VisitController extends Controller {
         return datatables($visits)->toJson();
     }
 
-    public function add_process(Request $request) {
+    public function add_process(Request $request)
+    {
         $validate = Validator::make($request->all(), [
             'lead_id' => 'required|exists:leads,lead_id',
             'visit_event_name' => 'required|string',
@@ -203,7 +214,8 @@ class VisitController extends Controller {
         return redirect()->back();
     }
 
-    public function get_forward_info($visit_id) {
+    public function get_forward_info($visit_id)
+    {
         $auth_user = Auth::guard('team')->user();
         try {
             $visit = Visit::where(['id' => $visit_id, 'created_by' => $auth_user->id])->first();
@@ -218,7 +230,8 @@ class VisitController extends Controller {
         }
     }
 
-    public function delete($visit_id) {
+    public function delete($visit_id)
+    {
         $auth_user = Auth::guard('team')->user();
         $visit = Visit::where(['id' => $visit_id, 'created_by' => $auth_user->id, 'done_datetime' => null])->first();
 
@@ -238,7 +251,8 @@ class VisitController extends Controller {
         return redirect()->back();
     }
 
-    public function status_update(Request $request, $visit_id) {
+    public function status_update(Request $request, $visit_id)
+    {
         $validate = Validator::make($request->all(), [
             'event_date' => 'required|date',
             'party_area' => 'required|string',
@@ -267,7 +281,8 @@ class VisitController extends Controller {
         return redirect()->back();
     }
 
-    public function rm_visit_status_update($visit_id) {
+    public function rm_visit_status_update($visit_id)
+    {
         $auth_user = Auth::guard('team')->user();
         $visit = Visit::where(['id' => $visit_id, 'created_by' => $auth_user->id])->first();
         if ($visit == null || $auth_user->role_id !== 4) {

@@ -37,6 +37,9 @@ class Lead extends Model {
     public function get_visits() {
         return $this->hasMany(Visit::class, 'lead_id', 'lead_id');
     }
+    public function get_visits_for_rm() {
+        return $this->hasMany(Visit::class, 'lead_id', 'lead_id');
+    }
     public function get_tasks() {
         return $this->hasMany(Task::class, 'lead_id', 'lead_id');
     }
@@ -93,7 +96,20 @@ class Lead extends Model {
             'tasks.done_with',
             'tasks.done_message',
             'tasks.done_datetime',
-        )->join('team_members as tm', ['tm.id' => 'tasks.created_by'])->orderBy('task_schedule_datetime', 'asc')->where(['tasks.lead_id' => $this->lead_id, 'tm.role_id' => 4, 'created_by' =>  $auth_user->id])->get();
+            'tasks.is_vm_recce_task',
+        )->join('team_members as tm', ['tm.id' => 'tasks.created_by'])->orderBy('task_schedule_datetime', 'asc')->where(['tasks.lead_id' => $this->lead_id, 'tm.role_id' => 4, 'created_by' =>  $auth_user->id])->whereNull('tasks.is_vm_recce_task')->get();
+    }
+    public function get_rm_vm_recce_tasks() {
+        $auth_user = Auth::guard('team')->user();
+        return Task::select(
+            'tasks.id',
+            'tasks.task_schedule_datetime',
+            'tasks.follow_up',
+            'tasks.message',
+            'tasks.done_with',
+            'tasks.done_message',
+            'tasks.done_datetime',
+        )->join('team_members as tm', ['tm.id' => 'tasks.created_by'])->orderBy('task_schedule_datetime', 'asc')->where(['tasks.lead_id' => $this->lead_id, 'tm.role_id' => 4, 'created_by' =>  $auth_user->id, 'tasks.is_vm_recce_task' => 1])->get();
     }
     public function get_rm_notes() {
         return Note::select(
