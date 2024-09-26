@@ -163,7 +163,7 @@
                 </div>
 
                 <div class="col-lg-12 mt-3">
-                    <h3 class="mt-3">Vm Recce Tasks</h3>
+                    <h3 class="mt-3">Vm Recce Status</h3>
                 </div>
                 <div class="col-lg-3 col-6">
                     <a target="_blank" href="{{route('team.lead.list', 'vm_recce_overdue')}}" class="text-light">

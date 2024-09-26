@@ -818,9 +818,9 @@
                         </div>
                         <div id="task_card_container" class="card mb-5">
                             <div class="card-header text-light" style="background-color: var(--wb-renosand);">
-                                <h3 class="card-title">Vm Recce Task</h3>
+                                <h3 class="card-title">Vm Recce Status</h3>
                                 <button data-bs-toggle="modal" data-bs-target="#manageVmRecceTaskModal"
-                                    class="btn p-0 text-light float-right" title="Add Vm Recce Task."><i
+                                    class="btn p-0 text-light float-right" title="Add Vm Recce Status."><i
                                         class="fa fa-plus"></i></button>
                             </div>
                             <div class="card-body">
@@ -1519,7 +1519,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Add Vm Recce Task</h4>
+                        <h4 class="modal-title">Add Vm Recce Status</h4>
                         <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
                                 class="fa fa-times"></i></button>
                     </div>
