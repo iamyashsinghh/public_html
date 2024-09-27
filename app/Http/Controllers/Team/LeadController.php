@@ -306,7 +306,7 @@ class LeadController extends Controller
                 ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '=', $current_date)
                 ->where('rm_messages.created_by', '=', $auth_user->id)
                 ->orderBy('rm_messages.updated_at', 'desc')
-                ->groupBy('leads.lead_id');
+                ->groupBy('leads.lead_id')
                 ->where('leads.lead_status', '!=', 'Done');
                 } elseif ($request->dashboard_filters == "vm_recce_overdue") {
                     $startDate = Carbon::createFromDate(2024, 8, 1);
@@ -352,7 +352,7 @@ class LeadController extends Controller
                     ->where('rm_messages.created_by', '=', $auth_user->id)
                     ->orderBy('rm_messages.updated_at', 'desc')
                     ->orderBy('visits.done_datetime', 'desc')
-                    ->groupBy('leads.lead_id');
+                    ->groupBy('leads.lead_id')
                     ->where('leads.lead_status', '!=', 'Done');
 
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
