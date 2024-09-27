@@ -307,7 +307,7 @@ class LeadController extends Controller
                 ->where('rm_messages.created_by', '=', $auth_user->id)
                 ->orderBy('rm_messages.updated_at', 'desc')
                 ->groupBy('leads.lead_id');
-                // ->where('leads.lead_status', '!=', 'Done');
+                ->where('leads.lead_status', '!=', 'Done');
                 } elseif ($request->dashboard_filters == "vm_recce_overdue") {
                     $startDate = Carbon::createFromDate(2024, 8, 1);
                     $leads = DB::table('leads')->select(
@@ -353,7 +353,7 @@ class LeadController extends Controller
                     ->orderBy('rm_messages.updated_at', 'desc')
                     ->orderBy('visits.done_datetime', 'desc')
                     ->groupBy('leads.lead_id');
-                    // ->where('leads.lead_status', '!=', 'Done');
+                    ->where('leads.lead_status', '!=', 'Done');
 
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();

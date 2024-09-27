@@ -174,7 +174,7 @@ class DashboardController extends Controller
                 ->where('rm_messages.created_by', '=', $auth_user->id)
                 ->orderBy('rm_messages.updated_at', 'desc')
                 ->groupBy('leads.lead_id')
-                // ->where('leads.lead_status', '!=', 'Done')
+                ->where('leads.lead_status', '!=', 'Done')
                 ->get()->count();
 
 
@@ -196,7 +196,7 @@ class DashboardController extends Controller
                 ->orderBy('rm_messages.updated_at', 'desc')
                 ->orderBy('visits.done_datetime', 'desc')
                 ->groupBy('leads.lead_id')
-                // ->where('leads.lead_status', '!=', 'Done')
+                ->where('leads.lead_status', '!=', 'Done')
                 ->get()->count();
 
             $task_schedule_this_month = $task_schedule_today = $total_task_overdue = $recce_schedule_this_month = $recce_schedule_today = $total_recce_overdue = $unfollowed_leads = $recce_done_this_month = $l2r = $bookings_this_month = $r2c = 0;
