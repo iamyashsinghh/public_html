@@ -19,6 +19,9 @@ Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->n
 // google sheet bdm lead fetch
 Route::get('/sheet', [Controllers\GoogleSheetController::class, 'processAllSheetData'])->name('get.sheet');
 
+Route::get('/vm_cisits_tasks_status_for_rm_today', [Controllers\CronController::class, 'vm_recce_today']);
+Route::get('/vm_cisits_tasks_status_for_rm_overdue', [Controllers\CronController::class, 'vm_recce_overdue']);
+
 Route::get('/sql', [Controllers\SqlDownloadController::class, 'downloadSql']);
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
