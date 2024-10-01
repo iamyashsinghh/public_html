@@ -711,7 +711,7 @@ class NvLeadController extends Controller
 
     public function get_vendor_by_category($category_id)
     {
-        $vendors = Vendor::select('id', 'name', 'business_name', 'group_name', 'is_lead_forwaded', 'last_lead_forwaded_value')->where(['category_id' => $category_id, 'status' => 1])->orderBy('group_name')->get();
+        $vendors = Vendor::select('id', 'name', 'business_name', 'group_name', 'is_lead_forwaded', 'last_lead_forwaded_value')->where(['category_id' => $category_id, 'status' => 1, 'is_active' => 1])->orderBy('group_name')->get();
 
         if ($vendors && sizeof($vendors) > 0) {
             return response()->json(['success' => true, 'vendors' => $vendors]);
