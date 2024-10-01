@@ -573,7 +573,7 @@ class NvLeadController extends Controller
         }
 
         if ($request->tier) {
-            $vendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id])
+            $vendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id, 'is_active'=> 1])
                 ->orderBy('id')
                 ->limit(4)
                 ->get();
@@ -585,10 +585,10 @@ class NvLeadController extends Controller
                     $vendor->save();
                 }
 
-                Vendor::where(['status' => 1, 'subscription_type' => $request->tier, 'category_id' => $request->nvrm_msg_id])
+                Vendor::where(['status' => 1, 'subscription_type' => $request->tier, 'category_id' => $request->nvrm_msg_id, 'is_active'=> 1])
                     ->update(['is_lead_forwaded' => 0]);
 
-                $remainingVendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id])
+                $remainingVendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id,'is_active'=> 1])
                     ->orderBy('id')
                     ->limit(4 - $vendors->count())
                     ->get();

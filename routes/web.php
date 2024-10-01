@@ -193,6 +193,7 @@ Route::middleware(['verify_token', 'checkLoginTime'])->group(function () {
             Route::get('/vendors/manage_ajax/{id?}', [Controllers\Admin\VendorController::class, 'manage_ajax'])->name('admin.vendor.edit');
             Route::post('/vendors/manage-process/{id?}', [Controllers\Admin\VendorController::class, 'manage_process'])->name('admin.vendor.manage.process');
             Route::post('/vendors/download-data', [Controllers\Admin\VendorController::class, 'download_nv_lead_data_download'])->name('admin.vendor.download.data');
+            Route::get('/vendors/update-is-active/{member_id?}/{status?}', [Controllers\Admin\VendorController::class, 'update_is_active'])->name('admin.vendor.update.is_active');
             Route::get('/vendors/update-status/{vendor_id?}/{status?}', [Controllers\Admin\VendorController::class, 'update_status'])->name('admin.vendor.update.status');
             Route::get('/vendors/view/{vendor_id?}', [Controllers\Admin\VendorController::class, 'view'])->name('admin.vendor.view');
             Route::get('/vendors/delete/{vendor_id?}', [Controllers\Admin\VendorController::class, 'delete'])->name('admin.vendor.delete');

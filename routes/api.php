@@ -38,7 +38,7 @@ if (!function_exists('getAssigningRm')) {
     {
         DB::beginTransaction();
         try {
-            $firstRmWithIsNext = TeamMember::where(['role_id' => 4, 'status' => 1, 'is_next' => 1])
+            $firstRmWithIsNext = TeamMember::where(['role_id' => 4, 'status' => 1, 'is_next' => 1, 'is_active' => 1])
                 ->orderBy('id', 'asc')
                 ->first();
             if ($firstRmWithIsNext) {
@@ -47,7 +47,7 @@ if (!function_exists('getAssigningRm')) {
                     ->update(['is_next' => 0]);
             }
             if (!$firstRmWithIsNext) {
-                $firstRmWithIsNext = TeamMember::where(['role_id' => 4, 'status' => 1])
+                $firstRmWithIsNext = TeamMember::where(['role_id' => 4, 'status' => 1, 'is_active' => 1])
                     ->orderBy('id', 'asc')
                     ->first();
                 if (!$firstRmWithIsNext) {
@@ -60,13 +60,13 @@ if (!function_exists('getAssigningRm')) {
             } else {
                 $firstRmWithIsNext->is_next = 0;
                 $firstRmWithIsNext->save();
-                $nextRm = TeamMember::where(['role_id' => 4, 'status' => 1])
+                $nextRm = TeamMember::where(['role_id' => 4, 'status' => 1, 'is_active' => 1])
                     ->where('id', '>', $firstRmWithIsNext->id)
                     ->orderBy('id', 'asc')
                     ->first();
 
                 if (!$nextRm) {
-                    $nextRm = TeamMember::where(['role_id' => 4, 'status' => 1])
+                    $nextRm = TeamMember::where(['role_id' => 4, 'status' => 1, 'is_active' => 1])
                         ->orderBy('id', 'asc')
                         ->first();
                 }

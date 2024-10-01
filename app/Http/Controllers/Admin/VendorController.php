@@ -186,6 +186,19 @@ class VendorController extends Controller
         return redirect()->back();
     }
 
+    public function update_is_active($member_id, $status) {
+        $member = Vendor::find($member_id);
+        if (!$member) {
+            return abort(404);
+        }
+
+        $member->is_active = $status;
+        $member->save();
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Status updated."]);
+        return redirect()->back();
+    }
+
     public function delete($vendor_id)
     {
         $vendor = Vendor::find($vendor_id);

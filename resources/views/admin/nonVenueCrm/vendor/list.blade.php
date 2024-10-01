@@ -43,6 +43,7 @@
                                 <th class="text-nowrap">Total Leads</th>
                                 <th class="text-nowrap">Category</th>
                                 <th class="text-nowrap">Status</th>
+                                <th class="text-nowrap">Is Active</th>
                                 <th class="text-nowrap">Created At</th>
                                 <th class="text-center text-nowrap">Action</th>
                             </tr>
@@ -366,6 +367,11 @@
                     },
                     {
                         targets: 10,
+                        name: "is_active",
+                        data: "is_active",
+                    },
+                    {
+                        targets: 11,
                         name: "created_at",
                         data: "created_at",
                     },
@@ -411,7 +417,10 @@
                         `<a href="{{ route('admin.vendor.update.status') }}/${data.id}/${data.status == 1 ? 0 : 1}" style="font-size: 22px;"><i class="fa ${data.status == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'} "></i></a>`;
                     td_elements[8].classList.add('text-nowrap');
                     td_elements[9].innerHTML = status_action_elem;
-                    td_elements[10].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
+                    diable_action_elem = `<a href="{{route('admin.vendor.update.is_active')}}/${data.id}/${data.is_active == 1 ? 0 : 1}" style="font-size: 22px;"><i class="fa ${data.is_active == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'} "></i></a>`;
+
+td_elements[10].innerHTML = diable_action_elem;
+                    td_elements[11].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
                     const action_btns = `<td class="d-flex justify-content-around">
                     <a href="{{ route('admin.vendor.view') }}/${data.id}" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                     <a href="javascript:void(0);" class="text-success mx-2" title="Edit"><i class="fa fa-edit" style="font-size: 15px;" onclick="handle_manage_vendor(${data.id})"></i></a>
@@ -426,8 +435,8 @@
                         </ul>
                     </div>
                 </td>`
-                    td_elements[11].classList.add('text-nowrap');
-                    td_elements[11].innerHTML = action_btns;
+                    td_elements[12].classList.add('text-nowrap');
+                    td_elements[12].innerHTML = action_btns;
                 }
             });
             $('.filter-btn').on('click', function() {
