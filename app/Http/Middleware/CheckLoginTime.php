@@ -23,11 +23,13 @@ class CheckLoginTime
             $role = Role::find($user->role_id);
             $currentTime = date('H:i:s');
 
-            if($role->is_all_time_login === 0){
+            $role = Role::find($user->role_id);
+            $currentTime = date('H:i:s');
+            if ($role->is_all_time_login === 0) {
                 if ($role->login_start_time && $role->login_end_time) {
                     if ($currentTime < $role->login_start_time || $currentTime > $role->login_end_time) {
                         Auth::logout();
-                        return redirect()->route('login')->with('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Your session has expired due to login time restrictions.']);
+                        return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Logged out due login time period is over.'], 400);
                     }
                 }
             }
