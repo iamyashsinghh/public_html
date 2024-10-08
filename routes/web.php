@@ -89,7 +89,8 @@ Route::post('whatsapp_msg_status_nv_team_vendor', [Controllers\WhatsappMsgContro
 | For Admin Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['verify_token', 'CheckLoginTime'])->group(function () {
+Route::middleware('verify_token')->group(function () {
+    Route::middleware('CheckLoginTime')->group(function () {
     Route::post('/bookings/manage_process/{booking_id}', [Controllers\Admin\BookingController::class, 'manage_process'])->name('booking.manage_process');
     Route::get('/bookings/fetch/{booking_id}', [Controllers\Admin\BookingController::class, 'fetch_booking'])->name('booking.fetch');
     Route::get('/vm_event/fetch/{event_id?}', [Controllers\Admin\BookingController::class, 'fetch_vm_event'])->name('vm_event.fetch');
@@ -521,6 +522,7 @@ Route::middleware(['verify_token', 'CheckLoginTime'])->group(function () {
             Route::post('/images/manage_process/{bdm_booking_id}', [Controllers\Bdm\BookingController::class, 'manage_agreement_image_process'])->name('bdm.aggrement_images.manage_process');
             Route::post('/images/delete/{booking_id?}', [Controllers\Bdm\BookingController::class, 'agreement_image_delete'])->name('bdm.agreement_images.delete');
         });
+    });
     });
 });
 
