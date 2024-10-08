@@ -19,11 +19,10 @@ class CheckLoginTime
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check()) {
             $user = Auth::user();
             $role = Role::find($user->role_id);
             Log::info($user);
-            Log::info($role);   
+            Log::info($role);
             $currentTime = date('H:i:s');
             if ($role->is_all_time_login == 0) {
                 if ($role->login_start_time && $role->login_end_time) {
@@ -33,7 +32,7 @@ class CheckLoginTime
                     }
                 }
             }
-        }
+        
         return $next($request);
     }
 }
