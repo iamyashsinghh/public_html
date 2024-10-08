@@ -9,10 +9,13 @@ use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class TaskController extends Controller {
-    public function list(Request $request, $dashboard_filters = null) {
+class TaskController extends Controller
+{
+    public function list(Request $request, $dashboard_filters = null)
+    {
         $filter_params = "";
         if ($request->task_status != null) {
             $filter_params =  ['task_status' => $request->task_status];
@@ -36,9 +39,19 @@ class TaskController extends Controller {
         return view('team.venueCrm.task.list', compact('page_heading', 'filter_params'));
     }
 
-    public function ajax_list(Request $request) {
-        $auth_user = Auth::guard('team')->user();
-        $tasks = Lead::select(
+    public function ajax_list(Request $request)
+{
+    $auth_user = Auth::guard('team')->user();
+
+    // Subquery to get the latest task for each lead
+    $latestTasks = DB::table('tasks as sub_tasks')
+        ->select('sub_tasks.lead_id', DB::raw('MAX(sub_tasks.created_at) as latest_created_at'))
+        ->where('sub_tasks.created_by', $auth_user->id)
+        ->whereNull('sub_tasks.deleted_at')
+        ->groupBy('sub_tasks.lead_id');
+
+    // Main query to join leads with their latest task
+    $tasks = Lead::select(
             'leads.lead_id',
             'leads.lead_datetime',
             'leads.name',
@@ -47,86 +60,94 @@ class TaskController extends Controller {
             'tasks.task_schedule_datetime',
             'leads.event_datetime',
             'tasks.created_at as task_created_datetime',
-            'tasks.done_datetime as task_done_datetime',
-        )->join('tasks', ['leads.lead_id' => 'tasks.lead_id'])->where(['tasks.created_by' => $auth_user->id, 'tasks.deleted_at' => null]);
+            'tasks.done_datetime as task_done_datetime'
+        )
+        ->joinSub($latestTasks, 'latest', function ($join) {
+            $join->on('leads.lead_id', '=', 'latest.lead_id');
+        })
+        ->join('tasks', function ($join) {
+            $join->on('leads.lead_id', '=', 'tasks.lead_id')
+                 ->on('tasks.created_at', '=', 'latest.latest_created_at');
+        })
+        ->where('tasks.created_by', $auth_user->id)
+        ->whereNull('tasks.deleted_at');
 
-        $current_date = date('Y-m-d');
-        if ($request->has('task_status')) {
-            $tasks->where(function ($query) use ($request) {
-                foreach ($request->task_status as $status) {
-                    switch ($status) {
-                        case 'Upcoming':
-                            $query->orWhere(function ($q) {
-                                $q->where('tasks.task_schedule_datetime', '>', Carbon::today()->endOfDay())
-                                    ->whereNull('tasks.done_datetime');
-                            });
-                            break;
-                        case 'Today':
-                            $current_date = date('Y-m-d');
-                            $query->orWhere(function ($q) use ($current_date) {
-                                $q->where('tasks.task_schedule_datetime', 'like', "%$current_date%")
-                                    ->whereNull('tasks.done_datetime');
-                            });
-                            break;
-                        case 'Overdue':
-                            $query->orWhere(function ($q) {
-                                $q->where('tasks.task_schedule_datetime', '<', Carbon::today())
-                                    ->whereNull('tasks.done_datetime');
-                            });
-                            break;
-                        case 'Done':
-                            $query->orWhereNotNull('tasks.done_datetime');
-                            break;
-                    }
+    $current_date = date('Y-m-d');
+
+    // Task status filters
+    if ($request->has('task_status')) {
+        $tasks->where(function ($query) use ($request) {
+            foreach ($request->task_status as $status) {
+                switch ($status) {
+                    case 'Upcoming':
+                        $query->orWhere(function ($q) {
+                            $q->where('tasks.task_schedule_datetime', '>', Carbon::today()->endOfDay())
+                                ->whereNull('tasks.done_datetime');
+                        });
+                        break;
+                    case 'Today':
+                        $query->orWhere(function ($q) {
+                            $q->whereDate('tasks.task_schedule_datetime', '=', Carbon::today())
+                                ->whereNull('tasks.done_datetime');
+                        });
+                        break;
+                    case 'Overdue':
+                        $query->orWhere(function ($q) {
+                            $q->where('tasks.task_schedule_datetime', '<', Carbon::today())
+                                ->whereNull('tasks.done_datetime');
+                        });
+                        break;
+                    case 'Done':
+                        $query->orWhereNotNull('tasks.done_datetime');
+                        break;
                 }
-            });
-        }
-        if ($request->task_created_from_date) {
-            $from = Carbon::make($request->task_created_from_date);
-            if ($request->task_created_to_date != null) {
-                $to = Carbon::make($request->task_created_to_date)->endOfDay();
-            } else {
-                $to = Carbon::make($request->task_created_from_date)->endOfDay();
             }
-            $tasks->whereBetween('tasks.created_at', [$from, $to]);
-        }
-        if ($request->task_done_from_date) {
-            $from = Carbon::make($request->task_done_from_date);
-            if ($request->task_done_to_date != null) {
-                $to = Carbon::make($request->task_done_to_date)->endOfDay();
-            } else {
-                $to = Carbon::make($request->task_done_from_date)->endOfDay();
-            }
-            $tasks->whereBetween('tasks.done_datetime', [$from, $to]);
-        }
-        if ($request->task_schedule_from_date) {
-            $from = Carbon::make($request->task_schedule_from_date);
-            if ($request->task_schedule_to_date != null) {
-                $to = Carbon::make($request->task_schedule_to_date)->endOfDay();
-            } else {
-                $to = Carbon::make($request->task_schedule_from_date)->endOfDay();
-            }
-            $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to])->whereNull('tasks.done_datetime');
-        }
-        if ($request->dashboard_filters != null) {
-            if ($request->dashboard_filters == "task_schedule_this_month") {
-                $from =  Carbon::today()->startOfMonth();
-                $to =  Carbon::today()->endOfMonth();
-                $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to]);
-            } elseif ($request->dashboard_filters == "task_schedule_today") {
-                $from =  Carbon::today()->startOfDay();
-                $to =  Carbon::today()->endOfDay();
-                $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to])->whereNull('tasks.done_datetime');
-            } elseif ($request->dashboard_filters == "total_task_overdue") {
-                $tasks->where('tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('tasks.done_datetime');
-            }
-        }
-
-        $tasks = $tasks->get();
-        return datatables($tasks)->toJson();
+        });
     }
 
-    public function add_process(Request $request) {
+    // Task created date filter
+    if ($request->task_created_from_date) {
+        $from = Carbon::make($request->task_created_from_date);
+        $to = $request->task_created_to_date ? Carbon::make($request->task_created_to_date)->endOfDay() : $from->endOfDay();
+        $tasks->whereBetween('tasks.created_at', [$from, $to]);
+    }
+
+    // Task done date filter
+    if ($request->task_done_from_date) {
+        $from = Carbon::make($request->task_done_from_date);
+        $to = $request->task_done_to_date ? Carbon::make($request->task_done_to_date)->endOfDay() : $from->endOfDay();
+        $tasks->whereBetween('tasks.done_datetime', [$from, $to]);
+    }
+
+    // Task schedule date filter
+    if ($request->task_schedule_from_date) {
+        $from = Carbon::make($request->task_schedule_from_date);
+        $to = $request->task_schedule_to_date ? Carbon::make($request->task_schedule_to_date)->endOfDay() : $from->endOfDay();
+        $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to])->whereNull('tasks.done_datetime');
+    }
+
+    // Dashboard filter
+    if ($request->dashboard_filters != null) {
+        if ($request->dashboard_filters == "task_schedule_this_month") {
+            $from = Carbon::today()->startOfMonth();
+            $to = Carbon::today()->endOfMonth();
+            $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to]);
+        } elseif ($request->dashboard_filters == "task_schedule_today") {
+            $from = Carbon::today()->startOfDay();
+            $to = Carbon::today()->endOfDay();
+            $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to])->whereNull('tasks.done_datetime');
+        } elseif ($request->dashboard_filters == "total_task_overdue") {
+            $tasks->where('tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('tasks.done_datetime');
+        }
+    }
+
+    $tasks = $tasks->get();
+    return datatables($tasks)->toJson();
+}
+
+
+    public function add_process(Request $request)
+    {
         $validate = Validator::make($request->all(), [
             'lead_id' => 'required|exists:leads,lead_id',
             'task_schedule_datetime' => 'required|date',
@@ -140,7 +161,7 @@ class TaskController extends Controller {
         $auth_user = Auth::guard('team')->user();
 
         if ($auth_user->role_id == 4) {
-            $exist_task = Task::join('team_members as tm', ['tm.id' => 'tasks.created_by'])->where(['tasks.lead_id' => $request->lead_id,'tasks.created_by' => $auth_user->id, 'tasks.done_datetime' => null, 'tm.role_id' => 4])->first();
+            $exist_task = Task::join('team_members as tm', ['tm.id' => 'tasks.created_by'])->where(['tasks.lead_id' => $request->lead_id, 'tasks.created_by' => $auth_user->id, 'tasks.done_datetime' => null, 'tm.role_id' => 4])->first();
         } else {
             $exist_task = Task::where(['lead_id' => $request->lead_id, 'created_by' => $auth_user->id, 'done_datetime' => null])->first();
         }
@@ -171,7 +192,8 @@ class TaskController extends Controller {
         return redirect()->back();
     }
 
-    public function status_update(Request $request, $task_id) {
+    public function status_update(Request $request, $task_id)
+    {
         $validate = Validator::make($request->all(), [
             'task_done_with' => 'required|string',
             'task_done_message' => 'required|string'
@@ -204,7 +226,8 @@ class TaskController extends Controller {
     }
 
 
-    public function delete($task_id) {
+    public function delete($task_id)
+    {
         $auth_user = Auth::guard('team')->user();
         $task = Task::where(['id' => $task_id, 'created_by' => $auth_user->id, 'done_datetime' => null])->first();
         if (!$task) {

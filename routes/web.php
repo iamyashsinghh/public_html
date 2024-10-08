@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'admin.login');
 
 
-Route::post('/store-token', [Controllers\NotificationSendController::class, 'updateDeviceToken'])->name('store.token');
-Route::get('/sendfcm', [Controllers\NotificationSendController::class, 'hi'])->name('send.token');
-
-
-
 // google sheet bdm lead fetch
 Route::get('/sheet', [Controllers\GoogleSheetController::class, 'processAllSheetData'])->name('get.sheet');
 

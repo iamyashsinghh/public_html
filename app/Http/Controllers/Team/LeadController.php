@@ -95,7 +95,7 @@ class LeadController extends Controller
                 'leads.lead_catagory',
                 'ne.pax as pax',
             )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
-            ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
+                ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
             $leads->where('leads.deleted_at', null)->groupBy('leads.mobile');
 
             if ($request->has('lead_status') && $request->lead_status != '') {
@@ -232,30 +232,30 @@ class LeadController extends Controller
                 } elseif ($request->dashboard_filters == "rm_unfollowed_leads") {
                     $currentDateTime = Carbon::now();
                     $leads = DB::table('leads')
-                    ->select(
-                        'leads.lead_id as lead_id',
-                        'leads.lead_datetime',
-                        'leads.name',
-                        'leads.mobile',
-                        'leads.event_datetime as event_date',
-                        'leads.lead_status',
-                        'leads.service_status',
-                        'leads.read_status',
-                        'leads.lead_color',
-                        'leads.assign_to',
-                        'leads.source',
-                        'leads.preference',
-                        'leads.locality',
-                        'tm.name as created_by',
-                        'leads.whatsapp_msg_time',
-                        'leads.last_forwarded_by',
-                        'leads.enquiry_count',
-                        'leads.is_whatsapp_msg',
-                        DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
+                        ->select(
+                            'leads.lead_id as lead_id',
+                            'leads.lead_datetime',
+                            'leads.name',
+                            'leads.mobile',
+                            'leads.event_datetime as event_date',
+                            'leads.lead_status',
+                            'leads.service_status',
+                            'leads.read_status',
+                            'leads.lead_color',
+                            'leads.assign_to',
+                            'leads.source',
+                            'leads.preference',
+                            'leads.locality',
+                            'tm.name as created_by',
+                            'leads.whatsapp_msg_time',
+                            'leads.last_forwarded_by',
+                            'leads.enquiry_count',
+                            'leads.is_whatsapp_msg',
+                            DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
                         )
-                    ->leftJoin('team_members as tm', 'tm.id', '=', 'leads.created_by')
-                    ->whereNull('leads.deleted_at')
-                    ->leftJoin(DB::raw("
+                        ->leftJoin('team_members as tm', 'tm.id', '=', 'leads.created_by')
+                        ->whereNull('leads.deleted_at')
+                        ->leftJoin(DB::raw("
                         (SELECT tasks.lead_id
                         FROM tasks
                         WHERE tasks.deleted_at IS NULL
@@ -263,8 +263,8 @@ class LeadController extends Controller
                         GROUP BY tasks.lead_id
                         HAVING COUNT(CASE WHEN tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
                     "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
-                    ->whereNotNull('completed_tasks.lead_id')
-                    ->where('leads.lead_status', '!=', 'Done');
+                        ->whereNotNull('completed_tasks.lead_id')
+                        ->where('leads.lead_status', '!=', 'Done');
                 } elseif ($request->dashboard_filters == "vm_recce_today") {
                     $threeDaysAgo = Carbon::now()->subDays(3);
                     $startDate = Carbon::createFromDate(2024, 8, 1);
@@ -291,22 +291,22 @@ class LeadController extends Controller
                         'leads.lead_catagory',
                         'ne.pax as pax',
                     )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
-                    ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
+                        ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
                     $leads->where('leads.deleted_at', null)
-                    ->groupBy('leads.mobile')
-                    ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
-                ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
-                ->leftJoin('tasks', function ($join) {
-                    $join->on('tasks.lead_id', '=', 'leads.lead_id');
-                })
-                ->whereDate('visits.done_datetime', '>=', $startDate)
-                ->whereNotNull('visits.done_datetime')
-                ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'))
-                ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '=', $current_date)
-                ->where('rm_messages.created_by', '=', $auth_user->id)
-                ->orderBy('rm_messages.updated_at', 'desc')
-                ->groupBy('leads.lead_id')
-                ->where('leads.lead_status', '!=', 'Done');
+                        ->groupBy('leads.mobile')
+                        ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
+                        ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
+                        ->leftJoin('tasks', function ($join) {
+                            $join->on('tasks.lead_id', '=', 'leads.lead_id');
+                        })
+                        ->whereDate('visits.done_datetime', '>=', $startDate)
+                        ->whereNotNull('visits.done_datetime')
+                        ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'))
+                        ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '=', $current_date)
+                        ->where('rm_messages.created_by', '=', $auth_user->id)
+                        ->orderBy('rm_messages.updated_at', 'desc')
+                        ->groupBy('leads.lead_id')
+                        ->where('leads.lead_status', '!=', 'Done');
                 } elseif ($request->dashboard_filters == "vm_recce_overdue") {
                     $startDate = Carbon::createFromDate(2024, 8, 1);
                     $leads = DB::table('leads')->select(
@@ -332,60 +332,59 @@ class LeadController extends Controller
                         'leads.lead_catagory',
                         'ne.pax as pax',
                     )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
-                    ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
+                        ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
                     $leads->where('leads.deleted_at', null)
-                    ->groupBy('leads.mobile')
-                    ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
-                    ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
-                    ->leftJoin('tasks', function ($join) {
-                        $join->on('tasks.lead_id', '=', 'leads.lead_id');
-                    })
-                    ->whereNotNull('visits.done_message')
-                    ->whereDate('visits.done_datetime', '>=', $startDate)
-                    ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '<', $current_date)
-                    ->where(function ($query) {
-                        $query->whereNull('tasks.created_at')
-                            ->orWhere(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'));
-                    })
-                    ->where('rm_messages.created_by', '=', $auth_user->id)
-                    ->orderBy('rm_messages.updated_at', 'desc')
-                    ->orderBy('visits.done_datetime', 'desc')
-                    ->groupBy('leads.lead_id')
-                    ->where('leads.lead_status', '!=', 'Done');
-
+                        ->groupBy('leads.mobile')
+                        ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
+                        ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
+                        ->leftJoin('tasks', function ($join) {
+                            $join->on('tasks.lead_id', '=', 'leads.lead_id');
+                        })
+                        ->whereNotNull('visits.done_message')
+                        ->whereDate('visits.done_datetime', '>=', $startDate)
+                        ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '<', $current_date)
+                        ->where(function ($query) {
+                            $query->whereNull('tasks.created_at')
+                                ->orWhere(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'));
+                        })
+                        ->where('rm_messages.created_by', '=', $auth_user->id)
+                        ->orderBy('rm_messages.updated_at', 'desc')
+                        ->orderBy('visits.done_datetime', 'desc')
+                        ->groupBy('leads.lead_id')
+                        ->where('leads.lead_status', '!=', 'Done');
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
                     $to = Carbon::today()->endOfMonth();
                     $leads->whereBetween('leads.lead_datetime', [$from, $to])
-                    ->where('assign_id', $auth_user->id)
-                    ->where('leads.read_status', false)
-                    ->where(function($query) use ($seven_days_ago) {
-                        $query->whereNull('last_forwarded_by')
-                              ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-                    });
+                        ->where('assign_id', $auth_user->id)
+                        ->where('leads.read_status', false)
+                        ->where(function ($query) use ($seven_days_ago) {
+                            $query->whereNull('last_forwarded_by')
+                                ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                        });
                 } elseif ($request->dashboard_filters == "unread_leads_today") {
                     $from = Carbon::today()->startOfDay();
                     $to = Carbon::today()->endOfDay();
                     $leads->whereBetween('leads.lead_datetime', [$from, $to])
-                    ->where('assign_id', $auth_user->id)
-                    ->where('leads.read_status', false)
-                    ->where(function($query) use ($seven_days_ago) {
-                        $query->whereNull('last_forwarded_by')
-                              ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-                    });
+                        ->where('assign_id', $auth_user->id)
+                        ->where('leads.read_status', false)
+                        ->where(function ($query) use ($seven_days_ago) {
+                            $query->whereNull('last_forwarded_by')
+                                ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                        });
                 } elseif ($request->dashboard_filters == "total_unread_leads_overdue") {
                     $leads->where('leads.read_status', false)
-                    ->where('leads.lead_datetime', '<', Carbon::today())
-                    ->where('assign_id', $auth_user->id)
-                    ->where('leads.lead_id' , '>' , '54262')
-                    ->where(function($query) use ($seven_days_ago) {
-                        $query->whereNull('last_forwarded_by')
-                              ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-                    });
+                        ->where('leads.lead_datetime', '<', Carbon::today())
+                        ->where('assign_id', $auth_user->id)
+                        ->where('leads.lead_id', '>', '54262')
+                        ->where(function ($query) use ($seven_days_ago) {
+                            $query->whereNull('last_forwarded_by')
+                                ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                        });
                 } elseif ($request->dashboard_filters == "not_contacted_lead") {
-                    $leads->where('leads.service_status' , 0)
-                    ->where('leads.lead_id' , '>' , '54262')
-                    ->where('leads.assign_id', $auth_user->id);
+                    $leads->where('leads.service_status', 0)
+                        ->where('leads.lead_id', '>', '54262')
+                        ->where('leads.assign_id', $auth_user->id);
                 } elseif ($request->dashboard_filters == "forward_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
                     $to = Carbon::today()->endOfMonth();
@@ -409,7 +408,7 @@ class LeadController extends Controller
                         'leads.enquiry_count',
                         'leads.is_whatsapp_msg',
                         DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
-                        )->join('leads', ['leads.lead_id' => 'fwd_info.lead_id'])
+                    )->join('leads', ['leads.lead_id' => 'fwd_info.lead_id'])
                         ->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
                         ->where(['fwd_info.forward_from' => $auth_user->id])->groupBy('fwd_info.lead_id');
                     $leads->whereBetween('fwd_info.updated_at', [$from, $to]);
@@ -436,11 +435,10 @@ class LeadController extends Controller
                         'leads.enquiry_count',
                         'leads.is_whatsapp_msg',
                         DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
-                        )->join('leads', ['leads.lead_id' => 'fwd_info.lead_id'])
+                    )->join('leads', ['leads.lead_id' => 'fwd_info.lead_id'])
                         ->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
                         ->where(['fwd_info.forward_from' => $auth_user->id])->groupBy('fwd_info.lead_id');
                     $leads->whereBetween('fwd_info.updated_at', [$from, $to]);
-
                 }
             }
         } else {
@@ -766,14 +764,14 @@ class LeadController extends Controller
                 'lead_forwards.read_status',
                 'lead_forward_infos.updated_at',
             )->join('team_members as tm', 'lead_forward_infos.forward_to', '=', 'tm.id')
-            ->join('team_members as rm', 'lead_forward_infos.forward_from', '=', 'rm.id')
-            ->join('lead_forwards', function($join) use ($lead_id) {
-                $join->on('lead_forwards.forward_to', '=', 'tm.id')
-                     ->where('lead_forwards.lead_id', '=', $lead_id);
-            })
-            ->where('lead_forward_infos.lead_id', $lead_id)
-            ->orderBy('lead_forwards.updated_at', 'desc')
-            ->get();
+                ->join('team_members as rm', 'lead_forward_infos.forward_from', '=', 'rm.id')
+                ->join('lead_forwards', function ($join) use ($lead_id) {
+                    $join->on('lead_forwards.forward_to', '=', 'tm.id')
+                        ->where('lead_forwards.lead_id', '=', $lead_id);
+                })
+                ->where('lead_forward_infos.lead_id', $lead_id)
+                ->orderBy('lead_forwards.updated_at', 'desc')
+                ->get();
 
             $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead_id])->orderBy('updated_at', 'desc')->first();
             if ($lead_forward_info) {
@@ -918,10 +916,10 @@ class LeadController extends Controller
             //update or insert lead_forward_info table;
             // $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead->lead_id, 'forward_from' => $auth_user->id, 'forward_to' => $vm_id])->first();
             // if (!$lead_forward_info) {
-                $lead_forward_info = new LeadForwardInfo();
-                $lead_forward_info->lead_id = $lead->lead_id;
-                $lead_forward_info->forward_from = $auth_user->id;
-                $lead_forward_info->forward_to = $vm_id;
+            $lead_forward_info = new LeadForwardInfo();
+            $lead_forward_info->lead_id = $lead->lead_id;
+            $lead_forward_info->forward_from = $auth_user->id;
+            $lead_forward_info->forward_to = $vm_id;
             // }
             $lead_forward_info->updated_at = $this->current_timestamp;
             $lead_forward_info->save();
