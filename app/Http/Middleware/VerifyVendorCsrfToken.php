@@ -27,7 +27,7 @@ class VerifyVendorCsrfToken extends Middleware
                 return $next($request);
         }
         if ($login_info->get_team_member) {
-            if ($login_info->get_team_member->role_id == 1) {
+            if ($login_info->get_team_member->role_id == 1 || $login_info->get_team_member->role_id == 7) {
                 return $next($request);
             } else {
                 session()->invalidate();

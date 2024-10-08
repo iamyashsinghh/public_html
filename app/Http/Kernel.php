@@ -68,6 +68,9 @@ class Kernel extends HttpKernel {
         'verify_token' =>  \App\Http\Middleware\VerifyCsrfToken::class,
         'verify_vendor_token' =>  \App\Http\Middleware\VerifyVendorCsrfToken::class,
         'CheckLoginTime' => \App\Http\Middleware\CheckLoginTime::class,
+        'checkDevice' => \App\Http\Middleware\CheckDevice::class,
+        'CheckVendorDevice' => \App\Http\Middleware\CheckVendorDevice::class,
+
 
 
         'auth' => \App\Http\Middleware\Authenticate::class,

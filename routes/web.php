@@ -90,7 +90,7 @@ Route::post('whatsapp_msg_status_nv_team_vendor', [Controllers\WhatsappMsgContro
 |--------------------------------------------------------------------------
 */
 Route::middleware('verify_token')->group(function () {
-    Route::middleware('CheckLoginTime')->group(function () {
+    Route::middleware(['CheckLoginTime', 'checkDevice'])->group(function () {
     Route::post('/bookings/manage_process/{booking_id}', [Controllers\Admin\BookingController::class, 'manage_process'])->name('booking.manage_process');
     Route::get('/bookings/fetch/{booking_id}', [Controllers\Admin\BookingController::class, 'fetch_booking'])->name('booking.fetch');
     Route::get('/vm_event/fetch/{event_id?}', [Controllers\Admin\BookingController::class, 'fetch_vm_event'])->name('vm_event.fetch');
@@ -531,7 +531,7 @@ Route::middleware('verify_token')->group(function () {
 | For vendor Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware('verify_vendor_token')->group(function () {
+Route::middleware(['verify_vendor_token', 'CheckVendorDevice'])->group(function () {
     Route::prefix('/vendor')->middleware('vendor')->group(function () {
         Route::get('/dashboard', [Controllers\Vendor\DashboardController::class, 'index'])->name('vendor.dashboard');
         Route::post('/update-profile-image', [Controllers\Vendor\DashboardController::class, 'update_profile_image'])->name('vendor.updateProfileImage');
