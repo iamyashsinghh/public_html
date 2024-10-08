@@ -15,7 +15,7 @@ Route::view('/', 'admin.login');
 Route::get('/sheet', [Controllers\GoogleSheetController::class, 'processAllSheetData'])->name('get.sheet');
 
 Route::get('/vm_cisits_tasks_status_for_rm_today', [Controllers\CronController::class, 'vm_recce_today']);
-// Route::get('/vm_cisits_tasks_status_for_rm_overdue', [Controllers\CronController::class, 'vm_recce_overdue']);
+Route::get('/vm_cisits_tasks_status_for_rm_overdue', [Controllers\CronController::class, 'vm_recce_overdue']);
 
 Route::get('/sql', [Controllers\SqlDownloadController::class, 'downloadSql']);
 
@@ -89,7 +89,7 @@ Route::post('whatsapp_msg_status_nv_team_vendor', [Controllers\WhatsappMsgContro
 | For Admin Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['verify_token', 'CheckLoginTime'])->group(function () {
+Route::middleware(['verify_token', 'checkLoginTime'])->group(function () {
     Route::post('/bookings/manage_process/{booking_id}', [Controllers\Admin\BookingController::class, 'manage_process'])->name('booking.manage_process');
     Route::get('/bookings/fetch/{booking_id}', [Controllers\Admin\BookingController::class, 'fetch_booking'])->name('booking.fetch');
     Route::get('/vm_event/fetch/{event_id?}', [Controllers\Admin\BookingController::class, 'fetch_vm_event'])->name('vm_event.fetch');
