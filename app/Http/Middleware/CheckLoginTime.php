@@ -6,6 +6,7 @@ use App\Models\Role;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CheckLoginTime
 {
@@ -22,14 +23,13 @@ class CheckLoginTime
             $user = Auth::user();
             $role = Role::find($user->role_id);
             $currentTime = date('H:i:s');
-
             $role = Role::find($user->role_id);
             $currentTime = date('H:i:s');
-            if ($role->is_all_time_login === 0) {
+            if ($role->is_all_time_login == 0) {
                 if ($role->login_start_time && $role->login_end_time) {
                     if ($currentTime < $role->login_start_time || $currentTime > $role->login_end_time) {
                         Auth::logout();
-                        return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Logged out due login time period is over.'], 400);
+                        return redirect()->route('login');
                     }
                 }
             }
