@@ -22,8 +22,8 @@ class CheckLoginTime
         if (Auth::check()) {
             $user = Auth::user();
             $role = Role::find($user->role_id);
-            $currentTime = date('H:i:s');
-            $role = Role::find($user->role_id);
+            Log::info($user);
+            Log::info($role);   
             $currentTime = date('H:i:s');
             if ($role->is_all_time_login == 0) {
                 if ($role->login_start_time && $role->login_end_time) {
