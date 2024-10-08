@@ -19,31 +19,24 @@ class CheckLoginTime
      */
     public function handle(Request $request, Closure $next)
     {
-        // List of guards that are used for different user roles
         $guards = ['admin', 'manager', 'nonvenue', 'bdm', 'vendormanager', 'seomanager', 'team'];
 
         $user = null;
 
-        // Loop through each guard to find the authenticated user
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 $user = Auth::guard($guard)->user();
-                break; // Stop the loop once the user is found
+                break;
             }
         }
 
         if ($user) {
-            Log::info($user);
-            $role = Role::find($user->role_id); // Get the user's role
+            $role = Role::find($user->role_id);
 
             if ($role && $role->is_all_time_login == 0) {
-                // Get the current time
                 $currentTime = date('H:i:s');
-                Log::info("Current Time: " . $currentTime);
 
-                // Check if login_start_time and login_end_time are set
                 if ($role->login_start_time && $role->login_end_time) {
-                    // If current time is outside allowed time range, log the user out
                     if ($currentTime < $role->login_start_time || $currentTime > $role->login_end_time) {
                         Auth::guard($guard)->logout();
                         session()->invalidate();
