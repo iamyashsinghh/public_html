@@ -19,7 +19,7 @@ class CheckLoginTime
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check()) {
+        if (session()->token()) {
             $user = Auth::user();
             $role = Role::find($user->role_id);
             Log::info($user);
