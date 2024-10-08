@@ -297,8 +297,7 @@ class LeadController extends Controller
                     ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
                 ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
                 ->leftJoin('tasks', function ($join) {
-                    $join->on('tasks.lead_id', '=', 'leads.lead_id')
-                        ->where('tasks.is_vm_recce_task', 1);
+                    $join->on('tasks.lead_id', '=', 'leads.lead_id');
                 })
                 ->whereDate('visits.done_datetime', '>=', $startDate)
                 ->whereNotNull('visits.done_datetime')
@@ -339,8 +338,7 @@ class LeadController extends Controller
                     ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
                     ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
                     ->leftJoin('tasks', function ($join) {
-                        $join->on('tasks.lead_id', '=', 'leads.lead_id')
-                            ->where('tasks.is_vm_recce_task', 1);
+                        $join->on('tasks.lead_id', '=', 'leads.lead_id');
                     })
                     ->whereNotNull('visits.done_message')
                     ->whereDate('visits.done_datetime', '>=', $startDate)
