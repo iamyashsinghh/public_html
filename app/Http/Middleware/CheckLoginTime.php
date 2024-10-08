@@ -33,6 +33,7 @@ class CheckLoginTime
         }
 
         if ($user) {
+            Log::info($user);
             $role = Role::find($user->role_id); // Get the user's role
 
             if ($role && $role->is_all_time_login == 0) {
@@ -47,7 +48,6 @@ class CheckLoginTime
                         Auth::guard($guard)->logout();
                         session()->invalidate();
                         session()->regenerateToken();
-                        Log::info("User logged out due to time restrictions");
                         return redirect()->route('login')->with('status', [
                             'success' => false,
                             'alert_type' => 'error',
