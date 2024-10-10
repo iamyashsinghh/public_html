@@ -54,7 +54,10 @@ class DashboardController extends Controller
             ->whereNull('tasks.done_datetime')
             ->whereNull('leads.deleted_at')
             ->whereNull('tasks.deleted_at')
-            ->where('tasks.created_by', $auth_user->id)->groupBy('leads.lead_id')
+            ->where('tasks.created_by', $auth_user->id)
+            ->whereNull('tasks.done_datetime')
+            ->where('leads.lead_status', '!=', 'done')
+            ->groupBy('leads.lead_id')
             ->get()->count();
         $rm_today_task_leads = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
             ->where('leads.lead_status', '!=', 'Done')
@@ -62,6 +65,8 @@ class DashboardController extends Controller
             ->whereNull('tasks.done_datetime')
             ->whereNull('leads.deleted_at')
             ->whereNull('tasks.deleted_at')
+            ->whereNull('tasks.done_datetime')
+            ->where('leads.lead_status', '!=', 'done')
             ->where('tasks.created_by', $auth_user->id)->groupBy('leads.lead_id')
             ->get()->count();
         $rm_month_task_leads = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
@@ -69,6 +74,8 @@ class DashboardController extends Controller
             ->whereNull('leads.deleted_at')
             ->whereNull('tasks.deleted_at')
             ->where('tasks.created_by', $auth_user->id)
+            ->whereNull('tasks.done_datetime')
+            ->where('leads.lead_status', '!=', 'done')
             ->groupBy('leads.lead_id')->get()->count();
         if ($auth_user->role_id == 5) {
             $total_leads_received_this_month = LeadForward::where('lead_datetime', 'like', "%$current_month%")->where('forward_to', $auth_user->id)->count();
@@ -77,9 +84,26 @@ class DashboardController extends Controller
             $unread_leads_today = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where(['forward_to' => $auth_user->id, 'read_status' => false])->count();
             $total_unread_leads_overdue = LeadForward::where('read_status', false)->where('lead_datetime', '<', Carbon::today())->where('forward_to', $auth_user->id)->count();
 
-            $task_schedule_this_month = Task::selectRaw('count(distinct(lead_id)) as count')->where('task_schedule_datetime', 'like', "%$current_month%")->where(['created_by' => $auth_user->id, 'done_datetime' => null])->first()->count;
-            $task_schedule_today = Task::selectRaw('count(distinct(lead_id)) as count')->where('task_schedule_datetime', 'like', "%$current_date%")->where(['created_by' => $auth_user->id, 'done_datetime' => null])->first()->count;
-            $total_task_overdue = Task::selectRaw('count(distinct(lead_id)) as count')->where('task_schedule_datetime', '<', Carbon::today())->where(['created_by' => $auth_user->id, 'done_datetime' => null])->first()->count;
+            $task_schedule_this_month = Task::selectRaw('count(distinct(lead_id)) as count')
+                ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
+                ->where('task_schedule_datetime', 'like', "%$current_month%")
+                ->where(['tasks.created_by' => $auth_user->id])
+                ->whereNull('tasks.done_datetime')
+                ->where('leads.lead_status', '!=', 'done')->count();
+
+            $task_schedule_today = Task::selectRaw('count(distinct(lead_id)) as count')
+                ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
+                ->where('task_schedule_datetime', 'like', "%$current_date%")
+                ->where(['tasks.created_by' => $auth_user->id])
+                ->whereNull('tasks.done_datetime')
+                ->where('leads.lead_status', '!=', 'done')->count();
+
+            $total_task_overdue = Task::selectRaw('count(distinct(lead_id)) as count')
+                ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
+                ->where('task_schedule_datetime', '<', Carbon::today())
+                ->where(['tasks.created_by' => $auth_user->id])
+                ->whereNull('tasks.done_datetime')
+                ->where('leads.lead_status', '!=', 'done')->count();
 
             $recce_schedule_this_month = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $auth_user->id, 'lead_forwards.source' => 'WB|Team', 'visits.done_datetime' => null, 'visits.deleted_at' => null])->whereBetween('visits.visit_schedule_datetime', [$from, $to])->count();
 

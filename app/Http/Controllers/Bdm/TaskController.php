@@ -8,6 +8,7 @@ use App\Models\BdmTask;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller {
@@ -38,7 +39,12 @@ class TaskController extends Controller {
 
     public function ajax_list(Request $request) {
         $auth_user = Auth::guard('bdm')->user();
-        $tasks = BdmLead::select(
+        $latestTask = BdmTask::select('lead_id', DB::raw('MAX(created_at) as latest_created_at'))
+        ->whereNull('done_datetime')
+        ->whereNull('deleted_at')
+        ->groupBy('lead_id');
+
+    $tasks = BdmLead::select(
             'bdm_leads.lead_id',
             'bdm_leads.lead_datetime',
             'bdm_leads.name',
@@ -48,10 +54,19 @@ class TaskController extends Controller {
             'vc.name as business_cat',
             'bdm_tasks.task_schedule_datetime',
             'bdm_tasks.created_at as task_created_datetime',
-            'bdm_tasks.done_datetime as task_done_datetime',
-        )->join('bdm_tasks', ['bdm_leads.lead_id' => 'bdm_tasks.lead_id'])
+            'bdm_tasks.done_datetime as task_done_datetime'
+        )
+        ->joinSub($latestTask, 'latest_task', function ($join) {
+            $join->on('bdm_leads.lead_id', '=', 'latest_task.lead_id');
+        })
+        ->join('bdm_tasks', function ($join) {
+            $join->on('bdm_leads.lead_id', '=', 'bdm_tasks.lead_id')
+                 ->on('bdm_tasks.created_at', '=', 'latest_task.latest_created_at');
+        })
         ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat')
-        ->where(['bdm_tasks.created_by' => $auth_user->id, 'bdm_tasks.deleted_at' => null]);
+        ->where(['bdm_tasks.created_by' => $auth_user->id])
+        ->whereNull('bdm_leads.deleted_at')
+        ->where('bdm_leads.lead_status', '!=', 'done');
 
         $current_date = date('Y-m-d');
 

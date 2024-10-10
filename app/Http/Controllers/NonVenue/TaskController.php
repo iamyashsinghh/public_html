@@ -8,6 +8,7 @@ use App\Models\nvrmTask;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
@@ -41,19 +42,34 @@ class TaskController extends Controller
     public function ajax_list(Request $request)
     {
         $auth_user = Auth::guard('nonvenue')->user();
-        $tasks = nvrmLeadForward::select(
-            'nvrm_lead_forwards.lead_id',
-            'nvrm_lead_forwards.lead_datetime',
-            'nvrm_lead_forwards.name',
-            'nvrm_lead_forwards.mobile',
-            'nvrm_lead_forwards.lead_status',
-            'nvrm_tasks.task_schedule_datetime',
-            'nvrm_lead_forwards.event_datetime',
-            'nvrm_tasks.created_at as task_created_datetime',
-            'nvrm_tasks.done_datetime as task_done_datetime'
-        )->join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
-            ->where(['nvrm_tasks.created_by' => $auth_user->id, 'nvrm_tasks.deleted_at' => null])
-            ->whereNull('nvrm_lead_forwards.deleted_at');
+        $latestTask = nvrmTask::select('lead_id', DB::raw('MAX(created_at) as latest_created_at'))
+    ->whereNull('done_datetime')
+    ->whereNull('deleted_at')
+    ->groupBy('lead_id');
+
+$tasks = nvrmLeadForward::select(
+        'nvrm_lead_forwards.lead_id',
+        'nvrm_lead_forwards.lead_datetime',
+        'nvrm_lead_forwards.name',
+        'nvrm_lead_forwards.mobile',
+        'nvrm_lead_forwards.lead_status',
+        'nvrm_tasks.task_schedule_datetime',
+        'nvrm_lead_forwards.event_datetime',
+        'nvrm_tasks.created_at as task_created_datetime',
+        'nvrm_tasks.done_datetime as task_done_datetime'
+    )
+    ->joinSub($latestTask, 'latest_task', function ($join) {
+        $join->on('nvrm_lead_forwards.lead_id', '=', 'latest_task.lead_id');
+    })
+    ->join('nvrm_tasks', function ($join) {
+        $join->on('nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
+             ->on('nvrm_tasks.created_at', '=', 'latest_task.latest_created_at');
+    })
+    ->where(['nvrm_tasks.created_by' => $auth_user->id])
+    ->whereNull('nvrm_lead_forwards.deleted_at')
+    ->where('nvrm_lead_forwards.lead_status', '!=', 'done');
+
+
 
         $current_date = date('Y-m-d');
         if ($request->task_status == "Upcoming") {
