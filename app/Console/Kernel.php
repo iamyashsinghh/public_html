@@ -21,11 +21,18 @@ class Kernel extends ConsoleKernel
             Log::info('Running the activitylog:clean command');
         });
 
-        // Daily task: Precompute dashboard data
+        // eveymin task: Precompute dashboard data
         $schedule->command('dashboard:precompute')->everyMinute()->before(function () {
             Log::info('Starting the dashboard:precompute command');
         })->after(function () {
             Log::info('Finished the dashboard:precompute command');
+        });
+
+        // eveymin task: Precompute dashboard data
+        $schedule->command('seomanagerdashboard:precompute')->everyMinute()->before(function () {
+            Log::info('Starting the seomanagerdashboard:precompute command');
+        })->after(function () {
+            Log::info('Finished the seomanagerdashboard:precompute command');
         });
     }
 
