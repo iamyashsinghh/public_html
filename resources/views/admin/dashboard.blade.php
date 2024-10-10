@@ -646,7 +646,7 @@
                                             <td class="p-1">{{ $v->forward_leads_this_month }}</td>
                                             <td class="p-1">{{ $v->forward_leads_today }}</td>
                                             @foreach ($categories as $category)
-                                                <td class="px-1">{{ $v->forward_leads_by_category[$category->name] }}
+                                                <td class="px-1">{{ $v->forward_leads_by_category->{$category->name} }}
                                                 </td>
                                             @endforeach
                                         </tr>

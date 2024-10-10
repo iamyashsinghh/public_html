@@ -16,9 +16,16 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Hourly task: Clean activity log
         $schedule->command('activitylog:clean --force')->hourly()->before(function () {
             Log::info('Running the activitylog:clean command');
+        });
+
+        // Daily task: Precompute dashboard data
+        $schedule->command('dashboard:precompute')->dailyAt('00:30')->before(function () {
+            Log::info('Starting the dashboard:precompute command');
+        })->after(function () {
+            Log::info('Finished the dashboard:precompute command');
         });
     }
 
