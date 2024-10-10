@@ -22,7 +22,7 @@ class Kernel extends ConsoleKernel
         });
 
         // Daily task: Precompute dashboard data
-        $schedule->command('dashboard:precompute')->dailyAt('00:30')->before(function () {
+        $schedule->command('dashboard:precompute')->everyMinute()->before(function () {
             Log::info('Starting the dashboard:precompute command');
         })->after(function () {
             Log::info('Finished the dashboard:precompute command');
