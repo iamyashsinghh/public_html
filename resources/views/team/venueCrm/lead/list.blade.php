@@ -510,7 +510,7 @@
 
                             row.style.background = data[8];
                             td_elements[9].innerText = data[19] ?? 'N/A';
-                            td_elements[10].innerHTML = data[11] ?? 'N/A';
+                            td_elements[10].innerHTML =data[11] ? data[11].split('?')[0] : 'N/A';
                             td_elements[11].innerHTML = data[12] ?? 'N/A';
                             td_elements[12].innerHTML = data[13] ?? 'N/A';
                             td_elements[14].innerHTML = data[5] ?? 'N/A';
@@ -610,7 +610,7 @@
 
                             row.style.background = data[8];
                             td_elements[9].innerText = data[19] ?? 'N/A';
-                            td_elements[10].innerHTML = data[11] ?? 'N/A';
+                            td_elements[10].innerHTML =data[11] ? data[11].split('?')[0] : 'N/A';
                             td_elements[11].innerHTML = data[12] ?? 'N/A';
                             td_elements[12].innerHTML = data[13] ?? 'N/A';
                             td_elements[14].innerHTML = data[5] ?? 'N/A';
