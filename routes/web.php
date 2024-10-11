@@ -107,7 +107,7 @@ Route::middleware('verify_token')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('/ai')->group(function () {
-        Route::post('/generate-message', [Controllers\Ai\ChatGptController::class, 'generateMessage'])->name('ai.chatGptPrompt');
+        Route::post('/generate-message', [Controllers\Ai\GoogleStudioController::class, 'generateMessage'])->name('ai.googleStudioPrompt');
     });
 
      /*

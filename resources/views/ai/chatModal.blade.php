@@ -2,16 +2,17 @@
     #messageContent {
     white-space: pre-wrap;
     padding: 10px;
+    color: black;
     background-color: #f1f1f1;
     border-radius: 10px;
     margin-top: 10px;
 }
 </style>
 <div class="modal fade" id="aimessageModal" tabindex="-1" aria-labelledby="aimessageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="aimessageModalLabel">Generate Message</h5>
+          <h5 class="modal-title" id="aimessageModalLabel">Wedding Banquets AI</h5>
           <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i></button>
         </div>
         <div class="modal-body">
@@ -29,7 +30,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="sendMessageBtn" onclick="generateMessage()">Send</button>
+          <button type="button" class="btn btn-primary" id="sendMessageBtn" onclick="generateMessage()" style="background: var(--wb-dark-red); border: 1px solid var(--wb-dark-red);">Send</button>
         </div>
       </div>
     </div>
@@ -41,7 +42,7 @@
 
     document.getElementById('messageContent').innerText = '';
 
-    fetch(`{{route('ai.chatGptPrompt')}}`, {
+    fetch(`{{route('ai.googleStudioPrompt')}}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
