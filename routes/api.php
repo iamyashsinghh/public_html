@@ -456,7 +456,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $pattern = "/^\d{10}$/";
 
         $caller_agent_name = null;
-        $lead_cat_data = null;
+        $lead_cat_data = 'Venue';
         $get_rm = null;
         $recording_url = $request->input('recording_url');
 
@@ -484,16 +484,24 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $crm_meta = CrmMeta::find(1);
         $preference = $crm_meta ? $crm_meta->meta_value : 'la-fortuna-banquets-mayapuri';
         $id_ad = $crm_meta ? $crm_meta->is_ad : '0';
-        $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
-        if (!$listing_data) {
-            $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
-            if ($listing_data) {
-                $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
-                $lead_cat_data = $cat_data_cms ? $cat_data_cms->name : null;
-            }
-        }
 
-        $locality = DB::connection('mysql2')->table('locations')->where('id', optional($listing_data)->location_id)->first();
+         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
+            if (!$listing_data) {
+                $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
+                if ($listing_data && isset($listing_data->vendor_category_id)) {
+                    $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
+                    if ($cat_data_cms && isset($cat_data_cms->name)) {
+                        $lead_cat_data = $cat_data_cms->name;
+                    }
+                }
+            }
+            $locality = null;
+            if ($listing_data && isset($listing_data->location_id)) {
+                $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data->location_id)->first();
+            } else {
+                $lead_cat_data = "Phone Nav";
+            }
+
         $lead = Lead::where('mobile', $mobile)->first();
         if ($lead) {
             if ($recording_url !== null) {
@@ -539,7 +547,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->source = $lead_source;
         $lead->lead_catagory = $lead_cat_data;
         $lead->preference = $preference;
-        $lead->locality = optional($locality)->name;
+        $lead->locality = $locality ? $locality->name : null;
         $lead->lead_status = "Super Hot Lead";
         $lead->read_status = false;
         $lead->service_status = false;
@@ -562,125 +570,6 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
     }
 });
-
-
-// Route::post('/new_lead', function (Request $request) {
-//     Log::info($request);
-//     $startSubstring = "-546674";
-//     $endSubstring = "@";
-//     $encoded = $request->post('token');
-//     $extractedValue = $encoded;
-//     $string = base64_decode(base64_decode($extractedValue));
-//     $startPos = strpos($string, $startSubstring);
-//     $endPos = strpos($string, $endSubstring, $startPos);
-//     $finalValue = substr($string, $startPos + strlen($startSubstring), $endPos - $startPos - strlen($startSubstring));
-//     $randompassvalue = DB::connection('mysql')->table('randomnes')->where('id', 1)->value('random_pass');
-//     $outvalue = md5(sha1(md5($randompassvalue)));
-
-//     if ($finalValue == $outvalue) {
-//         try {
-//             $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
-//             $is_email_valid = $request->post('email') != null ? "required|email" : "";
-//             $is_preference_valid = $request->post('preference') != null ? "required|string|max:255" : "";
-//             $mobile = $request->post('mobile');
-//             $validate = Validator::make($request->all(), [
-//                 'name' => $is_name_valid,
-//                 'email' => $is_email_valid,
-//                 'preference' => $is_preference_valid,
-//             ]);
-//             if ($validate->fails()) {
-//                 return response()->json(['status' => false, 'msg' => $validate->errors()->first()]);
-//             }
-//             $mobile = $request->post('mobile') ?: $request->post('caller_id_number');
-//             $pattern = "/^\d{10}$/";
-//             if (!preg_match($pattern, $mobile)) {
-//                 return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
-//             } elseif ($mobile <= 6000000000) {
-//                 return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
-//             }
-//             $current_timestamp = date('Y-m-d H:i:s');
-//             if ($request->post('call_to_number')) {
-//                 $call_to_wb_api_virtual_number = $request->post('call_to_number');
-//                 $lead_source = "WB|Call";
-//                 $crm_meta = CrmMeta::find(1);
-//                 $preference = $crm_meta->meta_value;
-//             } else {
-//                 $call_to_wb_api_virtual_number = null;
-//                 $lead_source = "WB|Form";
-//                 $preference = $request->post('preference');
-//             }
-
-//             $url_components = parse_url($preference);
-//             if (isset($url_components['query'])) {
-//                 parse_str($url_components['query'], $query_params);
-//                 $cleaned_query_params = array_filter($query_params, function ($value) {
-//                     return !empty($value);
-//                 });
-//                 $cleaned_query_string = http_build_query($cleaned_query_params);
-//                 $cleaned_url = $url_components['path'] . '?' . $cleaned_query_string;
-//                 $preference = $cleaned_url;
-//             }
-
-//             $lead_cat_data = "Venue";
-//             $listing_data = null;
-
-//             $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
-//             if (!$listing_data) {
-//                 $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
-//                 if ($listing_data && isset($listing_data->vendor_category_id)) {
-//                     $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
-//                     if ($cat_data_cms && isset($cat_data_cms->name)) {
-//                         $lead_cat_data = $cat_data_cms->name;
-//                     }
-//                 }
-//             }
-//             $locality = null;
-//             if ($listing_data && isset($listing_data->location_id)) {
-//                 $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data->location_id)->first();
-//             } else {
-//                 $lead_cat_data = "Phone Nav";
-//             }
-
-//             $lead = Lead::where('mobile', $mobile)->first();
-//             if ($lead) {
-//                 $lead->enquiry_count = $lead->enquiry_count + 1;
-//             } else {
-//                 $lead = new Lead();
-//                 $lead->name = $request->post('name');
-//                 $lead->email = $request->post('email');
-//                 $lead->mobile = $mobile;
-//             }
-
-//             $lead->lead_datetime = $current_timestamp;
-//             $lead->source = $lead_source;
-//             $lead->lead_catagory = $lead_cat_data;
-//             $lead->preference = $preference;
-//             $lead->is_ad = $request->post('is_ad');
-//             $lead->locality = $locality ? $locality->name : null;
-//             $lead->lead_status = "Super Hot Lead";
-//             $lead->read_status = false;
-//             $lead->service_status = false;
-//             $lead->done_title = null;
-//             $lead->done_message = null;
-//             $lead->whatsapp_msg_time = $current_timestamp;
-//             $lead->lead_color = "#4bff0033"; //green color
-//             $lead->virtual_number = $call_to_wb_api_virtual_number;
-//             $lead->user_ip = $request->post('user_ip');
-//             $lead->save();
-//             if ($lead->last_forwarded_by == null) {
-//                 $get_rm = getAssigningRm();
-//                 $lead->assign_to = $get_rm->name;
-//                 $lead->assign_id = $get_rm->id;
-//                 $lead->save();
-//             }
-//             return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
-//         } catch (\Throwable $th) {
-//             return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
-//         }
-//     } else {
-//         return response()->json(['status' => false, 'msg' => 'Something went wrong.'], 500);
-//     }
-// });
 
 Route::post('/new_lead', function (Request $request) {
     Log::info($request);
