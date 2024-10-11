@@ -16,10 +16,7 @@ class GoogleStudioController extends Controller
         $auth_user = Auth::guard('team')->user();
 
         if($auth_user->role_id == 4){
-            $aiprompt = `$aiprompt see some example responses input: Wedding/17feb/450pax/Dinner/Veg/West Delhi
-output: Lead for a wedding on 17th Feb, 450 pax, vegetarian dinner in West Delhi. Please take the necessary action to move forward with this lead
-input:Wedding/17feb/450pax/Dinner/Veg/West Delhi
-output:We have a wedding booking for 450 guests on February 17th. It's a vegetarian dinner event in West Delhi. Please confirm availability and proceed with the necessary steps to secure this booking.`;
+            $aiprompt .= " \n see some example responses \n input: Wedding/17feb/450pax/Dinner/Veg/West Delhi\n output: Lead for a wedding on 17th Feb, 450 pax, vegetarian dinner in West Delhi. Please take the necessary action to move forward with this lead\n input:Wedding/17feb/450pax/Dinner/Veg/West Delhi\n output:We have a wedding booking for 450 guests on February 17th. It's a vegetarian dinner event in West Delhi. Please confirm availability and proceed with the necessary steps to secure this booking.";
         }
 
         $apiKey = env('GOOGLE_AI_STUDIO_API_KEY');
