@@ -40,6 +40,8 @@
     @include('includes.preloader')
     @include('nonvenue.layouts.navbar')
     @include('nonvenue.layouts.sidebar')
+    @include('ai.chatModal');
+
 
     <div class="wrapper">
         @section('main')

@@ -37,6 +37,8 @@
     @include('includes.preloader')
     @include('bdm.layouts.navbar')
     @include('bdm.layouts.sidebar')
+    @include('ai.chatModal');
+
 
     <div class="wrapper">
         @section('main')

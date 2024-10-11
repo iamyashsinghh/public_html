@@ -27,6 +27,8 @@
     @include('includes.preloader')
     @include('seomanager.layouts.navbar')
     @include('seomanager.layouts.sidebar')
+    @include('ai.chatModal');
+
 
     <div class="wrapper">
         @section('main')

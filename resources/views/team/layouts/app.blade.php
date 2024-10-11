@@ -20,6 +20,7 @@
     @include('includes.preloader')
     @include('team.layouts.navbar')
     @include('team.layouts.sidebar')
+    @include('ai.chatModal');
 
     <div class="wrapper">
         @section('main')
