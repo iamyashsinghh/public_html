@@ -26,6 +26,15 @@ class GoogleStudioController extends Controller
             input:Wedding/9 Oct/600 pax/Dinner/Veg/South Delhi \n
             output: We have a wedding lead for October 9th, with 600 guests for a vegetarian dinner in South Delhi. Please confirm availability and proceed with the necessary steps.
  \n
+  input: Haldi/3 Feb/50 pax/Lunch/Veg/North Delhi\n
+            output:  We have a Haldi lead for February 3rd, with 50 guests for a vegetarian lunch in North Delhi. Please confirm availability and proceed with the necessary steps.
+\n
+            input: Anniversary/25 Sep/350 pax/Dinner/Veg non-veg/West Delhi\n
+            output:  We have an anniversary lead for September 25th, with 350 guests for a vegetarian and non-vegetarian dinner in West Delhi. Please confirm availability and proceed with the necessary steps.
+\n
+            input: Birthday/30 Apr/100 pax/Lunch/Veg/South Delhi\n
+            output:  We have a birthday booking for April 30th, with 100 guests for a vegetarian lunch in South Delhi. Please confirm availability and proceed with the necessary steps for this event.
+\n
              ";
         }
 
