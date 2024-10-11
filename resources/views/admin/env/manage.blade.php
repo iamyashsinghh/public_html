@@ -170,6 +170,30 @@
                                     </div>
                                 </div>
                             </div>
+                            <hr style="margin-top: 0px">
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h5 class="mb-3">ChatGPT</h1>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <div class="form-group">
+                                            <label for="OPENAI_API_STATUS">ChatGPT Status<span class="text-danger">*</span></label>
+                                            <select class="form-control" name="OPENAI_API_STATUS" id="OPENAI_API_STATUS" required>
+                                                <option value="true" @if(filter_var($envValues->OPENAI_API_STATUS, FILTER_VALIDATE_BOOLEAN) === true) selected @endif>On</option>
+                                                <option value="false" @if(filter_var($envValues->OPENAI_API_STATUS, FILTER_VALIDATE_BOOLEAN) === false) selected @endif>Off</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <div class="form-group">
+                                            <label for="OPENAI_API_KEY">ChatGPT Auth Key<span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="OPENAI_API_KEY" placeholder="Enter ChatGPT Auth Key"
+                                                name="OPENAI_API_KEY" required value="{{$envValues->OPENAI_API_KEY}}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="card-footer">
