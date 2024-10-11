@@ -26,7 +26,7 @@ class ChatGptController extends Controller
 
     $generatedMessage = $response->json('choices')[0]['message']['content'];
 
-    return response()->json(['message' => $generatedMessage]);
+    return response()->json(['message' => $response]);
 }
 
 }
