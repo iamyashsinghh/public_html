@@ -167,7 +167,6 @@ if (!function_exists('assignLeadsToRMs')) {
     }
 }
 
-
 Route::get('/getlol', function () {
     // $oneYearAgo = Carbon::now()->subYear();
     // $oneYearAgo0 = Carbon::now()->subMonth();

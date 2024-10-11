@@ -71,6 +71,7 @@
     }
     @endphp
     @yield('footer-script')
+    @include('ai.chatModal');
     <script>
         // global function: this is used for client side datatable non server processing.
         function initialize_datatable(){

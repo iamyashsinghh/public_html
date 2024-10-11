@@ -25,6 +25,7 @@ class EnvController extends Controller
             'SMTP2_MAIL_FROM_ADDRESS' => env('SMTP2_MAIL_FROM_ADDRESS'),
             'TATA_WHATSAPP_MSG_STATUS' => filter_var(env('TATA_WHATSAPP_MSG_STATUS', 'false'), FILTER_VALIDATE_BOOLEAN),
             'TATA_AUTH_KEY' => env('TATA_AUTH_KEY'),
+            'OPENAI_API_KEY' => env('OPENAI_API_KEY'),
         ]));
         return view('admin.env.manage', compact('envValues'));
     }

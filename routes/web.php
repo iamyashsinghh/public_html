@@ -9,17 +9,14 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'admin.login');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 // google sheet bdm lead fetch
 Route::get('/sheet', [Controllers\GoogleSheetController::class, 'processAllSheetData'])->name('get.sheet');
-
 Route::get('/vm_cisits_tasks_status_for_rm_today', [Controllers\CronController::class, 'vm_recce_today']);
-// Route::get('/vm_cisits_tasks_status_for_rm_overdue', [Controllers\CronController::class, 'vm_recce_overdue']);
-
 Route::get('/sql', [Controllers\SqlDownloadController::class, 'downloadSql']);
 
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => 'AuthCheck'], function () {
     Route::get('/', [AuthController::class, 'login'])->name('login');
@@ -33,6 +30,12 @@ Route::get('nonvenue-lead/phone-number/validate/{number?}', [Controller::class, 
 Route::get('bdm-lead/phone-number/validate/{number?}', [Controller::class, 'validate_bdm_lead_phone_number'])->name('bdm.lead.phoneNumber.validate');
 
 
+ /*
+    |--------------------------------------------------------------------------
+    | For mail Routes
+    |--------------------------------------------------------------------------
+ */
+
 Route::get('/notify_vendor_lead_mail', function () {
     $data = ['lead_name' => 'Hello lead', 'event_name' => 'Hello Event', 'event_date' => 'Hello event date', 'event_slot' => 'Hello event slot', 'lead_email' => 'Hello lead email', 'lead_mobile' => 'Hello lead mobile'];
     return view('mail.notify_vendor_lead', compact('data'));
@@ -42,9 +45,11 @@ Route::get('/login_mail', function () {
     return view('mail.login', compact('member'));
 });
 
-
-
-
+ /*
+    |--------------------------------------------------------------------------
+    | For Whatsapp Routes
+    |--------------------------------------------------------------------------
+*/
 // send and get
 Route::get('admin/ajax_tasks', [Controllers\WhatsappMsgController::class, 'ajax_tasks'])->name('whatsapp_chat.ajax');
 Route::get('admin/ajax_templates', [Controllers\WhatsappMsgController::class, 'fetchTemplates'])->name('whatsapp_chat.ajax_templates');
@@ -91,13 +96,25 @@ Route::post('whatsapp_msg_status_nv_team_vendor', [Controllers\WhatsappMsgContro
 */
 Route::middleware('verify_token')->group(function () {
     Route::middleware(['CheckLoginTime', 'checkDevice'])->group(function () {
+
     Route::post('/bookings/manage_process/{booking_id}', [Controllers\Admin\BookingController::class, 'manage_process'])->name('booking.manage_process');
     Route::get('/bookings/fetch/{booking_id}', [Controllers\Admin\BookingController::class, 'fetch_booking'])->name('booking.fetch');
     Route::get('/vm_event/fetch/{event_id?}', [Controllers\Admin\BookingController::class, 'fetch_vm_event'])->name('vm_event.fetch');
 
+     /*
+    |--------------------------------------------------------------------------
+    | For Ai Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('/ai')->group(function () {
+        Route::post('/generate-message', [Controllers\Ai\ChatGptController::class, 'generateMessage'])->name('ai.chatGptPrompt');
+    });
 
-
-
+     /*
+    |--------------------------------------------------------------------------
+    | For Admin Routes
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('/admin')->middleware('admin')->group(function () {
         Route::get('/dashboard', [Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 

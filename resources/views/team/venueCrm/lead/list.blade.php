@@ -22,13 +22,15 @@
             <div class="container-fluid">
                 <div class="d-flex justify-content-between mb-2">
                     <h1 class="m-0">{{ $page_heading }}</h1>
-                    <a href="{{ route('team.lead.list') }}" class="btn btn-secondary btn-sm">Refresh</a>
                     @if ($auth_user->role_id == 4)
-                        <div>
 
+                    <div>
+                            <a href="{{ route('team.lead.list') }}" class="btn btn-secondary btn-sm">Refresh</a>
                             <button class="btn btn-sm text-light" onclick="getSelectedCheckboxValues()"
                                 style="background-color: var(--wb-renosand);">Whatsapp</button>
                         </div>
+                    @else
+                    <a href="{{ route('team.lead.list') }}" class="btn btn-secondary btn-sm">Refresh</a>
                     @endif
                 </div>
                 @if (!isset($filter_params['dashboard_filters']))
@@ -275,6 +277,38 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse2lead_from"
+                                        aria-expanded="true" aria-controls="collapse2lead_from">Lead Site Source</button>
+                                </h2>
+                                <div id="collapse2lead_from"
+                                    class="accordion-collapse collapse {{ isset($filter_params['lead_from']) ? 'show' : '' }}"
+                                    data-bs-parent="#accordionExample">
+                                    <div class="accordion-body pl-2 pb-4">
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_from_weddingbanquets"
+                                                name="lead_from[]" value="weddingbanquets.in"
+                                                {{ isset($filter_params['lead_from']) && in_array('weddingbanquets.in', $filter_params['lead_from']) ? 'weddingbanquets.in' : '' }}>
+                                            <label for="lead_from_weddingbanquets" class="custom-control-label">WeddingBanquets</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_from_weddingphotographersindelhi"
+                                                name="lead_from[]" value="weddingphotographersindelhi.com"
+                                                {{ isset($filter_params['lead_from']) && in_array('weddingphotographersindelhi.com', $filter_params['lead_from']) ? 'weddingphotographersindelhi.com' : '' }}>
+                                            <label for="lead_from_weddingphotographersindelhi" class="custom-control-label">WeddingPhotographersinDelhi</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox" id="lead_from_bestmakeupartistindelhi"
+                                                name="lead_from[]" value="bestmakeupartistindelhi.com"
+                                                {{ isset($filter_params['lead_from']) && in_array('bestmakeupartistindelhi.com', $filter_params['lead_from']) ? 'bestmakeupartistindelhi.com' : '' }}>
+                                            <label for="lead_from_bestmakeupartistindelhi"
+                                                class="custom-control-label">BestMakeupArtistinDelhi</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @endif
                         <div class="accordion-item">
                             <h2 class="accordion-header">
@@ -509,7 +543,7 @@
                             }
 
                             row.style.background = data[8];
-                            td_elements[9].innerText = data[19] ?? 'N/A';
+                            td_elements[9].innerText = `${data[19] ? data[19] : 'N/A'} - ${data[21] ? data[21] : 'weddingbanquets.in'}`;
                             td_elements[10].innerHTML =data[11] ? data[11].split('?')[0] : 'N/A';
                             td_elements[11].innerHTML = data[12] ?? 'N/A';
                             td_elements[12].innerHTML = data[13] ?? 'N/A';
@@ -609,7 +643,7 @@
                             }
 
                             row.style.background = data[8];
-                            td_elements[9].innerText = data[19] ?? 'N/A';
+                            td_elements[9].innerText = `${data[19] ? data[19] : 'N/A'} - ${data[21] ? data[21] : 'weddingbanquets.in'}`;
                             td_elements[10].innerHTML =data[11] ? data[11].split('?')[0] : 'N/A';
                             td_elements[11].innerHTML = data[12] ?? 'N/A';
                             td_elements[12].innerHTML = data[13] ?? 'N/A';

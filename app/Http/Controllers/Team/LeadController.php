@@ -94,9 +94,22 @@ class LeadController extends Controller
                 DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
                 'leads.lead_catagory',
                 'ne.pax as pax',
+                'leads.lead_from',
             )->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')
                 ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id');
             $leads->where('leads.deleted_at', null)->groupBy('leads.mobile');
+
+            if ($request->has('lead_from') && $request->lead_from != '') {
+                if (in_array('weddingbanquets.in', $request->lead_from)) {
+                    // If 'weddingbanquets.in' is in the array, include records with 'null' lead_from
+                    $leads->where(function($query) use ($request) {
+                        $query->whereIn('leads.lead_from', $request->lead_from)
+                              ->orWhereNull('leads.lead_from');
+                    });
+                } else {
+                    $leads->whereIn('leads.lead_from', $request->lead_from);
+                }
+            }
 
             if ($request->has('lead_status') && $request->lead_status != '') {
                 $leads->whereIn('leads.lead_status', $request->lead_status);
