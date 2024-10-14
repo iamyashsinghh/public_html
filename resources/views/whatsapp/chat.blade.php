@@ -125,7 +125,7 @@ $userName = 'Ritu';
     $('#close-whatsapp-chatmodal').on('click', function() {
         resetChat();
     });
-    
+
     $("#sendMessageBtnHi").click(function() {
         var $btn = $(this);
         var originalText = $btn.html();
@@ -232,6 +232,7 @@ $userName = 'Ritu';
     });
 
     $("#sendMessageBtn").click(function() {
+        console.log('whatsapp_btn clicked')
         var $btn = $(this);
     var originalText = $btn.html();
     $btn.html('<i class="fa fa-spinner fa-spin"></i>');

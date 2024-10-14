@@ -186,7 +186,6 @@
             formData.append('documentTitle', documentTitle);
             formData.append('phone_inp_id_doc', phone_inp_id_doc);
 
-
             $.ajax({
                 url: '{{ route('whatsapp_chat.send.bdm_doc_send') }}',
                 type: 'POST',
