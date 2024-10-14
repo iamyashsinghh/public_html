@@ -74,6 +74,7 @@ Route::post('whatsapp_msg_send_nv_greet_btn', [Controllers\WhatsappMsgController
 Route::post('whatsapp_msg_send_nv_subscription_btn_one', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_one'])->name('whatsapp_chat.send.nv_subscription_btn_one');
 Route::post('whatsapp_msg_send_nv_subscription_btn_reminder', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_reminder'])->name('whatsapp_chat.send.nv_subscription_btn_reminder');
 Route::post('whatsapp_msg_send_nv_subscription_btn_two', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_nv_subscription_btn_two'])->name('whatsapp_chat.send.nv_subscription_btn_two');
+Route::post('whatsapp_msg_send_pending_payment', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_pending_payment'])->name('whatsapp_chat.send.pending_payment');
 
 // bdm great msg
 Route::post('whatsapp_msg_send_bdm_greet_btn', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send_bdm_greet_btn'])->name('whatsapp_chat.send.bdm_greet_btn');

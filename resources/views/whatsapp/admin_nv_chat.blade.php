@@ -117,6 +117,11 @@
                             Reminder 3</a>
 
                             <a href="javascript:void(0);" class="btn btn-sm m-1 text-light"
+                            style="background-color: var(--wb-dark-red)" id="pending_payment"
+                            title="Hi (Name of Vendor), \n\nI hope this message finds you well. We are reaching out to remind you that your Membership Subscription with Wedding Banquets is currently Pending Payment. To continue enjoying the full benefits of your Premium Listing and ensure your business remains visible, please clear your balance at your earliest convenience. Please note that failure to make the payment may result in the suspension of your membership, which could affect your business visibility and promotional opportunities. \n\nIf you have any questions or need assistance, please don't hesitate to contact me at 8882198989. \n\nBest Regards,\n\nWedding Banquets \ninfo@weddingbanquets.in \n\n(Call Us Btn)">
+                            Pending Payment</a>
+
+                            <a href="javascript:void(0);" class="btn btn-sm m-1 text-light"
                             style="background-color: var(--wb-dark-red)" id="sendMessageBtnnvGreetMsg"
                             title="Hi (Name of Vendor), I’m {{ $userName }}, your *Relationship Manager*. Do you need any support to improve your lead conversion? If yes, please let me know. (Yes {reply btn})">RM
                             Greet Msg</a>
@@ -243,6 +248,33 @@
         };
         $.ajax({
             url: '{{ route('whatsapp_chat.send.nv_subscription_btn_two') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
+            }
+        });
+    });
+    $("#pending_payment").click(function() {
+        var $btn = $(this);
+        var originalText = $btn.html();
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $btn.prop('disabled', true);
+        var recipient = $("#phone_inp_id").val();
+        var greetMsg = `{{ $userName }}`;
+        var data = {
+            recipient: recipient,
+            greetmsg: greetMsg,
+        };
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send.pending_payment') }}',
             type: 'POST',
             data: data,
             dataType: 'json',
