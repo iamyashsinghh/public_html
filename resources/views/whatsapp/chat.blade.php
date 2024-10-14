@@ -233,9 +233,10 @@ $userName = 'Ritu';
 
     $("#sendMessageBtn").click(function() {
         var $btn = $(this);
-        var originalText = $btn.html();
-        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
-        $btn.prop('disabled', true);
+    var originalText = $btn.html();
+    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+    $btn.prop('disabled', true);
+
         var message = $("#what_msg_send").val();
         var recipient = $("#phone_inp_id").val();
         var img = $('#wha_img_input').val();
@@ -243,7 +244,6 @@ $userName = 'Ritu';
             message: message,
             recipient: recipient,
         };
-        
         $.ajax({
             url: '{{ route('whatsapp_chat.send') }}',
             type: 'POST',

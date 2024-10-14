@@ -30,7 +30,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="sendMessageBtn" onclick="generateMessage()" style="background: var(--wb-dark-red); border: 1px solid var(--wb-dark-red);">Send</button>
+          <button type="button" class="btn btn-primary" id="sendMessageBtnAI" onclick="generateMessage()" style="background: var(--wb-dark-red); border: 1px solid var(--wb-dark-red);">Send</button>
         </div>
       </div>
     </div>
