@@ -61,7 +61,16 @@
         padding: 10px 1rem;
     }
 </style>
-
+@php
+$guards = ['admin', 'team', 'nonvenue', 'bdm' ];
+$userName = 'Ritu';
+    foreach ($guards as $guard) {
+    if (auth()->guard($guard)->check()) {
+        $userName = auth()->guard($guard)->user()->name;
+        break;
+    }
+}
+@endphp
 <div class="modal fade" id="wa_msg" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -73,8 +82,10 @@
             <div id="loadingMessages" style="display: none; text-align: center;">
                 <img src="https://i.postimg.cc/NF6hL0rM/giphy.webp" alt="Loading..." />
             </div>
-            <div class="modal-body whatsapp_msg text-sm"></div>
+            <div class="modal-body whatsapp_msg text-sm">
+            </div>
             <form action="" method="post" id="wa_msg_form">
+                @csrf
                 <div class="modal-body text-sm">
                     <div class="form-group d-none">
                         <label for="">Put image</label>
@@ -89,203 +100,333 @@
                 </div>
                 <div class="modal-footer text-sm">
                     <div class="mx-5">
-                        <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnGreetMsg">Rm Greet Msg</a>
-                        <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnHi">Hi</a>
+                    <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnGreetMsg" title="Hi (Name of person in lead), I'm {{ $userName }} your Wedding Planning assistant. Would you like me to help you find venues and wedding vendors for your wedding? (Some btns)">Rm Greet Msg</a>
+                    <a href="javascript:void(0);" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red)" id="sendMessageBtnHi" title="Hi">Hi</a>
                     </div>
                     <a href="javascript:void(0);" class="btn btn-sm btn-secondary m-1" data-bs-dismiss="modal">Close</a>
-                    <a href="javascript:void(0);" class="btn btn-sm text-light m-1" style="background-color: var(--wb-dark-red);" id="sendMessageBtn">Submit</a>
+                    <a href="javascript:void(0);" class="btn btn-sm text-light m-1"
+                        style="background-color: var(--wb-dark-red);" id="sendMessageBtn">Submit</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
+<script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
 <script>
     let lastMessageTimestamp = '';
-    let currentPage = 1;
-    let isFetchingMessages = false;
-    let hasMoreMessages = true;
-    let messageFetchInterval;
-    let newMessageFetchInterval;
-    let displayedMessages = [];
-    let messageSendElement = document.getElementById("what_msg_send");
-
-    document.getElementById('close-whatsapp-chatmodal').addEventListener('click', resetChat);
-
-    document.getElementById("sendMessageBtnHi").addEventListener('click', function() {
-        handleMessageSend('hi', this);
+    var currentPage = 1;
+    var isFetchingMessages = false;
+    var hasMoreMessages = true;
+    var messageFetchInterval;
+    var newmessageFetchInterval;
+    var displayedMessages = [];
+    var messageSendElement = document.getElementById("what_msg_send");
+    $('#close-whatsapp-chatmodal').on('click', function() {
+        resetChat();
     });
 
-    document.getElementById("sendMessageBtnGreetMsg").addEventListener('click', function() {
-        handleMessageSend('greet', this);
+    $("#sendMessageBtnHi").click(function() {
+        var $btn = $(this);
+        var originalText = $btn.html();
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $btn.prop('disabled', true);
+        var recipient = $("#phone_inp_id").val();
+        var data = {
+            recipient: recipient,
+        };
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send.hi') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                $btn.html(originalText);
+                $btn.prop('disabled', false);
+            }
+        });
     });
 
-    document.getElementById("sendMessageBtn").addEventListener('click', function() {
-        handleMessageSend('message', this);
+    $("#sendMessageBtnHey").click(function() {
+        var $btn = $(this);
+    var originalText = $btn.html();
+    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+    $btn.prop('disabled', true);
+        var recipient = $("#phone_inp_id").val();
+        var data = {
+            recipient: recipient,
+        };
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send.hi') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            }
+        });
+    });
+    $("#sendMessageBtnHello").click(function() {
+        var $btn = $(this);
+    var originalText = $btn.html();
+    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+    $btn.prop('disabled', true);
+        var recipient = $("#phone_inp_id").val();
+        var data = {
+            recipient: recipient,
+        };
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send.hello') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            }
+        });
+    });
+
+    $("#sendMessageBtnGreetMsg").click(function() {
+        var $btn = $(this);
+    var originalText = $btn.html();
+    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+    $btn.prop('disabled', true);
+        var recipient = $("#phone_inp_id").val();
+        var greetMsg = `{{ $userName }}`;
+        var data = {
+            recipient: recipient,
+            greetmsg: greetMsg,
+        };
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send.greet_btn') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            }
+        });
+    });
+
+    $("#sendMessageBtn").click(function() {
+        console.log('whatsapp_btn clicked')
+        var $btn = $(this);
+    var originalText = $btn.html();
+    $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+    $btn.prop('disabled', true);
+
+        var message = $("#what_msg_send").val();
+        var recipient = $("#phone_inp_id").val();
+        var img = $('#wha_img_input').val();
+        var data = {
+            message: message,
+            recipient: recipient,
+        };
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                messageSendElement.value = '';
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                // Error handling code
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            }
+        });
     });
 
     function resetChat() {
         currentPage = 1;
-        document.querySelector('.whatsapp_msg').innerHTML = '';
+        $('.whatsapp_msg').empty();
         hasMoreMessages = true;
         isFetchingMessages = false;
         clearInterval(messageFetchInterval);
-        clearInterval(newMessageFetchInterval);
+        clearInterval(newmessageFetchInterval);
         displayedMessages = [];
         lastMessageTimestamp = '';
     }
 
-    function handleMessageSend(type, button) {
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-        button.disabled = true;
-
-        const recipient = document.getElementById("phone_inp_id").value;
-        const data = {
-            recipient: recipient,
-            message: type === 'message' ? document.getElementById('what_msg_send').value : type,
-            greetmsg: type === 'greet' ? 'Hello! I am your assistant.' : null
-        };
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '{{ route('whatsapp_chat.send') }}', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                button.innerHTML = originalText;
-                button.disabled = false;
-                messageSendElement.value = '';
-            } else if (xhr.readyState === 4) {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        };
-        xhr.send(JSON.stringify(data));
-    }
-
     function wamsg(num) {
         resetChat();
-        const id = num;
-        document.getElementById("phone_inp_id").value = num;
+        let id = num;
+        $('#phone_inp_id').val(num);
 
         function fetchMessages(page) {
             if (isFetchingMessages || !hasMoreMessages) return;
-            document.getElementById('loadingMessages').style.display = 'block';
+            $('#loadingMessages').show();
             isFetchingMessages = true;
-
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', `{{ route('whatsapp_chat.get', '') }}/${id}?page=${page}`, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    document.getElementById('loadingMessages').style.display = 'none';
-
+            const data_url = `{{ route('whatsapp_chat.get', '') }}/${id}?page=${page}`;
+            $.ajax({
+                url: data_url,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $('#loadingMessages').hide();
                     if (response.data.length > 0) {
                         const groupedMessages = groupMessagesByDate(response.data);
                         updateHTML(groupedMessages);
-
-                        if (currentPage === 1) {
+                        if (currentPage == 1) {
                             lastMessageTimestamp = response.data[0].time;
                         }
-
                         if (currentPage >= response.last_page) {
                             hasMoreMessages = false;
                         } else {
                             currentPage++;
                         }
-                    }
 
+                    }
                     if (currentPage > response.last_page) {
                         hasMoreMessages = false;
                         clearInterval(messageFetchInterval);
                     }
-
                     isFetchingMessages = false;
-                } else if (xhr.readyState === 4) {
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
                     isFetchingMessages = false;
                 }
-            };
-            xhr.send();
+            });
         }
 
         fetchMessages(currentPage);
 
-        messageFetchInterval = setInterval(function () {
+        messageFetchInterval = setInterval(function() {
             fetchMessages(currentPage);
         }, 4000);
 
         function fetchNewMessages() {
-            if (lastMessageTimestamp !== '') {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', `{{ route('whatsapp_chat.get_new', '') }}/${id}?lastTimestamp=${lastMessageTimestamp}`, true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.length > 0) {
-                            response.forEach(message => {
-                                const messageHTML = buildMessageHTML(message);
-                                document.querySelector('.whatsapp_msg').insertAdjacentHTML('beforeend', messageHTML);
-                            });
-                            lastMessageTimestamp = response[response.length - 1].time;
-                        }
+            if(lastMessageTimestamp != ''){
+                const data_url = `{{ route('whatsapp_chat.get_new', '') }}/${id}?lastTimestamp=${lastMessageTimestamp}`;
+            $.ajax({
+                url: data_url,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.length > 0) {
+                        response.forEach(message => {
+                            const messageHTML = buildMessageHTML(message);
+                            $('.whatsapp_msg').append(messageHTML);
+                        });
+                        lastMessageTimestamp = response[response.length - 1].time;
                     }
-                };
-                xhr.send();
-            }
-        }
-
-        newMessageFetchInterval = setInterval(fetchNewMessages, 5000);
-    }
-
-    function groupMessagesByDate(messages) {
-        const groupedMessages = {};
-        messages.forEach(message => {
-            const date = formatTimestamp(message.timestamp);
-            if (!groupedMessages[date]) {
-                groupedMessages[date] = [];
-            }
-            groupedMessages[date].push(message);
-        });
-        return groupedMessages;
-    }
-
-    function formatTimestamp(timestamp) {
-        const messageDate = new Date(timestamp * 1000).toDateString();
-        const today = new Date().toDateString();
-        if (messageDate === today) {
-            return 'Today';
-        } else {
-            return messageDate;
-        }
-    }
-
-    function updateHTML(groupedMessages) {
-        const whatsappMsgElement = document.querySelector('.whatsapp_msg');
-        Object.keys(groupedMessages).forEach(date => {
-            if (!displayedMessages.includes(date)) {
-                displayedMessages.push(date);
-                whatsappMsgElement.insertAdjacentHTML('beforeend', `<div class="whatsapp-date">${date}</div>`);
-            }
-
-            groupedMessages[date].forEach(message => {
-                const messageHTML = buildMessageHTML(message);
-                whatsappMsgElement.insertAdjacentHTML('beforeend', messageHTML);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching new messages:", xhr.responseText);
+                }
             });
-        });
-    }
+            }
+        }
+        newmessageFetchInterval = setInterval(fetchNewMessages, 5000);
 
-    function buildMessageHTML(message) {
-        const messageAlignment = message.isSentByCurrentUser ? 'card-send' : '';
-        const messageType = message.isSentByCurrentUser ? 'whatsapp-card-send' : 'whatsapp-card';
-        const timestamp = moment(message.timestamp * 1000).format('LT');
-        return `
-            <div class="card ${messageAlignment}">
-                <div class="${messageType}">
-                    <p class="whatsapp-message">${message.message}</p>
-                    <p class="whatsapp-timestamp">${timestamp} <i class="fa fa-check"></i></p>
-                </div>
-            </div>
-        `;
+
+        function groupMessagesByDate(messages) {
+            const groupedMessages = {};
+            messages.forEach(message => {
+                const date = formatTimestamp(message.timestamp);
+                if (!groupedMessages[date]) {
+                    groupedMessages[date] = [];
+                }
+                groupedMessages[date].push(message);
+            });
+            return groupedMessages;
+        }
+
+        function formatTimestamp(timestamp) {
+            const messageDate = new Date(timestamp * 1000).toDateString();
+            const today = new Date().toDateString();
+            if (messageDate === today) {
+                return 'Today';
+            } else if (messageDate === new Date(Date.now() - 864e5).toDateString()) {
+                return 'Yesterday';
+            } else {
+                return new Date(timestamp * 1000).toLocaleDateString();
+            }
+        }
+
+        function updateHTML(groupedMessages) {
+            console.log(groupedMessages)
+            Object.entries(groupedMessages).forEach(([date, messages]) => {
+                messages.forEach(message => {
+                    if (!displayedMessages.includes(message.id)) {
+                        const msgHTML = buildMessageHTML(message);
+                        $('.whatsapp_msg').prepend(msgHTML);
+                        displayedMessages.push(message.id);
+                    }
+                });
+            });
+        }
+        function buildMessageHTML(message) {
+            let bodyContent = '';
+            const msgClass = message.is_sent ? 'whatsapp-card-send' : 'whatsapp-card';
+            switch (message.type) {
+                case 'text':
+                    bodyContent = message.body;
+                    break;
+                case 'contact':
+                case 'vcard': {
+                    const contactInfo = JSON.parse(message.doc);
+                    bodyContent = `Name: ${contactInfo.name}, Mobile: ${contactInfo.mobile}`;
+                    break;
+                }
+                case 'image':
+                    bodyContent = `<img src="${message.doc}" alt="image" style="max-width: 100%; height: auto;">`;
+                    break;
+                case 'audio':
+                    bodyContent =
+                        `<audio controls src="${message.doc}">Your browser does not support the audio element.</audio>`;
+                    break;
+                    case 'button':
+                    bodyContent = message.body;
+                    break;
+                case 'location':
+                    bodyContent = `<a href="${message.doc}" target="_blank">View Location</a>`;
+                    break;
+                case 'video':
+                    bodyContent =
+                        `<video controls style="max-width: 100%; height: auto;"><source src="${message.doc}" type="video/mp4">Your browser does not support the video tag.</video>`;
+                    break;
+                default:
+                    bodyContent = 'Unsupported message type';
+            }
+            let html =
+                `<div class="${msgClass}"><p class="whatsapp-message">${bodyContent}</p><p class="whatsapp-timestamp">${new Date(message.time).toLocaleString()} </p></div>`;
+            if (message.is_sent == '1') {
+                html = `<div class="card-send">${html}</div>`;
+            }
+            return html;
+        }
     }
+    $('#wa_msg').on('shown.bs.modal', function() {
+        var modalBody = $(this).find('.modal-body');
+        modalBody.scrollTop(modalBody.prop('scrollHeight'));
+    });
 </script>
