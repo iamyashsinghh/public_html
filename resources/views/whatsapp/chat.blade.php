@@ -231,42 +231,37 @@ $userName = 'Ritu';
         });
     });
 
-    document.getElementById("sendMessageBtn").addEventListener("click", function() {
-    console.log('whatsapp_btn clicked');
-
-    var btn = this;
-    var originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-    btn.disabled = true;
-
-    var message = document.getElementById("what_msg_send").value;
-    var recipient = document.getElementById("phone_inp_id").value;
-    var img = document.getElementById("wha_img_input").value; // Not used in data, but captured
-    var data = {
-        message: message,
-        recipient: recipient,
-    };
-
-    fetch('{{ route('whatsapp_chat.send') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('message').value = '';
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+    $("#sendMessageBtn").click(function() {
+        var $btn = $(this);
+        var originalText = $btn.html();
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $btn.prop('disabled', true);
+        var message = $("#what_msg_send").val();
+        var recipient = $("#phone_inp_id").val();
+        var img = $('#wha_img_input').val();
+        var data = {
+            message: message,
+            recipient: recipient,
+        };
+        
+        $.ajax({
+            url: '{{ route('whatsapp_chat.send') }}',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                $('#message').val('');
+                messageSendElement.value = '';
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                // Error handling code
+                $btn.html(originalText);
+            $btn.prop('disabled', false);
+            }
+        });
     });
-});
-
 
     function resetChat() {
         currentPage = 1;
