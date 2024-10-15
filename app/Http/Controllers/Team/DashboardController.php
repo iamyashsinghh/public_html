@@ -201,8 +201,9 @@ class DashboardController extends Controller
                 ->where('leads.lead_status', '!=', 'Done')
                 ->orderBy('rm_messages.updated_at', 'desc')
                 ->groupBy('leads.lead_id')
-                ->get()
-                ->count();
+                ->get();
+                // ->count();
+                return $vm_recce_today;
 
 
             $vm_recce_overdue = Lead::select('leads.lead_id')
@@ -225,8 +226,6 @@ class DashboardController extends Controller
                 ->groupBy('leads.lead_id')
                 ->get()
                 ->count();
-
-
 
             $task_schedule_this_month = $task_schedule_today = $total_task_overdue = $recce_schedule_this_month = $recce_schedule_today = $total_recce_overdue = $unfollowed_leads = $recce_done_this_month = $l2r = $bookings_this_month = $r2c = 0;
         }
