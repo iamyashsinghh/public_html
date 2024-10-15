@@ -194,7 +194,7 @@ class DashboardController extends Controller
                 ->whereNotNull('visits.done_datetime')
                 ->where(function ($query) {
                     $query->whereNull('latest_tasks.latest_task_created_at')
-                        ->orWhereDate('latest_tasks.latest_task_created_at', '<', DB::raw('DATE_ADD(visits.done_datetime, INTERVAL 2.4 DAY)'));
+                        ->orWhereDate('latest_tasks.latest_task_created_at', '<', DB::raw('DATE_ADD(visits.done_datetime, INTERVAL 3 DAY)'));
                 })
                 ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '=', $current_date)
                 ->where('rm_messages.created_by', '=', $auth_user->id)
@@ -203,7 +203,7 @@ class DashboardController extends Controller
                 ->groupBy('leads.lead_id')
                 ->get()
                 ->count();
-                
+
 
 
             $vm_recce_overdue = Lead::select('leads.lead_id')
