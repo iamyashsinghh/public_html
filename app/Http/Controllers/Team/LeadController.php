@@ -102,9 +102,9 @@ class LeadController extends Controller
             if ($request->has('lead_from') && $request->lead_from != '') {
                 if (in_array('weddingbanquets.in', $request->lead_from)) {
                     // If 'weddingbanquets.in' is in the array, include records with 'null' lead_from
-                    $leads->where(function($query) use ($request) {
+                    $leads->where(function ($query) use ($request) {
                         $query->whereIn('leads.lead_from', $request->lead_from)
-                              ->orWhereNull('leads.lead_from');
+                            ->orWhereNull('leads.lead_from');
                     });
                 } else {
                     $leads->whereIn('leads.lead_from', $request->lead_from);
@@ -309,17 +309,20 @@ class LeadController extends Controller
                         ->groupBy('leads.mobile')
                         ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
                         ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
-                        ->leftJoin('tasks', function ($join) {
-                            $join->on('tasks.lead_id', '=', 'leads.lead_id');
+                        ->leftJoin(DB::raw('(SELECT lead_id, MAX(created_at) as latest_task_created_at FROM tasks WHERE deleted_at IS NULL AND created_by = ' . $auth_user->id . ' GROUP BY lead_id) as latest_tasks'), function ($join) {
+                            $join->on('latest_tasks.lead_id', '=', 'leads.lead_id');
                         })
                         ->whereDate('visits.done_datetime', '>=', $startDate)
                         ->whereNotNull('visits.done_datetime')
-                        ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'))
-                        ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '=', $current_date)
+                        ->where(function ($query) {
+                            $query->whereNull('latest_tasks.latest_task_created_at')
+                                ->orWhereDate('latest_tasks.latest_task_created_at', '<', DB::raw('DATE_ADD(visits.done_datetime, INTERVAL 3 DAY)'));
+                        })
+                        ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 2.4 DAY))'), '=', $current_date)
                         ->where('rm_messages.created_by', '=', $auth_user->id)
+                        ->where('leads.lead_status', '!=', 'Done')
                         ->orderBy('rm_messages.updated_at', 'desc')
-                        ->groupBy('leads.lead_id')
-                        ->where('leads.lead_status', '!=', 'Done');
+                        ->groupBy('leads.lead_id');
                 } elseif ($request->dashboard_filters == "vm_recce_overdue") {
                     $startDate = Carbon::createFromDate(2024, 8, 1);
                     $leads = DB::table('leads')->select(
@@ -350,21 +353,21 @@ class LeadController extends Controller
                         ->groupBy('leads.mobile')
                         ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
                         ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
-                        ->leftJoin('tasks', function ($join) {
-                            $join->on('tasks.lead_id', '=', 'leads.lead_id');
+                        ->leftJoin(DB::raw('(SELECT lead_id, MAX(created_at) as latest_task_created_at FROM tasks WHERE deleted_at IS NULL AND created_by = ' . $auth_user->id . ' GROUP BY lead_id) as latest_tasks'), function ($join) {
+                            $join->on('latest_tasks.lead_id', '=', 'leads.lead_id');
                         })
                         ->whereNotNull('visits.done_message')
                         ->whereDate('visits.done_datetime', '>=', $startDate)
                         ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '<', $current_date)
                         ->where(function ($query) {
-                            $query->whereNull('tasks.created_at')
-                                ->orWhere(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '>', DB::raw('tasks.created_at'));
+                            $query->whereNull('latest_tasks.latest_task_created_at')
+                                ->orWhereDate('latest_tasks.latest_task_created_at', '<', DB::raw('DATE_ADD(visits.done_datetime, INTERVAL 3 DAY)'));
                         })
                         ->where('rm_messages.created_by', '=', $auth_user->id)
+                        ->where('leads.lead_status', '!=', 'Done')
                         ->orderBy('rm_messages.updated_at', 'desc')
                         ->orderBy('visits.done_datetime', 'desc')
-                        ->groupBy('leads.lead_id')
-                        ->where('leads.lead_status', '!=', 'Done');
+                        ->groupBy('leads.lead_id');
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
                     $to = Carbon::today()->endOfMonth();
