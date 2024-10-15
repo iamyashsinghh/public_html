@@ -34,6 +34,7 @@
                         <div id="msgTypeButtons">
                             <button type="button" class="btn btn-secondary btn-msg-type" data-value="normal">Normal</button>
                             <button type="button" class="btn btn-secondary btn-msg-type" data-value="rm_msg">RM Msg</button>
+                            <button type="button" class="btn btn-secondary btn-msg-type" data-value="nvrm_msg">NVRM Msg</button>
                         </div>
                         <input type="hidden" id="msg_type" name="msg_type" value="normal">
                     </div>

@@ -26,6 +26,17 @@ class GoogleStudioController extends Controller
             input:Wedding/9 Oct/600 pax/Dinner/Veg/South Delhi \n
             output: We have a wedding lead for October 9th, with 600 guests for a vegetarian dinner in South Delhi. Please confirm availability and proceed with the necessary steps.\n
             only give 1 output in formal tone";
+        }elseif($msg_type == 'nvrm_msg'){
+            $aiprompt .= " \n see some example responses \n
+            input: Customer Required photographer /Birthday/15dec/100pax/west delhi/Firstly share all details on whatsapp and call customer right now\n
+            output: Customer requires a photographer for a birthday event on December 15th in West Delhi, with approximately 100 guests. Please share all service details via WhatsApp first, then call the customer immediately. \n
+            input: Customer required photographer/Wedding/19jan/300pax/Mayapuri location/Firstly share details on whatsapp and call after 7 p.m\n
+            output: We have a customer looking for a wedding photographer for an event on January 19th. The event will host approximately 300 guests and will take place in Mayapuri. The client has requested that you first share your service details via WhatsApp, and then follow up with a call after 7 p.m. \n
+            input: Customer required Band/Wedding/23Feb/225pax/Rohini location/Firstly share details on whatsapp and call in evening\n
+            output: Customer requires a band for a wedding on February 23rd in Rohini, with approximately 225 guests. Please share the details via WhatsApp first, then call in the evening.\n
+            input:Wedding/9 Oct/600 pax/Dinner/Veg/South Delhi \n
+            output: Customer requires a band for a wedding on December 6th at Maharaja Banquet, Punjabi Bagh, with approximately 150 guests. Please share the details via WhatsApp first; the customer will review and update accordingly\n
+            only give 1 output in formal tone";
         }
 
         $apiKey = env('GOOGLE_AI_STUDIO_API_KEY');
