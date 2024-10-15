@@ -356,17 +356,16 @@ class LeadController extends Controller
                         ->leftJoin(DB::raw('(SELECT lead_id, MAX(created_at) as latest_task_created_at FROM tasks WHERE deleted_at IS NULL AND created_by = ' . $auth_user->id . ' GROUP BY lead_id) as latest_tasks'), function ($join) {
                             $join->on('latest_tasks.lead_id', '=', 'leads.lead_id');
                         })
-                        ->whereNotNull('visits.done_message')
                         ->whereDate('visits.done_datetime', '>=', $startDate)
-                        ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 2.4 DAY))'), '<', $current_date)
+                        ->whereNotNull('visits.done_datetime')
                         ->where(function ($query) {
                             $query->whereNull('latest_tasks.latest_task_created_at')
                                 ->orWhereDate('latest_tasks.latest_task_created_at', '<', DB::raw('DATE_ADD(visits.done_datetime, INTERVAL 3 DAY)'));
                         })
+                        ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '<', $current_date)
                         ->where('rm_messages.created_by', '=', $auth_user->id)
                         ->where('leads.lead_status', '!=', 'Done')
                         ->orderBy('rm_messages.updated_at', 'desc')
-                        ->orderBy('visits.done_datetime', 'desc')
                         ->groupBy('leads.lead_id');
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
