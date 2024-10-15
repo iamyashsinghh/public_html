@@ -201,9 +201,9 @@ class DashboardController extends Controller
                 ->where('leads.lead_status', '!=', 'Done')
                 ->orderBy('rm_messages.updated_at', 'desc')
                 ->groupBy('leads.lead_id')
-                ->get();
-                // ->count();
-                return $vm_recce_today;
+                ->get()
+                ->count();
+                
 
 
             $vm_recce_overdue = Lead::select('leads.lead_id')
