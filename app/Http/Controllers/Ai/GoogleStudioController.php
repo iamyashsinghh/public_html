@@ -13,9 +13,9 @@ class GoogleStudioController extends Controller
     public function generateMessage(Request $request)
     {
         $aiprompt = $request->input('aiprompt');
-        $auth_user = Auth::guard('team')->user();
+        $msg_type = $request->input('msg_type');
 
-        if($auth_user->role_id == 4){
+        if($msg_type == 'rm_msg'){
             $aiprompt .= " \n see some example responses \n
             input: Engagement/ 22 sep/ 300pax/ veg / dinner/ west delhi\n
             output: We have an engagement booking for September 22nd, with 300 guests, vegetarian dinner in West Delhi.  Additionally, we have a wedding lead for February 17th, with 450 guests for a vegetarian dinner in West Delhi. Please confirm availability and proceed with the necessary steps for both events. \n
@@ -25,8 +25,7 @@ class GoogleStudioController extends Controller
             output: We have an engagement booking for November 20th or 21st, with 150 guests for a vegetarian dinner in West Delhi. Please confirm availability and proceed with the necessary steps for this event. \n
             input:Wedding/9 Oct/600 pax/Dinner/Veg/South Delhi \n
             output: We have a wedding lead for October 9th, with 600 guests for a vegetarian dinner in South Delhi. Please confirm availability and proceed with the necessary steps.\n
-            only give 1 output in formal tone
-             ";
+            only give 1 output in formal tone";
         }
 
         $apiKey = env('GOOGLE_AI_STUDIO_API_KEY');
