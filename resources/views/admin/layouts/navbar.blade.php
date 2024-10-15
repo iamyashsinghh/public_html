@@ -1,3 +1,10 @@
+<style>
+    .wb-ai-btn{
+        background-color: #ffffff50;
+        border: 1px solid #ffffff80;
+        border-radius: : 10px;
+    }
+</style>
 <nav class="main-header navbar navbar-expand navbar-dark navbar-light" style="background: var(--wb-renosand)">
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -12,8 +19,8 @@
 
     <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aimessageModal"
-                style="border: none; background: transparent; padding: 0;">
+            <button type="button" class="btn btn-primary wb-ai-btn" data-bs-toggle="modal" data-bs-target="#aimessageModal"
+                style="padding: 0;">
                 <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision"
                     text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd"
                     clip-rule="evenodd" viewBox="0 0 512 512" width="40" height="40">
