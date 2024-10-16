@@ -55,7 +55,6 @@ class DashboardController extends Controller
             ->whereNull('tasks.deleted_at')
             ->where('tasks.created_by', $auth_user->id)
             ->whereNull('tasks.done_datetime')
-            ->where('leads.lead_status', '!=', 'done')
             ->groupBy('leads.lead_id')
             ->get()->count();
         $rm_today_task_leads = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
@@ -64,7 +63,6 @@ class DashboardController extends Controller
             ->whereNull('leads.deleted_at')
             ->whereNull('tasks.deleted_at')
             ->whereNull('tasks.done_datetime')
-            ->where('leads.lead_status', '!=', 'done')
             ->where('tasks.created_by', $auth_user->id)->groupBy('leads.lead_id')
             ->get()->count();
         $rm_month_task_leads = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
@@ -73,7 +71,6 @@ class DashboardController extends Controller
             ->whereNull('tasks.deleted_at')
             ->where('tasks.created_by', $auth_user->id)
             ->whereNull('tasks.done_datetime')
-            ->where('leads.lead_status', '!=', 'done')
             ->groupBy('leads.lead_id')->get()->count();
         if ($auth_user->role_id == 5) {
             $total_leads_received_this_month = LeadForward::where('lead_datetime', 'like', "%$current_month%")->where('forward_to', $auth_user->id)->count();
