@@ -132,9 +132,7 @@ class TaskController extends Controller
                 $to = Carbon::today()->endOfMonth();
                 $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to]);
             } elseif ($request->dashboard_filters == "task_schedule_today") {
-                $from = Carbon::today()->startOfDay();
-                $to = Carbon::today()->endOfDay();
-                $tasks->whereBetween('tasks.task_schedule_datetime', [$from, $to])->whereNull('tasks.done_datetime');
+                $tasks->where('task_schedule_datetime', 'like', "%$current_date%");
             } elseif ($request->dashboard_filters == "total_task_overdue") {
                 $tasks->where('tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('tasks.done_datetime');
             }
