@@ -88,10 +88,6 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                                     <input class="custom-control-input" type="checkbox" id="task_status_overdue_checkbox" name="task_status[]" value="Overdue" {{isset($filter_params['task_status']) && in_array('Overdue', $filter_params['task_status']) ? 'checked' : ''}}>
                                     <label for="task_status_overdue_checkbox" class="custom-control-label">Overdue</label>
                                 </div>
-                                <div class="custom-control custom-checkbox my-1">
-                                    <input class="custom-control-input" type="checkbox" id="task_status_done_checkbox" name="task_status[]" value="Done" {{isset($filter_params['task_status']) && in_array('Done', $filter_params['task_status']) ? 'checked' : ''}}>
-                                    <label for="task_status_done_checkbox" class="custom-control-label">Done</label>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -108,23 +104,6 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                                 <div class="form-group">
                                     <label for="task_created_to_date_inp">To</label>
                                     <input type="date" class="form-control" id="task_created_to_date_inp" name="task_created_to_date" value="{{isset($filter_params['task_created_to_date']) ? $filter_params['task_created_to_date'] : ''}}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">Task Done Date</button>
-                        </h2>
-                        <div id="collapse3" class="accordion-collapse collapse {{isset($filter_params['task_done_from_date']) ? 'show' : ''}}" data-bs-parent="#accordionExample">
-                            <div class="accordion-body pl-2 pb-4">
-                                <div class="form-group">
-                                    <label for="task_done_from_date_inp">From</label>
-                                    <input type="date" class="form-control" id="task_done_from_date_inp" name="task_done_from_date" value="{{isset($filter_params['task_done_from_date']) ? $filter_params['task_done_from_date'] : ''}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="task_done_to_date_inp">To</label>
-                                    <input type="date" class="form-control" id="task_done_to_date_inp" name="task_done_to_date" value="{{isset($filter_params['task_done_to_date']) ? $filter_params['task_done_to_date'] : ''}}">
                                 </div>
                             </div>
                         </div>
