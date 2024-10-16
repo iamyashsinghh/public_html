@@ -95,8 +95,7 @@ class DashboardController extends Controller
                 ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
                 ->where('task_schedule_datetime', 'like', "%$current_date%")
                 ->where(['tasks.created_by' => $auth_user->id])
-                ->whereNull('tasks.done_datetime')
-                ->where('leads.lead_status', '!=', 'done')->count();
+                ->whereNull('tasks.done_datetime')->count();
 
             $total_task_overdue = Task::selectRaw('count(distinct(lead_id)) as count')
                 ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
