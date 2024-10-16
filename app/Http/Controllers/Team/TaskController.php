@@ -55,6 +55,7 @@ class TaskController extends Controller
             'leads.lead_datetime',
             'leads.name',
             'leads.mobile',
+            'leads.lead_status',
             'tasks.task_schedule_datetime',
             'leads.event_datetime',
             'tasks.created_at as task_created_datetime',

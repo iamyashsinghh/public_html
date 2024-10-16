@@ -50,6 +50,7 @@ $filter_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
                             <th class="text-nowrap">Lead Date</th>
                             <th class="text-nowrap">Name</th>
                             <th class="text-nowrap">Mobile</th>
+                            <th class="text-nowrap">Lead Status</th>
                             <th class="text-nowrap">Task Schedule Date</th>
                             <th class="text-nowrap">Task Status</th>
                             <th class="text-nowrap">Event Date</th>
@@ -225,26 +226,31 @@ $filter = implode('&', $filters);
                 },
                 {
                     targets: 4,
+                    name: "lead_status",
+                    data: "lead_status",
+                },
+                {
+                    targets: 5,
                     name: "task_schedule_datetime",
                     data: "task_schedule_datetime",
                 },
                 {
-                    targets: 5,
+                    targets: 6,
                     name: "lead_id",
                     data: "lead_id",
                 },
                 {
-                    targets: 6,
+                    targets: 7,
                     name: "event_datetime",
                     data: "event_datetime",
                 },
                 {
-                    targets: 7,
+                    targets: 8,
                     name: "task_created_datetime",
                     data: "task_created_datetime",
                 },
                 {
-                    targets: 8,
+                    targets: 9,
                     name: "task_done_datetime",
                     data: "task_done_datetime",
                 },
@@ -259,6 +265,11 @@ $filter = implode('&', $filters);
                 const td_elements = row.querySelectorAll('td');
                 td_elements[1].innerText = moment(data.lead_datetime).format("DD-MMM-YYYY hh:mm a");
                 td_elements[1].classList.add('text-nowrap');
+                if(data.lead_status == "Done"){
+                    td_elements[4].innerHTML = `<span class="badge badge-secondary">Done</span>`;
+                }else{
+                    td_elements[4].innerHTML = `<span class="badge badge-success">${data.lead_status}</span>`;
+                }
 
                 td_elements[5].innerHTML = moment(data.task_schedule_datetime).format("DD-MMM-YYYY hh:mm a");;
 
