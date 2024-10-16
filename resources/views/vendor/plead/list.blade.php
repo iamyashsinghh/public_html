@@ -20,6 +20,11 @@
                 <div class="col-sm-6">
                     <h1 class="m-0">{{$page_heading}}</h1>
                 </div>
+                <div class="col-sm-6">
+                    <div class="d-flex flex-end">
+                        <button class="btn btn-sm text-light" data-bs-toggle="modal" data-bs-target="#createLeadModal">Create Lead Modal</button>
+                    </div>
+                </div>
             </div>
             @if (!isset($filter_params['dashboard_filters']))
                 <div class="filter-container text-center d-none">
