@@ -69,7 +69,7 @@ class TaskController extends Controller
                     ->on('tasks.created_at', '=', 'latest.latest_created_at');
             })
             ->where('tasks.created_by', $auth_user->id)
-            ->where('leads.lead_status', '!=', 'done')
+            // ->where('leads.lead_status', '!=', 'done')
             ->whereNull('tasks.deleted_at');
 
         $current_date = date('Y-m-d');
