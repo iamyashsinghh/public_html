@@ -21,9 +21,9 @@
                     <h1 class="m-0">{{$page_heading}}</h1>
                 </div>
                 <div class="col-sm-6">
-                    <div class="d-flex">
+                    <div class="float-right">
                         <button class="btn btn-sm text-light"  data-bs-toggle="modal" data-bs-target="#createLeadModal"
-                            style="background-color: var(--wb-renosand);">Create Lead Modal</button>
+                            style="background-color: var(--wb-renosand);">Create Lead</button>
                     </div>
                 </div>
             </div>
