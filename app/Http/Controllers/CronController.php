@@ -39,8 +39,8 @@ class CronController extends Controller
             foreach ($vm_recce_today as $lead) {
                 if ($lead->lead_status == 'Done') {
                     $lead->lead_status = 'Active';
-                    $lead->done_title = null;
-                    $lead->done_message = null;
+                    // $lead->done_title = null;
+                    // $lead->done_message = null;
                     $lead->lead_color = '#ff00001f'; // Corrected the color format to be a valid string
                     $lead->save();
                 }
