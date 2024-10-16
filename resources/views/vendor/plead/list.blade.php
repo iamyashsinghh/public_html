@@ -22,7 +22,8 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="d-flex">
-                        <button class="btn btn-sm text-light" data-bs-toggle="modal" data-bs-target="#createLeadModal">Create Lead Modal</button>
+                        <button class="btn btn-sm text-light"  data-bs-toggle="modal" data-bs-target="#createLeadModal"
+                            style="background-color: var(--wb-renosand);">Create Lead Modal</button>
                     </div>
                 </div>
             </div>
