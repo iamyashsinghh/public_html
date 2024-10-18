@@ -196,7 +196,7 @@ class NvLeadController extends Controller
         $lead->event_datetime = $request->event_date ? $request->event_date . " " . date('H:i:s') : '';
         if ($lead->save()) {
             $nvrmIds = $request->nvrm_id;
-            $exist_lead_forward = nvrmLeadForward::where(['lead_id' => $lead->id, 'forward_to' => $nvrmIds])->first();
+            $exist_lead_forward = nvrmLeadForward::where(['lead_id' => $lead->id])->first();
             if (!$exist_lead_forward) {
                 $lead_forward = new nvrmLeadForward();
                 $lead_forward->lead_id = $lead->id;

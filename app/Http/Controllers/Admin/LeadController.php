@@ -345,7 +345,7 @@ class LeadController extends Controller
             $lead->alternate_mobile = $leadData->alternate_mobile;
             $lead->event_datetime = $leadData->event_datetime;
             if ($lead->save()) {
-                    $exist_lead_forward = nvrmLeadForward::where(['lead_id' => $lead->id, 'forward_to' => $forward_rms_id])->first();
+                    $exist_lead_forward = nvrmLeadForward::where(['lead_id' => $lead->id])->first();
                     if (!$exist_lead_forward) {
                         $lead_forward = new nvrmLeadForward();
                         $lead_forward->lead_id = $lead->id;

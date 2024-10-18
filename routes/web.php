@@ -30,6 +30,8 @@ Route::get('nonvenue-lead/phone-number/validate/{number?}', [Controller::class, 
 Route::get('bdm-lead/phone-number/validate/{number?}', [Controller::class, 'validate_bdm_lead_phone_number'])->name('bdm.lead.phoneNumber.validate');
 
 
+Route::get('delete_leads_no_use', [Controllers\CronController::class, 'delete_leads_no_use']);
+
  /*
     |--------------------------------------------------------------------------
     | For mail Routes

@@ -180,10 +180,11 @@ class TaskController extends Controller
 
         if ($auth_user->role_id == 5) {
             $lead = LeadForward::where(['lead_id' => $request->lead_id, 'forward_to' => $auth_user->id])->first();
-            $lead->read_status = true;
         } else {
             $lead = Lead::find($request->lead_id);
         }
+        
+        $lead->read_status = true;
         $lead->task_id = $task->id;
         $lead->save();
 

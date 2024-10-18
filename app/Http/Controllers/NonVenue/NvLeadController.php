@@ -287,7 +287,7 @@ class NvLeadController extends Controller
         $auth_user = Auth::guard('nonvenue')->user();
         $exist_lead = nvLead::where('mobile', $request->mobile_number)->first();
         if ($exist_lead) {
-            $exist_forward = nvrmLeadForward::where(['lead_id' => $exist_lead->id, 'forward_to' => $auth_user->id])->first();
+            $exist_forward = nvrmLeadForward::where(['lead_id' => $exist_lead->id])->first();
             if ($exist_forward) {
                 $lead_link = route('nonvenue.lead.view', $exist_forward->lead_id);
                 session()->flash('status', ['success' => true, 'alert_type' => 'info', 'message' => "Lead is already exist with this mobile number. Click on the link below to view the lead. <a href='$lead_link'><b>$lead_link</b></a>"]);

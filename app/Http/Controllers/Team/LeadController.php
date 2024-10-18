@@ -685,7 +685,7 @@ class LeadController extends Controller
             $lead->alternate_mobile = $leadData->alternate_mobile;
             $lead->event_datetime = $leadData->event_datetime;
             if ($lead->save()) {
-                $exist_lead_forward = nvrmLeadForward::where(['lead_id' => $lead->id, 'forward_to' => $auth_user->nvrm_id])->first();
+                $exist_lead_forward = nvrmLeadForward::where(['lead_id' => $lead->id])->first();
                 if (!$exist_lead_forward) {
                     $lead_forward = new nvrmLeadForward();
                     $lead_forward->lead_id = $lead->id;
@@ -806,7 +806,6 @@ class LeadController extends Controller
         $auth_user = Auth::guard('team')->user();
         if ($auth_user->role_id == 4) {
             $lead = Lead::find($lead_id_or_forward_id);
-            $lead->read_status = true;
         } else {
             $lead = LeadForward::where(['lead_id' => $lead_id_or_forward_id, 'forward_to' => $auth_user->id])->first();
         }

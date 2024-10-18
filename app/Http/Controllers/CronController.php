@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
+use App\Models\nvrmLeadForward;
+use App\Models\nvrmMessage;
 use App\Models\TeamMember;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -81,4 +83,41 @@ class CronController extends Controller
         }
         return $vm_recce_overdue;
     }
+
+    public function delete_leads_no_use()
+{
+    $leadIds = nvrmLeadForward::distinct()->pluck('lead_id');
+    $totalDeletedCount = 0;  // Track total deleted leads count
+    $totalUpdatedCount = 0;  // Track total updated leads count
+
+    foreach ($leadIds as $lead_id) {
+        $lead = nvrmLeadForward::where('lead_id', $lead_id)->orderBy('id')->first();
+
+        if ($lead) {
+            $deletedCount = nvrmLeadForward::where('lead_id', $lead_id)
+                ->where('id', '!=', $lead->id)
+                ->delete();
+            $totalDeletedCount += $deletedCount;
+
+            $latestMessage = nvrmMessage::where('lead_id', $lead_id)
+                ->whereNull('deleted_at')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+                if ($latestMessage) {
+                $isValidTeamMember = TeamMember::where('id', $latestMessage->created_by)->exists();
+                if ($isValidTeamMember) {
+                    $lead->forward_to = $latestMessage->created_by;
+                    $lead->save();
+                    $totalUpdatedCount++;
+                }
+            }
+        }
+    }
+
+    echo "Total leads deleted: " . $totalDeletedCount . "\n";
+    echo "Total leads updated with the latest message: " . $totalUpdatedCount . "\n";
+}
+
+
 }
