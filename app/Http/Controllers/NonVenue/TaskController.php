@@ -43,31 +43,31 @@ class TaskController extends Controller
     {
         $auth_user = Auth::guard('nonvenue')->user();
         $latestTask = nvrmTask::select('lead_id', DB::raw('MAX(created_at) as latest_created_at'))
-            ->whereNull('done_datetime')
-            ->whereNull('deleted_at')
-            ->groupBy('lead_id');
+    ->whereNull('done_datetime')
+    ->whereNull('deleted_at')
+    ->groupBy('lead_id');
 
-        $tasks = nvrmLeadForward::select(
-            'nvrm_lead_forwards.lead_id',
-            'nvrm_lead_forwards.lead_datetime',
-            'nvrm_lead_forwards.name',
-            'nvrm_lead_forwards.mobile',
-            'nvrm_lead_forwards.lead_status',
-            'nvrm_tasks.task_schedule_datetime',
-            'nvrm_lead_forwards.event_datetime',
-            'nvrm_tasks.created_at as task_created_datetime',
-            'nvrm_tasks.done_datetime as task_done_datetime'
-        )
-            ->joinSub($latestTask, 'latest_task', function ($join) {
-                $join->on('nvrm_lead_forwards.lead_id', '=', 'latest_task.lead_id');
-            })
-            ->join('nvrm_tasks', function ($join) {
-                $join->on('nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
-                    ->on('nvrm_tasks.created_at', '=', 'latest_task.latest_created_at');
-            })
-            ->where(['nvrm_tasks.created_by' => $auth_user->id])
-            ->whereNull('nvrm_lead_forwards.deleted_at')
-            ->where('nvrm_lead_forwards.lead_status', '!=', 'done');
+$tasks = nvrmLeadForward::select(
+        'nvrm_lead_forwards.lead_id',
+        'nvrm_lead_forwards.lead_datetime',
+        'nvrm_lead_forwards.name',
+        'nvrm_lead_forwards.mobile',
+        'nvrm_lead_forwards.lead_status',
+        'nvrm_tasks.task_schedule_datetime',
+        'nvrm_lead_forwards.event_datetime',
+        'nvrm_tasks.created_at as task_created_datetime',
+        'nvrm_tasks.done_datetime as task_done_datetime'
+    )
+    ->joinSub($latestTask, 'latest_task', function ($join) {
+        $join->on('nvrm_lead_forwards.lead_id', '=', 'latest_task.lead_id');
+    })
+    ->join('nvrm_tasks', function ($join) {
+        $join->on('nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
+             ->on('nvrm_tasks.created_at', '=', 'latest_task.latest_created_at');
+    })
+    ->where(['nvrm_tasks.created_by' => $auth_user->id])
+    ->whereNull('nvrm_lead_forwards.deleted_at')
+    ->where('nvrm_lead_forwards.lead_status', '!=', 'done');
 
 
 
