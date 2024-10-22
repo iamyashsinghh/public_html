@@ -69,8 +69,12 @@ class TaskController extends Controller
                     ->on('tasks.created_at', '=', 'latest.latest_created_at');
             })
             ->where('tasks.created_by', $auth_user->id)
-            // ->where('leads.lead_status', '!=', 'done')
             ->whereNull('tasks.deleted_at');
+
+
+        if($auth_user->role_id == 4){
+            $tasks->where('leads.lead_status', '!=', 'done');
+        }
 
         $current_date = date('Y-m-d');
 
@@ -183,7 +187,7 @@ class TaskController extends Controller
         } else {
             $lead = Lead::find($request->lead_id);
         }
-        
+
         $lead->read_status = true;
         $lead->task_id = $task->id;
         $lead->save();
