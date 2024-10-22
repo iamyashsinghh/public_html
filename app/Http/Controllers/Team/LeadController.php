@@ -806,6 +806,7 @@ class LeadController extends Controller
         $auth_user = Auth::guard('team')->user();
         if ($auth_user->role_id == 4) {
             $lead = Lead::find($lead_id_or_forward_id);
+            $lead->service_status = $status;
         } else {
             $lead = LeadForward::where(['lead_id' => $lead_id_or_forward_id, 'forward_to' => $auth_user->id])->first();
             $lead->service_status = $status;
