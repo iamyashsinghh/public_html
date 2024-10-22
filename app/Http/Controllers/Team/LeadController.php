@@ -808,13 +808,13 @@ class LeadController extends Controller
             $lead = Lead::find($lead_id_or_forward_id);
         } else {
             $lead = LeadForward::where(['lead_id' => $lead_id_or_forward_id, 'forward_to' => $auth_user->id])->first();
+            $lead->service_status = $status;
         }
         if (!$lead) {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => "Something went wrong."]);
             return redirect()->back();
         }
 
-        $lead->service_status = $status;
         $lead->save();
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Service status updated."]);
         return redirect()->back();

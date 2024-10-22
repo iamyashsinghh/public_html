@@ -112,55 +112,55 @@ class DashboardController extends Controller
 
 
         $vendor_today_issue = nvNote::join('nvrm_messages', 'nv_notes.lead_id', '=', 'nvrm_messages.lead_id')
-        ->join('vendors', function($join) {
-            $join->on('nvrm_messages.vendor_category_id', '=', 'vendors.category_id')
-                 ->on('nv_notes.created_by', '=', 'vendors.id');
-        })
-        ->leftJoin('nvrm_lead_forwards', 'nvrm_lead_forwards.lead_id', '=', 'nv_notes.lead_id')
-        ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
-        ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
-        ->select(
-            'nv_notes.*',
-            'nvrm_lead_forwards.lead_id',
-            'nvrm_lead_forwards.lead_status',
-            'nvrm_lead_forwards.deleted_at',
-            'vendors.name as created_by_name',
-            'vendor_categories.name as category_name',
-            'team_members.name as done_by_name'
-        )
-        ->where('nv_notes.id', '>', 1706)
-        ->where('nvrm_messages.created_by', $auth_user->id)
-        ->whereBetween('nv_notes.created_at',  [$currentDateStart, $currentDateEnd])
-        ->groupBy('nv_notes.id')
-        ->whereNull('nv_notes.done_by')
-        ->whereNull('nvrm_lead_forwards.deleted_at')
-        ->get()
-        ->count();
+            ->join('vendors', function ($join) {
+                $join->on('nvrm_messages.vendor_category_id', '=', 'vendors.category_id')
+                    ->on('nv_notes.created_by', '=', 'vendors.id');
+            })
+            ->leftJoin('nvrm_lead_forwards', 'nvrm_lead_forwards.lead_id', '=', 'nv_notes.lead_id')
+            ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
+            ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
+            ->select(
+                'nv_notes.*',
+                'nvrm_lead_forwards.lead_id',
+                'nvrm_lead_forwards.lead_status',
+                'nvrm_lead_forwards.deleted_at',
+                'vendors.name as created_by_name',
+                'vendor_categories.name as category_name',
+                'team_members.name as done_by_name'
+            )
+            ->where('nv_notes.id', '>', 1706)
+            ->where('nvrm_messages.created_by', $auth_user->id)
+            ->whereBetween('nv_notes.created_at',  [$currentDateStart, $currentDateEnd])
+            ->groupBy('nv_notes.id')
+            ->whereNull('nv_notes.done_by')
+            ->whereNull('nvrm_lead_forwards.deleted_at')
+            ->get()
+            ->count();
 
         $vendor_overdue_issue = nvNote::join('nvrm_messages', 'nv_notes.lead_id', '=', 'nvrm_messages.lead_id')
-        ->join('vendors', function($join) {
-            $join->on('nvrm_messages.vendor_category_id', '=', 'vendors.category_id')
-                 ->on('nv_notes.created_by', '=', 'vendors.id');
-        })
-        ->leftJoin('nvrm_lead_forwards', 'nvrm_lead_forwards.lead_id', '=', 'nv_notes.lead_id')
-        ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
-        ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
-        ->select(
-            'nv_notes.*',
-            'nvrm_lead_forwards.lead_id',
-            'nvrm_lead_forwards.lead_status',
-            'vendors.name as created_by_name',
-            'vendor_categories.name as category_name',
-            'team_members.name as done_by_name'
-        )
-        ->where('nv_notes.id', '>', 1706)
-        ->where('nvrm_messages.created_by', $auth_user->id)
-        ->where('nv_notes.created_at', '<', $currentDateStart)
-        ->groupBy('nv_notes.id')
-        ->whereNull('nv_notes.done_by')
-        ->whereNull('nvrm_lead_forwards.deleted_at')
-        ->get()
-        ->count();
+            ->join('vendors', function ($join) {
+                $join->on('nvrm_messages.vendor_category_id', '=', 'vendors.category_id')
+                    ->on('nv_notes.created_by', '=', 'vendors.id');
+            })
+            ->leftJoin('nvrm_lead_forwards', 'nvrm_lead_forwards.lead_id', '=', 'nv_notes.lead_id')
+            ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
+            ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
+            ->select(
+                'nv_notes.*',
+                'nvrm_lead_forwards.lead_id',
+                'nvrm_lead_forwards.lead_status',
+                'vendors.name as created_by_name',
+                'vendor_categories.name as category_name',
+                'team_members.name as done_by_name'
+            )
+            ->where('nv_notes.id', '>', 1706)
+            ->where('nvrm_messages.created_by', $auth_user->id)
+            ->where('nv_notes.created_at', '<', $currentDateStart)
+            ->groupBy('nv_notes.id')
+            ->whereNull('nv_notes.done_by')
+            ->whereNull('nvrm_lead_forwards.deleted_at')
+            ->get()
+            ->count();
 
         $response_data = compact(
             'total_leads_received_this_month',
