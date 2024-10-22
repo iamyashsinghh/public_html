@@ -316,6 +316,7 @@ class LeadController extends Controller
         $TeamMember = TeamMember::where('id', $request->forward_rms_id)->first();
         foreach ($leads as $lead) {
             $lead->assign_to = $TeamMember->name;
+            $lead->assign_id = $TeamMember->id;
             $lead->save();
         }
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Lead's Forwarded successfully."]);

@@ -619,7 +619,12 @@ class LeadController extends Controller
         $lead->lead_status = $request->lead_status;
         $lead->event_datetime = $request->event_date ? $request->event_date . " " . date('H:i:s') : '';
         $lead->pax = $request->number_of_guest;
+        $lead->whatsapp_msg_time = $this->current_timestamp;
         $lead->lead_color = "#0066ff33";
+        if ($auth_user->role_id == 4) {
+        $lead->assign_to = $auth_user->name;
+        $lead->assign_id = $auth_user->id;
+        }
         $lead->save();
 
         if ($auth_user->role_id == 5) {
