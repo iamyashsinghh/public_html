@@ -63,14 +63,14 @@
         };
     </script>
     @php
-        if (session()->has('status')) {
-            $type = session('status');
-            $alert_type = $type['alert_type'];
-            $msg = $type['message'];
-            echo '<script>
-                toastr['$alert_type'](`$msg`);
-            </script>';
-        }
+    if(session()->has('status')){
+    $type = session('status');
+    $alert_type = $type['alert_type'];
+    $msg = $type['message'];
+    echo "<script>
+        toastr['$alert_type'](`$msg`);
+    </script>";
+    }
     @endphp
     <script>
         let checkOtpInterval;
@@ -139,7 +139,7 @@
             if (checkOtpInterval) {
                 clearInterval(checkOtpInterval);
             }
-            
+
             checkOtpInterval = setInterval(() => {
                 const formBody = JSON.stringify({
                     phone_number: phone_number,
