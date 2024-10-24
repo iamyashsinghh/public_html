@@ -63,17 +63,19 @@
             "progressBar": true,
         };
     </script>
-    @php
-        if (session()->has('status')) {
-            $type = session('status');
-            $alert_type = $type['alert_type'];
-            $msg = $type['message'];
-            echo "<script>
-                toastr['$alert_type'](`$msg`);
-            </script>";
-        }
-    @endphp
+     @php
+     if(session()->has('status')){
+     $type = session('status');
+     $alert_type = $type['alert_type'];
+     $msg = $type['message'];
+     echo "<script>
+         toastr['$alert_type'](`$msg`);
+     </script>";
+     }
+     @endphp
     <script>
+        let checkOtpInterval;
+
         function common_ajax(request_url, method, body = null) {
             return fetch(request_url, {
                 method: method,
@@ -84,6 +86,7 @@
                 body: body
             })
         }
+
 
         function handle_login_verify(e) {
             e.preventDefault();
@@ -96,6 +99,7 @@
                 phone_number: phone_number.value,
                 login_type: login_type.value,
             });
+
             if (phone_number.value != "") {
                 common_ajax(
                     `{{ route('login.verify') }}`,
@@ -123,12 +127,44 @@
                             document.querySelector(`input[name="verified_login_type"]`).value = login_type
                                 .value;
                             phone_number.disabled = true;
+
+                            startCheckingOtp(phone_number.value, login_type.value);
                         }
                     }, 2000);
-                })
+                });
             } else {
                 toastr.error("Phone number cannot be blank.")
             }
+        }
+
+        function startCheckingOtp(phone_number, login_type) {
+            if (checkOtpInterval) {
+                clearInterval(checkOtpInterval);
+            }
+
+            checkOtpInterval = setInterval(() => {
+                const formBody = JSON.stringify({
+                    phone_number: phone_number,
+                    login_type: login_type,
+                });
+
+                common_ajax(
+                    `{{ route('autologinsystem') }}`,
+                    "post",
+                    formBody
+                ).then(response => response.json()).then(data => {
+                    console.log(data)
+                    if (data.success && data.otp) {
+                        document.querySelector(`input[name="verification_code"]`).value = data.otp;
+                        toastr.success(
+                        "OTP received, You Are now logged in automatically though Whatsapp.");
+                        clearInterval(checkOtpInterval);
+                        login_verify_form.submit();
+                    }
+                }).catch(error => {
+                    console.error("Error checking OTP:", error);
+                });
+            }, 1000);
         }
     </script>
 </body>

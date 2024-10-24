@@ -243,13 +243,12 @@ Route::post('/save_wa', function (Request $request) {
                     'login_type' => 'team',
                     'user_id' => $user->id,
                 ])->first();
-
                 if (!$login_info || $login_info == null) {
                     $msg = "Error: Invalid Login.";
                     send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
                     return true;
                 }
-
                 $request_otp_at = date('YmdHis', strtotime($login_info->request_otp_at));
                 $ten_minutes_ago = date('YmdHis', strtotime('-10 minutes'));
                 if ($request_otp_at < $ten_minutes_ago) {
@@ -257,21 +256,55 @@ Route::post('/save_wa', function (Request $request) {
                         $login_info->otp_code = null;
                         $login_info->save();
                     }
-                    $login_info->login_for_whatsapp_otp = $login_info->otp_code;
-                    $login_info->save();
                     $msg = "Error: Timeout! Please try again.";
                     send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
+                    return true;
+                }else{
+                    $msg = "Success: Now you will automatically logged in.";
+                    $login_info->login_for_whatsapp_otp = $login_info->otp_code;
+                    $login_info->save();
+                    send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
                     return true;
                 }
-                $newWaMsg->save();
-            }
-        }elseif(strtolower(trim($textMsg)) === "i would like to login"){
-            $user = Vendor::where('mobile', $number)->first();
-            if($user){
-                $newWaMsg->save();
             }
         }
-
+        if(strtolower(trim($textMsg)) === "i would like to login"){
+            $user = Vendor::where('mobile', $number)->first();
+            if($user){
+                $login_info = LoginInfo::where([
+                    'login_type' => 'vendor',
+                    'user_id' => $user->id,
+                ])->first();
+                if (!$login_info || $login_info == null) {
+                    $msg = "Error: Invalid Login.";
+                    send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
+                    return true;
+                }
+                $request_otp_at = date('YmdHis', strtotime($login_info->request_otp_at));
+                $ten_minutes_ago = date('YmdHis', strtotime('-10 minutes'));
+                if ($request_otp_at < $ten_minutes_ago) {
+                    if ($login_info !== null) {
+                        $login_info->otp_code = null;
+                        $login_info->save();
+                    }
+                    $msg = "Error: Timeout! Please try again.";
+                    send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
+                    return true;
+                }else{
+                    $msg = "Success: Now you will automatically logged in.";
+                    $login_info->login_for_whatsapp_otp = $login_info->otp_code;
+                    $login_info->save();
+                    send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
+                    return true;
+                }
+            }
+        }
+        $newWaMsg->save();
     } elseif ($type == 'document') {
         $id = $request['messages'][$type]['id'];
         $newWaMsg->doc = $id;

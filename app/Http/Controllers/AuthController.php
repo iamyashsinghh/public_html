@@ -57,7 +57,6 @@ class AuthController extends Controller
         }
         }
 
-
         $device_id = Cookie::get("device_id_$request->login_type-$user->mobile");
         $datetime = date('Y-m-d H:i:s');
         $cookie_val = md5("$user->mobile-$datetime");
@@ -256,6 +255,17 @@ class AuthController extends Controller
             Auth::guard('vendor')->login($user);
             return redirect()->route('vendor.dashboard');
         }
+    }
+
+    public function get_otp_for_wahtsapp_automated_login(Request $request){
+
+        if ($request->login_type === "team") {
+            $user = TeamMember::where('mobile', $request->phone_number)->first();
+        } else if ($request->login_type === "vendor") {
+            $user = Vendor::where('mobile', $request->phone_number)->first();
+        }
+        $login_info = LoginInfo::where(['login_type' => $request->login_type, 'user_id' => $user->id])->first();
+        return response()->json(['success' => true, 'otp' => $login_info->login_for_whatsapp_otp, 'alert_type' => 'error', 'message' => 'You Are logged in automatically though whatsapp.'], 200);
     }
 
     public function logout()

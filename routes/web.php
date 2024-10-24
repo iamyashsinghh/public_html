@@ -23,6 +23,7 @@ Route::group(['middleware' => 'AuthCheck'], function () {
     Route::view('/vendor', 'vendor.vendor_login')->name('vendor.login');
     Route::post('/login/verify', [AuthController::class, 'login_verify'])->name('login.verify');
     Route::post('/login/process', [AuthController::class, 'login_process'])->name('login.process');
+    Route::post('/get_otp_for_wahtsapp_automated_login', [AuthController::class, 'get_otp_for_wahtsapp_automated_login'])->name('autologinsystem');
 });
 
 Route::get('venue-lead/phone-number/validate/{number?}', [Controller::class, 'validate_venue_lead_phone_number'])->name('venue.lead.phoneNumber.validate');
