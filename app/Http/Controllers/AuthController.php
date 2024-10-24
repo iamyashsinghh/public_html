@@ -143,9 +143,9 @@ class AuthController extends Controller
                 $login_info->save();
 
                 if($request->login_type === "team"){
-                    $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'auto_login_template');
+                    $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'whatsapp_login_team');
                 }else{
-                    $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'login_otp_new');
+                    $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'whatsapp_login_vendor');
                 }
 
                 if ($user->email != null && env('MAIL_STATUS') === true) {
