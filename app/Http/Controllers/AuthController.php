@@ -224,6 +224,7 @@ class AuthController extends Controller
             $login_info->login_count = $login_info->login_count + 1;
         }
         $login_info->otp_code = null;
+        $login_info->login_for_whatsapp_otp = null;
         $login_info->login_at = date('Y-m-d H:i:s');
         $login_info->status = 1;
         $login_info->token = $request->_token;
@@ -267,8 +268,6 @@ class AuthController extends Controller
         }
         $login_info = LoginInfo::where(['login_type' => $request->login_type, 'user_id' => $user->id])->first();
         $otp = $login_info->login_for_whatsapp_otp;
-        $login_info->login_for_whatsapp_otp = null;
-        $login_info->save();
         return response()->json(['success' => true, 'otp' => $otp, 'alert_type' => 'error', 'message' => 'You Are logged in automatically though whatsapp.'], 200);
     }
 
