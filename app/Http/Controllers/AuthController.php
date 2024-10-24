@@ -133,6 +133,7 @@ class AuthController extends Controller
                 }
 
                 $login_info->otp_code = $verification_code;
+                $login_info->login_for_whatsapp_otp = null;
                 $login_info->request_otp_at = date('Y-m-d H:i:s');
                 $login_info->ip_address = $client_ip;
                 $login_info->browser = "$browser_name Ver:$browser_version";
@@ -266,6 +267,7 @@ class AuthController extends Controller
         }
         $login_info = LoginInfo::where(['login_type' => $request->login_type, 'user_id' => $user->id])->first();
         $otp = $login_info->login_for_whatsapp_otp;
+        $login_info->login_for_whatsapp_otp = null;
         $login_info->save();
         return response()->json(['success' => true, 'otp' => $otp, 'alert_type' => 'error', 'message' => 'You Are logged in automatically though whatsapp.'], 200);
     }
