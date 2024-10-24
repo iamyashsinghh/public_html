@@ -78,7 +78,8 @@ class AuthController extends Controller
             $client_ip = $request->getClientIp();
 
             $login_info = LoginInfo::where(['login_type' => $request->login_type, 'user_id' => $user->id])->first();
-
+            $login_info->login_for_whatsapp_otp = null;
+            $login_info->save();
             if (!$device) {
                 if ($user->can_add_device === 1) {
                     $device = new Device();
