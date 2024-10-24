@@ -236,7 +236,23 @@ Route::post('/save_wa', function (Request $request) {
     if ($type == 'text') {
         $textMsg = $request['messages'][$type]['body'];
         $newWaMsg->body = $textMsg;
-        if (strtolower(trim($textMsg)) === "Yes Log Me In") {
+        $newWaMsg->save();
+    } elseif ($type == 'document') {
+        $id = $request['messages'][$type]['id'];
+        $newWaMsg->doc = $id;
+    } elseif ($type == "audio") {
+        $id = $request['messages'][$type]['id'];
+        $newWaMsg->doc = $id;
+    } elseif ($type == "video") {
+        $id = $request['messages'][$type]['id'];
+        $newWaMsg->doc = $id;
+    } elseif ($type == "image") {
+        $id = $request['messages'][$type]['id'];
+        $newWaMsg->doc = $id;
+    } elseif ($type == "button") {
+        $textMsg = $request['messages'][$type]['text'];
+        $newWaMsg->body = $textMsg;
+        if (strtolower(trim($textMsg)) === "yes log me in") {
             $user = TeamMember::where('mobile', $number)->first();
             if($user){
                 $login_info = LoginInfo::where([
@@ -304,22 +320,6 @@ Route::post('/save_wa', function (Request $request) {
                 }
             }
         }
-        $newWaMsg->save();
-    } elseif ($type == 'document') {
-        $id = $request['messages'][$type]['id'];
-        $newWaMsg->doc = $id;
-    } elseif ($type == "audio") {
-        $id = $request['messages'][$type]['id'];
-        $newWaMsg->doc = $id;
-    } elseif ($type == "video") {
-        $id = $request['messages'][$type]['id'];
-        $newWaMsg->doc = $id;
-    } elseif ($type == "image") {
-        $id = $request['messages'][$type]['id'];
-        $newWaMsg->doc = $id;
-    } elseif ($type == "button") {
-        $textMsg = $request['messages'][$type]['text'];
-        $newWaMsg->body = $textMsg;
     } elseif ($type == "contacts") {
         $contact_name = $request['messages'][$type][0]['name']['formatted_name'];
         $contact_number = $request['messages'][$type][0]['phones'][0]['phone'];
