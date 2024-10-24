@@ -142,9 +142,9 @@ class AuthController extends Controller
                 $login_info->status = 0;
                 $login_info->save();
 
-                if($request->login_type === "team"){
+                if($request->login_type == "team"){
                     $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'whatsapp_login_team');
-                }elseif($request->login_type === "vendor"){
+                }elseif($request->login_type == "vendor"){
                     $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'whatsapp_login_vendor');
                 }
 
