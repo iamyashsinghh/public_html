@@ -3,6 +3,7 @@
 use App\Models\BdmLead;
 use App\Models\CrmMeta;
 use App\Models\Lead;
+use App\Models\LoginInfo;
 use App\Models\nvLead;
 use App\Models\nvrmLeadForward;
 use App\Models\whatsappMessages;
@@ -139,6 +140,39 @@ if (!function_exists('getAssigningBdm')) {
         }
     }
 }
+if (!function_exists('send_wa_normal_text_msg')) {
+    function send_wa_normal_text_msg($number, $msg)
+    {
+        if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+            return false;
+        }
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $authKey = env('TATA_AUTH_KEY');
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer $authKey",
+            'Content-Type' => 'application/json'
+        ])->post($url, [
+            "messaging_product" => "whatsapp",
+            "recipient_type" => "individual",
+            "to" => "91$number",
+            "type" => "text",
+            "text" => [
+                "body" => $msg,
+            ]
+        ]);
+        if ($response->successful()) {
+            $current_timestamp = date('Y-m-d H:i:s');
+            $newWaMsgSave = new whatsappMessages();
+            $newWaMsgSave->msg_id = "$number";
+            $newWaMsgSave->msg_from = "$number";
+            $newWaMsgSave->time = $current_timestamp;
+            $newWaMsgSave->type = 'text';
+            $newWaMsgSave->is_sent = "1";
+            $newWaMsgSave->body = $msg;
+            $newWaMsgSave->save();
+        }
+    }
+}
 
 if (!function_exists('assignLeadsToRMs')) {
     function assignLeadsToRMs()
@@ -167,7 +201,7 @@ if (!function_exists('assignLeadsToRMs')) {
     }
 }
 
-Route::get('/getlol', function () {
+Route::get ('/getlol', function () {
     // $oneYearAgo = Carbon::now()->subYear();
     // $oneYearAgo0 = Carbon::now()->subMonth();
 
@@ -202,6 +236,42 @@ Route::post('/save_wa', function (Request $request) {
     if ($type == 'text') {
         $textMsg = $request['messages'][$type]['body'];
         $newWaMsg->body = $textMsg;
+        if (strtolower(trim($textMsg)) === "yes log me in") {
+            $user = TeamMember::where('mobile', $number)->first();
+            if($user){
+                $login_info = LoginInfo::where([
+                    'login_type' => 'team',
+                    'user_id' => $user->id,
+                ])->first();
+
+                if (!$login_info || $login_info == null) {
+                    $msg = "Error: Invalid Login.";
+                    send_wa_normal_text_msg($number, $msg);
+                    return true;
+                }
+
+                $request_otp_at = date('YmdHis', strtotime($login_info->request_otp_at));
+                $ten_minutes_ago = date('YmdHis', strtotime('-10 minutes'));
+                if ($request_otp_at < $ten_minutes_ago) {
+                    if ($login_info !== null) {
+                        $login_info->otp_code = null;
+                        $login_info->save();
+                    }
+                    $login_info->login_for_whatsapp_otp = $login_info->otp_code;
+                    $login_info->save();
+                    $msg = "Error: Timeout! Please try again.";
+                    send_wa_normal_text_msg($number, $msg);
+                    return true;
+                }
+                $newWaMsg->save();
+            }
+        }elseif(strtolower(trim($textMsg)) === "i would like to login"){
+            $user = Vendor::where('mobile', $number)->first();
+            if($user){
+                $newWaMsg->save();
+            }
+        }
+
     } elseif ($type == 'document') {
         $id = $request['messages'][$type]['id'];
         $newWaMsg->doc = $id;
@@ -285,12 +355,12 @@ Route::post('/save_wa', function (Request $request) {
     $getlead5 = Vendor::where('alt_mobile_number', $number)->first();
     $getlead6 = BdmLead::where('mobile', $number)->first();
 
+
     if ($getlead) {
         $getlead->is_whatsapp_msg = 1;
         $getlead->whatsapp_msg_time = $current_timestamp;
         $getlead->save();
     }
-
     if ($getlead2) {
         $getlead2->is_whatsapp_msg = 1;
         $getlead2->whatsapp_msg_time = $current_timestamp;
@@ -300,7 +370,6 @@ Route::post('/save_wa', function (Request $request) {
         $getlead3->is_whatsapp_msg = 1;
         $getlead3->save();
     }
-
     if ($getlead4) {
         $getlead4->is_whatsapp_msg = 1;
         $getlead4->whatsapp_msg_time = $current_timestamp;
@@ -316,7 +385,6 @@ Route::post('/save_wa', function (Request $request) {
         $getlead6->whatsapp_msg_time = $current_timestamp;
         $getlead6->save();
     }
-
     if (!$getlead && !$getlead2 && !$getlead3 && !$getlead4 && !$getlead5 && !$getlead6) {
         $current_timestamp = date('Y-m-d H:i:s');
         $lead = new Lead();
