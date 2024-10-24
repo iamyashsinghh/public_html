@@ -142,7 +142,7 @@ class AuthController extends Controller
                 $login_info->status = 0;
                 $login_info->save();
 
-                if($request->login_type == "team"){
+                if($request->login_type === "team"){
                     $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'auto_login_template');
                 }else{
                     $this->interakt_wa_msg_send($user->mobile, $user->name, $verification_code, 'login_otp_new');

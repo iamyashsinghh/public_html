@@ -31,9 +31,9 @@ class Controller extends BaseController {
             'Content-Type' => 'application/json',
         ])->post($url, [
                     "to" => "91{$phone_no}",
-                    "type" => $template_type,
+                    "type" => "template",
                     "template" => [
-                        "name" => "login_otp_new",
+                        "name" => $template_type,
                         "language" => [
                             "code" => "en"
                         ],
