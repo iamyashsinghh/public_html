@@ -68,7 +68,7 @@ class TeamMemberController extends Controller {
     public function manage_process($id = 0, Request $request) {
         $validate = Validator::make($request->all(), [
             'name' => 'required|string|min:3|max:255',
-            'profile_image' => 'mimes:jpg,jpeg,png,webp|max:1024',
+            'profile_image' => 'mimes:jpg,jpeg,png,webp,gif|max:1024',
             'email' => "required|email",
             'mobile_number' => "required|digits:10",
             'role' => 'required|integer|exists:roles,id',
