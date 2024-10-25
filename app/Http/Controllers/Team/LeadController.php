@@ -10,6 +10,7 @@ use App\Models\LeadForwardInfo;
 use App\Models\nvEvent;
 use App\Models\nvLead;
 use App\Models\nvrmLeadForward;
+use App\Models\RmMessage;
 use App\Models\TeamMember;
 use App\Models\WhatsappCampain;
 use App\Models\VmEvent;
@@ -750,6 +751,7 @@ class LeadController extends Controller
         }
 
         $total_events_count = Event::where('lead_id', $lead_id)->count();
+        $total_rm_msg = RmMessage::where('lead_id',  $lead_id)->count();
 
         $vm_members_which_contains_common_venue_name = [];
         $vm_members_which_contains_uncommon_venue_name = [];
@@ -771,7 +773,7 @@ class LeadController extends Controller
             }
         }
 
-        return view('team.venueCrm.lead.view', compact('lead', 'current_lead_having_vm_members', 'total_events_count', 'commonVenue', 'uncommonVenue'));
+        return view('team.venueCrm.lead.view', compact('lead', 'total_rm_msg','current_lead_having_vm_members', 'total_events_count', 'commonVenue', 'uncommonVenue'));
     }
 
     public function get_forward_info($lead_id = 0)
