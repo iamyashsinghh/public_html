@@ -162,14 +162,14 @@ if (!function_exists('send_wa_normal_text_msg')) {
         ]);
         if ($response->successful()) {
             $current_timestamp = date('Y-m-d H:i:s');
-            $newWaMsgSave = new whatsappMessages();
-            $newWaMsgSave->msg_id = "$number";
-            $newWaMsgSave->msg_from = "$number";
-            $newWaMsgSave->time = $current_timestamp;
-            $newWaMsgSave->type = 'text';
-            $newWaMsgSave->is_sent = "1";
-            $newWaMsgSave->body = $msg;
-            $newWaMsgSave->save();
+            // $newWaMsgSave = new whatsappMessages();
+            // $newWaMsgSave->msg_id = "$number";
+            // $newWaMsgSave->msg_from = "$number";
+            // $newWaMsgSave->time = $current_timestamp;
+            // $newWaMsgSave->type = 'text';
+            // $newWaMsgSave->is_sent = "1";
+            // $newWaMsgSave->body = $msg;
+            // $newWaMsgSave->save();
         }
     }
 }
@@ -277,7 +277,11 @@ Route::post('/save_wa', function (Request $request) {
                     $newWaMsg->save();
                     return true;
                 }else{
-                    $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in.";
+                    if($user->mobile == '9355330059'){
+                        $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in. \n K";
+                    }else{
+                        $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in.";
+                    }
                     $login_info->login_for_whatsapp_otp = $login_info->otp_code;
                     $login_info->save();
                     send_wa_normal_text_msg($number, $msg);
