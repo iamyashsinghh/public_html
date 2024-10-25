@@ -278,7 +278,7 @@ Route::post('/save_wa', function (Request $request) {
                     return true;
                 }else{
                     if($user->mobile == '9355330059'){
-                        $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in. \n K";
+                        $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in. \n Kya kroge login krke na task update krne hai na kuch krna hai na kam hai na kuch 🤣🤣🤣🤣";
                     }else{
                         $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in.";
                     }
