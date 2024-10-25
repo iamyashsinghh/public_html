@@ -277,7 +277,8 @@ Route::post('/save_wa', function (Request $request) {
                     $newWaMsg->save();
                     return true;
                 }else{
-                    $msg = "Success: Now you will automatically logged in.";
+                    $msg = "*Hey $user->name*,\n\n
+                    Success: Now you will automatically logged in.";
                     $login_info->login_for_whatsapp_otp = $login_info->otp_code;
                     $login_info->save();
                     send_wa_normal_text_msg($number, $msg);
@@ -311,7 +312,8 @@ Route::post('/save_wa', function (Request $request) {
                     $newWaMsg->save();
                     return true;
                 }else{
-                    $msg = "Success: Now you will automatically logged in.";
+                    $msg = "*Hey $user->name*,\n\n
+                    Success: Now you will automatically logged in.";
                     $login_info->login_for_whatsapp_otp = $login_info->otp_code;
                     $login_info->save();
                     send_wa_normal_text_msg($number, $msg);
