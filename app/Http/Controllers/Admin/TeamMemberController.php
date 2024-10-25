@@ -173,7 +173,7 @@ class TeamMemberController extends Controller {
 
     public function update_profile_image($member_id, Request $request) {
         $validate = Validator::make($request->all(), [
-            'profile_image' => 'mimes:jpg,jpeg,png,webp|max:1024',
+            'profile_image' => 'mimes:jpg,jpeg,png,webp,gif|max:1024',
         ]);
 
         if ($validate->fails()) {
