@@ -111,7 +111,7 @@ Route::middleware('verify_token')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('/ai')->group(function () {
-        Route::post('/generate-message', [Controllers\Ai\GoogleStudioController::class, 'generateMessage'])->name('ai.googleStudioPrompt');
+        Route::post('/generate-message', [Controllers\Ai\ChatGPTController::class, 'generateMessage'])->name('ai.chatgptrompt');
     });
 
      /*

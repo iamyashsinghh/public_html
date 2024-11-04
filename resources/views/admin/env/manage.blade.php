@@ -174,22 +174,22 @@
                             <div class="card-footer">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <h5 class="mb-3">GOOGLE AI STUDIO API</h1>
+                                        <h5 class="mb-3">ChatGPT API</h1>
                                     </div>
                                     <div class="col-sm-6 mb-3">
                                         <div class="form-group">
-                                            <label for="GOOGLE_AI_STUDIO_API_STATUS">GOOGLE AI STUDIO API Status<span class="text-danger">*</span></label>
-                                            <select class="form-control" name="GOOGLE_AI_STUDIO_API_STATUS" id="GOOGLE_AI_STUDIO_API_STATUS" required>
-                                                <option value="true" @if(filter_var($envValues->GOOGLE_AI_STUDIO_API_STATUS, FILTER_VALIDATE_BOOLEAN) === true) selected @endif>On</option>
-                                                <option value="false" @if(filter_var($envValues->GOOGLE_AI_STUDIO_API_STATUS, FILTER_VALIDATE_BOOLEAN) === false) selected @endif>Off</option>
+                                            <label for="CHATGPT_API_STATUS">ChatGPT API Status<span class="text-danger">*</span></label>
+                                            <select class="form-control" name="CHATGPT_API_STATUS" id="CHATGPT_API_STATUS" required>
+                                                <option value="true" @if(filter_var($envValues->CHATGPT_API_STATUS, FILTER_VALIDATE_BOOLEAN) === true) selected @endif>On</option>
+                                                <option value="false" @if(filter_var($envValues->CHATGPT_API_STATUS, FILTER_VALIDATE_BOOLEAN) === false) selected @endif>Off</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 mb-3">
                                         <div class="form-group">
-                                            <label for="GOOGLE_AI_STUDIO_API_KEY">GOOGLE AI STUDIO Auth Key<span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" id="GOOGLE_AI_STUDIO_API_KEY" placeholder="Enter GOOGLE AI STUDIO Auth Key"
-                                                name="GOOGLE_AI_STUDIO_API_KEY" required value="{{$envValues->GOOGLE_AI_STUDIO_API_KEY}}">
+                                            <label for="CHATGPT_API_KEY">ChatGPT Auth Key<span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="CHATGPT_API_KEY" placeholder="Enter ChatGPT Auth Key"
+                                                name="CHATGPT_API_KEY" required value="{{$envValues->CHATGPT_API_KEY}}">
                                         </div>
                                     </div>
                                 </div>

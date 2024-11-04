@@ -25,8 +25,8 @@ class EnvController extends Controller
             'SMTP2_MAIL_FROM_ADDRESS' => env('SMTP2_MAIL_FROM_ADDRESS'),
             'TATA_WHATSAPP_MSG_STATUS' => filter_var(env('TATA_WHATSAPP_MSG_STATUS', 'false'), FILTER_VALIDATE_BOOLEAN),
             'TATA_AUTH_KEY' => env('TATA_AUTH_KEY'),
-            'GOOGLE_AI_STUDIO_API_STATUS' => filter_var(env('GOOGLE_AI_STUDIO_API_STATUS', 'false'), FILTER_VALIDATE_BOOLEAN),
-            'GOOGLE_AI_STUDIO_API_KEY' => env('GOOGLE_AI_STUDIO_API_KEY'),
+            'CHATGPT_API_STATUS' => filter_var(env('CHATGPT_API_STATUS', 'false'), FILTER_VALIDATE_BOOLEAN),
+            'CHATGPT_API_KEY' => env('CHATGPT_API_KEY'),
         ]));
         return view('admin.env.manage', compact('envValues'));
     }

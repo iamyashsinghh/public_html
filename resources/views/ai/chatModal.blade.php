@@ -29,7 +29,7 @@
             </div>
             <div class="modal-body">
                 <form id="generateMessageForm">
-                    <div class="mb-3">
+                    <div class="mb-3 d-none">
                         <label for="msg_type" class="form-label">Msg Type</label>
                         <div id="msgTypeButtons">
                             <button type="button" class="btn btn-secondary btn-msg-type" data-value="normal">Normal</button>
@@ -84,7 +84,7 @@
 
         document.getElementById('messageContent').innerText = '';
 
-        fetch(`{{ route('ai.googleStudioPrompt') }}`, {
+        fetch(`{{ route('ai.chatgptrompt') }}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
