@@ -40,7 +40,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="aiprompt" class="form-label">Prompt</label>
-                        <textarea class="form-control" id="aiprompt" rows="3" placeholder="Enter Prompt..."></textarea>
+                        <textarea class="form-control" id="aiprompt" rows="3" placeholder="Enter Raw Message..."></textarea>
                     </div>
                 </form>
 
