@@ -71,6 +71,8 @@ class PrecomputeDashboardData extends Command
             array_push($venue_leads_for_this_month, $count);
         }
         $venue_leads_for_this_month = implode(",", $venue_leads_for_this_month);
+        $average_leads_for_month = array_sum(explode(",", $venue_leads_for_this_month)) / date('d');
+
 
         $venue_form_leads_for_this_month = [];
         for ($i = 1; $i <= date('d'); $i++) {
@@ -173,7 +175,7 @@ class PrecomputeDashboardData extends Command
             $vm['recce_schedule_today'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.done_datetime' => null, 'visits.deleted_at' => null])->where('visits.visit_schedule_datetime', 'like', "%$current_date%")->count();
             $vm['recce_done_this_month'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.deleted_at' => null])->whereBetween('visits.done_datetime', [$from, $to])->count();
             $vm['recce_overdue'] = Visit::where(['created_by' => $vm->id, 'done_datetime' => null])->where('visit_schedule_datetime', '<', Carbon::today())->count();
-            
+
             $vm['get_manager'] = $vm->get_manager;
 
             $vm['bookings_this_month'] = LeadForward::join('bookings', 'bookings.id', 'lead_forwards.booking_id')->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'bookings.deleted_at' => null])->whereBetween('bookings.created_at', [$from, $to])->count();
@@ -409,6 +411,7 @@ class PrecomputeDashboardData extends Command
             'total_team'  => $total_team,
             'total_venue_leads'  => $total_venue_leads,
             'total_nv_leads'  => $total_nv_leads,
+            'average_leads_for_month' => $average_leads_for_month,
             'venue_leads_for_this_month' => $venue_leads_for_this_month,
             'venue_form_leads_for_this_month' => $venue_form_leads_for_this_month,
             'venue_ads_leads_for_this_month' => $venue_ads_leads_for_this_month,

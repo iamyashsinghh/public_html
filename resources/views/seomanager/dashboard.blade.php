@@ -22,7 +22,7 @@
                             <div class="card-header border-0 text-light" style="background-color: var(--wb-renosand);">
                                 <h3 class="card-title">
                                     <i class="fas fa-th mr-1"></i>
-                                    Venue Leads of {{ date('F') }} Month
+                                    Venue Leads of {{ date('F') }} Month || Average: {{$average_leads_for_month}}
                                 </h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-xs text-light" data-card-widget="collapse">

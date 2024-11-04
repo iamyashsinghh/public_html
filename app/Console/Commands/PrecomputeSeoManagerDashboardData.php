@@ -49,6 +49,7 @@ class PrecomputeSeoManagerDashboardData extends Command
             array_push($venue_leads_for_this_month, $count);
         }
         $venue_leads_for_this_month = implode(",", $venue_leads_for_this_month);
+        $average_leads_for_month = array_sum(explode(",", $venue_leads_for_this_month)) / date('d');
 
         $venue_form_leads_for_this_month = [];
         for ($i = 1; $i <= date('d'); $i++) {
@@ -140,6 +141,7 @@ class PrecomputeSeoManagerDashboardData extends Command
 
 
         $data = [
+            'average_leads_for_month' => $average_leads_for_month,
             'venue_leads_for_this_month' => $venue_leads_for_this_month,
             'venue_form_leads_for_this_month' => $venue_form_leads_for_this_month,
             'venue_ads_leads_for_this_month' => $venue_ads_leads_for_this_month,
