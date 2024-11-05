@@ -42,12 +42,6 @@ class TaskController extends Controller
     public function ajax_list(Request $request)
     {
         $auth_user = Auth::guard('nonvenue')->user();
-        $latestTask = nvrmTask::select('lead_id', DB::raw('MAX(created_at) as latest_created_at'))
-            ->whereNull('done_datetime')
-            ->whereNull('deleted_at')
-            ->where(['created_by' => $auth_user->id])
-            ->groupBy('lead_id');
-
         $tasks = nvrmLeadForward::select(
             'nvrm_lead_forwards.lead_id',
             'nvrm_lead_forwards.lead_datetime',
@@ -59,18 +53,13 @@ class TaskController extends Controller
             'nvrm_tasks.created_at as task_created_datetime',
             'nvrm_tasks.done_datetime as task_done_datetime'
         )
-            ->joinSub($latestTask, 'latest_task', function ($join) {
-                $join->on('nvrm_lead_forwards.lead_id', '=', 'latest_task.lead_id');
-            })
-            ->join('nvrm_tasks', function ($join) {
+            ->join('nvrm_tasks', function ($join) use ($auth_user) {
                 $join->on('nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
-                    ->on('nvrm_tasks.created_at', '=', 'latest_task.latest_created_at');
+                    ->where('nvrm_tasks.created_by', '=', $auth_user->id)
+                    ->whereNull('nvrm_tasks.done_datetime');
             })
-            ->where(['nvrm_tasks.created_by' => $auth_user->id])
             ->whereNull('nvrm_lead_forwards.deleted_at')
             ->where('nvrm_lead_forwards.lead_status', '!=', 'done');
-
-
 
         $current_date = date('Y-m-d');
         if ($request->task_status == "Upcoming") {

@@ -43,13 +43,6 @@ class TaskController extends Controller
     {
         $auth_user = Auth::guard('team')->user();
 
-        $latestTasks = DB::table('tasks as sub_tasks')
-            ->select('sub_tasks.lead_id', DB::raw('MAX(sub_tasks.created_at) as latest_created_at'))
-            ->where('sub_tasks.created_by', $auth_user->id)
-            ->whereNull('sub_tasks.deleted_at')
-            ->whereNull('sub_tasks.done_datetime')
-            ->groupBy('sub_tasks.lead_id');
-
         $tasks = Lead::select(
             'leads.lead_id',
             'leads.lead_datetime',
@@ -61,15 +54,12 @@ class TaskController extends Controller
             'tasks.created_at as task_created_datetime',
             'tasks.done_datetime as task_done_datetime'
         )
-            ->joinSub($latestTasks, 'latest', function ($join) {
-                $join->on('leads.lead_id', '=', 'latest.lead_id');
-            })
-            ->join('tasks', function ($join) {
+            ->join('tasks', function ($join) use ($auth_user) {
                 $join->on('leads.lead_id', '=', 'tasks.lead_id')
-                    ->on('tasks.created_at', '=', 'latest.latest_created_at');
-            })
-            ->where('tasks.created_by', $auth_user->id)
-            ->whereNull('tasks.deleted_at');
+                    ->where('tasks.created_by', '=', $auth_user->id)
+                    ->whereNull('tasks.done_datetime')
+                    ->whereNull('tasks.deleted_at');
+            });
 
 
         if($auth_user->role_id == 4){
