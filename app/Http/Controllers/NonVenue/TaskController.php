@@ -101,7 +101,7 @@ class TaskController extends Controller
                 $to = Carbon::today()->endOfDay();
                 $tasks->whereBetween('nvrm_tasks.task_schedule_datetime', [$from, $to]);
             } elseif ($request->dashboard_filters == "total_task_overdue") {
-                $tasks->where('nvrm_tasks.task_schedule_datetime', '<', Carbon::today());
+                $tasks->where('nvrm_tasks.task_schedule_datetime', '<', Carbon::now());
             }
         }
 
