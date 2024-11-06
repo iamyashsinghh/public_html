@@ -62,9 +62,9 @@ class TaskController extends Controller
             });
 
 
-        if($auth_user->role_id == 4){
-            $tasks->where('leads.lead_status', '!=', 'done');
-        }
+        // if($auth_user->role_id == 4){
+        //     $tasks->where('leads.lead_status', '!=', 'done');
+        // }
 
         $current_date = date('Y-m-d');
 
