@@ -94,17 +94,16 @@ class DashboardController extends Controller
             ->whereNull('nvrm_lead_forwards.deleted_at')
             ->whereNull('nvrm_tasks.deleted_at')
             ->groupBy('nvrm_tasks.lead_id')
-            ->where('nvrm_lead_forwards.lead_status', '!=', 'done')
             ->where('nvrm_tasks.created_by', $auth_user->id)
             ->get()
             ->count();
 
         $nvrm_month_task_leads = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
             ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
+            ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
             ->whereNull('nvrm_lead_forwards.deleted_at')
             ->whereNull('nvrm_tasks.deleted_at')
             ->groupBy('nvrm_tasks.lead_id')
-            ->where('nvrm_lead_forwards.lead_status', '!=', 'done')
             ->where('nvrm_tasks.created_by', $auth_user->id)
             ->get()
             ->count();
