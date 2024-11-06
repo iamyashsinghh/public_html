@@ -58,7 +58,7 @@ class DashboardController extends Controller
         $currentDateEnd = Carbon::today()->endOfDay();
         $currentMonthStart = Carbon::today()->startOfMonth();
         $currentMonthEnd = Carbon::today()->endOfMonth();
-        
+
         $nvrm_unfollowed_leads = nvrmLeadForward::query()
             ->where('lead_status', '!=', 'Done')
             ->whereNull('deleted_at')
@@ -102,6 +102,7 @@ class DashboardController extends Controller
             ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
             ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
             ->whereNull('nvrm_lead_forwards.deleted_at')
+            ->whereNull('nvrm_tasks.done_datetime')
             ->whereNull('nvrm_tasks.deleted_at')
             ->groupBy('nvrm_tasks.lead_id')
             ->where('nvrm_tasks.created_by', $auth_user->id)
