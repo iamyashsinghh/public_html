@@ -56,7 +56,7 @@ class TaskController extends Controller
             ->join('nvrm_tasks', function ($join) use ($auth_user) {
                 $join->on('nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
                     ->where('nvrm_tasks.created_by', '=', $auth_user->id)
-                    ->whereNull('nvrm_tasks.done_datetime');
+                    ->whereNull('nvrm_tasks.deleted_at');
             })
             ->whereNull('nvrm_lead_forwards.deleted_at')
             ->where('nvrm_lead_forwards.lead_status', '!=', 'Done');
@@ -65,36 +65,32 @@ class TaskController extends Controller
         if ($request->task_status == "Upcoming") {
             $tasks->where('nvrm_tasks.task_schedule_datetime', '>', Carbon::today()->endOfDay());
         } elseif ($request->task_status == "Today") {
-            $tasks->where('nvrm_tasks.task_schedule_datetime', 'like', "%$current_date%");
+            $tasks->whereBetween('nvrm_tasks.task_schedule_datetime', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()]);
         } elseif ($request->task_status == "Overdue") {
             $tasks->where('nvrm_tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('nvrm_tasks.done_datetime');
         } elseif ($request->task_status == "Done") {
             $tasks->whereNotNull('nvrm_tasks.done_datetime');
-        } elseif ($request->task_created_from_date) {
+        }
+
+        if ($request->task_created_from_date) {
             $from = Carbon::make($request->task_created_from_date);
-            if ($request->task_created_to_date != null) {
-                $to = Carbon::make($request->task_created_to_date)->endOfDay();
-            } else {
-                $to = Carbon::make($request->task_created_from_date)->endOfDay();
-            }
+            $to = $request->task_created_to_date ? Carbon::make($request->task_created_to_date)->endOfDay() : $from->copy()->endOfDay();
             $tasks->whereBetween('nvrm_tasks.created_at', [$from, $to]);
-        } elseif ($request->task_done_from_date) {
+        }
+
+        if ($request->task_done_from_date) {
             $from = Carbon::make($request->task_done_from_date);
-            if ($request->task_done_to_date != null) {
-                $to = Carbon::make($request->task_done_to_date)->endOfDay();
-            } else {
-                $to = Carbon::make($request->task_done_from_date)->endOfDay();
-            }
+            $to = $request->task_done_to_date ? Carbon::make($request->task_done_to_date)->endOfDay() : $from->copy()->endOfDay();
             $tasks->whereBetween('nvrm_tasks.done_datetime', [$from, $to]);
-        } elseif ($request->task_schedule_from_date) {
+        }
+
+        if ($request->task_schedule_from_date) {
             $from = Carbon::make($request->task_schedule_from_date);
-            if ($request->task_schedule_to_date != null) {
-                $to = Carbon::make($request->task_schedule_to_date)->endOfDay();
-            } else {
-                $to = Carbon::make($request->task_schedule_from_date)->endOfDay();
-            }
+            $to = $request->task_schedule_to_date ? Carbon::make($request->task_schedule_to_date)->endOfDay() : $from->copy()->endOfDay();
             $tasks->whereBetween('nvrm_tasks.task_schedule_datetime', [$from, $to])->whereNull('nvrm_tasks.done_datetime');
-        } elseif ($request->dashboard_filters != null) {
+        }
+
+        if ($request->dashboard_filters != null) {
             if ($request->dashboard_filters == "task_schedule_this_month") {
                 $from = Carbon::today()->startOfMonth();
                 $to = Carbon::today()->endOfMonth();
@@ -108,7 +104,7 @@ class TaskController extends Controller
             }
         }
 
-        $tasks = $tasks->get();
+        $tasks = $tasks->groupBy('nvrm_tasks.lead_id')->get();
         return datatables($tasks)->toJson();
     }
 

@@ -53,12 +53,12 @@ class DashboardController extends Controller
             $forward_leads_by_category[$category_name] = $lead_count;
         }
 
-        $currentDateTime = Carbon::today();
-        $currentDateStart = Carbon::now()->startOfDay();
-        $currentDateEnd = Carbon::now()->endOfDay();
-        $currentMonthStart = Carbon::now()->startOfMonth();
-        $currentMonthEnd = Carbon::now()->endOfMonth();
-
+        $currentDateTime = Carbon::now();
+        $currentDateStart = Carbon::today()->startOfDay();
+        $currentDateEnd = Carbon::today()->endOfDay();
+        $currentMonthStart = Carbon::today()->startOfMonth();
+        $currentMonthEnd = Carbon::today()->endOfMonth();
+        
         $nvrm_unfollowed_leads = nvrmLeadForward::query()
             ->where('lead_status', '!=', 'Done')
             ->whereNull('deleted_at')
