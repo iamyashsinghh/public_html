@@ -83,7 +83,6 @@ class DashboardController extends Controller
             ->whereNull('nvrm_lead_forwards.deleted_at')
             ->whereNull('nvrm_tasks.deleted_at')
             ->groupBy('nvrm_tasks.lead_id')
-            ->where('nvrm_lead_forwards.lead_status', '!=', 'done')
             ->where('nvrm_tasks.created_by', $auth_user->id)
             ->get()
             ->count();

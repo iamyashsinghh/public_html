@@ -59,7 +59,7 @@ class TaskController extends Controller
                     ->whereNull('nvrm_tasks.done_datetime');
             })
             ->whereNull('nvrm_lead_forwards.deleted_at')
-            ->where('nvrm_lead_forwards.lead_status', '!=', 'done');
+            ->where('nvrm_lead_forwards.lead_status', '!=', 'Done');
 
         $current_date = date('Y-m-d');
         if ($request->task_status == "Upcoming") {
