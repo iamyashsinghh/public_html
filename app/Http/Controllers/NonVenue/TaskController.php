@@ -88,7 +88,7 @@ class TaskController extends Controller
         if ($request->task_schedule_from_date) {
             $from = Carbon::make($request->task_schedule_from_date);
             $to = $request->task_schedule_to_date ? Carbon::make($request->task_schedule_to_date)->endOfDay() : $from->copy()->endOfDay();
-            $tasks->whereBetween('nvrm_tasks.task_schedule_datetime', [$from, $to]);
+            $tasks->whereBetween('nvrm_tasks.task_schedule_datetime', [$from, $to])->whereNull('nvrm_tasks.done_datetime');
         }
 
         if ($request->dashboard_filters != null) {
@@ -99,9 +99,9 @@ class TaskController extends Controller
             } elseif ($request->dashboard_filters == "task_schedule_today") {
                 $from = Carbon::today()->startOfDay();
                 $to = Carbon::today()->endOfDay();
-                $tasks->whereBetween('nvrm_tasks.task_schedule_datetime', [$from, $to]);
+                $tasks->whereBetween('nvrm_tasks.task_schedule_datetime', [$from, $to])->whereNull('nvrm_tasks.done_datetime');
             } elseif ($request->dashboard_filters == "total_task_overdue") {
-                $tasks->where('nvrm_tasks.task_schedule_datetime', '<', Carbon::today());
+                $tasks->where('nvrm_tasks.task_schedule_datetime', '<', Carbon::today())->whereNull('nvrm_tasks.done_datetime');
             }
         }
 
