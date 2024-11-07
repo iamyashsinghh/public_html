@@ -66,7 +66,7 @@ class TaskController extends Controller {
         ->leftJoin('vendor_categories as vc', 'vc.id', 'bdm_leads.business_cat')
         ->where(['bdm_tasks.created_by' => $auth_user->id])
         ->whereNull('bdm_leads.deleted_at')
-        ->where('bdm_leads.lead_status', '!=', 'done');
+        ->where('bdm_leads.lead_status', '!=', 'done')->groupBy('bdm_leads.lead_id');
 
         $current_date = date('Y-m-d');
 
