@@ -79,11 +79,11 @@
                         </ul>
                     </div>
                     @if ($auth_user->role_id == 4)
-                        <button class="btn btn-xs text-light px-2 m-1" style="background-color: var(--wb-dark-red);"
-                            onclick="handle_forward_lead_btn(this)"><i class="fa fa-paper-plane"></i> Forward Lead</button>
+                        <button class="btn btn-xs text-light px-2 m-1" style="background-color: var(--wb-renosand);"
+                            onclick="handle_forward_lead_btn(this)"><i class="fa fa-paper-plane"></i> Forward to VM</button>
                         <a onclick="nvrm_forword_preloader(this)" class="btn text-light btn-sm buttons-print mx-1"
                             style="background-color: var(--wb-dark-red)"><i class="fa fa-paper-plane"></i>Forward to
-                            NvRM</a>
+                            NVRM</a>
                     @endif
                 </div>
                 <div class="card-body">
