@@ -79,7 +79,7 @@
                         </ul>
                     </div>
                     @if ($auth_user->role_id == 4)
-                        <button class="btn btn-xs px-2 m-1" style="background-color: rgb(198, 165, 0); color: #000;"
+                        <button class="btn btn-xs text-light px-2 m-1" style="background-color: rgb(198, 165, 0);"
                             onclick="handle_forward_lead_btn(this)"><i class="fa fa-paper-plane"></i> Forward to VM</button>
                         <a onclick="nvrm_forword_preloader(this)" class="btn btn-sm buttons-print mx-1"
                             style="background-color: #FFA500; color: #000;"><i class="fa fa-paper-plane"></i>Forward to
