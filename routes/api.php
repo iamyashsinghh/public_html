@@ -201,7 +201,7 @@ if (!function_exists('assignLeadsToRMs')) {
     }
 }
 
-Route::get('/getlol', function () {
+Route::get ('/getlol', function () {
     // $oneYearAgo = Carbon::now()->subYear();
     // $oneYearAgo0 = Carbon::now()->subMonth();
 
@@ -254,7 +254,7 @@ Route::post('/save_wa', function (Request $request) {
         $newWaMsg->body = $textMsg;
         if (strtolower(trim($textMsg)) === "yes log me in") {
             $user = TeamMember::where('mobile', $number)->first();
-            if ($user) {
+            if($user){
                 $login_info = LoginInfo::where([
                     'login_type' => 'team',
                     'user_id' => $user->id,
@@ -276,7 +276,7 @@ Route::post('/save_wa', function (Request $request) {
                     send_wa_normal_text_msg($number, $msg);
                     $newWaMsg->save();
                     return true;
-                } else {
+                }else{
                     $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in.";
                     $login_info->login_for_whatsapp_otp = $login_info->otp_code;
                     $login_info->save();
@@ -286,9 +286,9 @@ Route::post('/save_wa', function (Request $request) {
                 }
             }
         }
-        if (strtolower(trim($textMsg)) === "i would like to login") {
+        if(strtolower(trim($textMsg)) === "i would like to login"){
             $user = Vendor::where('mobile', $number)->first();
-            if ($user) {
+            if($user){
                 $login_info = LoginInfo::where([
                     'login_type' => 'vendor',
                     'user_id' => $user->id,
@@ -310,7 +310,7 @@ Route::post('/save_wa', function (Request $request) {
                     send_wa_normal_text_msg($number, $msg);
                     $newWaMsg->save();
                     return true;
-                } else {
+                }else{
                     $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in.";
                     $login_info->login_for_whatsapp_otp = $login_info->otp_code;
                     $login_info->save();
@@ -585,34 +585,25 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $preference = $crm_meta ? $crm_meta->meta_value : 'la-fortuna-banquets-mayapuri';
         $id_ad = $crm_meta ? $crm_meta->is_ad : '0';
 
-        $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
-        if (!$listing_data) {
-            $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
-            if ($listing_data && isset($listing_data->vendor_category_id)) {
-                $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
-                if ($cat_data_cms && isset($cat_data_cms->name)) {
-                    $lead_cat_data = $cat_data_cms->name;
+         $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
+            if (!$listing_data) {
+                $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
+                if ($listing_data && isset($listing_data->vendor_category_id)) {
+                    $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
+                    if ($cat_data_cms && isset($cat_data_cms->name)) {
+                        $lead_cat_data = $cat_data_cms->name;
+                    }
                 }
             }
-        }
-        $locality = null;
-        if ($listing_data && isset($listing_data->location_id)) {
-            $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data->location_id)->first();
-        } else {
-            $lead_cat_data = "Phone Nav";
-        }
+            $locality = null;
+            if ($listing_data && isset($listing_data->location_id)) {
+                $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data->location_id)->first();
+            } else {
+                $lead_cat_data = "Phone Nav";
+            }
 
-        $get_all_rm_id = TeamMember::where('reole_id', 4)->pluck('id');
         $lead = Lead::where('mobile', $mobile)->first();
         if ($lead) {
-            $tasks = DB::table('tasks')
-                ->where('lead_id', $lead->id)
-                ->whereIn('created_by', $get_all_rm_id)
-                ->whereNull('done_datetime')
-                ->first();
-            if ($tasks) {
-                $lead->read_status = true;
-            }
             if ($recording_url !== null) {
                 $metadata = [
                     'datetime' => $current_timestamp,
@@ -658,6 +649,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         $lead->preference = $preference;
         $lead->locality = $locality ? $locality->name : null;
         $lead->lead_status = "Super Hot Lead";
+        $lead->read_status = false;
         $lead->service_status = false;
         $lead->done_title = null;
         $lead->is_ad = $id_ad;
@@ -669,7 +661,8 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
         if ($lead->last_forwarded_by == null) {
             $lead->assign_to = $get_rm ? $get_rm->name : null;
             $lead->assign_id = $get_rm ? $get_rm->id : null;
-            $lead->save();
+        $lead->save();
+
         }
         return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with the best price..!']);
     } catch (\Throwable $th) {
@@ -757,18 +750,10 @@ Route::post('/new_lead', function (Request $request) {
             } else {
                 $lead_cat_data = "Phone Nav";
             }
-            $get_all_rm_id = TeamMember::where('reole_id', 4)->pluck('id');
+
             $lead = Lead::where('mobile', $mobile)->first();
             if ($lead) {
                 $lead->enquiry_count = $lead->enquiry_count + 1;
-                $tasks = DB::table('tasks')
-                    ->where('lead_id', $lead->id)
-                    ->whereIn('created_by', $get_all_rm_id)
-                    ->whereNull('done_datetime')
-                    ->first();
-                if ($tasks) {
-                    $lead->read_status = true;
-                }
             } else {
                 $lead = new Lead();
                 $lead->name = $request->post('name');
@@ -783,6 +768,7 @@ Route::post('/new_lead', function (Request $request) {
             $lead->is_ad = $request->post('is_ad');
             $lead->locality = $locality ? $locality->name : null;
             $lead->lead_status = "Super Hot Lead";
+            $lead->read_status = false;
             $lead->service_status = false;
             $lead->done_title = null;
             $lead->done_message = null;
