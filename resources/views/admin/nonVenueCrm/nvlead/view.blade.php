@@ -60,13 +60,16 @@
                                                             <button class="btn btn-sm btn-primary"
                                                                 onclick="handleEditNvrmMessage( '{{ $list->id }}', '{{ $list->title }}', '{{ $list->message }}' , '{{ $list->budget }}')"><i
                                                                     class="fa fa-edit"></i> Edit</button>
-                                                                    @php
-                                                                    $filteredVendors = $lead->get_vendors_for_lead()->filter(function($vendor) use ($list) {
-                                                                        return $vendor->category_id == $list->vendor_category_id;
+                                                            @php
+                                                                $filteredVendors = $lead
+                                                                    ->get_vendors_for_lead()
+                                                                    ->filter(function ($vendor) use ($list) {
+                                                                        return $vendor->category_id ==
+                                                                            $list->vendor_category_id;
                                                                     });
-                                                                @endphp
-        @if ($filteredVendors->count() > 0)
-        <form
+                                                            @endphp
+                                                            @if ($filteredVendors->count() > 0)
+                                                                <form
                                                                     action="{{ route('nonvenue.rm_message.delete', $list->id) }}"
                                                                     method="POST" style="display:inline-block;">
                                                                     @csrf
@@ -163,6 +166,16 @@
                                     <div class="col-sm-6">
                                         <span class="text-bold mx-1" style="color: var(--wb-wood)">Address: </span>
                                         <span class="mx-1">{{ $lead->address ?: 'N/A' }}</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <span class="text-bold mx-1" style="color: var(--wb-wood)">Done Title: </span>
+                                        <span class="mx-1">{{ $lead->done_title ?: 'N/A' }}</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <span class="text-bold mx-1" style="color: var(--wb-wood)">Done Message: </span>
+                                        <span class="mx-1">{{ $lead->done_message ?: 'N/A' }}</span>
                                     </div>
                                 </div>
                             </div>

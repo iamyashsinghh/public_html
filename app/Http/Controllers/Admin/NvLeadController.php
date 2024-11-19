@@ -255,6 +255,7 @@ class NvLeadController extends Controller
     {
         $nvrm_members = TeamMember::select('id', 'name')->where('role_id', 3)->orderBy('name', 'asc')->get(); //role_id:3=NVRM;
         $lead = nvLead::find($lead_id);
+        $lead_extra_data = nvrmLeadForward::where('lead_id', $lead_id)->first();
         if (!$lead) {
             abort(404);
         }
@@ -262,7 +263,7 @@ class NvLeadController extends Controller
         $nv_forwarded_count = nvLeadForward::where('lead_id', $lead_id)->count();
         $forwarded_count = $nvrm_forwarded_count + $nv_forwarded_count;
         // return $lead->get_events;
-        return view('admin.nonVenueCrm.nvlead.view', compact('lead', 'forwarded_count', 'nvrm_members'));
+        return view('admin.nonVenueCrm.nvlead.view', compact('lead', 'forwarded_count', 'nvrm_members', 'lead_extra_data'));
     }
 
     public function delete($lead_id)
