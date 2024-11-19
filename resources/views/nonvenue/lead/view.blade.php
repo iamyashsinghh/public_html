@@ -8,6 +8,7 @@
     $elem_text_help = '';
     $elem_class = '';
     $elem_text = '';
+    $auth_user = Auth::guard('nonvenue')->user();
 @endphp
 @section('header-css')
     <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
@@ -129,29 +130,34 @@
                                                                 <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                             @php
-                                                            $filteredVendors = $lead->get_vendors_for_lead()->filter(function($vendor) use ($list) {
-                                                                return $vendor->category_id == $list->vendor_category_id;
-                                                            });
-                                                        @endphp
-@if ($filteredVendors->count() > 0)                                                            <form
-                                                            action="{{ route('nonvenue.rm_message.delete', $list->id) }}"
-                                                            method="POST" style="display:inline-block;">
-                                                            @csrf
-                                                            <button type="submit" disabled class="btn btn-sm btn-danger"
-                                                                onclick="return confirm('Are you sure you want to delete this message?')">
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                        @else
-                                                        <form
-                                                                action="{{ route('nonvenue.rm_message.delete', $list->id) }}"
-                                                                method="POST" style="display:inline-block;">
-                                                                @csrf
-                                                                <button type="submit" class="btn btn-sm btn-danger"
-                                                                    onclick="return confirm('Are you sure you want to delete this message?')">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
-                                                            </form>
+                                                                $filteredVendors = $lead
+                                                                    ->get_vendors_for_lead()
+                                                                    ->filter(function ($vendor) use ($list) {
+                                                                        return $vendor->category_id ==
+                                                                            $list->vendor_category_id;
+                                                                    });
+                                                            @endphp
+                                                            @if ($filteredVendors->count() > 0)
+                                                                <form
+                                                                    action="{{ route('nonvenue.rm_message.delete', $list->id) }}"
+                                                                    method="POST" style="display:inline-block;">
+                                                                    @csrf
+                                                                    <button type="submit" disabled
+                                                                        class="btn btn-sm btn-danger"
+                                                                        onclick="return confirm('Are you sure you want to delete this message?')">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <form
+                                                                    action="{{ route('nonvenue.rm_message.delete', $list->id) }}"
+                                                                    method="POST" style="display:inline-block;">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-sm btn-danger"
+                                                                        onclick="return confirm('Are you sure you want to delete this message?')">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </button>
+                                                                </form>
                                                             @endif
 
                                                         </td>
@@ -161,7 +167,8 @@
                                                             <div class="vendor-list">
                                                                 @foreach ($lead->get_vendors_for_lead() as $vendorList)
                                                                     @if ($vendorList->category_id == $list->vendor_category_id)
-                                                                        <div class="vendor-badge" title="{{ date('d-M-Y h:i a', strtotime($vendorList->updated_at))}}">
+                                                                        <div class="vendor-badge"
+                                                                            title="{{ date('d-M-Y h:i a', strtotime($vendorList->updated_at)) }}">
                                                                             {{ $vendorList->name }}
                                                                         </div>
                                                                     @endif
@@ -171,10 +178,10 @@
                                                     </tr>
                                                 @endforeach
                                             @else
-                                            <tr>
-                                                <td class="text-center text-muted" colspan="8">No data available in
-                                                    table</td>
-                                            </tr>
+                                                <tr>
+                                                    <td class="text-center text-muted" colspan="8">No data available in
+                                                        table</td>
+                                                </tr>
                                             @endif
                                         </body>
                                     </table>
@@ -313,6 +320,7 @@
                                                 <th class="text-nowrap">Done With</th>
                                                 <th class="text-nowrap">Done Message</th>
                                                 <th class="text-nowrap">Done Date</th>
+                                                <th class="text-nowrap">Created By</th>
                                                 <th class="text-nowrap">Action</th>
                                             </tr>
                                         </thead>
@@ -355,26 +363,37 @@
                                                                     $elem_text = 'Overdue';
                                                                 }
                                                             @endphp
-                                                            @if ($list->done_datetime !== null)
-                                                                <span
-                                                                    class="badge badge-{{ $elem_class }}">{{ $elem_text }}</span>
+                                                            @if ($auth_user->id === $list->created_by)
+                                                                @if ($list->done_datetime !== null)
+                                                                    <span
+                                                                        class="badge badge-{{ $elem_class }}">{{ $elem_text }}</span>
+                                                                @else
+                                                                    <button
+                                                                        class="btn btn-{{ $elem_class }} dropdown-toggle btn-xs"
+                                                                        data-bs-toggle="dropdown"
+                                                                        style="font-size: 75% !important;">{{ $elem_text }}</button>
+                                                                    <ul class="dropdown-menu">
+                                                                        <li>
+                                                                            <a class="dropdown-item"
+                                                                                href="javascript:void(0);"
+                                                                                onclick="handle_task_status_update({{ $list->id }})">Task
+                                                                                Update</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                    @php
+                                                                        $active_task_count++;
+                                                                    @endphp
+                                                                @endif
                                                             @else
-                                                                <button
-                                                                    class="btn btn-{{ $elem_class }} dropdown-toggle btn-xs"
-                                                                    data-bs-toggle="dropdown"
-                                                                    style="font-size: 75% !important;">{{ $elem_text }}</button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li>
-                                                                        <a class="dropdown-item"
-                                                                            href="javascript:void(0);"
-                                                                            onclick="handle_task_status_update({{ $list->id }})">Task
-                                                                            Update</a>
-                                                                    </li>
-                                                                </ul>
-                                                                @php
-                                                                    $active_task_count++;
-                                                                @endphp
+                                                                @if ($list->done_datetime !== null)
+                                                                    <span
+                                                                        class="badge badge-{{ $elem_class }}">{{ $elem_text }}</span>
+                                                                @else
+                                                                    <button class="btn btn-{{ $elem_class }} btn-xs"
+                                                                        style="font-size: 75% !important;">{{ $elem_text }}</button>
+                                                                @endif
                                                             @endif
+
                                                         </td>
                                                         <td>{{ $list->done_with ?: 'N/A' }}</td>
                                                         <td>
@@ -386,8 +405,9 @@
                                                         <td class="">
                                                             {{ $list->done_datetime ? date('d-M-Y h:i a', strtotime($list->done_datetime)) : 'N/A' }}
                                                         </td>
+                                                        <td>{{ $list->team_name ?: 'N/A' }}</td>
                                                         <td class="text-nowrap">
-                                                            @if ($list->done_datetime == null)
+                                                            @if ($auth_user->id === $list->created_by && $list->done_datetime == null)
                                                                 <a href="{{ route('nonvenue.task.delete', $list->id) }}"
                                                                     onclick="return confirm('Are you sure want to delete the task?')"
                                                                     class="text-danger mx-2"><i

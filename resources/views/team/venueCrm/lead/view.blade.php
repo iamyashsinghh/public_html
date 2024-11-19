@@ -380,129 +380,263 @@
                                 </div>
                             </div>
                         @endif
-                        <div id="task_card_container" class="card mb-5">
-                            <div class="card-header text-light" style="background-color: var(--wb-renosand);">
-                                <h3 class="card-title">Task Details</h3>
-                                <button data-bs-toggle="modal" data-bs-target="#manageTaskModal"
-                                    class="btn p-0 text-light float-right" title="Add Task."><i
-                                        class="fa fa-plus"></i></button>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="serverTable" class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-nowrap">S.No.</th>
-                                                <th class="text-nowrap">Task Schedule Date</th>
-                                                <th class="text-nowrap">Follow Up</th>
-                                                <th class="">Message</th>
-                                                <th class="text-nowrap">Status</th>
-                                                <th class="text-nowrap">Done With</th>
-                                                <th class="text-nowrap">Done Message</th>
-                                                <th class="text-nowrap">Done Date</th>
-                                                <th class="text-nowrap">Action</th>
-                                            </tr>
-                                        </thead>
-
-                                        <body>
-                                            @php
-                                                if ($auth_user->role_id == 4) {
-                                                    $tasks = $lead->get_rm_tasks();
-                                                } else {
-                                                    $tasks = $lead->get_tasks();
-                                                }
-                                            @endphp
-                                            @if (sizeof($tasks) > 0)
-                                                @foreach ($tasks as $key => $list)
-                                                    <tr>
-                                                        <td>{{ $key + 1 }}</td>
-                                                        <td class="">
-                                                            {{ date('d-M-Y h:i a', strtotime($list->task_schedule_datetime)) }}
-                                                        </td>
-                                                        <td>{{ $list->follow_up }}</td>
-                                                        <td>
-                                                            <button class="btn"
-                                                                onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)"><i
-                                                                    class="fa fa-comment-dots"
-                                                                    style="color: var(--wb-renosand);"></i></button>
-                                                        </td>
-                                                        <td>
-                                                            @php
-                                                                $schedule_date = date(
-                                                                    'Y-m-d',
-                                                                    strtotime($list->task_schedule_datetime),
-                                                                );
-                                                                if ($list->done_datetime !== null) {
-                                                                    $elem_class = 'success';
-                                                                    $elem_text = 'Updated';
-                                                                } elseif ($schedule_date > $current_date) {
-                                                                    $elem_class = 'info';
-                                                                    $elem_text = 'Upcoming';
-                                                                } elseif ($schedule_date == $current_date) {
-                                                                    $elem_class = 'warning';
-                                                                    $elem_text = 'Today';
-                                                                } elseif ($schedule_date < $current_date) {
-                                                                    $elem_class = 'danger';
-                                                                    $elem_text = 'Overdue';
-                                                                }
-                                                            @endphp
-                                                            @if ($list->done_datetime !== null)
-                                                                <span
-                                                                    class="badge badge-{{ $elem_class }}">{{ $elem_text }}</span>
-                                                            @else
-                                                                <button
-                                                                    class="btn btn-{{ $elem_class }} dropdown-toggle btn-xs"
-                                                                    data-bs-toggle="dropdown"
-                                                                    style="font-size: 75% !important;">{{ $elem_text }}</button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li>
-                                                                        <a class="dropdown-item"
-                                                                            href="javascript:void(0);"
-                                                                            onclick="handle_task_status_update({{ $list->id }})">Task
-                                                                            Update</a>
-                                                                    </li>
-                                                                </ul>
-                                                                @php
-                                                                    $active_task_count++;
-                                                                @endphp
-                                                            @endif
-                                                        </td>
-                                                        <td>{{ $list->done_with ?: 'N/A' }}</td>
-                                                        <td>
-                                                            <button class="btn"
-                                                                onclick="handle_view_message(`{{ $list->done_message ?: 'N/A' }}`)"><i
-                                                                    class="fa fa-comment-dots"
-                                                                    style="color: var(--wb-renosand);"></i></button>
-                                                        </td>
-                                                        <td class="">
-                                                            {{ $list->done_datetime ? date('d-M-Y h:i a', strtotime($list->done_datetime)) : 'N/A' }}
-                                                        </td>
-                                                        <td class="text-nowrap">
-                                                            @if ($list->done_datetime == null)
-                                                                <a href="{{ route('team.task.delete', $list->id) }}"
-                                                                    onclick="return confirm('Are you sure want to delete the task?')"
-                                                                    class="text-danger mx-2"><i
-                                                                        class="fa fa-trash-alt"></i></a>
-                                                            @else
-                                                                <button class="btn p-0 text-secondary mx-2" disabled><i
-                                                                        class="fa fa-trash-alt"
-                                                                        title="Done task cannot be deleted."></i></button>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
+                        @if ($auth_user->role_id == 4)
+                            <div id="task_card_container" class="card mb-5">
+                                <div class="card-header text-light" style="background-color: var(--wb-renosand);">
+                                    <h3 class="card-title">Task Details</h3>
+                                    <button data-bs-toggle="modal" data-bs-target="#manageTaskModal"
+                                        class="btn p-0 text-light float-right" title="Add Task."><i
+                                            class="fa fa-plus"></i></button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="serverTable" class="table mb-0">
+                                            <thead>
                                                 <tr>
-                                                    <td class="text-center text-muted" colspan="9">No data available in
-                                                        table</td>
+                                                    <th class="text-nowrap">S.No.</th>
+                                                    <th class="text-nowrap">Task Schedule Date</th>
+                                                    <th class="text-nowrap">Follow Up</th>
+                                                    <th class="">Message</th>
+                                                    <th class="text-nowrap">Status</th>
+                                                    <th class="text-nowrap">Done With</th>
+                                                    <th class="text-nowrap">Done Message</th>
+                                                    <th class="text-nowrap">Done Date</th>
+                                                    <th class="text-nowrap">Created By</th>
+                                                    <th class="text-nowrap">Action</th>
                                                 </tr>
-                                            @endif
-                                        </body>
-                                    </table>
+                                            </thead>
+
+                                            <body>
+                                                @php
+                                                    $tasks = $lead->get_rm_tasks();
+                                                @endphp
+                                                @if (sizeof($tasks) > 0)
+                                                    @foreach ($tasks as $key => $list)
+                                                        <tr>
+                                                            <td>{{ $key + 1 }}</td>
+                                                            <td class="">
+                                                                {{ date('d-M-Y h:i a', strtotime($list->task_schedule_datetime)) }}
+                                                            </td>
+                                                            <td>{{ $list->follow_up }}</td>
+                                                            <td>
+                                                                <button class="btn"
+                                                                    onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)"><i
+                                                                        class="fa fa-comment-dots"
+                                                                        style="color: var(--wb-renosand);"></i></button>
+                                                            </td>
+                                                            <td>
+                                                                @php
+                                                                    $schedule_date = date(
+                                                                        'Y-m-d',
+                                                                        strtotime($list->task_schedule_datetime),
+                                                                    );
+                                                                    if ($list->done_datetime !== null) {
+                                                                        $elem_class = 'success';
+                                                                        $elem_text = 'Updated';
+                                                                    } elseif ($schedule_date > $current_date) {
+                                                                        $elem_class = 'info';
+                                                                        $elem_text = 'Upcoming';
+                                                                    } elseif ($schedule_date == $current_date) {
+                                                                        $elem_class = 'warning';
+                                                                        $elem_text = 'Today';
+                                                                    } elseif ($schedule_date < $current_date) {
+                                                                        $elem_class = 'danger';
+                                                                        $elem_text = 'Overdue';
+                                                                    }
+                                                                @endphp
+                                                                @if ($auth_user->id == $list->created_by)
+                                                                    @if ($list->done_datetime !== null)
+                                                                        <span
+                                                                            class="badge badge-{{ $elem_class }}">{{ $elem_text }}</span>
+                                                                    @else
+                                                                        <button
+                                                                            class="btn btn-{{ $elem_class }} dropdown-toggle btn-xs"
+                                                                            data-bs-toggle="dropdown"
+                                                                            style="font-size: 75% !important;">{{ $elem_text }}</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="javascript:void(0);"
+                                                                                    onclick="handle_task_status_update({{ $list->id }})">Task
+                                                                                    Update</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        @php
+                                                                            $active_task_count++;
+                                                                        @endphp
+                                                                    @endif
+                                                                @else
+                                                                    @if ($list->done_datetime !== null)
+                                                                        <span
+                                                                            class="badge badge-{{ $elem_class }}">{{ $elem_text }}</span>
+                                                                    @else
+                                                                        <button
+                                                                            class="btn btn-{{ $elem_class }} btn-xs"
+                                                                            style="font-size: 75% !important;">{{ $elem_text }}</button>
+                                                                    @endif
+                                                                @endif
+                                                            </td>
+                                                            <td>{{ $list->done_with ?: 'N/A' }}</td>
+                                                            <td>
+                                                                <button class="btn"
+                                                                    onclick="handle_view_message(`{{ $list->done_message ?: 'N/A' }}`)"><i
+                                                                        class="fa fa-comment-dots"
+                                                                        style="color: var(--wb-renosand);"></i></button>
+                                                            </td>
+                                                            <td class="">
+                                                                {{ $list->done_datetime ? date('d-M-Y h:i a', strtotime($list->done_datetime)) : 'N/A' }}
+                                                            </td>
+                                                            <td class="">
+                                                                {{ $list->team_name ? $list->team_name : 'N/A' }}
+                                                            </td>
+                                                            <td class="text-nowrap">
+                                                                @if ($auth_user->id == $list->created_by && $list->done_datetime == null)
+                                                                    <a href="{{ route('team.task.delete', $list->id) }}"
+                                                                        onclick="return confirm('Are you sure you want to delete the task?')"
+                                                                        class="text-danger mx-2"><i
+                                                                            class="fa fa-trash-alt"></i></a>
+                                                                @else
+                                                                    <button class="btn p-0 text-secondary mx-2" disabled><i
+                                                                            class="fa fa-trash-alt"
+                                                                            title="You do not have permission to delete this task or it is already done."></i></button>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @else
+                                                    <tr>
+                                                        <td class="text-center text-muted" colspan="9">No data
+                                                            available in
+                                                            table</td>
+                                                    </tr>
+                                                @endif
+                                            </body>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
+
                         @if ($auth_user->role_id == 5)
+                            <div id="task_card_container" class="card mb-5">
+                                <div class="card-header text-light" style="background-color: var(--wb-renosand);">
+                                    <h3 class="card-title">Task Details</h3>
+                                    <button data-bs-toggle="modal" data-bs-target="#manageTaskModal"
+                                        class="btn p-0 text-light float-right" title="Add Task."><i
+                                            class="fa fa-plus"></i></button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="serverTable" class="table mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-nowrap">S.No.</th>
+                                                    <th class="text-nowrap">Task Schedule Date</th>
+                                                    <th class="text-nowrap">Follow Up</th>
+                                                    <th class="">Message</th>
+                                                    <th class="text-nowrap">Status</th>
+                                                    <th class="text-nowrap">Done With</th>
+                                                    <th class="text-nowrap">Done Message</th>
+                                                    <th class="text-nowrap">Done Date</th>
+                                                    <th class="text-nowrap">Action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <body>
+                                                @php
+                                                    $tasks = $lead->get_tasks();
+                                                @endphp
+                                                @if (sizeof($tasks) > 0)
+                                                    @foreach ($tasks as $key => $list)
+                                                        <tr>
+                                                            <td>{{ $key + 1 }}</td>
+                                                            <td class="">
+                                                                {{ date('d-M-Y h:i a', strtotime($list->task_schedule_datetime)) }}
+                                                            </td>
+                                                            <td>{{ $list->follow_up }}</td>
+                                                            <td>
+                                                                <button class="btn"
+                                                                    onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)"><i
+                                                                        class="fa fa-comment-dots"
+                                                                        style="color: var(--wb-renosand);"></i></button>
+                                                            </td>
+                                                            <td>
+                                                                @php
+                                                                    $schedule_date = date(
+                                                                        'Y-m-d',
+                                                                        strtotime($list->task_schedule_datetime),
+                                                                    );
+                                                                    if ($list->done_datetime !== null) {
+                                                                        $elem_class = 'success';
+                                                                        $elem_text = 'Updated';
+                                                                    } elseif ($schedule_date > $current_date) {
+                                                                        $elem_class = 'info';
+                                                                        $elem_text = 'Upcoming';
+                                                                    } elseif ($schedule_date == $current_date) {
+                                                                        $elem_class = 'warning';
+                                                                        $elem_text = 'Today';
+                                                                    } elseif ($schedule_date < $current_date) {
+                                                                        $elem_class = 'danger';
+                                                                        $elem_text = 'Overdue';
+                                                                    }
+                                                                @endphp
+                                                                @if ($list->done_datetime !== null)
+                                                                    <span
+                                                                        class="badge badge-{{ $elem_class }}">{{ $elem_text }}</span>
+                                                                @else
+                                                                    <button
+                                                                        class="btn btn-{{ $elem_class }} dropdown-toggle btn-xs"
+                                                                        data-bs-toggle="dropdown"
+                                                                        style="font-size: 75% !important;">{{ $elem_text }}</button>
+                                                                    <ul class="dropdown-menu">
+                                                                        <li>
+                                                                            <a class="dropdown-item"
+                                                                                href="javascript:void(0);"
+                                                                                onclick="handle_task_status_update({{ $list->id }})">Task
+                                                                                Update</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                    @php
+                                                                        $active_task_count++;
+                                                                    @endphp
+                                                                @endif
+                                                            </td>
+                                                            <td>{{ $list->done_with ?: 'N/A' }}</td>
+                                                            <td>
+                                                                <button class="btn"
+                                                                    onclick="handle_view_message(`{{ $list->done_message ?: 'N/A' }}`)"><i
+                                                                        class="fa fa-comment-dots"
+                                                                        style="color: var(--wb-renosand);"></i></button>
+                                                            </td>
+                                                            <td class="">
+                                                                {{ $list->done_datetime ? date('d-M-Y h:i a', strtotime($list->done_datetime)) : 'N/A' }}
+                                                            </td>
+                                                            <td class="text-nowrap">
+                                                                @if ($list->done_datetime == null)
+                                                                    <a href="{{ route('team.task.delete', $list->id) }}"
+                                                                        onclick="return confirm('Are you sure want to delete the task?')"
+                                                                        class="text-danger mx-2"><i
+                                                                            class="fa fa-trash-alt"></i></a>
+                                                                @else
+                                                                    <button class="btn p-0 text-secondary mx-2" disabled><i
+                                                                            class="fa fa-trash-alt"
+                                                                            title="Done task cannot be deleted."></i></button>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @else
+                                                    <tr>
+                                                        <td class="text-center text-muted" colspan="9">No data
+                                                            available in
+                                                            table</td>
+                                                    </tr>
+                                                @endif
+                                            </body>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                             <div id="visit_card_container" class="card mb-5">
                                 <div class="card-header text-light" style="background-color: var(--wb-renosand);">
                                     <h3 class="card-title">Visit Details</h3>

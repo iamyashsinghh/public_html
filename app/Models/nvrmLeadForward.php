@@ -34,7 +34,6 @@ class nvrmLeadForward extends Model
     {
         return $this->hasMany(nvrmMessage::class, 'lead_id', 'lead_id');
     }
-
     public function get_events()
     {
         return $this->hasMany(nvEvent::class, 'lead_id', 'lead_id');
@@ -50,7 +49,6 @@ class nvrmLeadForward extends Model
     }
     public function get_nvrm_tasks()
     {
-        $auth_user = Auth::guard('nonvenue')->user();
         return nvrmTask::select(
             'nvrm_tasks.id',
             'nvrm_tasks.task_schedule_datetime',
@@ -59,7 +57,9 @@ class nvrmLeadForward extends Model
             'nvrm_tasks.done_with',
             'nvrm_tasks.done_message',
             'nvrm_tasks.done_datetime',
-        )->join('team_members as tm', ['tm.id' => 'nvrm_tasks.created_by'])->orderBy('task_schedule_datetime', 'asc')->where(['nvrm_tasks.lead_id' => $this->lead_id, 'tm.role_id' => 3, 'created_by' =>  $auth_user->id])->get();
+            'nvrm_tasks.created_by',
+            'tm.name as team_name',
+        )->join('team_members as tm', ['tm.id' => 'nvrm_tasks.created_by'])->orderBy('task_schedule_datetime', 'asc')->where(['nvrm_tasks.lead_id' => $this->lead_id, 'tm.role_id' => 3])->get();
     }
 
     public function get_vendors_for_lead()

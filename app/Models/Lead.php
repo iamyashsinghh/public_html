@@ -87,7 +87,6 @@ class Lead extends Model {
         )->join('team_members as tm', ['tm.id' => 'visits.created_by'])->orderBy('visit_schedule_datetime', 'asc')->where(['visits.lead_id' => $this->lead_id, 'tm.role_id' => 4])->get();
     }
     public function get_rm_tasks() {
-        $auth_user = Auth::guard('team')->user();
         return Task::select(
             'tasks.id',
             'tasks.task_schedule_datetime',
@@ -96,7 +95,9 @@ class Lead extends Model {
             'tasks.done_with',
             'tasks.done_message',
             'tasks.done_datetime',
-        )->join('team_members as tm', ['tm.id' => 'tasks.created_by'])->orderBy('task_schedule_datetime', 'asc')->where(['tasks.lead_id' => $this->lead_id, 'tm.role_id' => 4, 'created_by' =>  $auth_user->id])->get();
+            'tasks.created_by',
+            'tm.name as team_name',
+        )->join('team_members as tm', ['tm.id' => 'tasks.created_by'])->orderBy('task_schedule_datetime', 'asc')->where(['tasks.lead_id' => $this->lead_id, 'tm.role_id' => 4])->get();
     }
 
     public function get_rm_notes() {
