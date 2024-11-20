@@ -22,6 +22,9 @@
                             <tr>
                                 <th class="text-nowrap">ID</th>
                                 <th class="text-nowrap">Lead Id</th>
+                                <th class="text-nowrap">Name</th>
+                                <th class="text-nowrap">Mobile</th>
+                                <th class="text-nowrap">Event Date</th>
                                 <th class="text-nowrap">Lead Status</th>
                                 <th class="text-nowrap">Created At</th>
                                 <th class="text-nowrap">Status</th>
@@ -59,6 +62,21 @@
                     {
                         name: "lead_id",
                         data: "lead_id"
+                    },
+                    {
+                        name: "name",
+                        data: "name"
+                    },
+                    {
+                        name: "mobile",
+                        data: "mobile"
+                    },
+                    {
+                        name: "event_date",
+                        data: "event_date",
+                        render: function(data, type, row) {
+                            return moment(data).format('YYYY-MM-DD');
+                        }
                     },
                     {
                         name: "lead_status",
@@ -101,7 +119,7 @@
                 ],
                 rowCallback: function(row, data, index) {
                     const td_elements = row.querySelectorAll('td');
-                    for (let i = 1; i < 7; i++) {
+                    for (let i = 1; i < 9; i++) {
                                 td_elements[i].style.cursor = "pointer";
                                 td_elements[i].setAttribute('onclick',
                                     `handle_view_lead(${data.lead_id})`);

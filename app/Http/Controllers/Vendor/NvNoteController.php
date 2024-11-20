@@ -28,12 +28,12 @@ class NvNoteController extends Controller {
         ->leftJoin('vendors', 'vendors.id', '=', 'nv_notes.created_by')
         ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
         ->leftJoin('team_members', 'team_members.id', '=', 'nv_notes.done_by')
-        ->select('nv_notes.*', 'nvrm_lead_forwards.lead_id', 'nvrm_lead_forwards.lead_status', 'vendors.name as created_by_name', 'vendor_categories.name as category_name', 'team_members.name as done_by_name')
+        ->select('nv_notes.*', 'nvrm_lead_forwards.lead_id', 'nvrm_lead_forwards.lead_status', 'nvrm_lead_forwards.name', 'nvrm_lead_forwards.mobile', 'nvrm_lead_forwards.event_datetime as event_date', 'vendors.name as created_by_name', 'vendor_categories.name as category_name', 'team_members.name as done_by_name')
         ->where('nv_notes.created_by', Auth::guard('vendor')->user()->id)
         ->get();
         return datatables($vendor_help)->toJson();
     }
-    
+
     public function manage_process(Request $request, $note_id = 0) {
         $validate = Validator::make($request->all(), [
             'lead_id' => 'required|exists:nv_leads,id',
@@ -69,7 +69,7 @@ class NvNoteController extends Controller {
         $lead_forwards->save();
 
         $nvrm_lead_forwards = nvrmLeadForward::where(['lead_id' => $request->lead_id])->first();
-        $nvrm_lead_forwards->whatsapp_msg_time = Carbon::now();     
+        $nvrm_lead_forwards->whatsapp_msg_time = Carbon::now();
         $nvrm_lead_forwards->save();
 
         $nvlead = nvLead::where(['id' => $request->lead_id])->first();
