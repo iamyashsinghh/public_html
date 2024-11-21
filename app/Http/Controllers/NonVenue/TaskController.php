@@ -137,6 +137,9 @@ class TaskController extends Controller
         $task->follow_up = $request->task_follow_up;
         $task->message = $request->task_message;
         $task->save();
+        $lead = nvrmLeadForward::where('lead_id',$request->lead_id)->get();
+        $lead->read_status = true;
+        $lead->save();
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Task created successfully.']);
         return redirect()->back();
