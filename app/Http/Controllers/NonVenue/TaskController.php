@@ -137,7 +137,8 @@ class TaskController extends Controller
         $task->follow_up = $request->task_follow_up;
         $task->message = $request->task_message;
         $task->save();
-        $lead = nvrmLeadForward::where('lead_id',$request->lead_id)->get();
+
+        $lead = nvrmLeadForward::where('lead_id',$request->lead_id)->first();
         $lead->read_status = true;
         $lead->save();
 
