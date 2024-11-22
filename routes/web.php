@@ -16,6 +16,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/sheet', [Controllers\GoogleSheetController::class, 'processAllSheetData'])->name('get.sheet');
 Route::get('/vm_cisits_tasks_status_for_rm_today', [Controllers\CronController::class, 'vm_recce_today']);
 Route::get('/sql', [Controllers\SqlDownloadController::class, 'downloadSql']);
+Route::get('/yellow_leads', [Controllers\RefactorController::class, 'yello_lead']);
 
 
 Route::group(['middleware' => 'AuthCheck'], function () {

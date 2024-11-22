@@ -11,9 +11,64 @@ use App\Models\Task;
 use App\Models\TeamMember;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
+class RefactorController extends Controller
+{
 
-class RefactorController extends Controller {
+    public function yello_lead()
+    {
+        $leads = DB::table('leads')
+            ->select(
+                'leads.lead_id as lead_id',
+                'leads.lead_datetime',
+                'leads.name',
+                'leads.mobile',
+                'leads.event_datetime as event_date',
+                'leads.lead_status',
+                'leads.service_status',
+                'leads.read_status',
+                'leads.lead_color',
+                'leads.assign_to',
+                'leads.source',
+                'leads.preference',
+                'leads.locality',
+                'tm.name as created_by',
+                'leads.whatsapp_msg_time',
+                'leads.last_forwarded_by',
+                'leads.enquiry_count',
+                'leads.is_whatsapp_msg',
+                DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count")
+            )
+            ->join('tasks', 'tasks.lead_id', '=', 'leads.lead_id')
+            ->leftJoin('team_members as tm', 'tm.id', '=', 'leads.created_by')
+            ->where(function ($query) {
+                $query->whereNull('leads.done_message')
+                    ->orWhere('leads.done_message', '=', '');
+            })
+            ->where(function ($query) {
+                $query->whereNull('leads.last_forwarded_by')
+                    ->orWhere('leads.last_forwarded_by', '=', '');
+            })
+            ->whereNull('leads.deleted_at')
+            ->where('leads.lead_status', '!=', 'Done')->whereDate('leads.lead_datetime', '>=', '2024-10-01')
+            ->groupBy('leads.lead_id')->pluck('leads.lead_id');
+
+        DB::table('leads')
+            ->whereIn('lead_id', $leads)
+            ->update(['lead_color' => '#ffff0050']);
+
+        return $leads = DB::table('leads')
+            ->join('tasks', 'tasks.lead_id', '=', 'leads.lead_id')
+            ->whereNull('leads.done_message')
+            ->whereNull('leads.last_forwarded_by')
+            ->whereNull('leads.deleted_at')
+            ->where('leads.lead_status', '!=', 'Done')
+            ->whereDate('leads.lead_datetime', '>=', '2024-10-01')
+            ->groupBy('leads.lead_id')
+            ->pluck('leads.lead_id');
+    }
+
     // public function availablity() {
 
     //     $calendar = [];
