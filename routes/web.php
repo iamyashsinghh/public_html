@@ -122,6 +122,7 @@ Route::middleware('verify_token')->group(function () {
     */
     Route::prefix('/admin')->middleware('admin')->group(function () {
         Route::get('/dashboard', [Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
+        Route::get('/get_data/dashboard', [Controllers\Admin\DashboardController::class, 'getVenueChartData'])->name('admin.dashboard.data');
 
 
 

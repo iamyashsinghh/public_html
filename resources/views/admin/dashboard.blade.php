@@ -74,17 +74,24 @@
                     <div class="col-sm-6">
                         <div class="card text-xs">
                             <div class="card-header border-0 text-light" style="background-color: var(--wb-renosand);">
-                                <h3 class="card-title">
+                                <h3 class="card-title row">
                                     <i class="fas fa-th mr-1"></i>
-                                    Venue Leads of {{ date('F') }} Month || Average: {{ round($average_leads_for_month) }}
+                                    Venue Leads of&nbsp;<div id="selected-month">{{ date('F') }}</div>&nbsp;Month ||
+                                    Average: <div id="avarageLeadId">{{ round($average_leads_for_month) }}</div>
                                 </h3>
                                 <div class="card-tools">
-                                    <button type="button" class="btn btn-xs text-light" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-xs text-light" data-card-widget="remove">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+                                    <select id="month-selector" class="form-control form-control-sm"
+                                        style="width: auto; display: inline;">
+                                        <option value="Current Month">
+                                            Current Month
+                                        </option>
+                                        @foreach (range(1, 12) as $i)
+                                            <option value="{{ now()->subMonthsNoOverflow($i)->format('F Y') }}"
+                                                {{ $i === 0 ? 'selected' : '' }}>
+                                                {{ now()->subMonthsNoOverflow($i)->format('F Y') }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -211,7 +218,8 @@
                                             $total_leads_received_this_month += $vm->leads_received_this_month;
                                             $total_wb_targets += $vm->wb_recce_target;
 
-                                            $total_unactioned = $vm->unread_leads_overdue + $vm->task_overdue + $vm->unfollowed_leads;
+                                            $total_unactioned =
+                                                $vm->unread_leads_overdue + $vm->task_overdue + $vm->unfollowed_leads;
                                             $grand_total_unactioned += $total_unactioned;
 
                                             $total_unread_leads_overdue += $vm->unread_leads_overdue;
@@ -229,7 +237,9 @@
                                                 {{ $vm->name }} /<br /> {{ $vm->venue_name }}
                                             </td>
                                             <td>
-                                                <input type="number" style="width: 50px;" data-vm_id="{{ $vm->id }}" value="{{ $vm->wb_recce_target }}" onchange="wb_recce_target(this)">
+                                                <input type="number" style="width: 50px;"
+                                                    data-vm_id="{{ $vm->id }}" value="{{ $vm->wb_recce_target }}"
+                                                    onchange="wb_recce_target(this)">
                                             </td>
                                             <td class="recce_done_this_month_td">{{ $vm->recce_done_this_month }}</td>
                                             @php
@@ -254,14 +264,21 @@
                                             <td class="text-nowrap">{{ $vm->l2r }} %</td>
                                             <td class="text-nowrap">{{ $vm->r2c }} %</td>
                                             <td>{{ $vm->leads_received_this_month }}</td>
-                                            <td data-value="{{ $vm->unread_leads_overdue }}" class="unread_leads_overdue_td">{{ $vm->unread_leads_overdue }}</td>
-                                            <td data-value="{{ $vm->task_overdue }}" class="task_overdue_td">{{ $vm->task_overdue }}</td>
-                                            <td data-value="{{ $vm->unfollowed_leads }}" class="unfollowed_leads_td">{{ $vm->unfollowed_leads }}</td>
-                                            <td data-value="{{ $total_unactioned }}" class="total_unactioned_td">{{ $total_unactioned }}</td>
+                                            <td data-value="{{ $vm->unread_leads_overdue }}"
+                                                class="unread_leads_overdue_td">{{ $vm->unread_leads_overdue }}</td>
+                                            <td data-value="{{ $vm->task_overdue }}" class="task_overdue_td">
+                                                {{ $vm->task_overdue }}</td>
+                                            <td data-value="{{ $vm->unfollowed_leads }}" class="unfollowed_leads_td">
+                                                {{ $vm->unfollowed_leads }}</td>
+                                            <td data-value="{{ $total_unactioned }}" class="total_unactioned_td">
+                                                {{ $total_unactioned }}</td>
                                         </tr>
                                     @endforeach
                                     @php
-                                        $average_wb_recce_percentage = $total_wb_targets > 0 ? ($total_recce_done_this_month / $total_wb_targets) * 100 : 0;
+                                        $average_wb_recce_percentage =
+                                            $total_wb_targets > 0
+                                                ? ($total_recce_done_this_month / $total_wb_targets) * 100
+                                                : 0;
                                         $average_l2r = $number_of_vms > 0 ? $total_l2r / $number_of_vms : 0;
                                         $average_r2c = $number_of_vms > 0 ? $total_r2c / $number_of_vms : 0;
                                     @endphp
@@ -714,7 +731,7 @@
         </section>
     </div>
 @section('footer-script')
-    <script src="{{ asset('plugins/charts/chart.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         (function unfollowed_columns_color_handling() {
             //unread leads
@@ -857,187 +874,253 @@
                 datasets: [{
                         label: 'Total Leads',
                         fill: false,
-                        lineTension: 0,
+                        tension: 0, // Use `tension` instead of `lineTension` in Chart.js v3+
                         backgroundColor: "#891010",
                         borderColor: "#891010",
-                        data: ("{{ $venue_leads_for_this_month }}").split(",")
+                        data: "{{ $venue_leads_for_this_month }}".split(","),
                     },
                     {
                         label: 'Call',
                         fill: false,
-                        lineTension: 0,
+                        tension: 0,
                         backgroundColor: "#a06b14",
                         borderColor: "#a06b14",
-                        data: ("{{ $venue_call_leads_for_this_month }}").split(",")
+                        data: "{{ $venue_call_leads_for_this_month }}".split(","),
                     },
                     {
-                        label: 'Form ',
+                        label: 'Form',
                         fill: false,
-                        lineTension: 0,
+                        tension: 0,
                         backgroundColor: "#aa559f",
                         borderColor: "#aa559f",
-                        data: ("{{ $venue_form_leads_for_this_month }}").split(",")
+                        data: "{{ $venue_form_leads_for_this_month }}".split(","),
                     },
                     {
-                        label: 'Whatsapp',
+                        label: 'WhatsApp',
                         fill: false,
-                        lineTension: 0,
+                        tension: 0,
                         backgroundColor: "#618200",
                         borderColor: "#618200",
-                        data: ("{{ $venue_whatsapp_leads_for_this_month }}").split(",")
+                        data: "{{ $venue_whatsapp_leads_for_this_month }}".split(","),
                     },
                     {
                         label: 'Ad Data',
                         fill: false,
-                        lineTension: 0,
+                        tension: 0,
                         backgroundColor: "#4497bb",
                         borderColor: "#4497bb",
-                        data: ("{{ $venue_ads_leads_for_this_month }}").split(",")
+                        data: "{{ $venue_ads_leads_for_this_month }}".split(","),
                     },
                     {
                         label: 'Organic',
                         fill: false,
-                        lineTension: 0,
+                        tension: 0,
                         backgroundColor: "#cbe21d",
                         borderColor: "#cbe21d",
-                        data: ("{{ $venue_organic_leads_for_this_month }}").split(",")
-                    }
-                ]
+                        data: "{{ $venue_organic_leads_for_this_month }}".split(","),
+                    },
+                ],
             },
             options: {
-                legend: {
-                    display: true
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "top",
+                    },
+                    tooltip: {
+                        mode: "index",
+                        intersect: false,
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const label = tooltipItem.dataset.label || "";
+                                const value = tooltipItem.raw;
+                                return `${label}: ${value}`;
+                            },
+                        },
+                    },
                 },
                 scales: {
-                    yAxes: [{
+                    x: {
+                        type: "category",
+                        title: {
+                            // display: true,
+                            // text: "Days",
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            // display: true,
+                            // text: "Leads Count",
+                        },
                         ticks: {
-                            min: 1
-                        }
-                    }],
+                            min: 1, // Minimum value on the y-axis
+                        },
+                    },
                 },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false,
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            var label = data.datasets[tooltipItem.datasetIndex].label || '';
-                            var value = tooltipItem.yLabel;
-                            return label + ': ' + value;
-                        }
-                    }
-                }
-            }
+            },
         });
 
-        // console.log("{{$venue_leads_for_this_year}}");
+
+        // console.log("{{ $venue_leads_for_this_year }}");
 
         new Chart("venue_chart_years", {
             type: "bar",
             data: {
-                labels: ("{{ $yearly_calendar }}").split(','),
-                datasets: [
-                    {
+                labels: "{{ $yearly_calendar }}".split(','), // Ensure this outputs a valid string
+                datasets: [{
                         label: 'Ad Data',
-                        fill: false,
-                        lineTension: 0,
                         backgroundColor: "#4497bb",
                         borderColor: "#4497bb",
-                        data: ("{{ $venue_ads_leads_for_this_year }}").split(",")
+                        borderWidth: 1,
+                        data: "{{ $venue_ads_leads_for_this_year }}".split(
+                            ","), // Ensure this outputs a valid string
                     },
                     {
                         label: 'Organic',
-                        fill: false,
-                        lineTension: 0,
                         backgroundColor: "#cbe21d",
                         borderColor: "#cbe21d",
-                        data: ("{{ $venue_organic_leads_for_this_year }}").split(",")
+                        borderWidth: 1,
+                        data: "{{ $venue_organic_leads_for_this_year }}".split(
+                            ","), // Ensure this outputs a valid string
                     },
                     {
                         label: 'Total Leads',
-                        fill: false,
-                        lineTension: 0,
                         backgroundColor: "#891010",
                         borderColor: "#891010",
-                        data: ("{{ $venue_leads_for_this_year }}").split(",")
-                    }
-                ]
+                        borderWidth: 1,
+                        data: "{{ $venue_leads_for_this_year }}".split(
+                            ","), // Ensure this outputs a valid string
+                    },
+                ],
             },
             options: {
-                legend: {
-                    display: true
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "top",
+                    },
+                    tooltip: {
+                        mode: "index",
+                        intersect: false,
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const label = tooltipItem.dataset.label || '';
+                                const value = tooltipItem.raw;
+                                return `${label}: ${value}`;
+                            },
+                        },
+                    },
                 },
                 scales: {
-                    yAxes: [{
+                    x: {
+                        type: "category",
+                        title: {
+                            display: false,
+                            text: "Months",
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: false,
+                            text: "Leads Count",
+                        },
                         ticks: {
-                            min: 1
-                        }
-                    }],
+                            min: 1, // Minimum value on the y-axis
+                        },
+                    },
                 },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false,
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            var label = data.datasets[tooltipItem.datasetIndex].label || '';
-                            var value = tooltipItem.yLabel;
-                            return label + ': ' + value;
-                        }
-                    }
-                }
-            }
+            },
         });
 
-        // NonVenue Charts
+
         new Chart("nv_chart_months", {
-            type: "line",
-            data: {
-                labels: current_month_days_arr,
-                datasets: [{
-                    fill: false,
-                    lineTension: 0,
-                    backgroundColor: "#891010",
-                    borderColor: "rgba(0,0,255,0.1)",
-                    data: ("{{ $nv_leads_for_this_month }}").split(",")
-                }]
-            },
-            options: {
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            min: 1
-                        }
-                    }],
-                },
+    type: "line",
+    data: {
+        labels: current_month_days_arr,
+        datasets: [{
+            fill: false,
+            tension: 0,
+            backgroundColor: "#891010",
+            borderColor: "rgba(0,0,255,0.1)",
+            data: ("{{ $nv_leads_for_this_month }}").split(",")
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                display: false
             }
-        });
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                min: 1
+            }
+        }
+    }
+});
 
-        new Chart("nv_chart_years", {
-            type: "bar",
-            data: {
-                labels: ("{{ $yearly_calendar }}").split(','),
-                datasets: [{
-                    fill: false,
-                    lineTension: 0,
-                    backgroundColor: "#891010",
-                    borderColor: "rgba(0,0,255,0.1)",
-                    data: ("{{ $nv_leads_for_this_year }}").split(',')
-                }]
-            },
-            options: {
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            min: 1
-                        }
-                    }],
-                },
+new Chart("nv_chart_years", {
+    type: "bar",
+    data: {
+        labels: ("{{ $yearly_calendar }}").split(','),
+        datasets: [{
+            fill: false,
+            tension: 0,
+            backgroundColor: "#891010",
+            borderColor: "rgba(0,0,255,0.1)",
+            data: ("{{ $nv_leads_for_this_year }}").split(',')
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                display: false
             }
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                min: 1
+            }
+        }
+    }
+});
+
+
+
+
+        document.getElementById('month-selector').addEventListener('change', function() {
+            const selectedMonth = this.value.split(' ')[0];
+            const selectedYear = this.value.split(' ')[1];
+
+            document.getElementById('selected-month').innerText = `${selectedMonth} ${selectedYear}`;
+
+            fetch(`{{ route('admin.dashboard.data') }}?month=${selectedMonth}&year=${selectedYear}`)
+                .then(response => response.json())
+                .then(data => {
+                    const chart = Chart.getChart("venue_chart_months");
+                    chart.data.datasets[0].data = data.venue_leads.split(",");
+                    chart.data.datasets[1].data = data.call_leads.split(",");
+                    chart.data.datasets[2].data = data.form_leads.split(",");
+                    chart.data.datasets[3].data = data.whatsapp_leads.split(",");
+                    chart.data.datasets[4].data = data.ads_leads.split(",");
+                    chart.data.datasets[5].data = data.organic_leads.split(",");
+
+                    const venueLeads = data.venue_leads.split(",").map(Number);
+            const count = venueLeads.length;
+            const sum = venueLeads.reduce((acc, val) => acc + val, 0);
+            const average = parseFloat((sum / count).toFixed(2));
+            document.getElementById('avarageLeadId').innerText = `${average}`;
+
+
+                    chart.update();
+                })
+                .catch(err => console.error('Error fetching chart data:', err));
         });
     </script>
 @endsection

@@ -28,6 +28,8 @@ class Kernel extends ConsoleKernel
             Log::info('Finished the dashboard:precompute command');
         });
 
+        $schedule->command('dashboard:save-historical-data')->monthlyOn(1, '00:00');
+
         // eveymin task: Precompute dashboard data
         $schedule->command('seomanagerdashboard:precompute')->everyMinute()->before(function () {
             Log::info('Starting the seomanagerdashboard:precompute command');

@@ -168,20 +168,20 @@ class PrecomputeDashboardData extends Command
             $vm['unread_leads_overdue'] = LeadForward::where('read_status', false)->where('lead_datetime', '<', Carbon::today())->where('forward_to', $vm->id)->count();
 
             $vm['task_schedule_this_month'] = Task::selectRaw('count(distinct(lead_id)) as count')
-            ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
-            ->where('task_schedule_datetime', 'like', "%$current_month%")
-            ->where(['tasks.created_by' => $vm->id])
-            ->whereNull('tasks.done_datetime')->count();
+                ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
+                ->where('task_schedule_datetime', 'like', "%$current_month%")
+                ->where(['tasks.created_by' => $vm->id])
+                ->whereNull('tasks.done_datetime')->count();
             $vm['task_schedule_today'] = Task::selectRaw('count(distinct(lead_id)) as count')
-            ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
-            ->where('task_schedule_datetime', 'like', "%$current_date%")
-            ->where(['tasks.created_by' => $vm->id])
-            ->whereNull('tasks.done_datetime')->count();
+                ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
+                ->where('task_schedule_datetime', 'like', "%$current_date%")
+                ->where(['tasks.created_by' => $vm->id])
+                ->whereNull('tasks.done_datetime')->count();
             $vm['task_overdue'] = Task::selectRaw('count(distinct(lead_id)) as count')
-            ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
-            ->where('task_schedule_datetime', '<', Carbon::today())
-            ->where(['tasks.created_by' => $vm->id])
-            ->whereNull('tasks.done_datetime')->count();
+                ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
+                ->where('task_schedule_datetime', '<', Carbon::today())
+                ->where(['tasks.created_by' => $vm->id])
+                ->whereNull('tasks.done_datetime')->count();
 
             $vm['recce_schedule_this_month'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.done_datetime' => null, 'visits.deleted_at' => null])->whereBetween('visits.visit_schedule_datetime', [$from, $to])->count();
             $vm['recce_schedule_today'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.done_datetime' => null, 'visits.deleted_at' => null])->where('visits.visit_schedule_datetime', 'like', "%$current_date%")->count();
@@ -211,11 +211,11 @@ class PrecomputeDashboardData extends Command
             $vm['r2c'] = number_format($r2c);
 
             $vm['unfollowed_leads'] = LeadForward::join('tasks', ['tasks.id' => 'lead_forwards.task_id'])->where(['lead_forwards.forward_to' => $vm->id, 'tasks.deleted_at' => null])->where('lead_forwards.lead_status', '!=', 'Done')->whereNotNull('tasks.done_datetime')
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('bookings')
-                    ->whereRaw('bookings.id = lead_forwards.booking_id');
-            })->get()->count();
+                ->whereNotExists(function ($query) {
+                    $query->select(DB::raw(1))
+                        ->from('bookings')
+                        ->whereRaw('bookings.id = lead_forwards.booking_id');
+                })->get()->count();
 
             $vm['wb_recce_target'] = VmProductivity::where('team_id', $vm->id)->where('date', 'like', "%$current_month%")->first()->wb_recce_target ?? 0;
 
@@ -367,66 +367,66 @@ class PrecomputeDashboardData extends Command
             $v['unread_leads_this_month'] = nvrmLeadForward::where('lead_datetime', 'like', "%$current_month%")->whereNull('deleted_at')->where(['read_status' => false])->where('forward_to', $v->id)->distinct('lead_id')->count();
             $v['unread_leads_today'] = nvrmLeadForward::where('lead_datetime', 'like', "%$current_date%")->where(['read_status' => false])->whereNull('deleted_at')->where('forward_to', $v->id)->distinct('lead_id')->count();
             $v['unread_leads_overdue'] = nvrmLeadForward::where('lead_datetime', '>=', Carbon::parse('2024-02-01')->startOfDay())
-            ->where('lead_datetime', '<=', Carbon::now())
-            ->where('read_status', false)
-            ->whereNull('deleted_at')
-            ->where('forward_to', $v->id)
-            ->distinct('lead_id')
-            ->count('lead_id');
+                ->where('lead_datetime', '<=', Carbon::now())
+                ->where('read_status', false)
+                ->whereNull('deleted_at')
+                ->where('forward_to', $v->id)
+                ->distinct('lead_id')
+                ->count('lead_id');
 
             $v['forward_leads_this_month'] = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $v->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
             $v['forward_leads_today'] = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_date%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $v->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
 
             $v['nvrm_unfollowed_leads'] = nvrmLeadForward::query()
-            ->where('lead_status', '!=', 'Done')
-            ->whereNull('deleted_at')
-            ->whereExists(function ($query) use ($v) {
-                $query->select(DB::raw(1))
-                    ->from('nvrm_tasks')
-                    ->whereColumn('nvrm_tasks.lead_id', 'nvrm_lead_forwards.lead_id')
-                    ->whereNotNull('nvrm_tasks.done_datetime')
-                    ->whereNull('nvrm_tasks.deleted_at')
-                    ->where('nvrm_tasks.created_by', $v->id);
-            })
-            ->whereDoesntHave('nvrm_tasks', function ($query) {
-                $query->whereNull('done_datetime');
-            })
-            ->distinct('lead_id')
-            ->count();
+                ->where('lead_status', '!=', 'Done')
+                ->whereNull('deleted_at')
+                ->whereExists(function ($query) use ($v) {
+                    $query->select(DB::raw(1))
+                        ->from('nvrm_tasks')
+                        ->whereColumn('nvrm_tasks.lead_id', 'nvrm_lead_forwards.lead_id')
+                        ->whereNotNull('nvrm_tasks.done_datetime')
+                        ->whereNull('nvrm_tasks.deleted_at')
+                        ->where('nvrm_tasks.created_by', $v->id);
+                })
+                ->whereDoesntHave('nvrm_tasks', function ($query) {
+                    $query->whereNull('done_datetime');
+                })
+                ->distinct('lead_id')
+                ->count();
 
 
             $v['task_schedule_this_month'] = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
-            ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
-            ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
-            ->whereNull('nvrm_lead_forwards.deleted_at')
-            ->whereNull('nvrm_tasks.done_datetime')
-            ->whereNull('nvrm_tasks.deleted_at')
-            ->groupBy('nvrm_tasks.lead_id')
-            ->where('nvrm_tasks.created_by', $v->id)
-            ->get()
-            ->count();
+                ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
+                ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
+                ->whereNull('nvrm_lead_forwards.deleted_at')
+                ->whereNull('nvrm_tasks.done_datetime')
+                ->whereNull('nvrm_tasks.deleted_at')
+                ->groupBy('nvrm_tasks.lead_id')
+                ->where('nvrm_tasks.created_by', $v->id)
+                ->get()
+                ->count();
 
             $v['task_schedule_today'] =  nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
-            ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
-            ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentDateStart, $currentDateEnd])
-            ->whereNull('nvrm_tasks.done_datetime')
-            ->whereNull('nvrm_lead_forwards.deleted_at')
-            ->whereNull('nvrm_tasks.deleted_at')
-            ->groupBy('nvrm_tasks.lead_id')
-            ->where('nvrm_tasks.created_by', $v->id)
-            ->get()
-            ->count();
+                ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
+                ->whereBetween('nvrm_tasks.task_schedule_datetime', [$currentDateStart, $currentDateEnd])
+                ->whereNull('nvrm_tasks.done_datetime')
+                ->whereNull('nvrm_lead_forwards.deleted_at')
+                ->whereNull('nvrm_tasks.deleted_at')
+                ->groupBy('nvrm_tasks.lead_id')
+                ->where('nvrm_tasks.created_by', $v->id)
+                ->get()
+                ->count();
 
-            $v['task_overdue'] =nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
-            ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
-            ->where('nvrm_tasks.task_schedule_datetime', '<', $currentDateTime)
-            ->whereNull('nvrm_tasks.done_datetime')
-            ->whereNull('nvrm_lead_forwards.deleted_at')
-            ->whereNull('nvrm_tasks.deleted_at')
-            ->groupBy('nvrm_tasks.lead_id')
-            ->where('nvrm_tasks.created_by', $v->id)
-            ->get()
-            ->count();
+            $v['task_overdue'] = nvrmLeadForward::join('nvrm_tasks', 'nvrm_lead_forwards.lead_id', '=', 'nvrm_tasks.lead_id')
+                ->where('nvrm_lead_forwards.lead_status', '!=', 'Done')
+                ->where('nvrm_tasks.task_schedule_datetime', '<', $currentDateTime)
+                ->whereNull('nvrm_tasks.done_datetime')
+                ->whereNull('nvrm_lead_forwards.deleted_at')
+                ->whereNull('nvrm_tasks.deleted_at')
+                ->groupBy('nvrm_tasks.lead_id')
+                ->where('nvrm_tasks.created_by', $v->id)
+                ->get()
+                ->count();
 
             $categories = VendorCategory::whereIn('id', [1, 2, 3, 4, 5])->get();
             $forward_leads_by_category = [];
