@@ -1097,7 +1097,10 @@ new Chart("nv_chart_years", {
         document.getElementById('month-selector').addEventListener('change', function() {
             const selectedMonth = this.value.split(' ')[0];
             const selectedYear = this.value.split(' ')[1];
-
+            if (selectedMonth == 'Current' && selectedYear == 'Month') {
+        location.reload();
+        return;
+    }
             document.getElementById('selected-month').innerText = `${selectedMonth} ${selectedYear}`;
 
             fetch(`{{ route('admin.dashboard.data') }}?month=${selectedMonth}&year=${selectedYear}`)
@@ -1116,8 +1119,6 @@ new Chart("nv_chart_years", {
             const sum = venueLeads.reduce((acc, val) => acc + val, 0);
             const average = parseFloat((sum / count).toFixed(2));
             document.getElementById('avarageLeadId').innerText = `${average}`;
-
-
                     chart.update();
                 })
                 .catch(err => console.error('Error fetching chart data:', err));
