@@ -81,13 +81,13 @@
                                 </h3>
                                 <div class="card-tools">
                                     <select id="month-selector" class="form-control form-control-sm"
-                                        style="width: auto; display: inline;">
-                                        <option value="Current Month">
+                                        style="width: auto; display: inline; font-weight: 600;">
+                                        <option value="Current Month" style="font-weight: 600;">
                                             {{ date('F Y') }}
                                         </option>
                                         @foreach (range(1, 12) as $i)
                                             <option value="{{ now()->subMonthsNoOverflow($i)->format('F Y') }}"
-                                                {{ $i === 0 ? 'selected' : '' }}>
+                                                {{ $i === 0 ? 'selected' : '' }} style="font-weight: 600;">
                                                 {{ now()->subMonthsNoOverflow($i)->format('F Y') }}
                                             </option>
                                         @endforeach
