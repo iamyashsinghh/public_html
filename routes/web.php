@@ -370,6 +370,7 @@ Route::middleware('verify_token')->group(function () {
    */
     Route::prefix('/seomanager')->middleware('seomanager')->group(function () {
         Route::get('/dashboard', [Controllers\SeoManager\DashboardController::class, 'index'])->name('seomanager.dashboard');
+        Route::get('/get_data/dashboard', [Controllers\SeoManager\DashboardController::class, 'getVenueChartData'])->name('seomanager.dashboard.data');
 
         Route::match(['get', 'post'], '/leads', [Controllers\SeoManager\LeadController::class, 'list'])->name('seomanager.lead.list');
         Route::get('/leads/ajax_list', [Controllers\SeoManager\LeadController::class, 'ajax_list'])->name('seomanager.lead.list.ajax');
