@@ -76,14 +76,14 @@
                             <div class="card-header border-0 text-light" style="background-color: var(--wb-renosand);">
                                 <h3 class="card-title row">
                                     <i class="fas fa-th mr-1"></i>
-                                    Venue Leads of&nbsp;<div id="selected-month">{{ date('F') }}</div>&nbsp;Month ||
+                                    Venue Leads ||
                                     Average: <div id="avarageLeadId">{{ round($average_leads_for_month) }}</div>
                                 </h3>
                                 <div class="card-tools">
                                     <select id="month-selector" class="form-control form-control-sm"
                                         style="width: auto; display: inline;">
                                         <option value="Current Month">
-                                            Current Month
+                                            {{ date('F Y') }}
                                         </option>
                                         @foreach (range(1, 12) as $i)
                                             <option value="{{ now()->subMonthsNoOverflow($i)->format('F Y') }}"
@@ -1101,7 +1101,7 @@ new Chart("nv_chart_years", {
         location.reload();
         return;
     }
-            document.getElementById('selected-month').innerText = `${selectedMonth} ${selectedYear}`;
+            // document.getElementById('selected-month').innerText = `${selectedMonth}`;
 
             fetch(`{{ route('admin.dashboard.data') }}?month=${selectedMonth}&year=${selectedYear}`)
                 .then(response => response.json())
