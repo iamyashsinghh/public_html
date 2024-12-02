@@ -103,8 +103,9 @@ class LeadForward extends Model
             return Booking::where(['lead_id' => $this->lead_id, 'created_by' => $this->forward_to])->get();
         }
     }
+
     public function teamMember()
     {
-        return $this->belongsTo(TeamMember::class, 'forward_to', 'id');
+        return $this->belongsTo(TeamMember::class, 'forward_to', 'id')->withTrashed();
     }
 }
