@@ -286,7 +286,7 @@ class LeadController extends Controller
             $venue_ids_assigned = [];
 
             foreach ($request->forward_vms_id as $vm_id) {
-                $forwarding_member = TeamMember::find($vm_id)->withTrashed();
+                $forwarding_member = TeamMember::withTrashed()->find($vm_id);
                 $forwarding_member_venue_id = $forwarding_member->venue_id ?? null;
                 if (in_array($forwarding_member_venue_id, $venue_ids_assigned)) {
                     continue;
