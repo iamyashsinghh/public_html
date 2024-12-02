@@ -397,7 +397,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="accordion-item">
+                            {{-- <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
                                         type="button" data-bs-toggle="collapse" data-bs-target="#collapse2lead_from"
@@ -428,7 +428,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
@@ -673,7 +673,7 @@
                         td_elements[8].innerHTML =
                             `<span class="badge badge-danger">Not-Contacted</span>`;
                     }
-                    td_elements[9].innerText = `${data.lead_catagory ? data.lead_catagory : 'N/A'} - ${data.lead_from ? data.lead_from : 'weddingbanquets.in'}`;
+                    td_elements[9].innerText = `${data.lead_catagory ? data.lead_catagory : 'N/A'}`;
                     td_elements[10].innerText = td_elements[10].innerText = data.preference ? data.preference.split('?')[0] : 'N/A';                    ;
                     td_elements[11].innerText = data.locality ? data.locality : 'N/A';
                     td_elements[12].innerText = data.created_by ? data.created_by + " - " + data

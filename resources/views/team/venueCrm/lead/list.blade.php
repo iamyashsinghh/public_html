@@ -277,7 +277,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="accordion-item">
+                            {{-- <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
                                         type="button" data-bs-toggle="collapse" data-bs-target="#collapse2lead_from"
@@ -308,7 +308,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         @endif
                         <div class="accordion-item">
                             <h2 class="accordion-header">
@@ -543,7 +543,7 @@
                             }
 
                             row.style.background = data[8];
-                            td_elements[9].innerText = `${data[19] ? data[19] : 'N/A'} - ${data[21] ? data[21] : 'weddingbanquets.in'}`;
+                            td_elements[9].innerText = `${data[19] ? data[19] : 'N/A'}`;
                             td_elements[10].innerHTML =data[11] ? data[11].split('?')[0] : 'N/A';
                             td_elements[11].innerHTML = data[12] ?? 'N/A';
                             td_elements[12].innerHTML = data[13] ?? 'N/A';
