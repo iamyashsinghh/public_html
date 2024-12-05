@@ -46,6 +46,7 @@ class DashboardController extends Controller
         "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
             ->whereNotNull('completed_tasks.lead_id')
             ->where('leads.lead_status', '!=', 'Done')
+            ->where('leads.assign_id',  $auth_user->id)
             ->count();
 
         $rm_task_overdue_leads = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')

@@ -278,7 +278,8 @@ class LeadController extends Controller
                         HAVING COUNT(CASE WHEN tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
                     "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
                         ->whereNotNull('completed_tasks.lead_id')
-                        ->where('leads.lead_status', '!=', 'Done');
+                        ->where('leads.lead_status', '!=', 'Done')
+                        ->where('leads.assign_id', $auth_user->id);
                 } elseif ($request->dashboard_filters == "vm_recce_today") {
                     $threeDaysAgo = Carbon::now()->subDays(3);
                     $startDate = Carbon::createFromDate(2024, 8, 1);
