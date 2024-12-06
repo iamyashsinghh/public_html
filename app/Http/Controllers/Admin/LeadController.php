@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class LeadController extends Controller
 {
@@ -89,17 +90,19 @@ class LeadController extends Controller
             'leads.lead_catagory',
             'ne.pax as pax',
             DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
-            'leads.lead_from',
+            'leads.lead_from'
         )->leftJoin('team_members as tm', 'leads.created_by', 'tm.id')
         ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id')
-            ->leftJoin('roles', 'tm.role_id', 'roles.id')->groupBy('leads.mobile');
+        ->leftJoin('roles', 'tm.role_id', 'roles.id')
+        ->groupBy('leads.mobile');
 
+        // Apply filters before DataTables processing
         if ($request->has('lead_status') && $request->lead_status != '') {
             $leads->whereIn('leads.lead_status', $request->lead_status);
         }
+
         if ($request->has('lead_from') && $request->lead_from != '') {
             if (in_array('weddingbanquets.in', $request->lead_from)) {
-                // If 'weddingbanquets.in' is in the array, include records with 'null' lead_from
                 $leads->where(function($query) use ($request) {
                     $query->whereIn('leads.lead_from', $request->lead_from)
                           ->orWhereNull('leads.lead_from');
@@ -108,7 +111,6 @@ class LeadController extends Controller
                 $leads->whereIn('leads.lead_from', $request->lead_from);
             }
         }
-
 
         if ($request->has('event_from_date') && $request->event_from_date != '') {
             $from = Carbon::make($request->event_from_date);
@@ -143,12 +145,8 @@ class LeadController extends Controller
         }
 
         if ($request->pax_min_value != null) {
-            $min =  $request->pax_min_value;
-            if ($request->pax_max_value != null) {
-                $max = $request->pax_max_value;
-            } else {
-                $max = $request->pax_min_value;
-            }
+            $min = $request->pax_min_value;
+            $max = $request->pax_max_value ?? $min;
             $leads->whereBetween('ne.pax', [$min, $max]);
         }
 
@@ -158,11 +156,7 @@ class LeadController extends Controller
 
         if ($request->lead_done_from_date != null) {
             $from = Carbon::make($request->lead_done_from_date);
-            if ($request->lead_done_to_date != null) {
-                $to = Carbon::make($request->lead_done_to_date)->endOfDay();
-            } else {
-                $to = Carbon::make($request->lead_done_from_date)->endOfDay();
-            }
+            $to = $request->lead_done_to_date != null ? Carbon::make($request->lead_done_to_date)->endOfDay() : $from->endOfDay();
             $leads->where('leads.lead_status', 'Done')->whereBetween('leads.updated_at', [$from, $to]);
         }
 
@@ -174,12 +168,11 @@ class LeadController extends Controller
             $leads->whereIn('leads.source', $request->lead_source);
         }
 
-        $leads->orderBy('leads.whatsapp_msg_time', 'desc');
-
         $leads->whereNull('leads.deleted_at');
 
-        $leads = $leads->get();
-        return datatables($leads)->escapeColumns([])->toJson();
+        return DataTables::of($leads)
+            ->orderColumn('whatsapp_msg_time', '-whatsapp_msg_time $1')
+            ->make(true);
     }
 
     public function add_process(Request $request)
