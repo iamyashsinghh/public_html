@@ -1,479 +1,491 @@
 @extends('admin.layouts.app')
 @section('header-css')
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
 @endsection
 @section('title', $page_heading . ' | Venue CRM')
 @section('navbar-right-links')
-    <li class="nav-item">
-        <a class="nav-link" title="Filters" data-widget="control-sidebar" data-controlsidebar-slide="true"
-            href="javascript:void(0);" role="button">
-            <i class="fas fa-filter"></i>
-        </a>
-    </li>
+<li class="nav-item">
+    <a class="nav-link" title="Filters" data-widget="control-sidebar" data-controlsidebar-slide="true"
+        href="javascript:void(0);" role="button">
+        <i class="fas fa-filter"></i>
+    </a>
+</li>
 @endsection
 @section('main')
-    <div class="content-wrapper pb-5">
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between mb-2">
-                    <h1 class="m-0">{{ $page_heading }}</h1>
-                    <div class="d-flex">
-                        <button class="btn btn-sm text-light" onclick="send_what_msg_multiple()"
-                            style="background-color: var(--wb-renosand);">Whatsapp</button>
-                    </div>
-                </div>
-                <div class="button-group my-4">
-                    <a href="javascript:void(0);" class="btn text-light btn-sm buttons-print mx-1" data-bs-toggle="modal"
-                        data-bs-target="#manageLeadModal" style="background-color: var(--wb-renosand)"><i
-                            class="fa fa-plus"></i> New</a>
-                    <a href="javascript:void(0);" class="btn text-light btn-sm buttons-print mx-1"
-                        onclick="handle_forward_leads_to_rm(this)" style="background-color: var(--wb-dark-red)"><i
-                            class="fa fa-paper-plane"></i> Forward to RM's</a>
-                    <a href="{{ route('admin.lead.list') }}" class="text-center btn btn-secondary btn-sm">Refresh</a>
-                </div>
-                <div class="filter-container text-center" style="display: none">
-                    <form action="{{ route('admin.lead.list') }}" method="post">
-                        @csrf
-                        <label for="">Filter by lead date</label>
-                        <input type="date" name="lead_from_date"
-                            value="{{ isset($filter_params['lead_from_date']) ? $filter_params['lead_from_date'] : '' }}"
-                            class="form-control form-control-sm d-inline-block" style="width: unset;" required>
-                        <span class="">To:</span>
-                        <input type="date" name="lead_to_date"
-                            value="{{ isset($filter_params['lead_to_date']) ? $filter_params['lead_to_date'] : '' }}"
-                            class="form-control form-control-sm d-inline-block" style="width: unset;">
-                        <button type="submit" class="btn text-light btn-sm"
-                            style="background-color: var(--wb-dark-red)">Submit</button>
-                        <a href="{{ route('admin.lead.list') }}" class="btn btn-secondary btn-sm">Reset</a>
-                    </form>
+<div class="content-wrapper pb-5">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between mb-2">
+                <h1 class="m-0">{{ $page_heading }}</h1>
+                <div class="d-flex">
+                    <button class="btn btn-sm text-light" onclick="send_what_msg_multiple()"
+                        style="background-color: var(--wb-renosand);">Whatsapp</button>
                 </div>
             </div>
-        </section>
-        <section class="content">
-            <div class="container-fluid">
-                <div class="table-responsive">
-                    <table id="serverTable" class="table text-sm">
-                        <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
-                            <tr>
-                                <th class=""><input type="checkbox" onchange="handle_select_all_leads(this)"></th>
-                                <th class="text-nowrap">Lead ID</th>
-                                <th class="">Assigned Rm Name</th>
-                                <th class="text-nowrap">Lead Date</th>
-                                <th class="">Name</th>
-                                <th class="text-nowrap">Mobile</th>
-                                <th class="">Source</th>
-                                <th class="text-nowrap">Event Date</th>
-                                <th class="text-nowrap">Service Status</th>
-                                <th class="text-nowrap">Category</th>
-                                <th class="">Preference</th>
-                                <th class="">Locality</th>
-                                <th class="">Created or Done By</th>
-                                <th class="text-nowrap">Last Forwarded By</th>
-                                <th class="">Lead Status</th>
-                                <th class="text-center">Action</th>
-                            </tr>
-                        </thead>
-                    </table>
+            <div class="button-group my-4">
+                <a href="javascript:void(0);" class="btn text-light btn-sm buttons-print mx-1" data-bs-toggle="modal"
+                    data-bs-target="#manageLeadModal" style="background-color: var(--wb-renosand)"><i
+                        class="fa fa-plus"></i> New</a>
+                <a href="javascript:void(0);" class="btn text-light btn-sm buttons-print mx-1"
+                    onclick="handle_forward_leads_to_rm(this)" style="background-color: var(--wb-dark-red)"><i
+                        class="fa fa-paper-plane"></i> Forward to RM's</a>
+                <a href="{{ route('admin.lead.list') }}" class="text-center btn btn-secondary btn-sm">Refresh</a>
+            </div>
+            <div class="filter-container text-center" style="display: none">
+                <form action="{{ route('admin.lead.list') }}" method="post">
+                    @csrf
+                    <label for="">Filter by lead date</label>
+                    <input type="date" name="lead_from_date"
+                        value="{{ isset($filter_params['lead_from_date']) ? $filter_params['lead_from_date'] : '' }}"
+                        class="form-control form-control-sm d-inline-block" style="width: unset;" required>
+                    <span class="">To:</span>
+                    <input type="date" name="lead_to_date"
+                        value="{{ isset($filter_params['lead_to_date']) ? $filter_params['lead_to_date'] : '' }}"
+                        class="form-control form-control-sm d-inline-block" style="width: unset;">
+                    <button type="submit" class="btn text-light btn-sm"
+                        style="background-color: var(--wb-dark-red)">Submit</button>
+                    <a href="{{ route('admin.lead.list') }}" class="btn btn-secondary btn-sm">Reset</a>
+                </form>
+            </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="table-responsive">
+                <table id="serverTable" class="table text-sm">
+                    <thead class="sticky_head bg-light" style="position: sticky; top: 0;">
+                        <tr>
+                            <th class=""><input type="checkbox" onchange="handle_select_all_leads(this)"></th>
+                            <th class="text-nowrap">Lead ID</th>
+                            <th class="">Assigned Rm Name</th>
+                            <th class="text-nowrap">Lead Date</th>
+                            <th class="">Name</th>
+                            <th class="text-nowrap">Mobile</th>
+                            <th class="">Source</th>
+                            <th class="text-nowrap">Event Date</th>
+                            <th class="text-nowrap">Service Status</th>
+                            <th class="text-nowrap">Category</th>
+                            <th class="">Preference</th>
+                            <th class="">Locality</th>
+                            <th class="">Created or Done By</th>
+                            <th class="text-nowrap">Last Forwarded By</th>
+                            <th class="">Lead Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                </table>
 
-                </div>
             </div>
-        </section>
-        <div class="modal fade" id="leadForwardedMemberInfo" tabindex="-1">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header text-sm">
-                        <h4 class="modal-title">Forward Information</h4>
-                        <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
-                                class="fa fa-times"></i></button>
+        </div>
+    </section>
+    <div class="modal fade" id="leadForwardedMemberInfo" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header text-sm">
+                    <h4 class="modal-title">Forward Information</h4>
+                    <button type="button" class="btn text-secondary" data-bs-dismiss="modal" aria-label="Close"><i
+                            class="fa fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <p id="last_forwarded_info_paragraph" class="text-sm mb-2"></p>
+                    <div class="table-responsive">
+                        <table id="clientTable" class="table text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="text-nowrap">S.No.</th>
+                                    <th class="text-nowrap">Forward At</th>
+                                    <th class="text-nowrap">Rm Name</th>
+                                    <th class="text-nowrap">Vm Name</th>
+                                    <th class="text-nowrap">Venue Name</th>
+                                    <th class="text-nowrap">Read Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forward_info_table_body">
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="modal-body">
-                        <p id="last_forwarded_info_paragraph" class="text-sm mb-2"></p>
-                        <div class="table-responsive">
-                            <table id="clientTable" class="table text-sm">
-                                <thead>
-                                    <tr>
-                                        <th class="text-nowrap">S.No.</th>
-                                        <th class="text-nowrap">Forward At</th>
-                                        <th class="text-nowrap">Rm Name</th>
-                                        <th class="text-nowrap">Vm Name</th>
-                                        <th class="text-nowrap">Venue Name</th>
-                                        <th class="text-nowrap">Read Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="forward_info_table_body">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-        @include('admin.venueCrm.lead.forward_leads_modal')
-        <aside class="control-sidebar control-sidebar-dark" style="display: none;">
-            <div class="p-3 control-sidebar-content">
-                <h5>Lead Filters</h5>
-                <hr class="mb-2">
-                <form action="{{ route('admin.lead.list') }}" id="filters-form" method="post">
-                    @csrf
-                    <div class="accordion text-sm" id="accordionExample">
-                        <div class="accordion-item">
-                            <div class="accordion text-sm" id="accordionExample">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#collapse41"
-                                            aria-expanded="true" aria-controls="collapse41">Lead assigned to Rm</button>
-                                    </h2>
-                                    <div id="collapse41"
-                                        class="accordion-collapse collapse {{ isset($filter_params['team_members']) ? 'show' : '' }}"
-                                        data-bs-parent="#accordionExample">
-                                        <div class="accordion-body pl-2 pb-4">
-                                            @foreach ($getRm as $rm)
-                                                <div class="custom-control custom-checkbox my-1">
-                                                    <input class="custom-control-input" type="checkbox"
-                                                        id="team_member_{{ $rm->id }}" name="team_members[]"
-                                                        value="{{ $rm->id }}"
-                                                        {{ isset($filter_params['team_members']) && in_array($rm->id, $filter_params['team_members']) ? 'checked' : '' }}>
-                                                    <label for="team_member_{{ $rm->id }}"
-                                                        class="custom-control-label">{{ $rm->name }}</label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#collapse1"
-                                            aria-expanded="true" aria-controls="collapse1">Lead Status</button>
-                                    </h2>
-                                    <div id="collapse1"
-                                        class="accordion-collapse collapse {{ isset($filter_params['lead_status']) ? 'show' : '' }}"
-                                        data-bs-parent="#accordionExample">
-                                        <div class="accordion-body pl-2 pb-4">
-                                            <div class="custom-control custom-checkbox my-1">
-                                                <input class="custom-control-input" type="checkbox"
-                                                    id="lead_status_active_checkbox" name="lead_status[]" value="Active"
-                                                    {{ isset($filter_params['lead_status']) && in_array('Active', $filter_params['lead_status']) ? 'checked' : '' }}>
-                                                <label for="lead_status_active_checkbox"
-                                                    class="custom-control-label">Active</label>
-                                            </div>
-                                            <div class="custom-control custom-checkbox my-1">
-                                                <input class="custom-control-input" type="checkbox"
-                                                    id="lead_status_hot_checkbox" name="lead_status[]" value="Hot"
-                                                    {{ isset($filter_params['lead_status']) && in_array('Hot', $filter_params['lead_status']) ? 'checked' : '' }}>
-                                                <label for="lead_status_hot_checkbox"
-                                                    class="custom-control-label">Hot</label>
-                                            </div>
-                                            <div class="custom-control custom-checkbox my-1">
-                                                <input class="custom-control-input" type="checkbox"
-                                                    id="lead_status_super_hot_checkbox" name="lead_status[]"
-                                                    value="Super Hot"
-                                                    {{ isset($filter_params['lead_status']) && in_array('Super Hot', $filter_params['lead_status']) ? 'checked' : '' }}>
-                                                <label for="lead_status_super_hot_checkbox"
-                                                    class="custom-control-label">Super
-                                                    Hot</label>
-                                            </div>
-                                            <div class="custom-control custom-checkbox my-1">
-                                                <input class="custom-control-input" type="checkbox"
-                                                    id="lead_status_done_checkbox" name="lead_status[]" value="Done"
-                                                    {{ isset($filter_params['lead_status']) && in_array('Done', $filter_params['lead_status']) ? 'checked' : '' }}>
-                                                <label for="lead_status_done_checkbox"
-                                                    class="custom-control-label">Done</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse2"
-                                        aria-expanded="true" aria-controls="collapse2">Lead Read Status</button>
-                                </h2>
-                                <div id="collapse2"
-                                    class="accordion-collapse collapse {{ isset($filter_params['lead_read_status']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="read_status_readed_radio" name="lead_read_status" value="1"
-                                                {{ isset($filter_params['lead_read_status']) && $filter_params['lead_read_status'] == '1' ? 'checked' : '' }}>
-                                            <label for="read_status_readed_radio"
-                                                class="custom-control-label">Readed</label>
-                                        </div>
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="read_status_unreaded_radio" name="lead_read_status" value="0"
-                                                {{ isset($filter_params['lead_read_status']) && $filter_params['lead_read_status'] == '0' ? 'checked' : '' }}>
-                                            <label for="read_status_unreaded_radio"
-                                                class="custom-control-label">Unreaded</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse3"
-                                        aria-expanded="true" aria-controls="collapse3">Service Status</button>
-                                </h2>
-                                <div id="collapse3"
-                                    class="accordion-collapse collapse {{ isset($filter_params['service_status']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="service_status_contacted_radio" name="service_status" value="1"
-                                                {{ isset($filter_params['service_status']) && $filter_params['service_status'] == '1' ? 'checked' : '' }}>
-                                            <label for="service_status_contacted_radio"
-                                                class="custom-control-label">Contacted</label>
-                                        </div>
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="service_status_not_contacted_radio" name="service_status"
-                                                value="0"
-                                                {{ isset($filter_params['service_status']) && $filter_params['service_status'] == '0' ? 'checked' : '' }}>
-                                            <label for="service_status_not_contacted_radio"
-                                                class="custom-control-label">Not
-                                                Contacted</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse4"
-                                        aria-expanded="true" aria-controls="collapse4">Has RM Message?</button>
-                                </h2>
-                                <div id="collapse4"
-                                    class="accordion-collapse collapse {{ isset($filter_params['has_rm_message']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="has_rm_message_no_radio" name="has_rm_message" value="no"
-                                                {{ isset($filter_params['has_rm_message']) && $filter_params['has_rm_message'] == 'no' ? 'checked' : '' }}>
-                                            <label for="has_rm_message_no_radio" class="custom-control-label">No</label>
-                                        </div>
-                                        <div class="custom-control custom-radio my-1">
-                                            <input class="custom-control-input" type="radio"
-                                                id="has_rm_message_yes_radio" name="has_rm_message" value="yes"
-                                                {{ isset($filter_params['has_rm_message']) && $filter_params['has_rm_message'] == 'yes' ? 'checked' : '' }}>
-                                            <label for="has_rm_message_yes_radio" class="custom-control-label">Yes</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse55"
-                                        aria-expanded="true" aria-controls="collapse55">Pax</button>
-                                </h2>
-                                <div id="collapse55"
-                                    class="accordion-collapse collapse {{ isset($filter_params['pax_min_value']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="form-group">
-                                            <label for="pax_min_value">Min</label>
-                                            <input type="text" class="form-control" id="pax_min_value"
-                                                name="pax_min_value"
-                                                value="{{ isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : '' }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="pax_max_value">Max</label>
-                                            <input type="text" class="form-control" id="pax_max_value"
-                                                name="pax_max_value"
-                                                value="{{ isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : '' }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse5"
-                                        aria-expanded="true" aria-controls="collapse5">Event Date</button>
-                                </h2>
-                                <div id="collapse5"
-                                    class="accordion-collapse collapse {{ isset($filter_params['event_from_date']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="form-group">
-                                            <label for="event_from_date_inp">From</label>
-                                            <input type="date" class="form-control" id="event_from_date_inp"
-                                                name="event_from_date"
-                                                value="{{ isset($filter_params['event_from_date']) ? $filter_params['event_from_date'] : '' }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="event_to_date_inp">To</label>
-                                            <input type="date" class="form-control" id="event_to_date_inp"
-                                                name="event_to_date"
-                                                value="{{ isset($filter_params['event_to_date']) ? $filter_params['event_to_date'] : '' }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse7"
-                                        aria-expanded="true" aria-controls="collapse7">Lead Done Date</button>
-                                </h2>
-                                <div id="collapse7"
-                                    class="accordion-collapse collapse {{ isset($filter_params['lead_done_from_date']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="form-group">
-                                            <label for="lead_done_from_date">From</label>
-                                            <input type="date" class="form-control" id="event_date_inp"
-                                                name="lead_done_from_date"
-                                                value="{{ isset($filter_params['lead_done_from_date']) ? $filter_params['lead_done_from_date'] : '' }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="lead_done_to_date">To</label>
-                                            <input type="date" class="form-control" id="event_date_inp"
-                                                name="lead_done_to_date"
-                                                value="{{ isset($filter_params['lead_done_to_date']) ? $filter_params['lead_done_to_date'] : '' }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse2soruce"
-                                        aria-expanded="true" aria-controls="collapse2soruce">Lead Source</button>
-                                </h2>
-                                <div id="collapse2soruce"
-                                    class="accordion-collapse collapse {{ isset($filter_params['lead_source']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_source_Team"
-                                                name="lead_source[]" value="WB|Team"
-                                                {{ isset($filter_params['lead_source']) && in_array('WB|Team', $filter_params['lead_source']) ? 'WB|Team' : '' }}>
-                                            <label for="lead_source_Team" class="custom-control-label">WB|Team</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_source_call"
-                                                name="lead_source[]" value="WB|Call"
-                                                {{ isset($filter_params['lead_source']) && in_array('WB|Call', $filter_params['lead_source']) ? 'WB|Call' : '' }}>
-                                            <label for="lead_source_call" class="custom-control-label">WB|Call</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_source_form"
-                                                name="lead_source[]" value="WB|form"
-                                                {{ isset($filter_params['lead_source']) && in_array('WB|form', $filter_params['lead_source']) ? 'WB|form' : '' }}>
-                                            <label for="lead_source_form"
-                                                class="custom-control-label">WB|form</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_source_whatsapp"
-                                                name="lead_source[]" value="WB|WhatsApp"
-                                                {{ isset($filter_params['lead_source']) && in_array('WB|WhatsApp', $filter_params['lead_source']) ? 'WB|WhatsApp' : '' }}>
-                                            <label for="lead_source_whatsapp"
-                                                class="custom-control-label">WB|WhatsApp</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_source_vm_refrence"
-                                                name="lead_source[]" value="VM|Reference"
-                                                {{ isset($filter_params['lead_source']) && in_array('VM|Reference', $filter_params['lead_source']) ? 'VM|Reference' : '' }}>
-                                            <label for="lead_source_vm_refrence"
-                                                class="custom-control-label">VM|Reference</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_source_walk_in"
-                                                name="lead_source[]" value="Walk-in"
-                                                {{ isset($filter_params['lead_source']) && in_array('Walk-in', $filter_params['lead_source']) ? 'Walk-in' : '' }}>
-                                            <label for="lead_source_walk_in"
-                                                class="custom-control-label">Walk-in</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse2lead_from"
-                                        aria-expanded="true" aria-controls="collapse2lead_from">Lead Site Source</button>
-                                </h2>
-                                <div id="collapse2lead_from"
-                                    class="accordion-collapse collapse {{ isset($filter_params['lead_from']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_from_weddingbanquets"
-                                                name="lead_from[]" value="weddingbanquets.in"
-                                                {{ isset($filter_params['lead_from']) && in_array('weddingbanquets.in', $filter_params['lead_from']) ? 'weddingbanquets.in' : '' }}>
-                                            <label for="lead_from_weddingbanquets" class="custom-control-label">WeddingBanquets</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_from_weddingphotographersindelhi"
-                                                name="lead_from[]" value="weddingphotographersindelhi.com"
-                                                {{ isset($filter_params['lead_from']) && in_array('weddingphotographersindelhi.com', $filter_params['lead_from']) ? 'weddingphotographersindelhi.com' : '' }}>
-                                            <label for="lead_from_weddingphotographersindelhi" class="custom-control-label">WeddingPhotographersinDelhi</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox my-1">
-                                            <input class="custom-control-input" type="checkbox" id="lead_from_bestmakeupartistindelhi"
-                                                name="lead_from[]" value="bestmakeupartistindelhi.com"
-                                                {{ isset($filter_params['lead_from']) && in_array('bestmakeupartistindelhi.com', $filter_params['lead_from']) ? 'bestmakeupartistindelhi.com' : '' }}>
-                                            <label for="lead_from_bestmakeupartistindelhi"
-                                                class="custom-control-label">BestMakeupArtistinDelhi</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse6"
-                                        aria-expanded="true" aria-controls="collapse6">Lead Date</button>
-                                </h2>
-                                <div id="collapse6"
-                                    class="accordion-collapse collapse {{ isset($filter_params['lead_from_date']) ? 'show' : '' }}"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body pl-2 pb-4">
-                                        <div class="form-group">
-                                            <label for="lead_from_date_inp">From</label>
-                                            <input type="date" class="form-control" id="lead_from_date_inp"
-                                                name="lead_from_date"
-                                                value="{{ isset($filter_params['lead_from_date']) ? $filter_params['lead_from_date'] : '' }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="lead_to_date_inp">To</label>
-                                            <input type="date" class="form-control" id="lead_to_date_inp"
-                                                name="lead_to_date"
-                                                value="{{ isset($filter_params['lead_to_date']) ? $filter_params['lead_to_date'] : '' }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="my-5">
-                            <button type="submit" class="btn btn-sm text-light btn-block"
-                                style="background-color: var(--wb-renosand);">Apply</button>
-                            <a href="{{ route('admin.lead.list') }}" type="submit"
-                                class="btn btn-sm btn-secondary btn-block">Reset</a>
-                        </div>
-                </form>
-            </div>
-        </aside>
     </div>
+    @include('admin.venueCrm.lead.forward_leads_modal')
+    <aside class="control-sidebar control-sidebar-dark" style="display: none;">
+        <div class="p-3 control-sidebar-content">
+            <h5>Lead Filters</h5>
+            <hr class="mb-2">
+            <form action="{{ route('admin.lead.list') }}" id="filters-form" method="post">
+                @csrf
+                <div class="accordion text-sm" id="accordionExample">
+                    <div class="accordion-item">
+                        <div class="accordion text-sm" id="accordionExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse41"
+                                        aria-expanded="true" aria-controls="collapse41">Lead assigned to Rm</button>
+                                </h2>
+                                <div id="collapse41"
+                                    class="accordion-collapse collapse {{ isset($filter_params['team_members']) ? 'show' : '' }}"
+                                    data-bs-parent="#accordionExample">
+                                    <div class="accordion-body pl-2 pb-4">
+                                        @foreach ($getRm as $rm)
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox"
+                                                id="team_member_{{ $rm->id }}" name="team_members[]"
+                                                value="{{ $rm->id }}" {{ isset($filter_params['team_members']) &&
+                                                in_array($rm->id, $filter_params['team_members']) ? 'checked' : '' }}>
+                                            <label for="team_member_{{ $rm->id }}" class="custom-control-label">{{
+                                                $rm->name }}</label>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse1"
+                                        aria-expanded="true" aria-controls="collapse1">Lead Status</button>
+                                </h2>
+                                <div id="collapse1"
+                                    class="accordion-collapse collapse {{ isset($filter_params['lead_status']) ? 'show' : '' }}"
+                                    data-bs-parent="#accordionExample">
+                                    <div class="accordion-body pl-2 pb-4">
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox"
+                                                id="lead_status_active_checkbox" name="lead_status[]" value="Active" {{
+                                                isset($filter_params['lead_status']) && in_array('Active',
+                                                $filter_params['lead_status']) ? 'checked' : '' }}>
+                                            <label for="lead_status_active_checkbox"
+                                                class="custom-control-label">Active</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox"
+                                                id="lead_status_hot_checkbox" name="lead_status[]" value="Hot" {{
+                                                isset($filter_params['lead_status']) && in_array('Hot',
+                                                $filter_params['lead_status']) ? 'checked' : '' }}>
+                                            <label for="lead_status_hot_checkbox"
+                                                class="custom-control-label">Hot</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox"
+                                                id="lead_status_super_hot_checkbox" name="lead_status[]"
+                                                value="Super Hot" {{ isset($filter_params['lead_status']) &&
+                                                in_array('Super Hot', $filter_params['lead_status']) ? 'checked' : ''
+                                                }}>
+                                            <label for="lead_status_super_hot_checkbox"
+                                                class="custom-control-label">Super
+                                                Hot</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox my-1">
+                                            <input class="custom-control-input" type="checkbox"
+                                                id="lead_status_done_checkbox" name="lead_status[]" value="Done" {{
+                                                isset($filter_params['lead_status']) && in_array('Done',
+                                                $filter_params['lead_status']) ? 'checked' : '' }}>
+                                            <label for="lead_status_done_checkbox"
+                                                class="custom-control-label">Done</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse2"
+                                    aria-expanded="true" aria-controls="collapse2">Lead Read Status</button>
+                            </h2>
+                            <div id="collapse2"
+                                class="accordion-collapse collapse {{ isset($filter_params['lead_read_status']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="custom-control custom-radio my-1">
+                                        <input class="custom-control-input" type="radio" id="read_status_readed_radio"
+                                            name="lead_read_status" value="1" {{
+                                            isset($filter_params['lead_read_status']) &&
+                                            $filter_params['lead_read_status']=='1' ? 'checked' : '' }}>
+                                        <label for="read_status_readed_radio"
+                                            class="custom-control-label">Readed</label>
+                                    </div>
+                                    <div class="custom-control custom-radio my-1">
+                                        <input class="custom-control-input" type="radio" id="read_status_unreaded_radio"
+                                            name="lead_read_status" value="0" {{
+                                            isset($filter_params['lead_read_status']) &&
+                                            $filter_params['lead_read_status']=='0' ? 'checked' : '' }}>
+                                        <label for="read_status_unreaded_radio"
+                                            class="custom-control-label">Unreaded</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse3"
+                                    aria-expanded="true" aria-controls="collapse3">Service Status</button>
+                            </h2>
+                            <div id="collapse3"
+                                class="accordion-collapse collapse {{ isset($filter_params['service_status']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="custom-control custom-radio my-1">
+                                        <input class="custom-control-input" type="radio"
+                                            id="service_status_contacted_radio" name="service_status" value="1" {{
+                                            isset($filter_params['service_status']) &&
+                                            $filter_params['service_status']=='1' ? 'checked' : '' }}>
+                                        <label for="service_status_contacted_radio"
+                                            class="custom-control-label">Contacted</label>
+                                    </div>
+                                    <div class="custom-control custom-radio my-1">
+                                        <input class="custom-control-input" type="radio"
+                                            id="service_status_not_contacted_radio" name="service_status" value="0" {{
+                                            isset($filter_params['service_status']) &&
+                                            $filter_params['service_status']=='0' ? 'checked' : '' }}>
+                                        <label for="service_status_not_contacted_radio" class="custom-control-label">Not
+                                            Contacted</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse4"
+                                    aria-expanded="true" aria-controls="collapse4">Has RM Message?</button>
+                            </h2>
+                            <div id="collapse4"
+                                class="accordion-collapse collapse {{ isset($filter_params['has_rm_message']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="custom-control custom-radio my-1">
+                                        <input class="custom-control-input" type="radio" id="has_rm_message_no_radio"
+                                            name="has_rm_message" value="no" {{ isset($filter_params['has_rm_message'])
+                                            && $filter_params['has_rm_message']=='no' ? 'checked' : '' }}>
+                                        <label for="has_rm_message_no_radio" class="custom-control-label">No</label>
+                                    </div>
+                                    <div class="custom-control custom-radio my-1">
+                                        <input class="custom-control-input" type="radio" id="has_rm_message_yes_radio"
+                                            name="has_rm_message" value="yes" {{ isset($filter_params['has_rm_message'])
+                                            && $filter_params['has_rm_message']=='yes' ? 'checked' : '' }}>
+                                        <label for="has_rm_message_yes_radio" class="custom-control-label">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse55"
+                                    aria-expanded="true" aria-controls="collapse55">Pax</button>
+                            </h2>
+                            <div id="collapse55"
+                                class="accordion-collapse collapse {{ isset($filter_params['pax_min_value']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="form-group">
+                                        <label for="pax_min_value">Min</label>
+                                        <input type="text" class="form-control" id="pax_min_value" name="pax_min_value"
+                                            value="{{ isset($filter_params['pax_min_value']) ? $filter_params['pax_min_value'] : '' }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pax_max_value">Max</label>
+                                        <input type="text" class="form-control" id="pax_max_value" name="pax_max_value"
+                                            value="{{ isset($filter_params['pax_max_value']) ? $filter_params['pax_max_value'] : '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse5"
+                                    aria-expanded="true" aria-controls="collapse5">Event Date</button>
+                            </h2>
+                            <div id="collapse5"
+                                class="accordion-collapse collapse {{ isset($filter_params['event_from_date']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="form-group">
+                                        <label for="event_from_date_inp">From</label>
+                                        <input type="date" class="form-control" id="event_from_date_inp"
+                                            name="event_from_date"
+                                            value="{{ isset($filter_params['event_from_date']) ? $filter_params['event_from_date'] : '' }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="event_to_date_inp">To</label>
+                                        <input type="date" class="form-control" id="event_to_date_inp"
+                                            name="event_to_date"
+                                            value="{{ isset($filter_params['event_to_date']) ? $filter_params['event_to_date'] : '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse7"
+                                    aria-expanded="true" aria-controls="collapse7">Lead Done Date</button>
+                            </h2>
+                            <div id="collapse7"
+                                class="accordion-collapse collapse {{ isset($filter_params['lead_done_from_date']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="form-group">
+                                        <label for="lead_done_from_date">From</label>
+                                        <input type="date" class="form-control" id="event_date_inp"
+                                            name="lead_done_from_date"
+                                            value="{{ isset($filter_params['lead_done_from_date']) ? $filter_params['lead_done_from_date'] : '' }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lead_done_to_date">To</label>
+                                        <input type="date" class="form-control" id="event_date_inp"
+                                            name="lead_done_to_date"
+                                            value="{{ isset($filter_params['lead_done_to_date']) ? $filter_params['lead_done_to_date'] : '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse2soruce"
+                                    aria-expanded="true" aria-controls="collapse2soruce">Lead Source</button>
+                            </h2>
+                            <div id="collapse2soruce"
+                                class="accordion-collapse collapse {{ isset($filter_params['lead_source']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_Team"
+                                            name="lead_source[]" value="WB|Team" {{ isset($filter_params['lead_source'])
+                                            && in_array('WB|Team', $filter_params['lead_source']) ? 'WB|Team' : '' }}>
+                                        <label for="lead_source_Team" class="custom-control-label">WB|Team</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_call"
+                                            name="lead_source[]" value="WB|Call" {{ isset($filter_params['lead_source'])
+                                            && in_array('WB|Call', $filter_params['lead_source']) ? 'WB|Call' : '' }}>
+                                        <label for="lead_source_call" class="custom-control-label">WB|Call</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_form"
+                                            name="lead_source[]" value="WB|form" {{ isset($filter_params['lead_source'])
+                                            && in_array('WB|form', $filter_params['lead_source']) ? 'WB|form' : '' }}>
+                                        <label for="lead_source_form" class="custom-control-label">WB|form</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_whatsapp"
+                                            name="lead_source[]" value="WB|WhatsApp" {{
+                                            isset($filter_params['lead_source']) && in_array('WB|WhatsApp',
+                                            $filter_params['lead_source']) ? 'WB|WhatsApp' : '' }}>
+                                        <label for="lead_source_whatsapp"
+                                            class="custom-control-label">WB|WhatsApp</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_vm_refrence"
+                                            name="lead_source[]" value="VM|Reference" {{
+                                            isset($filter_params['lead_source']) && in_array('VM|Reference',
+                                            $filter_params['lead_source']) ? 'VM|Reference' : '' }}>
+                                        <label for="lead_source_vm_refrence"
+                                            class="custom-control-label">VM|Reference</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox" id="lead_source_walk_in"
+                                            name="lead_source[]" value="Walk-in" {{ isset($filter_params['lead_source'])
+                                            && in_array('Walk-in', $filter_params['lead_source']) ? 'Walk-in' : '' }}>
+                                        <label for="lead_source_walk_in" class="custom-control-label">Walk-in</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse2lead_from"
+                                    aria-expanded="true" aria-controls="collapse2lead_from">Lead Site Source</button>
+                            </h2>
+                            <div id="collapse2lead_from"
+                                class="accordion-collapse collapse {{ isset($filter_params['lead_from']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_from_weddingbanquets" name="lead_from[]" value="weddingbanquets.in"
+                                            {{ isset($filter_params['lead_from']) && in_array('weddingbanquets.in',
+                                            $filter_params['lead_from']) ? 'weddingbanquets.in' : '' }}>
+                                        <label for="lead_from_weddingbanquets"
+                                            class="custom-control-label">WeddingBanquets</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_from_weddingphotographersindelhi" name="lead_from[]"
+                                            value="weddingphotographersindelhi.com" {{
+                                            isset($filter_params['lead_from']) &&
+                                            in_array('weddingphotographersindelhi.com', $filter_params['lead_from'])
+                                            ? 'weddingphotographersindelhi.com' : '' }}>
+                                        <label for="lead_from_weddingphotographersindelhi"
+                                            class="custom-control-label">WeddingPhotographersinDelhi</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox my-1">
+                                        <input class="custom-control-input" type="checkbox"
+                                            id="lead_from_bestmakeupartistindelhi" name="lead_from[]"
+                                            value="bestmakeupartistindelhi.com" {{ isset($filter_params['lead_from']) &&
+                                            in_array('bestmakeupartistindelhi.com', $filter_params['lead_from'])
+                                            ? 'bestmakeupartistindelhi.com' : '' }}>
+                                        <label for="lead_from_bestmakeupartistindelhi"
+                                            class="custom-control-label">BestMakeupArtistinDelhi</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> --}}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="btn btn-block btn-sm btn-secondary text-left text-bold text-light"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapse6"
+                                    aria-expanded="true" aria-controls="collapse6">Lead Date</button>
+                            </h2>
+                            <div id="collapse6"
+                                class="accordion-collapse collapse {{ isset($filter_params['lead_from_date']) ? 'show' : '' }}"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body pl-2 pb-4">
+                                    <div class="form-group">
+                                        <label for="lead_from_date_inp">From</label>
+                                        <input type="date" class="form-control" id="lead_from_date_inp"
+                                            name="lead_from_date"
+                                            value="{{ isset($filter_params['lead_from_date']) ? $filter_params['lead_from_date'] : '' }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lead_to_date_inp">To</label>
+                                        <input type="date" class="form-control" id="lead_to_date_inp"
+                                            name="lead_to_date"
+                                            value="{{ isset($filter_params['lead_to_date']) ? $filter_params['lead_to_date'] : '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="my-5">
+                        <button type="submit" class="btn btn-sm text-light btn-block"
+                            style="background-color: var(--wb-renosand);">Apply</button>
+                        <a href="{{ route('admin.lead.list') }}" type="submit"
+                            class="btn btn-sm btn-secondary btn-block">Reset</a>
+                    </div>
+            </form>
+        </div>
+    </aside>
+</div>
 @endsection
 @section('footer-script')
-    @include('whatsapp.admin_multiplemsg');
-    @include('whatsapp.chat');
+@include('whatsapp.admin_multiplemsg');
+@include('whatsapp.chat');
 
-    <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-    <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
-    <script>
-        var dataTable;
+<script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
+<script>
+    var dataTable;
 
         function send_what_msg_multiple() {
             const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg_multiple'));
@@ -642,8 +654,8 @@
 
                 ],
                 order: [
-                    [15, 'desc']
-                ],
+    [15, 'desc']
+],
                 rowCallback: function(row, data, index) {
                     row.style.backgroundColor = data.lead_color;
 
@@ -738,5 +750,5 @@
                 toastr.info("Select the lead's which you want to forward.");
             }
         }
-    </script>
+</script>
 @endsection

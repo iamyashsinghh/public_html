@@ -68,7 +68,8 @@ class LeadController extends Controller
 
     public function ajax_list(Request $request)
     {
-        $leads = DB::table('leads')->select(
+        $query = DB::table('leads')
+        ->select(
             'leads.lead_id',
             'leads.assign_to',
             'leads.service_status',
@@ -91,88 +92,116 @@ class LeadController extends Controller
             'ne.pax as pax',
             DB::raw("(select count(fwd.id) from lead_forward_infos as fwd where fwd.lead_id = leads.lead_id group by fwd.lead_id) as forwarded_count"),
             'leads.lead_from'
-        )->leftJoin('team_members as tm', 'leads.created_by', 'tm.id')
+        )
+        ->leftJoin('team_members as tm', 'leads.created_by', '=', 'tm.id')
         ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id')
-        ->leftJoin('roles', 'tm.role_id', 'roles.id')
-        ->groupBy('leads.mobile');
+        ->leftJoin('roles', 'tm.role_id', '=', 'roles.id')
+        ->whereNull('leads.deleted_at');
 
-        // Apply filters before DataTables processing
-        if ($request->has('lead_status') && $request->lead_status != '') {
-            $leads->whereIn('leads.lead_status', $request->lead_status);
-        }
+    return DataTables::of($query)
+        ->filter(function ($query) use ($request) {
 
-        if ($request->has('lead_from') && $request->lead_from != '') {
-            if (in_array('weddingbanquets.in', $request->lead_from)) {
-                $leads->where(function($query) use ($request) {
-                    $query->whereIn('leads.lead_from', $request->lead_from)
-                          ->orWhereNull('leads.lead_from');
-                });
-            } else {
-                $leads->whereIn('leads.lead_from', $request->lead_from);
-            }
-        }
-
-        if ($request->has('event_from_date') && $request->event_from_date != '') {
-            $from = Carbon::make($request->event_from_date);
-            $to = $request->has('event_to_date') && $request->event_to_date != '' ? Carbon::make($request->event_to_date)->endOfDay() : $from->copy()->endOfDay();
-            $leads->whereBetween('leads.event_datetime', [$from, $to]);
-        }
-
-        if ($request->has('lead_from_date') && $request->lead_from_date != '') {
-            $from = Carbon::make($request->lead_from_date);
-            $to = $request->has('lead_to_date') && $request->lead_to_date != '' ? Carbon::make($request->lead_to_date)->endOfDay() : $from->copy()->endOfDay();
-            $leads->whereBetween('leads.lead_datetime', [$from, $to]);
-        }
-
-        if ($request->has('has_rm_message') && $request->has_rm_message != '') {
-            if ($request->has_rm_message == "yes") {
-                $leads->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                        ->from('rm_messages')
-                        ->whereRaw('leads.lead_id = rm_messages.lead_id');
-                });
-            } else {
-                $leads->whereNotExists(function ($query) {
-                    $query->select(DB::raw(1))
-                        ->from('rm_messages')
-                        ->whereRaw('leads.lead_id = rm_messages.lead_id');
+            if ($request->has('search') && $request->search['value'] != '') {
+                $search = $request->search['value'];
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('leads.name', 'LIKE', "%{$search}%")
+                        ->orWhere('leads.mobile', 'LIKE', "%{$search}%")
+                        ->orWhere('leads.lead_status', 'LIKE', "%{$search}%")
+                        ->orWhere('leads.source', 'LIKE', "%{$search}%")
+                        ->orWhere('tm.name', 'LIKE', "%{$search}%");
                 });
             }
-        }
 
-        if ($request->lead_read_status != null) {
-            $leads->where('read_status', $request->lead_read_status);
-        }
+            if ($request->has('lead_status') && $request->lead_status != '') {
+                $query->whereIn('leads.lead_status', $request->lead_status);
+            }
 
-        if ($request->pax_min_value != null) {
-            $min = $request->pax_min_value;
-            $max = $request->pax_max_value ?? $min;
-            $leads->whereBetween('ne.pax', [$min, $max]);
-        }
+            if ($request->has('lead_from') && $request->lead_from != '') {
+                if (in_array('weddingbanquets.in', $request->lead_from)) {
+                    $query->where(function($subQuery) use ($request) {
+                        $subQuery->whereIn('leads.lead_from', $request->lead_from)
+                                 ->orWhereNull('leads.lead_from');
+                    });
+                } else {
+                    $query->whereIn('leads.lead_from', $request->lead_from);
+                }
+            }
 
-        if ($request->service_status != null) {
-            $leads->where('service_status', $request->service_status);
-        }
+            if ($request->has('event_from_date') && $request->event_from_date != '') {
+                $from = Carbon::make($request->event_from_date);
+                $to = $request->has('event_to_date') ? Carbon::make($request->event_to_date)->endOfDay() : $from->copy()->endOfDay();
+                $query->whereBetween('leads.event_datetime', [$from, $to]);
+            }
 
-        if ($request->lead_done_from_date != null) {
-            $from = Carbon::make($request->lead_done_from_date);
-            $to = $request->lead_done_to_date != null ? Carbon::make($request->lead_done_to_date)->endOfDay() : $from->endOfDay();
-            $leads->where('leads.lead_status', 'Done')->whereBetween('leads.updated_at', [$from, $to]);
-        }
+            if ($request->has('lead_from_date') && $request->lead_from_date != '') {
+                $from = Carbon::make($request->lead_from_date);
+                $to = $request->has('lead_to_date') ? Carbon::make($request->lead_to_date)->endOfDay() : $from->copy()->endOfDay();
+                $query->whereBetween('leads.lead_datetime', [$from, $to]);
+            }
 
-        if ($request->team_members != null) {
-            $leads->whereIn('leads.assign_id', $request->team_members);
-        }
+            if ($request->has('has_rm_message') && $request->has_rm_message != '') {
+                if ($request->has_rm_message == "yes") {
+                    $query->whereExists(function ($subQuery) {
+                        $subQuery->select(DB::raw(1))
+                            ->from('rm_messages')
+                            ->whereRaw('leads.lead_id = rm_messages.lead_id');
+                    });
+                } else {
+                    $query->whereNotExists(function ($subQuery) {
+                        $subQuery->select(DB::raw(1))
+                            ->from('rm_messages')
+                            ->whereRaw('leads.lead_id = rm_messages.lead_id');
+                    });
+                }
+            }
 
-        if ($request->lead_source != null) {
-            $leads->whereIn('leads.source', $request->lead_source);
-        }
+            if ($request->lead_read_status != null) {
+                $query->where('read_status', $request->lead_read_status);
+            }
 
-        $leads->whereNull('leads.deleted_at');
+            if ($request->pax_min_value != null) {
+                $min = $request->pax_min_value;
+                $max = $request->pax_max_value ?? $request->pax_min_value;
+                $query->whereBetween('ne.pax', [$min, $max]);
+            }
 
-        return DataTables::of($leads)
-            ->orderColumn('whatsapp_msg_time', '-whatsapp_msg_time $1')
-            ->make(true);
+            if ($request->service_status != null) {
+                $query->where('service_status', $request->service_status);
+            }
+
+            if ($request->lead_done_from_date != null) {
+                $from = Carbon::make($request->lead_done_from_date);
+                $to = $request->lead_done_to_date ? Carbon::make($request->lead_done_to_date)->endOfDay() : $from->copy()->endOfDay();
+                $query->where('leads.lead_status', 'Done')->whereBetween('leads.updated_at', [$from, $to]);
+            }
+
+            if ($request->team_members != null) {
+                $query->whereIn('leads.assign_id', $request->team_members);
+            }
+
+            if ($request->lead_source != null) {
+                $query->whereIn('leads.source', $request->lead_source);
+            }
+        })
+        ->order(function ($query) use ($request) {
+            if ($request->has('order')) {
+                $order = $request->order[0];
+                $columns = $request->columns;
+
+                $columnIndex = $order['column'];
+                $columnName = $columns[$columnIndex]['data'];
+                $direction = $order['dir'];
+
+                if (in_array($columnName, [
+                    'lead_id', 'assign_to', 'service_status', 'lead_datetime', 'name', 'mobile', 'lead_status', 'source', 'lead_color', 'enquiry_count', 'event_datetime', 'preference', 'locality', 'created_by', 'last_forwarded_by', 'is_whatsapp_msg', 'created_by_role', 'whatsapp_msg_time', 'lead_catagory', 'pax', 'lead_from'
+                ])) {
+                    $query->orderBy($columnName, $direction);
+                }
+            } else {
+                $query->orderBy('leads.whatsapp_msg_time', 'desc');
+            }
+        })
+        ->make(true);
     }
 
     public function add_process(Request $request)
