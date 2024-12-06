@@ -322,6 +322,7 @@ class LeadController extends Controller
                         })
                         ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '=', $current_date)
                         ->where('rm_messages.created_by', '=', $auth_user->id)
+                        ->where('leads.assign_id', $auth_user->id)
                         ->where('leads.lead_status', '!=', 'Done')
                         ->orderBy('rm_messages.updated_at', 'desc')
                         ->groupBy('leads.lead_id');
@@ -366,6 +367,7 @@ class LeadController extends Controller
                         })
                         ->whereDate(DB::raw('DATE(DATE_ADD(visits.done_datetime, INTERVAL 3 DAY))'), '<', $current_date)
                         ->where('rm_messages.created_by', '=', $auth_user->id)
+                        ->where('leads.assign_id', $auth_user->id)
                         ->where('leads.lead_status', '!=', 'Done')
                         ->orderBy('rm_messages.updated_at', 'desc')
                         ->groupBy('leads.lead_id');
