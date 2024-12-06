@@ -105,6 +105,7 @@ Route::middleware('verify_token')->group(function () {
     Route::post('/bookings/manage_process/{booking_id}', [Controllers\Admin\BookingController::class, 'manage_process'])->name('booking.manage_process');
     Route::get('/bookings/fetch/{booking_id}', [Controllers\Admin\BookingController::class, 'fetch_booking'])->name('booking.fetch');
     Route::get('/vm_event/fetch/{event_id?}', [Controllers\Admin\BookingController::class, 'fetch_vm_event'])->name('vm_event.fetch');
+    Route::get('/team_event/fetch/{event_id?}', [Controllers\Admin\BookingController::class, 'fetch_team_event'])->name('team_event.fetch');
 
      /*
     |--------------------------------------------------------------------------

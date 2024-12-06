@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Event;
 use App\Models\foodPreference;
 use App\Models\Lead;
 use App\Models\LeadForward;
@@ -235,6 +236,14 @@ class BookingController extends Controller {
     function fetch_vm_event($event_id) {
         try {
             $event = VmEvent::find($event_id);
+            return response()->json(['success' => true, 'alert_type' => 'success', 'event' => $event]);
+        } catch (\Throwable $th) {
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
+    function fetch_team_event($event_id) {
+        try {
+            $event = Event::find($event_id);
             return response()->json(['success' => true, 'alert_type' => 'success', 'event' => $event]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);

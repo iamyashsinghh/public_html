@@ -309,10 +309,17 @@
                                                         <td>{{ $list['event_slot'] }}</td>
                                                         <td>{{ $list['food_preference'] }}</td>
                                                         <td class="text-center">
-                                                            <button
+                                                            @if ($auth_user->role_id == 4)
+                                                                <button
+                                                                onclick="handle_event_information(`{{ route('team.event.edit.process', $list->id) }}`, `{{ route('team_event.fetch', $list->id) }}`)"
+                                                                class="btn p-0 text-success" title="Edit Event."><i
+                                                                    class="fa fa-edit"></i></button>
+                                                            @else
+                                                                <button
                                                                 onclick="handle_event_information(`{{ route('team.event.edit.process', $list->id) }}`, `{{ route('vm_event.fetch', $list->id) }}`)"
                                                                 class="btn p-0 text-success" title="Edit Event."><i
                                                                     class="fa fa-edit"></i></button>
+                                                            @endif
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -1978,7 +1985,7 @@
                     if (data.success == true) {
                         modalHeading.innerText = "Edit Event";
                         manageEventModal.querySelector('#event_name_inp').value = data.event.event_name;
-                        manageEventModal.querySelector('#event_date_inp').value = data.event.event_date;
+                        manageEventModal.querySelector('#event_date_inp').value = moment(data.event.event_datetime).format('YYYY-MM-DD');
                         manageEventModal.querySelector('#number_of_guest_inp').value = data.event.pax;
                         manageEventModal.querySelector('#budget_inp').value = data.event.budget;
 
