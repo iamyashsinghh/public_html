@@ -96,7 +96,7 @@ class LeadController extends Controller
         ->leftJoin('team_members as tm', 'leads.created_by', '=', 'tm.id')
         ->leftJoin('events as ne', 'ne.lead_id', '=', 'leads.lead_id')
         ->leftJoin('roles', 'tm.role_id', '=', 'roles.id')
-        ->whereNull('leads.deleted_at');
+        ->whereNull('leads.deleted_at')->groupBy('leads.lead_id');
 
     return DataTables::of($query)
         ->filter(function ($query) use ($request) {
