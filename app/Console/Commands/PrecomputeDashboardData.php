@@ -142,9 +142,6 @@ class PrecomputeDashboardData extends Command
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
             $count = nvLead::where('nv_leads.lead_datetime', 'like', "%$datetime%")
-            ->whereDoesntHave('nvrmMessages', function ($query) {
-                $query->where('vendor_category_id', '<>', 4);
-            })
             ->count();
             array_push($nv_leads_for_this_month, $count);
         }
@@ -154,9 +151,6 @@ class PrecomputeDashboardData extends Command
         for ($i = 12; $i >= 0; $i--) {
             $datetime = date("Y-m", strtotime("-$i month"));
             $count =nvLead::where('nv_leads.lead_datetime', 'like', "%$datetime%")
-            ->whereDoesntHave('nvrmMessages', function ($query) {
-                $query->where('vendor_category_id', '<>', 4);
-            })
             ->count();
             array_push($nv_leads_for_this_year, $count);
         }
