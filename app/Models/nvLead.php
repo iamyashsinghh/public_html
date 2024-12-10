@@ -11,8 +11,9 @@ use Spatie\Activitylog\LogOptions;
 use App\Traits\HasAuthenticatedUser;
 use Illuminate\Support\Facades\DB;
 
-class nvLead extends Model {
-    use HasFactory, HasAuthenticatedUser, SoftDeletes,LogsActivity;
+class nvLead extends Model
+{
+    use HasFactory, HasAuthenticatedUser, SoftDeletes, LogsActivity;
     public function getActivitylogOptions(): LogOptions
     {
         $userId = $this->getAuthenticatedUserId();
@@ -24,10 +25,12 @@ class nvLead extends Model {
             });
     }
 
-    public function get_nvrm_messages() {
+    public function get_nvrm_messages()
+    {
         return $this->hasMany(nvrmMessage::class, 'lead_id', 'id');
     }
-    public function get_nvrm_help_messages() {
+    public function get_nvrm_help_messages()
+    {
         return nvNote::where('lead_id', $this->id)
             ->leftJoin('vendors', 'vendors.id', '=', 'nv_notes.created_by')
             ->leftJoin('vendor_categories', 'vendor_categories.id', '=', 'vendors.category_id')
@@ -35,27 +38,33 @@ class nvLead extends Model {
             ->select('nv_notes.*', 'vendors.name as created_by_name', 'vendor_categories.name as category_name', 'team_members.name as done_by_name')
             ->get();
     }
-    public function get_events(){
+    public function get_events()
+    {
         return $this->hasMany(nvEvent::class, 'lead_id', 'id');
     }
-    public function get_tasks() {
+    public function get_tasks()
+    {
         return $this->hasMany(nvrmTask::class, 'lead_id', 'id');
     }
-    public function get_tasks_vendor() {
+    public function get_tasks_vendor()
+    {
         return $this->hasMany(nvTask::class, 'lead_id', 'id');
     }
     public function get_vendors_for_lead()
     {
         return DB::table('nv_lead_forwards as lf')
             ->join('vendors as v', 'lf.forward_to', '=', 'v.id')
-            ->leftJoin('nv_lead_forward_infos as lfi', function($join) {
+            ->leftJoin('nv_lead_forward_infos as lfi', function ($join) {
                 $join->on('lf.lead_id', '=', 'lfi.lead_id')
-                     ->on('v.id', '=', 'lfi.forward_to');
+                    ->on('v.id', '=', 'lfi.forward_to');
             })
             ->where('lf.lead_id', $this->id)
             ->select('v.name', 'v.category_id', 'lfi.updated_at')
             ->get();
     }
 
-
+    public function nvrmMessages()
+    {
+        return $this->hasMany(NvrmMessage::class, 'lead_id', 'id');
+    }
 }

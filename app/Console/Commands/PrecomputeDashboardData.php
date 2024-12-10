@@ -141,7 +141,11 @@ class PrecomputeDashboardData extends Command
         $nv_leads_for_this_month = [];
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
-            $count = nvLead::where('lead_datetime', 'like', "%$datetime%")->count();
+            $count = nvLead::where('nv_leads.lead_datetime', 'like', "%$datetime%")
+            ->whereDoesntHave('nvrmMessages', function ($query) {
+                $query->where('vendor_category_id', '<>', 4);
+            })
+            ->count();
             array_push($nv_leads_for_this_month, $count);
         }
         $nv_leads_for_this_month = implode(",", $nv_leads_for_this_month);
@@ -149,7 +153,11 @@ class PrecomputeDashboardData extends Command
         $nv_leads_for_this_year = [];
         for ($i = 12; $i >= 0; $i--) {
             $datetime = date("Y-m", strtotime("-$i month"));
-            $count = nvLead::where('lead_datetime', 'like', "%$datetime%")->count();
+            $count =nvLead::where('nv_leads.lead_datetime', 'like', "%$datetime%")
+            ->whereDoesntHave('nvrmMessages', function ($query) {
+                $query->where('vendor_category_id', '<>', 4);
+            })
+            ->count();
             array_push($nv_leads_for_this_year, $count);
         }
         $nv_leads_for_this_year = implode(",", $nv_leads_for_this_year);
