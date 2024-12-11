@@ -147,6 +147,76 @@ class PrecomputeDashboardData extends Command
         }
         $nv_leads_for_this_month = implode(",", $nv_leads_for_this_month);
 
+        $nv_forward_leads_for_this_month_wb_venue = [];
+        for ($i = 1; $i <= date('d'); $i++) {
+            $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
+            $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+            ->where('vendors.category_id', 4)
+            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+            ->groupBy('nv_lead_forward_infos.lead_id')
+            ->get()
+            ->count();
+            array_push($nv_forward_leads_for_this_month_wb_venue, $count);
+        }
+        $nv_forward_leads_for_this_month_wb_venue = implode(",", $nv_forward_leads_for_this_month_wb_venue);
+
+        $nv_forward_leads_for_this_month_photography = [];
+        for ($i = 1; $i <= date('d'); $i++) {
+            $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
+            $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+            ->where('vendors.category_id', 1)
+            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+            ->groupBy('nv_lead_forward_infos.lead_id')
+            ->get()
+            ->count();
+            array_push($nv_forward_leads_for_this_month_photography, $count);
+        }
+        $nv_forward_leads_for_this_month_photography = implode(",", $nv_forward_leads_for_this_month_photography);
+
+        $nv_forward_leads_for_this_month_makeup_artist = [];
+        for ($i = 1; $i <= date('d'); $i++) {
+            $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
+            $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+            ->where('vendors.category_id', 2)
+            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+            ->groupBy('nv_lead_forward_infos.lead_id')
+            ->get()
+            ->count();
+            array_push($nv_forward_leads_for_this_month_makeup_artist, $count);
+        }
+        $nv_forward_leads_for_this_month_makeup_artist = implode(",", $nv_forward_leads_for_this_month_makeup_artist);
+
+        $nv_forward_leads_for_this_month_mehndi_artist = [];
+        for ($i = 1; $i <= date('d'); $i++) {
+            $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
+            $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+            ->where('vendors.category_id', 3)
+            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+            ->groupBy('nv_lead_forward_infos.lead_id')
+            ->get()
+            ->count();
+            array_push($nv_forward_leads_for_this_month_mehndi_artist, $count);
+        }
+        $nv_forward_leads_for_this_month_mehndi_artist = implode(",", $nv_forward_leads_for_this_month_mehndi_artist);
+
+        $nv_forward_leads_for_this_month_band_baja = [];
+        for ($i = 1; $i <= date('d'); $i++) {
+            $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
+            $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+            ->where('vendors.category_id', 5)
+            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+            ->groupBy('nv_lead_forward_infos.lead_id')
+            ->get()
+            ->count();
+            array_push($nv_forward_leads_for_this_month_band_baja, $count);
+        }
+        $nv_forward_leads_for_this_month_band_baja = implode(",", $nv_forward_leads_for_this_month_band_baja);
+
         $nv_leads_for_this_year = [];
         for ($i = 12; $i >= 0; $i--) {
             $datetime = date("Y-m", strtotime("-$i month"));
@@ -467,6 +537,11 @@ class PrecomputeDashboardData extends Command
             'venue_whatsapp_leads_for_this_month' => $venue_whatsapp_leads_for_this_month,
             'venue_leads_for_this_year' => $venue_leads_for_this_year,
             'nv_leads_for_this_month' => $nv_leads_for_this_month,
+            'nv_forward_leads_for_this_month_wb_venue' => $nv_forward_leads_for_this_month_wb_venue,
+            'nv_forward_leads_for_this_month_band_baja' => $nv_forward_leads_for_this_month_band_baja,
+            'nv_forward_leads_for_this_month_mehndi_artist' => $nv_forward_leads_for_this_month_mehndi_artist,
+            'nv_forward_leads_for_this_month_makeup_artist' => $nv_forward_leads_for_this_month_makeup_artist,
+            'nv_forward_leads_for_this_month_photography' => $nv_forward_leads_for_this_month_photography,
             'nv_leads_for_this_year' => $nv_leads_for_this_year,
             'vm_members' => $vm_members,
             'rm_members' => $rm_members,

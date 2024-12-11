@@ -1031,32 +1031,82 @@
         });
 
 
-        new Chart("nv_chart_months", {
+        const nvChartMonths = new Chart("nv_chart_months", {
     type: "line",
     data: {
         labels: current_month_days_arr,
-        datasets: [{
-            fill: false,
-            tension: 0,
-            backgroundColor: "#891010",
-            borderColor: "rgba(0,0,255,0.1)",
-            data: ("{{ $nv_leads_for_this_month }}").split(",")
-        }]
+        datasets: [
+            {
+                label: 'Total Leads',
+                backgroundColor: "#891010",
+                borderColor: "#891010",
+                borderWidth: 1,
+                fill: false, // Prevents the line from being filled under
+                data: "{{ $nv_leads_for_this_month }}".split(","),
+            },
+            {
+                label: 'Wb Venue Forwarded',
+                backgroundColor: "#cbe21d",
+                borderColor: "#cbe21d",
+                borderWidth: 1,
+                fill: false,
+                data: "{{ $nv_forward_leads_for_this_month_wb_venue }}".split(","),
+            },
+            {
+                label: 'Photography Forwarded',
+                backgroundColor: "#cbe21d",
+                borderColor: "#cbe21d",
+                borderWidth: 1,
+                fill: false,
+                data: "{{ $nv_forward_leads_for_this_month_photography }}".split(","),
+            },
+            {
+                label: 'Makeup Artist Forwarded',
+                backgroundColor: "#cbe21d",
+                borderColor: "#cbe21d",
+                borderWidth: 1,
+                fill: false,
+                data: "{{ $nv_forward_leads_for_this_month_makeup_artist }}".split(","),
+            },
+            {
+                label: 'Mehndi Artist Forwarded',
+                backgroundColor: "#cbe21d",
+                borderColor: "#cbe21d",
+                borderWidth: 1,
+                fill: false,
+                data: "{{ $nv_forward_leads_for_this_month_mehndi_artist }}".split(","),
+            },
+            {
+                label: 'Band Baja Forwarded',
+                backgroundColor: "#cbe21d",
+                borderColor: "#cbe21d",
+                borderWidth: 1,
+                fill: false,
+                data: "{{ $nv_forward_leads_for_this_month_band_baja }}".split(","),
+            },
+        ]
     },
     options: {
         plugins: {
             legend: {
-                display: false
-            }
+                display: false, // Disables the legend
+            },
         },
         scales: {
             y: {
-                beginAtZero: false,
-                min: 1
+                beginAtZero: false, // Start y-axis at a custom value
+            },
+            x: {
+                ticks: {
+                    autoSkip: true, // Automatically skips some ticks for clarity
+                }
             }
-        }
+        },
+        responsive: true, // Ensures chart adjusts to the container size
+        maintainAspectRatio: false, // Allows custom sizing
     }
 });
+
 
 new Chart("nv_chart_years", {
     type: "bar",
