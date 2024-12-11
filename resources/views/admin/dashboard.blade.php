@@ -1087,24 +1087,44 @@
         ]
     },
     options: {
-        plugins: {
-            legend: {
-                display: false, // Disables the legend
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "top",
+                    },
+                    tooltip: {
+                        mode: "index",
+                        intersect: false,
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const label = tooltipItem.dataset.label || '';
+                                const value = tooltipItem.raw;
+                                return `${label}: ${value}`;
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        type: "category",
+                        title: {
+                            display: false,
+                            text: "Months",
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: false,
+                            text: "Leads Count",
+                        },
+                        ticks: {
+                            min: 1, // Minimum value on the y-axis
+                        },
+                    },
+                },
             },
-        },
-        scales: {
-            y: {
-                beginAtZero: false, // Start y-axis at a custom value
-            },
-            x: {
-                ticks: {
-                    autoSkip: true, // Automatically skips some ticks for clarity
-                }
-            }
-        },
-        responsive: true, // Ensures chart adjusts to the container size
-        maintainAspectRatio: false, // Allows custom sizing
-    }
 });
 
 
