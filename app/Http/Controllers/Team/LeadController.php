@@ -952,7 +952,6 @@ class LeadController extends Controller
         }
 
         $last_forwarded_info = $auth_user->name . " <br> " . date('d-M-Y h:i a');
-        $lead->read_status = true;
         $lead->lead_color = "#ff00001f";
         $lead->last_forwarded_by = $last_forwarded_info;
         $lead->save();
