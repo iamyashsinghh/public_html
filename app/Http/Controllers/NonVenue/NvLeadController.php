@@ -614,7 +614,6 @@ class NvLeadController extends Controller
             }
         }
 
-        $forward->read_status = true;
         $forward->last_forwarded_by = $auth_user->name;
         $forward->save();
 
