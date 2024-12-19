@@ -38,20 +38,33 @@ class DashboardController extends Controller
         $forward_leads_this_month = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
         $forward_leads_today = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_date%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
 
+
         $categories = VendorCategory::all();
         $forward_leads_by_category = [];
         foreach ($categories as $category) {
             $category_name = $category->name;
-            $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+            $monthly_lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
                 ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
                 ->where('vendors.category_id', $category->id)
-                ->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")
+                ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
                 ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
                 ->groupBy('nv_lead_forward_infos.lead_id')
                 ->get()
                 ->count();
-            $forward_leads_by_category[$category_name] = $lead_count;
+            $daily_lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                ->where('vendors.category_id', $category->id)
+                ->where('nv_lead_forward_infos.updated_at', 'like', "$current_date%")
+                ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
+                ->groupBy('nv_lead_forward_infos.lead_id')
+                ->get()
+                ->count();
+            $forward_leads_by_category[$category_name] = [
+                'month' => $monthly_lead_count,
+                'today' => $daily_lead_count,
+            ];
         }
+
 
         $currentDateTime = Carbon::now();
         $currentDateStart = Carbon::today()->startOfDay();

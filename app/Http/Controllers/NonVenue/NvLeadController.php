@@ -222,9 +222,19 @@ class NvLeadController extends Controller
                     $leads->join('nv_lead_forward_infos', 'nvrm_lead_forwards.lead_id', '=', 'nv_lead_forward_infos.lead_id')
                         ->join('vendors', 'nv_lead_forward_infos.forward_to', '=', 'vendors.id')
                         ->where('vendors.category_id', $category->id)
-                        ->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")
                         ->where('nv_lead_forward_infos.forward_from', $auth_user->id)
                         ->groupBy('nv_lead_forward_infos.lead_id');
+
+                    if ($request->has('filter')) {
+                        $filter = $request->filter;
+                        if ($filter === 'month') {
+                            $leads->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%");
+                        } elseif ($filter === 'today') {
+                            $leads->whereDate('nv_lead_forward_infos.updated_at', '=', $current_date);
+                        }
+                    } else {
+                        $leads->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%");
+                    }
                 }
             }
         }
