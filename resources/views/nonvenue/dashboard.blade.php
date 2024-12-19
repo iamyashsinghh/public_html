@@ -236,16 +236,16 @@
                                             <a target="_blank"
                                                 href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'month']) }}"
                                                 class="text-light d-block">
-                                                <h4>{{ $lead_counts['month'] }}</h4>
-                                                <p class="mb-0">This Month</p>
+                                                <h4><b>{{ $lead_counts['month'] }}</b></h4>
+                                                <p class="mb-0"><b>Month</b></p>
                                             </a>
                                         </div>
                                         <div class="col-6 text-center">
                                             <a target="_blank"
                                                 href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'today']) }}"
                                                 class="text-light d-block">
-                                                <h4>{{ $lead_counts['today'] }}</h4>
-                                                <p class="mb-0">Today</p>
+                                                <h4 style="color: #babdbf"><b>{{ $lead_counts['today'] }}</b></h4>
+                                                <p class="mb-0" style="color: #babdbf"><b>Today</b></p>
                                             </a>
                                         </div>
                                     </div>
