@@ -226,7 +226,7 @@
                     <h3>Lead Forward By Category</h3>
                     <div class="row">
                         @foreach ($forward_leads_by_category as $category => $lead_counts)
-                        {{-- @if ($lead_counts['month'] > 0 || $lead_counts['today'] > 0) --}}
+                        @if ($lead_counts['month'] > 0 || $lead_counts['today'] > 0)
                         <div class="col-lg-3 col-6">
                             <div class="small-box text-sm bg-success">
                                 <div class="inner">
@@ -236,16 +236,16 @@
                                             <a target="_blank"
                                                 href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'month']) }}"
                                                 class="text-light d-block">
-                                                <p class="mb-0">This Month</p>
                                                 <h4>{{ $lead_counts['month'] }}</h4>
+                                                <p class="mb-0">This Month</p>
                                             </a>
                                         </div>
                                         <div class="col-6 text-center">
                                             <a target="_blank"
                                                 href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'today']) }}"
                                                 class="text-light d-block">
-                                                <p class="mb-0">Today</p>
                                                 <h4>{{ $lead_counts['today'] }}</h4>
+                                                <p class="mb-0">Today</p>
                                             </a>
                                         </div>
                                     </div>
@@ -256,7 +256,7 @@
                                 <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
                             </div>
                         </div>
-                        {{-- @endif --}}
+                        @endif
                         @endforeach
 
                     </div>
