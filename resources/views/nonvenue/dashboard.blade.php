@@ -226,7 +226,7 @@
                     <h3>Lead Forward By Category</h3>
                     <div class="row">
                         @foreach ($forward_leads_by_category as $category => $lead_counts)
-                        @if ($lead_counts['month'] > 0 || $lead_counts['today'] > 0)
+                        {{-- @if ($lead_counts['month'] > 0 || $lead_counts['today'] > 0) --}}
                         <div class="col-lg-3 col-6">
                             <div class="small-box text-sm bg-success">
                                 <div class="inner">
@@ -256,7 +256,7 @@
                                 <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
                             </div>
                         </div>
-                        @endif
+                        {{-- @endif --}}
                         @endforeach
 
                     </div>
