@@ -530,6 +530,12 @@
                 .catch((error) => {});
         }
 
+        function unescapeHTML(html) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || '';
+}
+
         const data_url = `{{ route('admin.lead.list.ajax') }}`;
         $(document).ready(function() {
             dataTable = $('#serverTable').DataTable({
@@ -692,7 +698,14 @@
                         .created_by_role : 'N/A';
                     td_elements[14].innerText = data.lead_status ? data.lead_status : 'N/A';
                     td_elements[13].classList.add('text-nowrap');
-                    td_elements[13].innerHTML = data.last_forwarded_by ? data.last_forwarded_by : 'N/A';
+                    if (data.last_forwarded_by) {
+    td_elements[13].innerHTML = unescapeHTML(data.last_forwarded_by);
+} else {
+    td_elements[13].textContent = 'N/A';
+}
+
+
+
                     const action_btns =
                         `<a href="{{ route('admin.lead.view') }}/${data.lead_id}" target="_blank" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                          <button onclick="handle_get_forward_info(${data.lead_id})" class="btn mx-2 p-0 px-2 btn-info" title="Forward info"><i class="fa fa-share-alt" style="font-size: 15px;"></i> ${data.forwarded_count ? data.forwarded_count : '0'}</button>
