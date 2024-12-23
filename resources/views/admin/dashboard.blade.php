@@ -1045,7 +1045,7 @@
                 data: "{{ $nv_leads_for_this_month }}".split(","),
             },
             {
-                label: 'Wb Venue Forwarded',
+                label: 'Wb Venue',
                 backgroundColor: "#cbe21d",
                 borderColor: "#cbe21d",
                 borderWidth: 3,
@@ -1053,7 +1053,7 @@
                 data: "{{ $nv_forward_leads_for_this_month_wb_venue }}".split(","),
             },
             {
-                label: 'Photography Forwarded',
+                label: 'Photography',
                 backgroundColor: "#a06b14",
                 borderColor: "#a06b14",
                 borderWidth: 3,
@@ -1061,7 +1061,7 @@
                 data: "{{ $nv_forward_leads_for_this_month_photography }}".split(","),
             },
             {
-                label: 'Makeup Artist Forwarded',
+                label: 'Makeup Artist',
                 backgroundColor: "#aa559f",
                 borderColor: "#aa559f",
                 borderWidth: 3,
@@ -1069,7 +1069,7 @@
                 data: "{{ $nv_forward_leads_for_this_month_makeup_artist }}".split(","),
             },
             {
-                label: 'Mehndi Artist Forwarded',
+                label: 'Mehndi Artist',
                 backgroundColor: "#4497bb",
                 borderColor: "#4497bb",
                 borderWidth: 3,
@@ -1077,7 +1077,7 @@
                 data: "{{ $nv_forward_leads_for_this_month_mehndi_artist }}".split(","),
             },
             {
-                label: 'Band Baja Forwarded',
+                label: 'Band Baja',
                 backgroundColor: "#618200",
                 borderColor: "#618200",
                 borderWidth: 3,
