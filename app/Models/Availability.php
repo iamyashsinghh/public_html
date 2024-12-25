@@ -10,10 +10,10 @@ use Spatie\Activitylog\LogOptions;
 use App\Traits\HasAuthenticatedUser;
 class Availability extends Model {
     use HasFactory, HasAuthenticatedUser, SoftDeletes ,LogsActivity;
+    protected $guarded = [];
     public function getActivitylogOptions(): LogOptions
     {
         $userId = $this->getAuthenticatedUserId();
-
         return LogOptions::defaults()
             ->logOnly(['*'])
             ->setDescriptionForEvent(function (string $eventName) use ($userId) {

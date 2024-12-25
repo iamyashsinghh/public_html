@@ -133,7 +133,6 @@ class BookingController extends Controller {
         $event->budget = $request->total_gmv;
         $event->food_preference = $request->food_Preference;
         $event->event_slot = $request->event_slot;
-        $event->save();
 
         $lead_forward = LeadForward::where(['lead_id' => $request->lead_id, 'forward_to' => $auth_user->id])->first();
         if (!$lead_forward) {
@@ -160,20 +159,28 @@ class BookingController extends Controller {
         $booking->total_gmv = $request->total_gmv;
         $booking->advance_amount = $total_advance_amount;
         $booking->quarter_advance_collected = $quarter_advance <= $total_advance_amount;
-        $booking->save();
 
         $lead_forward->event_datetime = $event_datetime;
         $lead_forward->booking_id = $booking->id;
         $lead_forward->lead_status = "Booked";
         $lead_forward->read_status = true;
-        $lead_forward->save();
 
         $lead->pax = $request->number_of_guest;
-        $lead->save();
 
         $party_area = partyArea::where(['member_id' => $auth_user->id, 'name' => $request->party_area])->first();
         if (!$party_area) {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => "Something went wrong. availability was not marked!"]);
+            return redirect()->back();
+        }
+
+        $availability = Availability::where([
+            'created_by' => $auth_user->id,
+            'party_area_id' => $party_area->id,
+            'food_type' => $request->event_slot,
+            'date' => $request->event_date,
+        ])->first();
+        if($availability){
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => "Availability was already marked!"]);
             return redirect()->back();
         }
 
@@ -184,6 +191,11 @@ class BookingController extends Controller {
         $availability->pax = $request->number_of_guest;
         $availability->date = $request->event_date;
         $availability->save();
+
+        $event->save();
+        $lead_forward->save();
+        $booking->save();
+        $lead->save();
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Booking added successfully."]);
         return redirect()->back();

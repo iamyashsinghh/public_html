@@ -140,4 +140,39 @@ class RefactorController extends Controller
     //     }
     //     return "Availability refactored successfully.";
     // }
+
+    public function deelte_old_availabilities()
+    {
+        $availabilities = Availability::get();
+
+        $groupedAvailabilities = $availabilities->groupBy(function ($item) {
+            return $item->created_by . '-' . $item->party_area_id . '-' . $item->food_type . '-' . $item->date;
+        });
+
+        $deletedRecords = [];
+        $keptRecords = [];
+        $idsToDelete = [];
+        foreach ($groupedAvailabilities as $group) {
+            $sortedGroup = $group->sortByDesc('id');
+
+            $latestRecord = $sortedGroup->first();
+            $keptRecords[] = $latestRecord;
+
+            $toDelete = $sortedGroup->slice(1)->pluck('id')->toArray();
+            $idsToDelete = array_merge($idsToDelete, $toDelete);
+
+            $deletedRecords = array_merge($deletedRecords, $sortedGroup->slice(1)->toArray());
+        }
+
+        Availability::whereIn('id', $idsToDelete)->delete();
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Older records deleted successfully, latest records kept.',
+            'deleted_records' => $deletedRecords,
+            'kept_records' => $keptRecords,
+        ];
+
+        return response()->json($response);
+    }
 }
