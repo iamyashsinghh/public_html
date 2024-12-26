@@ -1054,7 +1054,7 @@
                 hidden: false,
             },
             {
-                label: 'Wb Venue',
+                label: 'Venue',
                 backgroundColor: "#cbe21d",
                 borderColor: "#cbe21d",
                 borderWidth: 3,
@@ -1072,7 +1072,7 @@
                 hidden: true,
             },
             {
-                label: 'Makeup Artist',
+                label: 'Makeup',
                 backgroundColor: "#aa559f",
                 borderColor: "#aa559f",
                 borderWidth: 3,
@@ -1081,7 +1081,7 @@
                 hidden: true,
             },
             {
-                label: 'Mehndi Artist',
+                label: 'Mehndi',
                 backgroundColor: "#4497bb",
                 borderColor: "#4497bb",
                 borderWidth: 3,
