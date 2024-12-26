@@ -907,7 +907,7 @@
                         backgroundColor: "#4497bb",
                         borderColor: "#4497bb",
                         data: "{{ $venue_ads_leads_for_this_month }}".split(","),
-                        hidden: true,
+                        hidden: false,
                     },
                     {
                         label: 'Organic',
@@ -916,7 +916,7 @@
                         backgroundColor: "#cbe21d",
                         borderColor: "#cbe21d",
                         data: "{{ $venue_organic_leads_for_this_month }}".split(","),
-                        hidden: true,
+                        hidden: false,
                     },
                 ],
             },
@@ -974,7 +974,7 @@
                         borderWidth: 1,
                         data: "{{ $venue_ads_leads_for_this_year }}".split(
                             ","),
-                            hidden: true,
+                            hidden: false,
                     },
                     {
                         label: 'Organic',
@@ -983,7 +983,7 @@
                         borderWidth: 1,
                         data: "{{ $venue_organic_leads_for_this_year }}".split(
                             ","),
-                            hidden: true,
+                            hidden: false,
                     },
                     {
                         label: 'Total Leads',
