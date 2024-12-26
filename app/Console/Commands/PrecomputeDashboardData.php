@@ -142,7 +142,7 @@ class PrecomputeDashboardData extends Command
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
             $count = nvLead::where('nv_leads.lead_datetime', 'like', "%$datetime%")
-            ->count();
+                ->count();
             array_push($nv_leads_for_this_month, $count);
         }
         $nv_leads_for_this_month = implode(",", $nv_leads_for_this_month);
@@ -151,12 +151,12 @@ class PrecomputeDashboardData extends Command
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
             $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
-            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
-            ->where('vendors.category_id', 4)
-            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
-            ->groupBy('nv_lead_forward_infos.lead_id')
-            ->get()
-            ->count();
+                ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                ->where('vendors.category_id', 4)
+                ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+                ->groupBy('nv_lead_forward_infos.lead_id')
+                ->get()
+                ->count();
             array_push($nv_forward_leads_for_this_month_wb_venue, $count);
         }
         $nv_forward_leads_for_this_month_wb_venue = implode(",", $nv_forward_leads_for_this_month_wb_venue);
@@ -165,12 +165,12 @@ class PrecomputeDashboardData extends Command
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
             $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
-            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
-            ->where('vendors.category_id', 1)
-            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
-            ->groupBy('nv_lead_forward_infos.lead_id')
-            ->get()
-            ->count();
+                ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                ->where('vendors.category_id', 1)
+                ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+                ->groupBy('nv_lead_forward_infos.lead_id')
+                ->get()
+                ->count();
             array_push($nv_forward_leads_for_this_month_photography, $count);
         }
         $nv_forward_leads_for_this_month_photography = implode(",", $nv_forward_leads_for_this_month_photography);
@@ -179,12 +179,12 @@ class PrecomputeDashboardData extends Command
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
             $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
-            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
-            ->where('vendors.category_id', 2)
-            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
-            ->groupBy('nv_lead_forward_infos.lead_id')
-            ->get()
-            ->count();
+                ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                ->where('vendors.category_id', 2)
+                ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+                ->groupBy('nv_lead_forward_infos.lead_id')
+                ->get()
+                ->count();
             array_push($nv_forward_leads_for_this_month_makeup_artist, $count);
         }
         $nv_forward_leads_for_this_month_makeup_artist = implode(",", $nv_forward_leads_for_this_month_makeup_artist);
@@ -193,12 +193,12 @@ class PrecomputeDashboardData extends Command
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
             $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
-            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
-            ->where('vendors.category_id', 3)
-            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
-            ->groupBy('nv_lead_forward_infos.lead_id')
-            ->get()
-            ->count();
+                ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                ->where('vendors.category_id', 3)
+                ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+                ->groupBy('nv_lead_forward_infos.lead_id')
+                ->get()
+                ->count();
             array_push($nv_forward_leads_for_this_month_mehndi_artist, $count);
         }
         $nv_forward_leads_for_this_month_mehndi_artist = implode(",", $nv_forward_leads_for_this_month_mehndi_artist);
@@ -207,12 +207,12 @@ class PrecomputeDashboardData extends Command
         for ($i = 1; $i <= date('d'); $i++) {
             $datetime = date("Y-m-d", strtotime(date('Y-m-') . $i));
             $count = $lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
-            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
-            ->where('vendors.category_id', 5)
-            ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
-            ->groupBy('nv_lead_forward_infos.lead_id')
-            ->get()
-            ->count();
+                ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                ->where('vendors.category_id', 5)
+                ->where('nv_lead_forward_infos.updated_at', 'like', "%$datetime%")
+                ->groupBy('nv_lead_forward_infos.lead_id')
+                ->get()
+                ->count();
             array_push($nv_forward_leads_for_this_month_band_baja, $count);
         }
         $nv_forward_leads_for_this_month_band_baja = implode(",", $nv_forward_leads_for_this_month_band_baja);
@@ -220,8 +220,8 @@ class PrecomputeDashboardData extends Command
         $nv_leads_for_this_year = [];
         for ($i = 12; $i >= 0; $i--) {
             $datetime = date("Y-m", strtotime("-$i month"));
-            $count =nvLead::where('nv_leads.lead_datetime', 'like', "%$datetime%")
-            ->count();
+            $count = nvLead::where('nv_leads.lead_datetime', 'like', "%$datetime%")
+                ->count();
             array_push($nv_leads_for_this_year, $count);
         }
         $nv_leads_for_this_year = implode(",", $nv_leads_for_this_year);
@@ -380,9 +380,10 @@ class PrecomputeDashboardData extends Command
             AND tasks.created_by = $rm->id
             GROUP BY tasks.lead_id
             HAVING COUNT(CASE WHEN tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
-        "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
+            "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
                 ->whereNotNull('completed_tasks.lead_id')
                 ->where('leads.lead_status', '!=', 'Done')
+                ->where('leads.assign_id',  $rm->id)
                 ->count();
         }
 
