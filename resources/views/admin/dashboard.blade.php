@@ -860,7 +860,6 @@
             current_month_days_arr.push(`${i}-{{ date('M') }}`)
         }
 
-        //VanuesChart
         new Chart("venue_chart_months", {
             type: "line",
             data: {
@@ -868,7 +867,7 @@
                 datasets: [{
                         label: 'Total Leads',
                         fill: false,
-                        tension: 0, // Use `tension` instead of `lineTension` in Chart.js v3+
+                        tension: 0,
                         backgroundColor: "#891010",
                         borderColor: "#891010",
                         data: "{{ $venue_leads_for_this_month }}".split(","),
@@ -955,7 +954,7 @@
                             // text: "Leads Count",
                         },
                         ticks: {
-                            min: 1, // Minimum value on the y-axis
+                            min: 1,
                         },
                     },
                 },
@@ -1031,7 +1030,7 @@
                             text: "Leads Count",
                         },
                         ticks: {
-                            min: 1, // Minimum value on the y-axis
+                            min: 1,
                         },
                     },
                 },
@@ -1134,7 +1133,7 @@
                             text: "Leads Count",
                         },
                         ticks: {
-                            min: 1, // Minimum value on the y-axis
+                            min: 1,
                         },
                     },
                 },
