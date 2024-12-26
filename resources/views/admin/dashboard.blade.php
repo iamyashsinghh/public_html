@@ -976,7 +976,7 @@
                         borderWidth: 1,
                         data: "{{ $venue_ads_leads_for_this_year }}".split(
                             ","), // Ensure this outputs a valid string
-                            hidden: false,
+                            hidden: true,
                     },
                     {
                         label: 'Organic',
@@ -994,7 +994,7 @@
                         borderWidth: 1,
                         data: "{{ $venue_leads_for_this_year }}".split(
                             ","), // Ensure this outputs a valid string
-                            hidden: true,
+                            hidden: false,
                     },
                 ],
             },
