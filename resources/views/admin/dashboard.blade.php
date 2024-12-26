@@ -1090,7 +1090,7 @@
                 hidden: true,
             },
             {
-                label: 'Band/Baja',
+                label: 'Band',
                 backgroundColor: "#618200",
                 borderColor: "#618200",
                 borderWidth: 3,
