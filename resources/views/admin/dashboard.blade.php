@@ -963,19 +963,18 @@
         });
 
 
-        // console.log("{{ $venue_leads_for_this_year }}");
 
         new Chart("venue_chart_years", {
             type: "bar",
             data: {
-                labels: "{{ $yearly_calendar }}".split(','), // Ensure this outputs a valid string
+                labels: "{{ $yearly_calendar }}".split(','),
                 datasets: [{
                         label: 'Ad Data',
                         backgroundColor: "#4497bb",
                         borderColor: "#4497bb",
                         borderWidth: 1,
                         data: "{{ $venue_ads_leads_for_this_year }}".split(
-                            ","), // Ensure this outputs a valid string
+                            ","),
                             hidden: true,
                     },
                     {
@@ -984,7 +983,7 @@
                         borderColor: "#cbe21d",
                         borderWidth: 1,
                         data: "{{ $venue_organic_leads_for_this_year }}".split(
-                            ","), // Ensure this outputs a valid string
+                            ","),
                             hidden: true,
                     },
                     {
@@ -993,7 +992,7 @@
                         borderColor: "#891010",
                         borderWidth: 1,
                         data: "{{ $venue_leads_for_this_year }}".split(
-                            ","), // Ensure this outputs a valid string
+                            ","),
                             hidden: false,
                     },
                 ],
