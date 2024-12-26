@@ -872,6 +872,7 @@
                         backgroundColor: "#891010",
                         borderColor: "#891010",
                         data: "{{ $venue_leads_for_this_month }}".split(","),
+                        hidden: false,
                     },
                     {
                         label: 'Call',
@@ -880,6 +881,7 @@
                         backgroundColor: "#a06b14",
                         borderColor: "#a06b14",
                         data: "{{ $venue_call_leads_for_this_month }}".split(","),
+                        hidden: true,
                     },
                     {
                         label: 'Form',
@@ -888,6 +890,7 @@
                         backgroundColor: "#aa559f",
                         borderColor: "#aa559f",
                         data: "{{ $venue_form_leads_for_this_month }}".split(","),
+                        hidden: true,
                     },
                     {
                         label: 'WhatsApp',
@@ -896,6 +899,7 @@
                         backgroundColor: "#618200",
                         borderColor: "#618200",
                         data: "{{ $venue_whatsapp_leads_for_this_month }}".split(","),
+                        hidden: true,
                     },
                     {
                         label: 'Ad Data',
@@ -904,6 +908,7 @@
                         backgroundColor: "#4497bb",
                         borderColor: "#4497bb",
                         data: "{{ $venue_ads_leads_for_this_month }}".split(","),
+                        hidden: true,
                     },
                     {
                         label: 'Organic',
@@ -912,6 +917,7 @@
                         backgroundColor: "#cbe21d",
                         borderColor: "#cbe21d",
                         data: "{{ $venue_organic_leads_for_this_month }}".split(","),
+                        hidden: true,
                     },
                 ],
             },
@@ -970,6 +976,7 @@
                         borderWidth: 1,
                         data: "{{ $venue_ads_leads_for_this_year }}".split(
                             ","), // Ensure this outputs a valid string
+                            hidden: false,
                     },
                     {
                         label: 'Organic',
@@ -978,6 +985,7 @@
                         borderWidth: 1,
                         data: "{{ $venue_organic_leads_for_this_year }}".split(
                             ","), // Ensure this outputs a valid string
+                            hidden: true,
                     },
                     {
                         label: 'Total Leads',
@@ -986,6 +994,7 @@
                         borderWidth: 1,
                         data: "{{ $venue_leads_for_this_year }}".split(
                             ","), // Ensure this outputs a valid string
+                            hidden: true,
                     },
                 ],
             },
@@ -1043,6 +1052,7 @@
                 borderWidth: 3,
                 fill: false,
                 data: "{{ $nv_leads_for_this_month }}".split(","),
+                hidden: false,
             },
             {
                 label: 'Wb Venue',
@@ -1051,6 +1061,7 @@
                 borderWidth: 3,
                 fill: false,
                 data: "{{ $nv_forward_leads_for_this_month_wb_venue }}".split(","),
+                hidden: true,
             },
             {
                 label: 'Photography',
@@ -1059,6 +1070,7 @@
                 borderWidth: 3,
                 fill: false,
                 data: "{{ $nv_forward_leads_for_this_month_photography }}".split(","),
+                hidden: true,
             },
             {
                 label: 'Makeup Artist',
@@ -1067,6 +1079,7 @@
                 borderWidth: 3,
                 fill: false,
                 data: "{{ $nv_forward_leads_for_this_month_makeup_artist }}".split(","),
+                hidden: true,
             },
             {
                 label: 'Mehndi Artist',
@@ -1075,6 +1088,7 @@
                 borderWidth: 3,
                 fill: false,
                 data: "{{ $nv_forward_leads_for_this_month_mehndi_artist }}".split(","),
+                hidden: true,
             },
             {
                 label: 'Band Baja',
@@ -1083,6 +1097,7 @@
                 borderWidth: 3,
                 fill: false,
                 data: "{{ $nv_forward_leads_for_this_month_band_baja }}".split(","),
+                hidden: true,
             },
         ]
     },
