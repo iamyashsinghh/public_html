@@ -1045,7 +1045,7 @@
         labels: current_month_days_arr,
         datasets: [
             {
-                label: 'Total Leads',
+                label:  'Leads',
                 backgroundColor: "#891010",
                 borderColor: "#891010",
                 borderWidth: 3,
@@ -1090,7 +1090,7 @@
                 hidden: true,
             },
             {
-                label: 'Band Baja',
+                label: 'Band/Baja',
                 backgroundColor: "#618200",
                 borderColor: "#618200",
                 borderWidth: 3,
