@@ -164,6 +164,7 @@ class VendorController extends Controller
         $vendor->alt_mobile_number = $request->alt_mobile_number;
         $vendor->parent_id = $request->parent_id;
         $vendor->subscription_type = $request->subscription_type;
+        $vendor->insta_username = $request->insta_username;
         $vendor->save();
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $msg]);
         return redirect()->back();

@@ -189,6 +189,14 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label for="insta_username_inp">Instagram Username (Without @). <span
+                                                class="text-danger"></span></label>
+                                        <input type="text" class="form-control" id="insta_username_inp"
+                                            placeholder="Enter Insta username." name="insta_username">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer text-sm">
@@ -472,6 +480,7 @@ td_elements[10].innerHTML = diable_action_elem;
                         end_date_inp.value = data.vendor.end_date;
                         group_name_select.value = data.vendor.group_name;
                         vendor_altmobile_inp.value = data.vendor.alt_mobile_number;
+                        insta_username_inp.value = data.vendor.insta_username;
                         category_select.querySelector(`option[value="${data.vendor.category_id}"]`).selected = true;
 
                         const subscriptionElement = subscription_select.querySelector(`option[value="${data.vendor.subscription_type}"]`);
