@@ -189,7 +189,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-4 mb-3">
+                                <div class="col-sm-4 mb-1">
                                     <div class="form-group">
                                         <label for="insta_username_inp">Instagram Username (Without @). <span
                                                 class="text-danger"></span></label>
