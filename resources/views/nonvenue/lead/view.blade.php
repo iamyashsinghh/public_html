@@ -159,8 +159,9 @@ $auth_user = Auth::guard('nonvenue')->user();
                                                 <div class="vendor-list">
                                                     @foreach ($lead->get_vendors_for_lead() as $vendorList)
                                                     @php
+                                                        dd($vendorList)
                                                     @endphp
-                                                    @if ($vendorList->category_id == $list->vendor_category_id && $vendorList->updated_at->format('Y-m-d') == $list->created_at->format('Y-m-d'))
+                                                    @if ($vendorList->category_id == $list->vendor_category_id)
                                                     <div class="vendor-badge"
                                                         title="{{ date('d-M-Y h:i a', strtotime($vendorList->updated_at)) }}">
                                                         {{ $vendorList->name }}
