@@ -668,15 +668,10 @@ class NvLeadController extends Controller
         $lead_forward->event_datetime = $forward->event_datetime;
         $lead_forward->save();
 
-        $lead_forward_info = nvLeadForwardInfo::where(['lead_id' => $forward->lead_id, 'forward_to' => $vendor->id])->first();
-        if (!$lead_forward_info) {
-            $lead_forward_info = new nvLeadForwardInfo();
-            $lead_forward_info->lead_id = $forward->lead_id;
-            $lead_forward_info->forward_from = $auth_user->id;
-            $lead_forward_info->forward_to = $vendor->id;
-        } else {
-            $lead_forward_info->forward_from = $auth_user->id;
-        }
+        $lead_forward_info = new nvLeadForwardInfo();
+        $lead_forward_info->lead_id = $forward->lead_id;
+        $lead_forward_info->forward_from = $auth_user->id;
+        $lead_forward_info->forward_to = $vendor->id;
         $lead_forward_info->updated_at = $this->current_timestamp;
         $lead_forward_info->save();
 
