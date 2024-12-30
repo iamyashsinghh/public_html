@@ -1,6 +1,25 @@
 @extends('nonvenue.layouts.app')
 @section('title', 'Dashboard | NVRM')
 @section('main')
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-footer {
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .card-body h4 {
+        font-size: 1.5rem;
+    }
+</style>
 <div class="content-wrapper pb-5">
     <section class="content-header">
         <div class="container-fluid">
@@ -222,61 +241,49 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-lg-12 my-3">
-                    <h3>Lead Forward By Category</h3>
-                    <div class="row">
+                <div class="col-lg-12 my-4">
+                    <h3 class="mb-4">Lead Forward By Category</h3>
+                    <div class="row gy-4">
                         @foreach ($forward_leads_by_category as $category => $lead_counts)
-                        @if ($lead_counts['month'] > 0 || $lead_counts['today'] > 0)
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box text-sm bg-success">
-                                <div class="inner">
-                                    <h5>{{ $category }}</h5>
-                                    <div class="row">
-                                        <div class="col-6 text-center">
-                                            <a target="_blank"
-                                                href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'month']) }}"
-                                                class="text-light d-block">
-                                                <h4><b>{{ $lead_counts['month'] }}</b></h4>
-                                                <p class="mb-0"><b>Month</b></p>
+                        {{-- @if ($lead_counts['month'] > 0 || $lead_counts['today'] > 0) --}}
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="card shadow-sm border-0" style="background: cadetblue !important;"> 
+                                <div class="card-body bg-light rounded" >
+                                    <h5 class="card-title text-center text-dark fw-bold mb-3">{{ $category }}</h5>
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <a target="_blank" href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'month']) }}" class="text-decoration-none">
+                                                <h4 class="text-primary fw-bold">{{ $lead_counts['month'] }}</h4>
+                                                <p class="text-muted mb-0">Month</p>
                                             </a>
                                         </div>
-                                        <div class="col-6 text-center">
-                                            <a target="_blank"
-                                                href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'today']) }}"
-                                                class="text-light d-block">
-                                                <h4 style="color: #babdbf"><b>{{ $lead_counts['today'] }}</b></h4>
-                                                <p class="mb-0" style="color: #babdbf"><b>Today</b></p>
+                                        <div class="col-6">
+                                            <a target="_blank" href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'today']) }}" class="text-decoration-none">
+                                                <h4 class="text-secondary fw-bold">{{ $lead_counts['today'] }}</h4>
+                                                <p class="text-muted mb-0">Today</p>
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-6 text-center">
-                                            <a target="_blank"
-                                                href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'fresh_requirement']) }}"
-                                                class="text-light d-block">
-                                                <h4><b>{{ $lead_counts['fresh_requirement'] }}</b></h4>
-                                                <p class="mb-0"><b>Fresh Requirement</b></p>
+                                    <hr class="my-3">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <a target="_blank" href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'fresh_requirement']) }}" class="text-decoration-none">
+                                                <h4 class="text-success fw-bold">{{ $lead_counts['fresh_requirement'] }}</h4>
+                                                <p class="text-muted mb-0">Fresh Requirement</p>
                                             </a>
                                         </div>
-                                        <div class="col-6 text-center">
-                                            <a target="_blank"
-                                                href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'not_fresh_requirement']) }}"
-                                                class="text-light d-block">
-                                                <h4 style="color: #babdbf"><b>{{ $lead_counts['not_fresh_requirement'] }}</b></h4>
-                                                <p class="mb-0" style="color: #babdbf"><b>Other Requirement</b></p>
+                                        <div class="col-6">
+                                            <a target="_blank" href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'not_fresh_requirement']) }}" class="text-decoration-none">
+                                                <h4 class="text-danger fw-bold">{{ $lead_counts['not_fresh_requirement'] }}</h4>
+                                                <p class="text-muted mb-0">Other Requirement</p>
                                             </a>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="icon">
-                                    <i class="ion ion-bag"></i>
-                                </div>
-                                <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
                             </div>
                         </div>
-                        @endif
+                        {{-- @endif --}}
                         @endforeach
-
                     </div>
                 </div>
             </div>
