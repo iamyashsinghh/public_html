@@ -72,7 +72,8 @@ class DashboardController extends Controller
                 ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
                 ->whereRaw('LOWER(nvrm_messages.title) = ?', ['fresh requirement'])
                 ->groupBy('nv_lead_forward_infos.lead_id')
-                ->get();
+                ->get()
+                ->count();
 
                 $not_fresh_requirement_lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
                 ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
@@ -86,7 +87,8 @@ class DashboardController extends Controller
                 ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
                 ->whereRaw('LOWER(nvrm_messages.title) != ?', ['fresh requirement'])
                 ->groupBy('nv_lead_forward_infos.lead_id')
-                ->get();
+                ->get()
+                ->count();
 
             return $forward_leads_by_category[$category_name] = [
                 'month' => $monthly_lead_count,
