@@ -90,7 +90,7 @@ class DashboardController extends Controller
                 ->get()
                 ->count();
 
-            return $forward_leads_by_category[$category_name] = [
+         $forward_leads_by_category[$category_name] = [
                 'month' => $monthly_lead_count,
                 'today' => $daily_lead_count,
                 'fresh_requirement' => $fresh_requirement_lead_count,
