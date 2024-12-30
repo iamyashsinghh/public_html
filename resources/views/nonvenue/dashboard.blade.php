@@ -275,7 +275,7 @@
                                         <div class="col-6">
                                             <a target="_blank" href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'not_fresh_requirement']) }}" class="text-decoration-none">
                                                 <h4 class="text-danger fw-bold">{{ $lead_counts['not_fresh_requirement'] }}</h4>
-                                                <p class="text-muted mb-0">Other Requirement</p>
+                                                <p class="text-muted mb-0">Unserved Requirement</p>
                                             </a>
                                         </div>
                                     </div>

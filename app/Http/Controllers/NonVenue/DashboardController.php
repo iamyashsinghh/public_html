@@ -88,7 +88,7 @@ class DashboardController extends Controller
                 ->where('vendors.category_id', $category->id)
                 ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
                 ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
-                ->whereRaw('LOWER(nvrm_messages.title) != ?', ['fresh requirement'])
+                ->whereRaw('LOWER(nvrm_messages.title) = ?', ['unserved requirement'])
                 ->groupBy('nv_lead_forward_infos.lead_id')
                 ->get()
                 ->count();
