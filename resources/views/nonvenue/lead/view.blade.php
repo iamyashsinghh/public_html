@@ -131,7 +131,6 @@ $auth_user = Auth::guard('nonvenue')->user();
                                                 </button>
                                                 @php
                                                 $filteredVendors = $lead->get_vendors_for_lead()->filter(function ($vendor) use ($list) {return $vendor->category_id == $list->vendor_category_id;});
-
                                                 @endphp
                                                 @if ($filteredVendors->count() > 0)
                                                 <form action="{{ route('nonvenue.rm_message.delete', $list->id) }}"
@@ -158,9 +157,6 @@ $auth_user = Auth::guard('nonvenue')->user();
                                             <td colspan="9">
                                                 <div class="vendor-list">
                                                     @foreach ($lead->get_vendors_for_lead() as $vendorList)
-                                                    @php
-                                                        dd($vendorList)
-                                                    @endphp
                                                     @if ($vendorList->category_id == $list->vendor_category_id)
                                                     <div class="vendor-badge"
                                                         title="{{ date('d-M-Y h:i a', strtotime($vendorList->updated_at)) }}">
