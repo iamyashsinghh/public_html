@@ -248,7 +248,7 @@
                         @if ($lead_counts['month'] > 0 || $lead_counts['today'] > 0)
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="card shadow-sm border-0" style="background: cadetblue !important;">
-                                <div class="card-body bg-light rounded" >
+                                <div class="card-body bg-light rounded">
                                     <h5 class="card-title text-center text-dark fw-bold mb-3">{{ $category }}</h5>
                                     <div class="row text-center">
                                         <div class="col-6">
