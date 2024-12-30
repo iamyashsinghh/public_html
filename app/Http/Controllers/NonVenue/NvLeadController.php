@@ -213,8 +213,7 @@ class NvLeadController extends Controller
                                 ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
                                     $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
                                         ->where('nvrm_messages.vendor_category_id', '=', $category->id)
-                                        ->where('nvrm_messages.created_by', '=', $auth_user->id)
-                                        ->where('nvrm_messages.updated_at', 'like', "$current_month%");
+                                        ->where('nvrm_messages.created_by', '=', $auth_user->id);
                                 })
                                 ->where('vendors.category_id', $category->id)
                                 ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
@@ -228,8 +227,7 @@ class NvLeadController extends Controller
                                 ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
                                     $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
                                         ->where('nvrm_messages.vendor_category_id', '=', $category->id)
-                                        ->where('nvrm_messages.created_by', '=', $auth_user->id)
-                                        ->where('nvrm_messages.updated_at', 'like', "$current_month%");
+                                        ->where('nvrm_messages.created_by', '=', $auth_user->id);
                                 })
                                 ->where('vendors.category_id', $category->id)
                                 ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
