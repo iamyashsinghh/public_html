@@ -210,26 +210,39 @@ class NvLeadController extends Controller
                         if ($filter == 'fresh_requirement') {
                             $leads->join('nv_lead_forward_infos', 'nvrm_lead_forwards.lead_id', '=', 'nv_lead_forward_infos.lead_id')
                                 ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
-                                ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
+                                ->join(DB::raw('(
+                            SELECT lead_id, MAX(updated_at) as latest_updated_at
+                            FROM nvrm_messages
+                            GROUP BY lead_id
+                        ) as latest_messages'), function ($join) {
+                                    $join->on('nvrm_lead_forwards.lead_id', '=', 'latest_messages.lead_id');
+                                })
+                                ->join('nvrm_messages', function ($join) use ($category, $auth_user) {
                                     $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                                        ->on('nvrm_messages.updated_at', '=', 'latest_messages.latest_updated_at')
                                         ->where('nvrm_messages.vendor_category_id', '=', $category->id)
-                                        ->where('nvrm_messages.created_by', '=', $auth_user->id)
-                                        ->where('nvrm_messages.updated_at', 'like', "$current_month%");
+                                        ->where('nvrm_messages.created_by', '=', $auth_user->id);
                                 })
                                 ->where('vendors.category_id', $category->id)
                                 ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
                                 ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
                                 ->whereRaw('LOWER(nvrm_messages.title) = ?', ['fresh requirement'])
                                 ->groupBy('nv_lead_forward_infos.lead_id');
-
                         } elseif ($filter == 'not_fresh_requirement') {
                             $leads->join('nv_lead_forward_infos', 'nvrm_lead_forwards.lead_id', '=', 'nv_lead_forward_infos.lead_id')
                                 ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
-                                ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
+                                ->join(DB::raw('(
+                                SELECT lead_id, MAX(updated_at) as latest_updated_at
+                                FROM nvrm_messages
+                                GROUP BY lead_id
+                            ) as latest_messages'), function ($join) {
+                                    $join->on('nvrm_lead_forwards.lead_id', '=', 'latest_messages.lead_id');
+                                })
+                                ->join('nvrm_messages', function ($join) use ($category, $auth_user) {
                                     $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                                        ->on('nvrm_messages.updated_at', '=', 'latest_messages.latest_updated_at')
                                         ->where('nvrm_messages.vendor_category_id', '=', $category->id)
-                                        ->where('nvrm_messages.created_by', '=', $auth_user->id)
-                                        ->where('nvrm_messages.updated_at', 'like', "$current_month%");
+                                        ->where('nvrm_messages.created_by', '=', $auth_user->id);
                                 })
                                 ->where('vendors.category_id', $category->id)
                                 ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
