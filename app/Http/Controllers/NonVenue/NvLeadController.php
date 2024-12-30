@@ -174,11 +174,11 @@ class NvLeadController extends Controller
                 $leads->where('nvrm_lead_forwards.lead_datetime', 'like', "%$current_date%")->whereNull('nvrm_lead_forwards.deleted_at')->where('nvrm_lead_forwards.forward_to', $auth_user->id);
             } elseif ($request->dashboard_filters == "nvrm_unfollowed_leads") {
                 $leads->where('lead_status', '!=', 'Done')
-                ->whereHas('nvrm_tasks', function ($query) use ($auth_user) {
-                    $query->whereNotNull('done_datetime')
-                        ->whereNull('deleted_at')
-                        ->where('created_by', $auth_user->id);
-                })
+                    ->whereHas('nvrm_tasks', function ($query) use ($auth_user) {
+                        $query->whereNotNull('done_datetime')
+                            ->whereNull('deleted_at')
+                            ->where('created_by', $auth_user->id);
+                    })
                     ->whereDoesntHave('nvrm_tasks', function ($query) {
                         $query->whereNull('done_datetime');
                     })
@@ -205,21 +205,50 @@ class NvLeadController extends Controller
             } else {
                 $category = VendorCategory::where('name', $request->dashboard_filters)->first();
                 if ($category) {
-                    $leads->join('nv_lead_forward_infos', 'nvrm_lead_forwards.lead_id', '=', 'nv_lead_forward_infos.lead_id')
-                        ->join('vendors', 'nv_lead_forward_infos.forward_to', '=', 'vendors.id')
-                        ->where('vendors.category_id', $category->id)
-                        ->where('nv_lead_forward_infos.forward_from', $auth_user->id)
-                        ->groupBy('nv_lead_forward_infos.lead_id');
-
-                    if ($request->has('dashboard_filterss')) {
-                        $filter = $request->dashboard_filterss;
-                        if ($filter === 'month') {
-                            $leads->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%");
-                        } elseif ($filter === 'today') {
-                            $leads->whereDate('nv_lead_forward_infos.updated_at', 'like', "%$current_date%");
-                        }
+                    $filter = $request->dashboard_filterss;
+                    if ($filter == 'fresh_requirement') {
+                        $leads->join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                            ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
+                                $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                                    ->where('nvrm_messages.vendor_category_id', '=', $category->id)
+                                    ->where('nvrm_messages.created_by', '=', $auth_user->id);
+                            })
+                            ->where('vendors.category_id', $category->id)
+                            ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
+                            ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
+                            ->whereRaw('LOWER(nvrm_messages.title) = ?', ['fresh requirement'])
+                            ->groupBy('nv_lead_forward_infos.lead_id');
+                    } elseif ($filter == 'not_fresh_requirement') {
+                        $leads->join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                            ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                            ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
+                                $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                                    ->where('nvrm_messages.vendor_category_id', '=', $category->id)
+                                    ->where('nvrm_messages.created_by', '=', $auth_user->id);
+                            })
+                            ->where('vendors.category_id', $category->id)
+                            ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
+                            ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
+                            ->whereRaw('LOWER(nvrm_messages.title) = ?', ['fresh requirement'])
+                            ->groupBy('nv_lead_forward_infos.lead_id');
                     } else {
-                        $leads->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%");
+                        $leads->join('nv_lead_forward_infos', 'nvrm_lead_forwards.lead_id', '=', 'nv_lead_forward_infos.lead_id')
+                            ->join('vendors', 'nv_lead_forward_infos.forward_to', '=', 'vendors.id')
+                            ->where('vendors.category_id', $category->id)
+                            ->where('nv_lead_forward_infos.forward_from', $auth_user->id)
+                            ->groupBy('nv_lead_forward_infos.lead_id');
+
+                        if ($request->has('dashboard_filterss')) {
+                            $filter = $request->dashboard_filterss;
+                            if ($filter === 'month') {
+                                $leads->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%");
+                            } elseif ($filter === 'today') {
+                                $leads->whereDate('nv_lead_forward_infos.updated_at', 'like', "%$current_date%");
+                            }
+                        } else {
+                            $leads->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%");
+                        }
                     }
                 }
             }
@@ -569,7 +598,7 @@ class NvLeadController extends Controller
         }
 
         if ($request->tier) {
-            $vendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id, 'is_active'=> 1])
+            $vendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id, 'is_active' => 1])
                 ->orderBy('id')
                 ->limit(4)
                 ->get();
@@ -581,10 +610,10 @@ class NvLeadController extends Controller
                     $vendor->save();
                 }
 
-                Vendor::where(['status' => 1, 'subscription_type' => $request->tier, 'category_id' => $request->nvrm_msg_id, 'is_active'=> 1])
+                Vendor::where(['status' => 1, 'subscription_type' => $request->tier, 'category_id' => $request->nvrm_msg_id, 'is_active' => 1])
                     ->update(['is_lead_forwaded' => 0]);
 
-                $remainingVendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id,'is_active'=> 1])
+                $remainingVendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id, 'is_active' => 1])
                     ->orderBy('id')
                     ->limit(4 - $vendors->count())
                     ->get();
