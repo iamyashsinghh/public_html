@@ -249,6 +249,24 @@
                                             </a>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-6 text-center">
+                                            <a target="_blank"
+                                                href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'fresh_requirement']) }}"
+                                                class="text-light d-block">
+                                                <h4><b>{{ $lead_counts['fresh_requirement'] }}</b></h4>
+                                                <p class="mb-0"><b>Fresh Requirement</b></p>
+                                            </a>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <a target="_blank"
+                                                href="{{ route('nonvenue.lead.list', ['category' => $category, 'filter' => 'not_fresh_requirement']) }}"
+                                                class="text-light d-block">
+                                                <h4 style="color: #babdbf"><b>{{ $lead_counts['not_fresh_requirement'] }}</b></h4>
+                                                <p class="mb-0" style="color: #babdbf"><b>Other Requirement</b></p>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-bag"></i>
