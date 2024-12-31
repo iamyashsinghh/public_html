@@ -119,7 +119,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                                             </td>
                                             <td>{{ $list->get_service_category->name }}</td>
                                             <td class="text-center text-nowrap">
-                                                <button onclick="handle_lead_forward({{ $list->get_service_category->id }}, `{{ $list->get_service_category->name }}`, `{{ $list->schedule_datetime }}`)" class="btn p-0 mx-2" title="Forward" style="color: var(--wb-dark-red);">
+                                                <button onclick="handle_lead_forward({{ $list->get_service_category->id }}, `{{ $list->get_service_category->name }}`, '{{ $list->schedule_datetime }}')" class="btn p-0 mx-2" title="Forward" style="color: var(--wb-dark-red);">
                                                     <i class="fa fa-paper-plane"></i>
                                                 </button>
                                             </td>
