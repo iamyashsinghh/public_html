@@ -65,9 +65,9 @@
         }
     </style>
     <script>
-        setTimeout(() => {
-            window.location.reload();
-        }, 10000); // Refresh every 10 seconds
+        // setTimeout(() => {
+        //     window.location.reload();
+        // }, 10000); // Refresh every 10 seconds
     </script>
 </head>
 <body>
