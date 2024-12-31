@@ -891,7 +891,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                     @csrf
                     <input type="hidden" name="forward_id" value="{{ $lead->id }}">
                     <input type="hidden" name="nvrm_msg_id" id="nvrm_msg_id" value="">
-                    <input type="hidden" name="schedule_datetime" id="schedule_datetime" value="">
+                    <input type="hidden" name="schedule_datetime" id="schedule_datetime_for_forward" value="">
                     <input type="hidden" name="tier" id="tier" value="">
                     <div class="modal-body text-sm">
 
@@ -1065,7 +1065,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                 const modalHeading = forwardLeadModal.querySelector('.modal-title');
                 const modalBody = forwardLeadModal.querySelector('.modal-body');
                 const nvrm_msg_id = document.getElementById('nvrm_msg_id');
-                const schedule_datetime = document.getElementById('schedule_datetime');
+                const schedule_datetime = document.getElementById('schedule_datetime_for_forward');
                 const closeBtnWithToogleBtn = forwardLeadModal.querySelector('.close-btn-with-toogle-btn');
                 closeBtnWithToogleBtn.innerHTML = `<button type="button" class="btn text-secondary" data-bs-dismiss="modal"
                                 aria-label="Close"><i class="fa fa-times"></i></button>`;
