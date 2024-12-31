@@ -640,7 +640,7 @@ class NvLeadController extends Controller
             if ($index > 3) break; // Limit to 4 cards
             $vendor_count++;
             $carouselCards[] = [
-                "card_index" => $index,
+                "card_index" => "$index",
                 "components" => [
                     [
                         "type" => "HEADER",
@@ -648,7 +648,7 @@ class NvLeadController extends Controller
                             [
                                 "type" => "IMAGE",
                                 "image" => [
-                                    "link" => $vendor->profile_image // Ensure this is publicly accessible
+                                    "link" => "$vendor->profile_image" // Ensure this is publicly accessible
                                 ]
                             ]
                         ]
@@ -658,15 +658,15 @@ class NvLeadController extends Controller
                         "parameters" => [
                             [
                                 "type" => "TEXT",
-                                "text" => $vendor->business_name
+                                "text" => "$vendor->business_name"
                             ],
                             [
                                 "type" => "TEXT",
-                                "text" => $vendor->name
+                                "text" => "$vendor->name"
                             ],
                             [
                                 "type" => "TEXT",
-                                "text" => $vendor->mobile
+                                "text" => "$vendor->mobile"
                             ]
                         ]
                     ],
@@ -677,7 +677,7 @@ class NvLeadController extends Controller
                         "parameters" => [
                             [
                                 "type" => "PAYLOAD",
-                                "payload" => $vendor->insta_username
+                                "payload" => "$vendor->insta_username"
                             ]
                         ]
                     ]
@@ -691,7 +691,7 @@ class NvLeadController extends Controller
             "type" => "template",
             "source" => "external",
             "template" => [
-                "name" => $tempName,
+                "name" => "$tempName",
                 "language" => [
                     "code" => "en"
                 ],
@@ -701,15 +701,15 @@ class NvLeadController extends Controller
                         "parameters" => [
                             [
                                 "type" => "TEXT",
-                                "text" => $forward->name
+                                "text" => "$forward->name"
                             ],
                             [
                                 "type" => "TEXT",
-                                "text" => $auth_user->name
+                                "text" => "$auth_user->name"
                             ],
                             [
                                 "type" => "TEXT",
-                                "text" => $time
+                                "text" => "$time"
                             ]
                         ]
                     ],
