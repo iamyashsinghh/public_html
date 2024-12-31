@@ -734,6 +734,7 @@ class NvLeadController extends Controller
             'Authorization' => $authToken,
             'Content-Type' => 'application/json',
         ])->post($url, $payload);
+        Log::info($response);
 
         $currentTimestamp = Carbon::now();
         $msg = "*Hi {{1}}!* I am {{2}}, as we discussed during our call, I have lined up some perfect vendors for your upcoming event. But here’s the exciting part- these premium deals are in high demand, and slots are very limited.⌛So grab the deal as soon as possible before you miss out! The selected vendors will be reaching out to you on 🕐 *{{3}}*, or feel free to contact 📞 them directly at your convenience to get things started. _Team Wedding Banquets_";
