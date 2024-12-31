@@ -744,8 +744,8 @@ $auth_user = Auth::guard('nonvenue')->user();
                         </div>
                         <div class="form-group">
                             <label for="schedule_datetime_imp">Appointment Schedule Datetime</label>
-                            <textarea type="text" class="form-control" id="schedule_datetime_imp" placeholder="Ex: 29 Dec at 5:30 pm"
-                                name="schedule_datetime"></textarea>
+                            <input type="text" class="form-control" id="schedule_datetime_imp" placeholder="Ex: 29 Dec at 5:30 pm"
+                                name="schedule_datetime">
                         </div>
                         <div class="form-group">
                             <label for="msg_desc_inp">Message</label>
@@ -787,8 +787,8 @@ $auth_user = Auth::guard('nonvenue')->user();
                         </div>
                         <div class="form-group">
                             <label for="schedule_datetime_imp">Appointment Schedule Datetime</label>
-                            <textarea type="text" class="form-control" id="schedule_datetime_imp" placeholder="Ex: 29 Dec at 5:30 pm"
-                                name="schedule_datetime"></textarea>
+                            <input type="text" class="form-control" id="schedule_datetime_imp" placeholder="Ex: 29 Dec at 5:30 pm"
+                                name="schedule_datetime">
                         </div>
                         <div class="form-group">
                             <label for="msg_desc_inp">Message</label>
