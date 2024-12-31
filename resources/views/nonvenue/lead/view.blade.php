@@ -1124,7 +1124,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                 const modalHeader = forwardLeadModal.querySelector('.modal-header');
                 const closeBtnWithToogleBtn = forwardLeadModal.querySelector('.close-btn-with-toogle-btn');
                 const nvrm_msg_id = document.getElementById('nvrm_msg_id');
-                const schedule_datetime = document.getElementById('schedule_datetime_for_forward');
+                const schedule_date = document.getElementById('schedule_datetime_for_forward');
                 const tier = document.getElementById('tier');
                 const forwardLeadModalForm = document.getElementById('forwardLeadModalForm');
                 modalBody.innerHTML = "";
@@ -1135,7 +1135,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                 modalHeading.innerHTML =
                     `Forward Lead to <span style="color: var(--wb-renosand);">${category_name} Vendors</span>`;
                 nvrm_msg_id.value = vendor_category_id;
-                schedule_datetime.value = schedule_datetime;
+                schedule_date.value = schedule_datetime;
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
