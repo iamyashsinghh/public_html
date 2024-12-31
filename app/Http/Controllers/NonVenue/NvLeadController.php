@@ -70,6 +70,7 @@ class NvLeadController extends Controller
 
         $auth_user = Auth::guard('nonvenue')->user();
         $whatsapp_campaigns = WhatsappCampain::where('status', 1)->where('assign_to', $auth_user->id)->get();
+        return view('includes.maintenance');
         return view('nonvenue.lead.list', compact('page_heading', 'filter_params', 'whatsapp_campaigns', 'getRm'));
     }
     public function ajax_list(Request $request)
@@ -492,9 +493,8 @@ class NvLeadController extends Controller
             return redirect()->back();
         }
 
-        $forwardedVendors = [];
-
         if ($request->tier) {
+            $forwardedVendors = [];
             $vendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id, 'is_active' => 1])
                 ->orderBy('id')
                 ->limit(4)
@@ -530,6 +530,7 @@ class NvLeadController extends Controller
                     $forwardedVendors[] = $vendor;
                 }
             }
+        // $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
         } elseif ($request->forward_vendors_id) {
             foreach ($request->forward_vendors_id as $vendor_id) {
                 $vendor = Vendor::find($vendor_id);
@@ -540,8 +541,6 @@ class NvLeadController extends Controller
         }
         $forward->last_forwarded_by = $auth_user->name;
         $forward->save();
-
-        // $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead forwarded successfully.']);
         return redirect()->back();

@@ -224,7 +224,9 @@ class DashboardController extends Controller
             'vendor_today_issue',
             'forward_leads_by_category'
         );
-        return view('nonvenue.dashboard', $response_data);
+        // return view('nonvenue.dashboard', $response_data);
+        return view('includes.maintenance', $response_data);
+
     }
 
     public function update_profile_image(Request $request)
