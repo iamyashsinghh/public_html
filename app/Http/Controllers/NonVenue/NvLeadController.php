@@ -532,7 +532,7 @@ class NvLeadController extends Controller
                     $forwardedVendors[] = $vendor;
                 }
             }
-        $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
+            $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
         } elseif ($request->forward_vendors_id) {
             foreach ($request->forward_vendors_id as $vendor_id) {
                 $vendor = Vendor::find($vendor_id);
@@ -631,24 +631,24 @@ class NvLeadController extends Controller
 
     private function sendWhatsAppMessageToConsumer($vendors, $forward, $time)
     {
-        // Log::info($vendors);
         $auth_user = Auth::guard('nonvenue')->user();
         $recipientPhone = $forward->mobile;
         $carouselCards = [];
         $vendor_count = 0;
+
         foreach ($vendors as $index => $vendor) {
-            if ($index > 3) break;
+            if ($index > 3) break; // Limit to 4 cards
             $vendor_count++;
             $carouselCards[] = [
-                "card_index" => "$index",
+                "card_index" => $index,
                 "components" => [
                     [
-                        "type" => "header",
+                        "type" => "HEADER",
                         "parameters" => [
                             [
-                                "type" => "image",
+                                "type" => "IMAGE",
                                 "image" => [
-                                    "link" => "$vendor->profile_image"
+                                    "link" => $vendor->profile_image // Ensure this is publicly accessible
                                 ]
                             ]
                         ]
@@ -657,27 +657,27 @@ class NvLeadController extends Controller
                         "type" => "BODY",
                         "parameters" => [
                             [
-                                "type" => "text",
-                                "text" => "$vendor->business_name"
+                                "type" => "TEXT",
+                                "text" => $vendor->business_name
                             ],
                             [
-                                "type" => "text",
-                                "text" => "$vendor->name"
+                                "type" => "TEXT",
+                                "text" => $vendor->name
                             ],
                             [
-                                "type" => "text",
-                                "text" => "$vendor->mobile"
+                                "type" => "TEXT",
+                                "text" => $vendor->mobile
                             ]
                         ]
                     ],
                     [
-                        "type" => "button",
+                        "type" => "BUTTON",
                         "sub_type" => "URL",
                         "index" => "0",
                         "parameters" => [
                             [
-                                "type" => "payload",
-                                "payload" => "$vendor->insta_username"
+                                "type" => "PAYLOAD",
+                                "payload" => $vendor->insta_username
                             ]
                         ]
                     ]
@@ -687,70 +687,76 @@ class NvLeadController extends Controller
 
         $tempName = "contact_info_about_vendor_$vendor_count";
         $payload = [
-            "to" => "917754966128",
+            "to" => $recipientPhone,
             "type" => "template",
             "source" => "external",
             "template" => [
-                "name" => "$tempName",
+                "name" => $tempName,
                 "language" => [
                     "code" => "en"
                 ],
                 "components" => [
                     [
-                        "type" => "body",
+                        "type" => "BODY",
                         "parameters" => [
                             [
-                                "type" => "text",
-                                "text" => "$forward->name"
+                                "type" => "TEXT",
+                                "text" => $forward->name
                             ],
                             [
-                                "type" => "text",
-                                "text" => "$auth_user->name"
+                                "type" => "TEXT",
+                                "text" => $auth_user->name
                             ],
                             [
-                                "type" => "text",
-                                "text" => "$time",
+                                "type" => "TEXT",
+                                "text" => $time
                             ]
                         ]
                     ],
                     [
-                        "type" => "carousel",
+                        "type" => "CAROUSEL",
                         "cards" => $carouselCards
                     ]
                 ]
             ]
         ];
 
-        Log::info('hello');
-        Log::info($payload);
+        Log::info('Payload Sent: ' . json_encode($payload));
 
+        // Skip sending if disabled
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
             return false;
         }
+
         $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
         $token = env("TATA_AUTH_KEY");
         $authToken = "Bearer $token";
+
         $response = Http::withHeaders([
             'Authorization' => $authToken,
             'Content-Type' => 'application/json',
         ])->post($url, $payload);
-        Log::info($response);
+
+        Log::info('Response: ' . $response->body());
 
         $currentTimestamp = Carbon::now();
         $msg = "*Hi {{1}}!* I am {{2}}, as we discussed during our call, I have lined up some perfect vendors for your upcoming event. But here’s the exciting part- these premium deals are in high demand, and slots are very limited.⌛So grab the deal as soon as possible before you miss out! The selected vendors will be reaching out to you on 🕐 *{{3}}*, or feel free to contact 📞 them directly at your convenience to get things started. _Team Wedding Banquets_";
         $bodyMsg = Str::replace('{{1}}', $forward->name, $msg);
         $bodyMsg = Str::replace('{{2}}', $auth_user->name, $bodyMsg);
         $bodyMsg = Str::replace('{{3}}', $time, $bodyMsg);
+
         $newWaMsg = new whatsappMessages();
-        $newWaMsg->msg_id = "$recipientPhone";
-        $newWaMsg->msg_from = "$recipientPhone";
+        $newWaMsg->msg_id = $recipientPhone;
+        $newWaMsg->msg_from = $recipientPhone;
         $newWaMsg->time = $currentTimestamp;
         $newWaMsg->type = 'text';
         $newWaMsg->is_sent = "1";
-        $newWaMsg->body = "$bodyMsg";
+        $newWaMsg->body = $bodyMsg;
         $newWaMsg->save();
+
         return $response;
     }
+
 
 
     public function get_vendor_by_category($category_id)
