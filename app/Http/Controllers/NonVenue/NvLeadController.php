@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -718,6 +719,9 @@ class NvLeadController extends Controller
                 ]
             ]
         ];
+
+        Log::info('hello');
+        Log::info($payload);
 
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
             return false;
