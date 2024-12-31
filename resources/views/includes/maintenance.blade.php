@@ -17,7 +17,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); */
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
             overflow: hidden;
         }
