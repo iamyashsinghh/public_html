@@ -373,6 +373,8 @@ class NvLeadController extends Controller
         if (!$lead) {
             abort(404);
         }
+        return view('includes.maintenance');
+
         return view('nonvenue.lead.view', compact('lead', 'service_categories'));
     }
 
