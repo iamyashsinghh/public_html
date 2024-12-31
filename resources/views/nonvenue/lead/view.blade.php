@@ -91,6 +91,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                                             <th class="text-nowrap">Created At</th>
                                             <th class="">RM Name</th>
                                             <th class="text-nowrap">Title</th>
+                                            <th class="text-nowrap">Appointment Schedule Datetime</th>
                                             <th class="">Message</th>
                                             <th class="">Tentative Budget</th>
                                             <th class="">Service Category</th>
@@ -106,6 +107,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                                             <td>{{ date('d-M-Y h:i a', strtotime($list->created_at)) }}</td>
                                             <td>{{ $list->get_created_by->name ?? '' }}</td>
                                             <td>{{ $list->title }}</td>
+                                            <td>{{ $list->schedule_datetime ?: 'N/A' }}</td>
                                             <td>
                                                 <button class="btn"
                                                     onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)">
@@ -126,7 +128,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                                             </td>
                                             <td>
                                                 <button class="btn btn-sm btn-primary"
-                                                    onclick="handleEditNvrmMessage( '{{ $list->id }}', '{{ $list->title }}', '{{ $list->message }}' , '{{ $list->budget }}')">
+                                                    onclick="handleEditNvrmMessage( '{{ $list->id }}', '{{ $list->title }}', '{{ $list->message }}' , '{{ $list->budget }}',  '{{ $list->schedule_datetime }}')">
                                                     <i class="fa fa-edit"></i> Edit
                                                 </button>
                                                 @php
@@ -741,6 +743,11 @@ $auth_user = Auth::guard('nonvenue')->user();
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="schedule_datetime_imp">Appointment Schedule Datetime</label>
+                            <textarea type="text" class="form-control" id="schedule_datetime_imp" placeholder="Ex: 29 Dec at 5:30 pm"
+                                name="schedule_datetime"></textarea>
+                        </div>
+                        <div class="form-group">
                             <label for="msg_desc_inp">Message</label>
                             <textarea type="text" class="form-control" id="msg_desc_inp" placeholder="Type message"
                                 name="message"></textarea>
@@ -777,6 +784,11 @@ $auth_user = Auth::guard('nonvenue')->user();
                             <label for="msg_title_inp">Title <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="msg_title_inp" placeholder="Enter title"
                                 name="title" required readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="schedule_datetime_imp">Appointment Schedule Datetime</label>
+                            <textarea type="text" class="form-control" id="schedule_datetime_imp" placeholder="Ex: 29 Dec at 5:30 pm"
+                                name="schedule_datetime"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="msg_desc_inp">Message</label>
@@ -1311,7 +1323,7 @@ $auth_user = Auth::guard('nonvenue')->user();
             }
         }
 
-        function handleEditNvrmMessage(rm_msg_id, title, message, budget) {
+        function handleEditNvrmMessage(rm_msg_id, title, message, budget, schedule_datetime) {
             const updateNvrmMessageModal = new bootstrap.Modal('#updateNvrmMessageModal');
 
             const form = document.querySelector('#updateNvrmMessageModal form');
@@ -1321,6 +1333,7 @@ $auth_user = Auth::guard('nonvenue')->user();
             form.querySelector('input[name="title"]').value = title;
             form.querySelector('textarea[name="message"]').value = message;
             form.querySelector('input[name="budget"]').value = budget;
+            form.querySelector('input[name="schedule_datetime"]').value = schedule_datetime;
 
             updateNvrmMessageModal.show();
         }

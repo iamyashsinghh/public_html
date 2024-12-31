@@ -15,12 +15,15 @@ use App\Models\Vendor;
 use App\Models\nvNote;
 use App\Models\WhatsappCampain;
 use App\Models\VendorCategory;
+use App\Models\whatsappMessages;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class NvLeadController extends Controller
 {
@@ -220,7 +223,6 @@ class NvLeadController extends Controller
                                 ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
                                 ->whereRaw('LOWER(nvrm_messages.title) = ?', ['fresh requirement'])
                                 ->groupBy('nv_lead_forward_infos.lead_id');
-
                         } elseif ($filter == 'not_fresh_requirement') {
                             $leads->join('nv_lead_forward_infos', 'nvrm_lead_forwards.lead_id', '=', 'nv_lead_forward_infos.lead_id')
                                 ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
@@ -467,114 +469,6 @@ class NvLeadController extends Controller
         return redirect()->back();
     }
 
-    // public function lead_forward(Request $request)
-    // {
-    //     $validate = Validator::make($request->all(), [
-    //         'forward_id' => 'required|int|exists:nvrm_lead_forwards,id',
-    //         'forward_vendors_id' => 'required',
-    //         'tier' => 'nullable|string',
-    //     ]);
-
-    //     if ($validate->fails()) {
-    //         session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
-    //         return redirect()->back();
-    //     }
-    //     $auth_user = Auth::guard('nonvenue')->user();
-    //     $forward = nvrmLeadForward::where(['id' => $request->forward_id])->first();
-    //     if (!$forward) {
-    //         session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
-    //         return redirect()->back();
-    //     }
-    //     foreach ($request->forward_vendors_id as $vendor_id) {
-    //         $exist_lead_forward = nvLeadForward::where(['lead_id' => $forward->lead_id, 'forward_to' => $vendor_id])->first();
-    //         if ($exist_lead_forward) {
-    //             $lead_forward = $exist_lead_forward;
-    //         } else {
-    //             $lead_forward = new nvLeadForward();
-    //             $lead_forward->lead_id = $forward->lead_id;
-    //             $lead_forward->forward_to = $vendor_id;
-    //         }
-    //         $lead_forward->lead_datetime = $this->current_timestamp;
-    //         $lead_forward->name = $forward->name;
-    //         $lead_forward->email = $forward->email;
-    //         $lead_forward->mobile = $forward->mobile;
-    //         $lead_forward->alternate_mobile = $forward->alternate_mobile;
-    //         $lead_forward->lead_status = "Active";
-    //         $lead_forward->read_status = false;
-    //         $lead_forward->done_title = null;
-    //         $lead_forward->done_message = null;
-    //         $lead_forward->event_datetime = $forward->event_datetime;
-    //         $lead_forward->save();
-
-    //         $lead_forward_info = nvLeadForwardInfo::where(['lead_id' => $forward->lead_id, 'forward_to' => $vendor_id])->first();
-    //         if (!$lead_forward_info) {
-    //             $lead_forward_info = new nvLeadForwardInfo();
-    //             $lead_forward_info->lead_id = $forward->lead_id;
-    //             $lead_forward_info->forward_from = $auth_user->id;
-    //             $lead_forward_info->forward_to = $vendor_id;
-    //         } else {
-    //             $lead_forward_info->forward_from = $auth_user->id;
-    //         }
-    //         $lead_forward_info->updated_at = $this->current_timestamp;
-    //         $lead_forward_info->save();
-
-    //         $vendor = Vendor::find($vendor_id);
-
-    //         if (count($request->forward_vendors_id) == 1) {
-    //             if ($vendor) {
-    //                 Vendor::where(['is_lead_forwaded' => 1, 'status' => 1, 'category_id' => $request->nvrm_msg_id])->update(['last_lead_forwaded_value' => '']);
-    //                 $vendor->is_lead_forwaded = 1;
-    //                 $vendor->last_lead_forwaded_value = "--- Last Forward At ==> $this->current_timestamp By $auth_user->name";
-    //                 $vendor->save();
-    //                 $vendorsNotHavingForwardedLeadsCount = Vendor::where(['is_lead_forwaded' => 0, 'status' => 1, 'category_id' => $request->nvrm_msg_id])->count();
-    //                 if ($vendorsNotHavingForwardedLeadsCount == 0) {
-    //                     Vendor::where(['status' => 1, 'category_id' => $request->nvrm_msg_id])->update(['is_lead_forwaded' => 0]);
-    //                 }
-    //             }
-    //         }
-
-    //         $message = substr($forward->mobile, 0, -2) . "XX";
-    //         $lead_id = $forward->lead_id;
-
-    //         if($request->nvrm_msg_id == 4){
-    //             $event = nvEvent::where(['lead_id' => $forward->lead_id])->orderBy('id', 'desc')->first();
-    //             $eventdate = $forward->event_datetime ? date('d-M-Y', strtotime($forward->event_datetime)) : 'N/A';
-    //             $pax = $event ? $event->pax : 'N/A';
-    //             // $this->notify_wbvendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
-    //             if($vendor->alt_mobile_number){
-    //                 // $this->notify_wbvendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $eventdate, $pax, $lead_id);
-    //             }
-    //         }else{
-    //             if($vendor->alt_mobile_number){
-    //                 // $this->notify_vendor_lead_using_interakt($vendor->alt_mobile_number, $vendor->business_name, $message, $lead_id);
-    //             }
-    //             // $this->notify_vendor_lead_using_interakt($vendor->mobile, $vendor->business_name, $message, $lead_id);
-    //         }
-
-    //         if ($vendor->email != null) {
-    //             $event = nvEvent::where(['lead_id' => $forward->lead_id])->orderBy('id', 'desc')->first();
-    //             $data = [
-    //                 'lead_name' => $forward->name ?: 'N/A',
-    //                 'event_name' => $event ? $event->event_name : 'N/A',
-    //                 'event_date' => $forward->event_datetime ? date('d-M-Y', strtotime($forward->event_datetime)) : 'N/A',
-    //                 'event_slot' => $event ? $event->event_slot : 'N/A',
-    //                 'lead_email' => $forward->email ?: 'N/A',
-    //                 'lead_mobile' => $forward->mobile ?: 'N/A',
-    //             ];
-
-    //             if (env('MAIL_STATUS') === true) {
-    //                 // Mail::mailer('smtp2')->to($vendor->email)->send(new NotifyVendorLead($data));
-    //             }
-    //         }
-    //     }
-    //     $forward->read_status = true;
-    //     $forward->last_forwarded_by = $auth_user->name;
-    //     $forward->save();
-
-    //     session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead forwarded successfully.']);
-    //     return redirect()->back();
-    // }
-
 
     public function lead_forward(Request $request)
     {
@@ -582,6 +476,7 @@ class NvLeadController extends Controller
             'forward_id' => 'required|int|exists:nvrm_lead_forwards,id',
             'forward_vendors_id' => 'nullable|array',
             'tier' => 'nullable|string',
+            'schedule_datetime' => 'nullable|string',
         ]);
 
         if ($validate->fails()) {
@@ -597,6 +492,8 @@ class NvLeadController extends Controller
             return redirect()->back();
         }
 
+        $forwardedVendors = [];
+
         if ($request->tier) {
             $vendors = Vendor::where(['subscription_type' => $request->tier, 'status' => 1, 'is_lead_forwaded' => 0, 'category_id' => $request->nvrm_msg_id, 'is_active' => 1])
                 ->orderBy('id')
@@ -608,6 +505,7 @@ class NvLeadController extends Controller
                     $this->forwardLeadToVendor($forward, $vendor, $auth_user);
                     $vendor->is_lead_forwaded = 1;
                     $vendor->save();
+                    $forwardedVendors[] = $vendor;
                 }
 
                 Vendor::where(['status' => 1, 'subscription_type' => $request->tier, 'category_id' => $request->nvrm_msg_id, 'is_active' => 1])
@@ -622,12 +520,14 @@ class NvLeadController extends Controller
                     $this->forwardLeadToVendor($forward, $vendor, $auth_user);
                     $vendor->is_lead_forwaded = 1;
                     $vendor->save();
+                    $forwardedVendors[] = $vendor;
                 }
             } else {
                 foreach ($vendors as $vendor) {
                     $this->forwardLeadToVendor($forward, $vendor, $auth_user);
                     $vendor->is_lead_forwaded = 1;
                     $vendor->save();
+                    $forwardedVendors[] = $vendor;
                 }
             }
         } elseif ($request->forward_vendors_id) {
@@ -638,9 +538,10 @@ class NvLeadController extends Controller
                 }
             }
         }
-
         $forward->last_forwarded_by = $auth_user->name;
         $forward->save();
+
+        // $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead forwarded successfully.']);
         return redirect()->back();
@@ -725,6 +626,123 @@ class NvLeadController extends Controller
                 Mail::mailer('smtp2')->to($vendor->email)->send(new NotifyVendorLead($data));
             }
         }
+    }
+
+    private function sendWhatsAppMessageToConsumer($vendorsid, $forward, $time)
+    {
+        $auth_user = Auth::guard('nonvenue')->user();
+        $vendors = Vendor::whereIn('id', $vendorsid)->get();
+        $recipientPhone = $forward->mobile;
+        $carouselCards = [];
+        $vendor_count = $vendors->count();
+        foreach ($vendors as $index => $vendor) {
+            if ($index > 3) break;
+            $carouselCards[] = [
+                "card_index" => $index,
+                "components" => [
+                    [
+                        "type" => "HEADER",
+                        "parameters" => [
+                            [
+                                "type" => "IMAGE",
+                                "image" => [
+                                    "link" => $vendor->profile_image
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        "type" => "BODY",
+                        "parameters" => [
+                            [
+                                "type" => "TEXT",
+                                "text" => $vendor->business_name
+                            ],
+                            [
+                                "type" => "TEXT",
+                                "text" => $vendor->name
+                            ],
+                            [
+                                "type" => "TEXT",
+                                "text" => $vendor->mobile
+                            ]
+                        ]
+                    ],
+                    [
+                        "type" => "BUTTON",
+                        "sub_type" => "URL",
+                        "index" => "0",
+                        "parameters" => [
+                            [
+                                "type" => "PAYLOAD",
+                                "payload" => $vendor->insta_username
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+        }
+
+        $payload = [
+            "to" => "91$recipientPhone",
+            "type" => "template",
+            "source" => "external",
+            "template" => [
+                "name" => "contact_info_about_vendor_$vendor_count",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "BODY",
+                        "parameters" => [
+                            [
+                                "type" => "TEXT",
+                                "text" => $forward->name
+                            ],
+                            [
+                                "type" => "TEXT",
+                                "text" => $auth_user->name
+                            ],
+                            [
+                                "type" => "TEXT",
+                                "text" => $time,
+                            ]
+                        ]
+                    ],
+                    [
+                        "type" => "CAROUSEL",
+                        "cards" => $carouselCards
+                    ]
+                ]
+            ]
+        ];
+
+        if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
+            return false;
+        }
+        $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
+        $token = env("TATA_AUTH_KEY");
+        $authToken = "Bearer $token";
+        $response = Http::withHeaders([
+            'Authorization' => $authToken,
+            'Content-Type' => 'application/json',
+        ])->post($url, $payload);
+
+        $currentTimestamp = Carbon::now();
+        $msg = "*Hi {{1}}!* I am {{2}}, as we discussed during our call, I have lined up some perfect vendors for your upcoming event. But here’s the exciting part- these premium deals are in high demand, and slots are very limited.⌛So grab the deal as soon as possible before you miss out! The selected vendors will be reaching out to you on 🕐 *{{3}}*, or feel free to contact 📞 them directly at your convenience to get things started. _Team Wedding Banquets_";
+        $bodyMsg = Str::replace('{{1}}', $forward->name, $msg);
+        $bodyMsg = Str::replace('{{2}}', $auth_user->name, $bodyMsg);
+        $bodyMsg = Str::replace('{{3}}', $time, $bodyMsg);
+        $newWaMsg = new whatsappMessages();
+        $newWaMsg->msg_id = "$recipientPhone";
+        $newWaMsg->msg_from = "$recipientPhone";
+        $newWaMsg->time = $currentTimestamp;
+        $newWaMsg->type = 'text';
+        $newWaMsg->is_sent = "1";
+        $newWaMsg->body = "$bodyMsg";
+        $newWaMsg->save();
+        return $response;
     }
 
 

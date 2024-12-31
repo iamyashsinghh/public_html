@@ -16,6 +16,7 @@ class NvrmMessageController extends Controller {
             'service_category' => 'required|int|exists:vendor_categories,id',
             'lead_id' => 'required|int|exists:nv_leads,id',
             'title' => "required|string|max:255",
+            'schedule_datetime' => "required|string|max:255",
             'budget' => $is_budget_valid,
             'message' => $is_message_valid,
         ]);
@@ -33,6 +34,7 @@ class NvrmMessageController extends Controller {
             $msg->title = $request->title;
             $msg->message = $request->message;
             $msg->budget = $request->budget;
+            $msg->schedule_datetime = $request->schedule_datetime;
             $msg->save();
 
             session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'RM message added.']);
@@ -50,6 +52,7 @@ class NvrmMessageController extends Controller {
             $msg->title = $request->title;
             $msg->message = $request->message;
             $msg->budget = $request->budget;
+            $msg->schedule_datetime = $request->schedule_datetime;
             $msg->save();
             session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'RM message Updated.']);
         } else {
