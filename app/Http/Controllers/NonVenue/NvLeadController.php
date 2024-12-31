@@ -71,7 +71,7 @@ class NvLeadController extends Controller
 
         $auth_user = Auth::guard('nonvenue')->user();
         $whatsapp_campaigns = WhatsappCampain::where('status', 1)->where('assign_to', $auth_user->id)->get();
-        return view('includes.maintenance');
+        // return view('includes.maintenance');
         return view('nonvenue.lead.list', compact('page_heading', 'filter_params', 'whatsapp_campaigns', 'getRm'));
     }
     public function ajax_list(Request $request)
@@ -375,7 +375,6 @@ class NvLeadController extends Controller
             abort(404);
         }
         // return view('includes.maintenance');
-
         return view('nonvenue.lead.view', compact('lead', 'service_categories'));
     }
 
@@ -533,7 +532,7 @@ class NvLeadController extends Controller
                     $forwardedVendors[] = $vendor;
                 }
             }
-        $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
+        // $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
         } elseif ($request->forward_vendors_id) {
             foreach ($request->forward_vendors_id as $vendor_id) {
                 $vendor = Vendor::find($vendor_id);
