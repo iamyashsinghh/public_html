@@ -657,21 +657,21 @@ class NvLeadController extends Controller
                         "type" => "BODY",
                         "parameters" => [
                             [
-                                "type" => "TEXT",
+                                "type" => "text",
                                 "text" => "$vendor->business_name"
                             ],
                             [
-                                "type" => "TEXT",
+                                "type" => "text",
                                 "text" => "$vendor->name"
                             ],
                             [
-                                "type" => "TEXT",
+                                "type" => "text",
                                 "text" => "$vendor->mobile"
                             ]
                         ]
                     ],
                     [
-                        "type" => "BUTTON",
+                        "type" => "button",
                         "sub_type" => "URL",
                         "index" => "0",
                         "parameters" => [
@@ -685,12 +685,13 @@ class NvLeadController extends Controller
             ];
         }
 
+        $tempName = "contact_info_about_vendor_$vendor_count";
         $payload = [
             "to" => "917754966128",
             "type" => "template",
             "source" => "external",
             "template" => [
-                "name" => "contact_info_about_vendor_$vendor_count",
+                "name" => "$tempName",
                 "language" => [
                     "code" => "en"
                 ],
