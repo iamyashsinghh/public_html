@@ -119,10 +119,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                                             </td>
                                             <td>{{ $list->get_service_category->name }}</td>
                                             <td class="text-center text-nowrap">
-                                                <button
-                                                    onclick="handle_lead_forward({{ $list->get_service_category->id }}, `{{ $list->get_service_category->name }}`)"
-                                                    class="btn p-0 mx-2" title="Forward"
-                                                    style="color: var(--wb-dark-red);">
+                                                <button onclick="handle_lead_forward({{ $list->get_service_category->id }}, `{{ $list->get_service_category->name }}`, `{{ $list->schedule_datetime }}`)" class="btn p-0 mx-2" title="Forward" style="color: var(--wb-dark-red);">
                                                     <i class="fa fa-paper-plane"></i>
                                                 </button>
                                             </td>
@@ -894,6 +891,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                     @csrf
                     <input type="hidden" name="forward_id" value="{{ $lead->id }}">
                     <input type="hidden" name="nvrm_msg_id" id="nvrm_msg_id" value="">
+                    <input type="hidden" name="schedule_datetime" id="schedule_datetime" value="">
                     <input type="hidden" name="tier" id="tier" value="">
                     <div class="modal-body text-sm">
 
@@ -1060,13 +1058,14 @@ $auth_user = Auth::guard('nonvenue')->user();
         }
 
 
-        function handle_lead_forward(vendor_category_id, category_name) {
+        function handle_lead_forward(vendor_category_id, category_name, schedule_datetime) {
             if (vendor_category_id === 4) {
                 const url = `{{ route('nonvenue.getVendorsByCategory') }}/${vendor_category_id}`;
                 const forwardLeadModal = document.getElementById('forwardLeadModal');
                 const modalHeading = forwardLeadModal.querySelector('.modal-title');
                 const modalBody = forwardLeadModal.querySelector('.modal-body');
                 const nvrm_msg_id = document.getElementById('nvrm_msg_id');
+                const schedule_datetime = document.getElementById('schedule_datetime');
                 const closeBtnWithToogleBtn = forwardLeadModal.querySelector('.close-btn-with-toogle-btn');
                 closeBtnWithToogleBtn.innerHTML = `<button type="button" class="btn text-secondary" data-bs-dismiss="modal"
                                 aria-label="Close"><i class="fa fa-times"></i></button>`;
@@ -1074,6 +1073,7 @@ $auth_user = Auth::guard('nonvenue')->user();
                     `Forward Lead to <span style="color: var(--wb-renosand);">${category_name} Vendors</span>`;
                 modalBody.innerHTML = "";
                 nvrm_msg_id.value = vendor_category_id;
+                schedule_datetime.value = schedule_datetime;
                 fetch(url).then(response => response.json()).then(data => {
                     if (data.success === true) {
                         const vendors = data.vendors;
