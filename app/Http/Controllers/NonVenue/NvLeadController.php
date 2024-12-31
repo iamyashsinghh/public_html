@@ -532,7 +532,7 @@ class NvLeadController extends Controller
                     $forwardedVendors[] = $vendor;
                 }
             }
-        // $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
+        $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
         } elseif ($request->forward_vendors_id) {
             foreach ($request->forward_vendors_id as $vendor_id) {
                 $vendor = Vendor::find($vendor_id);
@@ -685,7 +685,7 @@ class NvLeadController extends Controller
         }
 
         $payload = [
-            "to" => "91$recipientPhone",
+            "to" => "917754966128",
             "type" => "template",
             "source" => "external",
             "template" => [
