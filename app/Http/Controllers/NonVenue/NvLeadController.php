@@ -532,7 +532,7 @@ class NvLeadController extends Controller
                     $forwardedVendors[] = $vendor;
                 }
             }
-        // $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
+        $this->sendWhatsAppMessageToConsumer($forwardedVendors, $forward, $request->schedule_datetime);
         } elseif ($request->forward_vendors_id) {
             foreach ($request->forward_vendors_id as $vendor_id) {
                 $vendor = Vendor::find($vendor_id);
@@ -629,15 +629,16 @@ class NvLeadController extends Controller
         }
     }
 
-    private function sendWhatsAppMessageToConsumer($vendorsid, $forward, $time)
+    private function sendWhatsAppMessageToConsumer($vendors, $forward, $time)
     {
+        // Log::info($vendors);
         $auth_user = Auth::guard('nonvenue')->user();
-        $vendors = Vendor::whereIn('id', $vendorsid)->get();
         $recipientPhone = $forward->mobile;
         $carouselCards = [];
-        $vendor_count = $vendors->count();
+        $vendor_count = 0;
         foreach ($vendors as $index => $vendor) {
             if ($index > 3) break;
+            $vendor_count++;
             $carouselCards[] = [
                 "card_index" => $index,
                 "components" => [
