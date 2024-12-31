@@ -640,15 +640,15 @@ class NvLeadController extends Controller
             if ($index > 3) break;
             $vendor_count++;
             $carouselCards[] = [
-                "card_index" => $index,
+                "card_index" => "$index",
                 "components" => [
                     [
-                        "type" => "HEADER",
+                        "type" => "header",
                         "parameters" => [
                             [
-                                "type" => "IMAGE",
+                                "type" => "image",
                                 "image" => [
-                                    "link" => $vendor->profile_image
+                                    "link" => "$vendor->profile_image"
                                 ]
                             ]
                         ]
@@ -658,15 +658,15 @@ class NvLeadController extends Controller
                         "parameters" => [
                             [
                                 "type" => "TEXT",
-                                "text" => $vendor->business_name
+                                "text" => "$vendor->business_name"
                             ],
                             [
                                 "type" => "TEXT",
-                                "text" => $vendor->name
+                                "text" => "$vendor->name"
                             ],
                             [
                                 "type" => "TEXT",
-                                "text" => $vendor->mobile
+                                "text" => "$vendor->mobile"
                             ]
                         ]
                     ],
@@ -677,7 +677,7 @@ class NvLeadController extends Controller
                         "parameters" => [
                             [
                                 "type" => "text",
-                                "text" => $vendor->insta_username
+                                "text" => "$vendor->insta_username"
                             ]
                         ]
                     ]
@@ -696,24 +696,24 @@ class NvLeadController extends Controller
                 ],
                 "components" => [
                     [
-                        "type" => "BODY",
+                        "type" => "body",
                         "parameters" => [
                             [
-                                "type" => "TEXT",
-                                "text" => $forward->name
+                                "type" => "text",
+                                "text" => "$forward->name"
                             ],
                             [
-                                "type" => "TEXT",
-                                "text" => $auth_user->name
+                                "type" => "text",
+                                "text" => "$auth_user->name"
                             ],
                             [
-                                "type" => "TEXT",
-                                "text" => $time,
+                                "type" => "text",
+                                "text" => "$time",
                             ]
                         ]
                     ],
                     [
-                        "type" => "CAROUSEL",
+                        "type" => "carousel",
                         "cards" => $carouselCards
                     ]
                 ]
