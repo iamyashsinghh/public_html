@@ -677,7 +677,7 @@ class NvLeadController extends Controller
                         "parameters" => [
                             [
                                 "type" => "payload",
-                                "text" => "$vendor->insta_username"
+                                "payload" => "$vendor->insta_username"
                             ]
                         ]
                     ]
