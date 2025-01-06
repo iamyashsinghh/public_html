@@ -646,9 +646,9 @@ class NvLeadController extends Controller
                         "type" => "HEADER",
                         "parameters" => [
                             [
-                                "type" => "IMAGE",
+                                "type" => "Image",
                                 "image" => [
-                                    "link" => "$vendor->profile_image" // Ensure this is publicly accessible
+                                    "link" => "$vendor->profile_image"
                                 ]
                             ]
                         ]
@@ -671,7 +671,7 @@ class NvLeadController extends Controller
                         ]
                     ],
                     [
-                        "type" => "BUTTON",
+                        "type" => "button",
                         "sub_type" => "URL",
                         "index" => "0",
                         "parameters" => [
@@ -685,11 +685,10 @@ class NvLeadController extends Controller
             ];
         }
 
-        $tempName = "contact_info_about_vendor_$vendor_count";
+        $tempName = "vendor_info_to_consumer_$vendor_count";
         $payload = [
             "to" => "917754966128",
             "type" => "template",
-            "source" => "external",
             "template" => [
                 "name" => "$tempName",
                 "language" => [
@@ -714,7 +713,7 @@ class NvLeadController extends Controller
                         ]
                     ],
                     [
-                        "type" => "CAROUSEL",
+                        "type" => "carousel",
                         "cards" => $carouselCards
                     ]
                 ]
