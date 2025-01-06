@@ -640,7 +640,7 @@ class NvLeadController extends Controller
             if ($index > 3) break; // Limit to 4 cards
             $vendor_count++;
             $carouselCards[] = [
-                "card_index" => "$index",
+                "card_index" => $index,
                 "components" => [
                     [
                         "type" => "HEADER",
@@ -685,7 +685,7 @@ class NvLeadController extends Controller
             ];
         }
 
-        $tempName = "vendor_info_to_consumer_$vendor_count";
+        $tempName = "vendor_info_to_customer_new_$vendor_count";
         $payload = [
             "to" => "917754966128",
             "type" => "template",
