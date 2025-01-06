@@ -637,7 +637,7 @@ class NvLeadController extends Controller
         $vendor_count = 0;
 
         foreach ($vendors as $index => $vendor) {
-            if ($index > 3) break; // Limit to 4 cards
+            if ($index > 3) break;
             $vendor_count++;
             $carouselCards[] = [
                 "card_index" => $index,
@@ -716,9 +716,7 @@ class NvLeadController extends Controller
             ]
         ];
 
-        Log::info('Payload Sent: ' . json_encode($payload));
 
-        // Skip sending if disabled
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
             return false;
         }
@@ -747,7 +745,7 @@ class NvLeadController extends Controller
         $newWaMsg->type = 'text';
         $newWaMsg->is_sent = "1";
         $newWaMsg->body = $bodyMsg;
-        // $newWaMsg->save();
+        $newWaMsg->save();
 
         return $response;
     }
