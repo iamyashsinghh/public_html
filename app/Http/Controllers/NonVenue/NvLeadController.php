@@ -662,10 +662,6 @@ class NvLeadController extends Controller
                             ],
                             [
                                 "type" => "TEXT",
-                                "text" => "$vendor->name"
-                            ],
-                            [
-                                "type" => "TEXT",
                                 "text" => "$vendor->mobile"
                             ]
                         ]
