@@ -635,6 +635,7 @@ class NvLeadController extends Controller
         $recipientPhone = $forward->mobile;
         $carouselCards = [];
         $vendor_count = 0;
+        $vendor_count--;
 
         foreach ($vendors as $index => $vendor) {
             if ($index > 3) break;
@@ -681,7 +682,7 @@ class NvLeadController extends Controller
             ];
         }
 
-        $tempName = "vendor_info_to_customer_new_$vendor_count";
+        $tempName = "vendor_info_to_customer_set_$vendor_count";
         $payload = [
             "to" => "917754966128",
             "type" => "template",
