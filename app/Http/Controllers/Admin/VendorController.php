@@ -44,6 +44,7 @@ class VendorController extends Controller
                 'vendors.is_whatsapp_msg',
                 'vendors.created_at',
                 'vendors.group_name',
+                'vendors.vendor_location',
                 DB::raw('
                 (SELECT COUNT(*)
                  FROM nv_lead_forwards
@@ -73,6 +74,7 @@ class VendorController extends Controller
                 'vendors.is_whatsapp_msg',
                 'vendors.created_at',
                 'vendors.group_name',
+                'vendors.vendor_location',
                 DB::raw('
                 (SELECT COUNT(*)
                  FROM nv_lead_forwards

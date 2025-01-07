@@ -36,10 +36,11 @@
                                 <th class="text-nowrap">Subscription Type</th>
                                 <th class="text-nowrap">Profile Image</th>
                                 <th class="text-nowrap">&nbsp;&nbsp;ID&nbsp;&nbsp;</th>
+                                <th class="text-nowrap">Business Name</th>
                                 <th class="">Name</th>
                                 <th class="text-nowrap">Mobile</th>
                                 <th class="text-nowrap">Email</th>
-                                <th class="text-nowrap">Business Name</th>
+                                <th class="text-nowrap">Location</th>
                                 <th class="text-nowrap">Total Leads</th>
                                 <th class="text-nowrap">Category</th>
                                 <th class="text-nowrap">Status</th>
@@ -346,6 +347,11 @@
                         data: "profile_image",
                     },
                     {
+                        targets: 6,
+                        name: "business_name",
+                        data: "business_name",
+                    },
+                    {
                         targets: 3,
                         name: "name",
                         data: "name",
@@ -361,9 +367,9 @@
                         data: "email",
                     },
                     {
-                        targets: 6,
-                        name: "business_name",
-                        data: "business_name",
+                        targets: 5,
+                        name: "vendor_location",
+                        data: "vendor_location",
                     },
                     {
                         targets: 7,
@@ -401,7 +407,7 @@
 
                 ],
                 order: [
-                    [9, 'desc']
+                    [10, 'desc']
                 ],
                 rowCallback: function(row, data, index) {
                     row.setAttribute('id', data.id);
@@ -418,25 +424,25 @@
                 </a>`;
                 td_elements[2].innerHTML = `${data.id}-${data.group_name}`;
 
-
                     if (data.is_whatsapp_msg === 1) {
-                        td_elements[4].innerHTML =
+                        td_elements[5].innerHTML =
                             `<div class="d-flex"><div>${data.mobile} </div> &nbsp;&nbsp;&nbsp;<i class="fa-brands fa-square-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" id="what_id-${data.mobile}" style="font-size: 25px; color: green;"></i></div>`;
                     } else {
-                        td_elements[4].innerHTML =
+                        td_elements[5].innerHTML =
                             `<div class="d-flex"><div>${data.mobile} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data.mobile})" style="font-size: 25px; color: green;"></i></div>`;
                     }
-                    td_elements[5].innerHTML = data.group_name;
-                    td_elements[5].innerHTML = data.email ? data.email : 'N/A';
-                    td_elements[6].innerHTML = data.business_name ? data.business_name : 'N/A';
+                    td_elements[6].innerHTML = data.email ? data.email : 'N/A';
+                    td_elements[7].innerText = data.vendor_location ? data.vendor_location : 'N/A';
+                    td_elements[3].innerHTML = data.business_name ? data.business_name : 'N/A';
                     status_action_elem =
                         `<a href="{{ route('admin.vendor.update.status') }}/${data.id}/${data.status == 1 ? 0 : 1}" style="font-size: 22px;"><i class="fa ${data.status == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'} "></i></a>`;
                     td_elements[8].classList.add('text-nowrap');
-                    td_elements[9].innerHTML = status_action_elem;
+                    td_elements[9].innerHTML = data.category_name ? data.category_name : 'N/A';
+                    td_elements[10].innerHTML = status_action_elem;
                     diable_action_elem = `<a href="{{route('admin.vendor.update.is_active')}}/${data.id}/${data.is_active == 1 ? 0 : 1}" style="font-size: 22px;"><i class="fa ${data.is_active == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger'} "></i></a>`;
 
-td_elements[10].innerHTML = diable_action_elem;
-                    td_elements[11].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
+td_elements[11].innerHTML = diable_action_elem;
+                    td_elements[12].innerHTML = moment(data.created_at).format("DD-MMM-YYYY");
                     const action_btns = `<td class="d-flex justify-content-around">
                     <a href="{{ route('admin.vendor.view') }}/${data.id}" class="text-dark mx-2" title="View"><i class="fa fa-eye" style="font-size: 15px;"></i></a>
                     <a href="javascript:void(0);" class="text-success mx-2" title="Edit"><i class="fa fa-edit" style="font-size: 15px;" onclick="handle_manage_vendor(${data.id})"></i></a>
@@ -451,8 +457,8 @@ td_elements[10].innerHTML = diable_action_elem;
                         </ul>
                     </div>
                 </td>`
-                    td_elements[12].classList.add('text-nowrap');
-                    td_elements[12].innerHTML = action_btns;
+                    td_elements[13].classList.add('text-nowrap');
+                    td_elements[13].innerHTML = action_btns;
                 }
             });
             $('.filter-btn').on('click', function() {
