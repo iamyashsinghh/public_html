@@ -191,10 +191,18 @@
                                 </div>
                                 <div class="col-sm-4 mb-1">
                                     <div class="form-group">
-                                        <label for="insta_username_inp">Instagram Username (Without @). <span
+                                        <label for="vendor_location_inp">Location<span
+                                                class="text-danger"></span></label>
+                                        <input type="text" class="form-control" id="vendor_location_inp"
+                                            placeholder="Enter Insta username." name="vendor_location">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-1">
+                                    <div class="form-group">
+                                        <label for="insta_username_inp" info="first it is for the insta username now for the slug">Vendor slug. <span
                                                 class="text-danger"></span></label>
                                         <input type="text" class="form-control" id="insta_username_inp"
-                                            placeholder="Enter Insta username." name="insta_username">
+                                            placeholder="Enter Vendor slug." name="insta_username">
                                     </div>
                                 </div>
                             </div>
@@ -481,6 +489,7 @@ td_elements[10].innerHTML = diable_action_elem;
                         group_name_select.value = data.vendor.group_name;
                         vendor_altmobile_inp.value = data.vendor.alt_mobile_number;
                         insta_username_inp.value = data.vendor.insta_username;
+                        vendor_location_inp.value = data.vendor.vendor_location;
                         category_select.querySelector(`option[value="${data.vendor.category_id}"]`).selected = true;
 
                         const subscriptionElement = subscription_select.querySelector(`option[value="${data.vendor.subscription_type}"]`);
