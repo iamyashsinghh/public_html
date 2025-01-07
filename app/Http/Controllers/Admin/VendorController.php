@@ -282,8 +282,8 @@ class VendorController extends Controller
                     ->whereBetween('updated_at', [$fromDate, $toDate])
                     ->pluck('lead_id');
 
-                Log::info("Vendor ID: $vendorId, From Date: $fromDate, To Date: $toDate");
-                Log::info($leads_ids);
+                // Log::info("Vendor ID: $vendorId, From Date: $fromDate, To Date: $toDate");
+                // Log::info($leads_ids);
 
                 $leads = nvLeadForward::select(
                     'nv_lead_forwards.lead_id',
@@ -299,7 +299,7 @@ class VendorController extends Controller
                     ->where(['forward_to' => $vendorId])->groupBy('nv_lead_forwards.mobile')
                     ->get();
 
-                Log::info('Leads Data: ', ['leads' => $leads]);
+                // Log::info('Leads Data: ', ['leads' => $leads]);
 
                 $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                 $sheet = $spreadsheet->getActiveSheet();

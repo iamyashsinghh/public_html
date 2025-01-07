@@ -585,7 +585,7 @@ class WhatsappMsgController extends Controller
                 "components" => [],
             ]
         ]);
-        Log::info($response);
+        // Log::info($response);
         if ($response->successful()) {
             // Log::info($response);
             $currentTimestamp = Carbon::now();

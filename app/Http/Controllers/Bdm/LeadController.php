@@ -197,7 +197,7 @@ class LeadController extends Controller
         $lead->business_name = $request->business_name;
         $lead->business_cat = $request->business_cat;
         $lead->save();
-        Log::info($request);
+        // Log::info($request);
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Lead updated successfully.']);
         return redirect()->back();
     }
