@@ -194,7 +194,7 @@
                                         <label for="vendor_location_inp">Location<span
                                                 class="text-danger"></span></label>
                                         <input type="text" class="form-control" id="vendor_location_inp"
-                                            placeholder="Enter Insta username." name="vendor_location">
+                                            placeholder="Enter vendor location." name="vendor_location">
                                     </div>
                                 </div>
                                 <div class="col-sm-4 mb-1">
