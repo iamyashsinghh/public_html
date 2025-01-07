@@ -684,7 +684,7 @@ class NvLeadController extends Controller
 
         $tempName = "vendor_info_to_customer_set_$vendor_count";
         $payload = [
-            "to" => "917754966128",
+            "to" => "91$recipientPhone",
             "type" => "template",
             "template" => [
                 "name" => "$tempName",
