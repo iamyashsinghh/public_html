@@ -1,6 +1,7 @@
 @extends('nonvenue.layouts.app')
 @section('title', 'Dashboard | NVRM')
 @section('main')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
     .card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -27,6 +28,9 @@
                 <div class="col-sm-6">
                     <h1 class="m-0">Dashboard</h1>
                 </div>
+                <div class="col-sm-6 d-flex justify-content-end">
+                    <div class="btn btn-secondary btn-sm" onclick="introJs().start();">Demo</div>
+                </div>
             </div>
         </div>
     </section>
@@ -38,6 +42,7 @@
                 </div>
                 <div class="col-lg-3 col-6">
                     <a target="_blank" href="{{ route('nonvenue.lead.list', 'leads_received_this_month') }}"
+                    data-intro='Total Leads Recived this month means it all the leads from 1 to end of this month. Ex. if you have created it, forwaded from another nvrm, or frowaded from venue!'
                         class="text-light">
                         <div class="small-box text-sm bg-secondary">
                             <div class="inner">
@@ -290,4 +295,7 @@
         </div>
     </section>
 </div>
+@endsection
+@section('footer-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 @endsection

@@ -863,3 +863,11 @@ Route::post('handle_calling_request', function (Request $request) {
         return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Somethin went wrong, please try again later.']);
     }
 });
+
+Route::get('get_random_rm', function () {
+    $teamMember = TeamMember::where(['role_id' => 4, 'status' => 1, 'is_active' => 1])
+        ->inRandomOrder()
+        ->first();
+
+    return response()->json($teamMember);
+});
