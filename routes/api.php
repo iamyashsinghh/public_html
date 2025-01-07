@@ -320,6 +320,40 @@ Route::post('/save_wa', function (Request $request) {
                 }
             }
         }
+
+        if (strtolower(trim($textMsg)) === "i would like to login now") {
+            $user = DB::connection('mysql2')->table('users')->where('is_admin', 1)->where('phone', $number)->first();
+            if ($user) {
+                $login_info = DB::connection('mysql2')->table('login_infos')->where([
+                    'user_id' => $user->id,
+                ])->first();
+                if (!$login_info || $login_info == null) {
+                    $msg = "Error: Invalid Login.";
+                    send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
+                    return true;
+                }
+                $request_otp_at = date('YmdHis', strtotime($login_info->request_otp_at));
+                $ten_minutes_ago = date('YmdHis', strtotime('-10 minutes'));
+                if ($request_otp_at < $ten_minutes_ago) {
+                    if ($login_info !== null) {
+                        $login_info->otp_code = null;
+                        $login_info->save();
+                    }
+                    $msg = "Error: Timeout! Please try again.";
+                    send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
+                    return true;
+                } else {
+                    $msg = "*Hey $user->name*,\nSuccess: Now you will automatically logged in.";
+                    $login_info->login_for_whatsapp_otp = $login_info->otp_code;
+                    $login_info->save();
+                    send_wa_normal_text_msg($number, $msg);
+                    $newWaMsg->save();
+                    return true;
+                }
+            }
+        }
     } elseif ($type == "contacts") {
         $contact_name = $request['messages'][$type][0]['name']['formatted_name'];
         $contact_number = $request['messages'][$type][0]['phones'][0]['phone'];
