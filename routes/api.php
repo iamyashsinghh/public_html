@@ -252,6 +252,8 @@ Route::post('/save_wa', function (Request $request) {
     } elseif ($type == "button") {
         $textMsg = $request['messages'][$type]['text'];
         $newWaMsg->body = $textMsg;
+        Log::info($textMsg);
+        Log::info($request['messages']);
         if (strtolower(trim($textMsg)) === "yes log me in") {
             $user = TeamMember::where('mobile', $number)->first();
             if ($user) {
