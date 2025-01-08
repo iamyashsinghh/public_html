@@ -35,12 +35,14 @@ class DashboardController extends Controller
             ->distinct('lead_id')
             ->count('lead_id');
 
-        $forward_leads_this_month = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
-        $forward_leads_today = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_date%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
+        // $forward_leads_this_month = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_month%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
+        // $forward_leads_today = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')->where('nv_lead_forward_infos.updated_at', 'like', "%$current_date%")->whereNull('nvrm_lead_forwards.deleted_at')->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])->groupBy('nv_lead_forward_infos.lead_id')->get()->count();
 
 
         $categories = VendorCategory::all();
         $forward_leads_by_category = [];
+        $forward_leads_this_month = 0;
+        $forward_leads_today = 0;
         foreach ($categories as $category) {
             $category_name = $category->name;
             $monthly_lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
@@ -77,7 +79,28 @@ class DashboardController extends Controller
                 ->get()
                 ->count();
 
-                $not_fresh_requirement_lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+            $fresh_requirement_lead_count_today = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
+                ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_date) {
+                    $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
+                        ->where('nvrm_messages.vendor_category_id', '=', $category->id)
+                        ->where('nvrm_messages.created_by', '=', $auth_user->id)
+                        ->where('nvrm_messages.created_at', 'like', "$current_date%");
+                })
+                ->where('vendors.category_id', $category->id)
+                ->whereRaw('LOWER(nvrm_messages.title) = ?', ['fresh requirement'])
+                ->where('nv_lead_forward_infos.updated_at', 'like', "$current_date%")
+                ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
+                ->groupBy('nv_lead_forward_infos.lead_id')
+                ->get()
+                ->count();
+
+                if($category->id !== 4){
+                    $forward_leads_this_month = $fresh_requirement_lead_count + $forward_leads_this_month;
+                    $forward_leads_today = $fresh_requirement_lead_count_today + $forward_leads_today;
+                }
+
+            $not_fresh_requirement_lead_count = nvLeadForwardInfo::join('nvrm_lead_forwards', 'nv_lead_forward_infos.lead_id', '=', 'nvrm_lead_forwards.lead_id')
                 ->join('vendors', 'vendors.id', '=', 'nv_lead_forward_infos.forward_to')
                 ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
                     $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
@@ -93,14 +116,13 @@ class DashboardController extends Controller
                 ->get()
                 ->count();
 
-         $forward_leads_by_category[$category_name] = [
+            $forward_leads_by_category[$category_name] = [
                 'month' => $monthly_lead_count,
                 'today' => $daily_lead_count,
                 'fresh_requirement' => $fresh_requirement_lead_count,
                 'not_fresh_requirement' => $not_fresh_requirement_lead_count,
             ];
         }
-
 
         $currentDateTime = Carbon::now();
         $currentDateStart = Carbon::today()->startOfDay();
@@ -227,8 +249,6 @@ class DashboardController extends Controller
             'forward_leads_by_category'
         );
         return view('nonvenue.dashboard', $response_data);
-        // return view('includes.maintenance', $response_data);
-
     }
 
     public function update_profile_image(Request $request)
