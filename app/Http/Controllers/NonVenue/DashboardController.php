@@ -66,12 +66,13 @@ class DashboardController extends Controller
                 ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
                     $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
                         ->where('nvrm_messages.vendor_category_id', '=', $category->id)
-                        ->where('nvrm_messages.created_by', '=', $auth_user->id);
+                        ->where('nvrm_messages.created_by', '=', $auth_user->id)
+                        ->where('nvrm_messages.created_at', 'like', "$current_month%");
                 })
                 ->where('vendors.category_id', $category->id)
+                ->whereRaw('LOWER(nvrm_messages.title) = ?', ['fresh requirement'])
                 ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
                 ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
-                ->whereRaw('LOWER(nvrm_messages.title) = ?', ['fresh requirement'])
                 ->groupBy('nv_lead_forward_infos.lead_id')
                 ->get()
                 ->count();
@@ -81,12 +82,13 @@ class DashboardController extends Controller
                 ->join('nvrm_messages', function ($join) use ($category, $auth_user, $current_month) {
                     $join->on('nvrm_messages.lead_id', '=', 'nvrm_lead_forwards.lead_id')
                         ->where('nvrm_messages.vendor_category_id', '=', $category->id)
-                        ->where('nvrm_messages.created_by', '=', $auth_user->id);
+                        ->where('nvrm_messages.created_by', '=', $auth_user->id)
+                        ->where('nvrm_messages.created_at', 'like', "$current_month%");
                 })
                 ->where('vendors.category_id', $category->id)
+                ->whereRaw('LOWER(nvrm_messages.title) = ?', ['unserved requirement'])
                 ->where('nv_lead_forward_infos.updated_at', 'like', "$current_month%")
                 ->where(['nv_lead_forward_infos.forward_from' => $auth_user->id])
-                ->whereRaw('LOWER(nvrm_messages.title) = ?', ['unserved requirement'])
                 ->groupBy('nv_lead_forward_infos.lead_id')
                 ->get()
                 ->count();
