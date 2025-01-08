@@ -662,6 +662,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
             if($lead->is_called_picked === 2 && $answered_agent != null){
                 $lead->assign_to = $get_rm ? $get_rm->name : null;
                 $lead->assign_id = $get_rm ? $get_rm->id : null;
+                $lead->is_called_picked = 1;
             } else {
                 $rmcheck = TeamMember::where(['role_id' => 4, 'id' => $lead->assign_id, 'is_active' => 1, 'status' => 1])->first();
                 if (!$rmcheck) {
