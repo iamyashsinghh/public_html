@@ -43,7 +43,7 @@ class BookingController extends Controller {
 
     public function ajax_list(Request $request) {
         $auth_user = Auth::guard('team')->user();
-
+        
         $bookings = LeadForward::select(
             'lead_forwards.lead_id',
             'bookings.created_at',
@@ -54,17 +54,24 @@ class BookingController extends Controller {
             'events.pax',
             'bookings.total_gmv',
             'bookings.advance_amount',
-            'bookings.quarter_advance_collected',
-        )->join('bookings', 'bookings.id', 'lead_forwards.booking_id')
-            ->join('vm_events as events', 'events.id', 'bookings.event_id')
-            ->where(['lead_forwards.forward_to' => $auth_user->id, 'bookings.deleted_at' => null]);
+            'bookings.quarter_advance_collected'
+        )
+        ->join('bookings', 'bookings.lead_id', '=', 'lead_forwards.lead_id')
+        ->join('vm_events as events', 'events.id', '=', 'bookings.event_id')
+        ->where([
+            'lead_forwards.forward_to' => $auth_user->id,
+            'bookings.created_by' => $auth_user->id,
+            'bookings.deleted_at' => null
+        ]);
 
         if ($request->booking_source != null) {
             $bookings->whereIn('bookings.booking_source', $request->booking_source);
         }
-         if ($request->quarter_advance_collected != null) {
+
+        if ($request->quarter_advance_collected != null) {
             $bookings->where('bookings.quarter_advance_collected', $request->quarter_advance_collected);
         }
+
         if ($request->booking_from_date != null) {
             $from =  Carbon::make($request->booking_from_date);
             if ($request->booking_to_date != null) {
@@ -162,7 +169,6 @@ class BookingController extends Controller {
 
         $lead_forward->event_datetime = $event_datetime;
         $lead_forward->booking_id = $booking->id;
-        $lead_forward->lead_status = "Booked";
         $lead_forward->read_status = true;
 
         $lead->pax = $request->number_of_guest;

@@ -856,7 +856,12 @@ class LeadController extends Controller
                 $lead->lead_color = "#4bff0033";
             }
             $lead->save();
-        } else {
+        } elseif ($status == "Booked") {
+            $lead->lead_status = "Booked";
+            $lead->read_status = true;
+            $lead->save();
+        }
+        else {
             $validate = Validator::make($request->all(), [
                 'done_title' => 'required|string',
             ]);

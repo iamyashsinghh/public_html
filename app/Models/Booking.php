@@ -10,6 +10,7 @@ use Spatie\Activitylog\LogOptions;
 use App\Traits\HasAuthenticatedUser;
 class Booking extends Model {
     use HasFactory, HasAuthenticatedUser, SoftDeletes,LogsActivity;
+    protected $guarded = [];
     public function getActivitylogOptions(): LogOptions
     {
         $userId = $this->getAuthenticatedUserId();

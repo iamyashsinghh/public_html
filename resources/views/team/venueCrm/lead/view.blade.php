@@ -64,6 +64,39 @@
                             </li>
                         </ul>
                     </div>
+                    @if ($auth_user->role_id == 5)
+                    <div class="dropdown d-inline-block">
+                        <a href="javascript:void(0);"
+                            class="btn dropdown-toggle text-light btn-xs px-2 mx-1
+                                {{ $lead->lead_status == 'Done' ? 'bg-secondary' : ($lead->lead_status == 'Booked' ? 'bg-success' : '') }}"
+                            data-bs-toggle="dropdown" style="background-color: var(--wb-renosand);">
+                            <i class="fa fa-chart-line"></i> Lead:
+                            {{ $lead->lead_status == 'Done' ? 'Done' : ($lead->lead_status == 'Booked' ? 'Booked' : 'Active') }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item {{ $lead->lead_status == 'Active' ? 'disabled' : '' }}"
+                                    onclick="return confirm('Are you sure you want to activate this lead?')"
+                                    href="{{ route('team.lead.status.update', $lead->lead_id) }}/Active">
+                                    Active
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ $lead->lead_status == 'Done' ? 'disabled' : '' }}"
+                                    href="javascript:void(0);"
+                                    onclick="handle_lead_status(this)">Done
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ $lead->lead_status == 'Booked' ? 'disabled' : '' }}"
+                                    onclick="return confirm('Are you sure you want to mark this lead as Booked?')"
+                                    href="{{ route('team.lead.status.update', $lead->lead_id) }}/Booked">
+                                    Booked
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    @else
                     <div class="dropdown d-inline-block">
                         <a href="javascript:void(0);"
                             class="btn dropdown-toggle text-light btn-xs px-2 mx-1 {{ $lead->lead_status == 'Done' ? 'bg-secondary' : '' }}"
@@ -78,6 +111,7 @@
                                     onclick="handle_lead_status(this)">Done</a></li>
                         </ul>
                     </div>
+                    @endif
                     @if ($auth_user->role_id == 4)
                         <button class="btn btn-xs text-light px-2 m-1" style="background-color: rgb(123, 10, 2);"
                             onclick="handle_forward_lead_btn(this)"><i class="fa fa-paper-plane"></i> Forward to VM</button>
@@ -1957,7 +1991,7 @@
                 theme: "classic",
             });
 
-            if ("{{ $lead->lead_status }}" == "Done") {
+            if ("{{ $lead->lead_status }}" == "Done" || "{{ $lead->lead_status }}" == "Booked") {
                 const container = document.getElementById('view_lead_card_container');
                 const btns = container.querySelectorAll('button');
                 for (let item of btns) {

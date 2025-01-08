@@ -233,11 +233,11 @@ class PrecomputeDashboardData extends Command
         $from = Carbon::today()->startOfMonth();
         $to = Carbon::today()->endOfMonth();
         foreach ($vm_members as $vm) {
-            $vm['leads_received_this_month'] = LeadForward::where('lead_datetime', 'like', "%$current_month%")->where('forward_to', $vm->id)->count();
-            $vm['leads_received_today'] = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where('forward_to', $vm->id)->count();
-            $vm['unread_leads_this_month'] = LeadForward::where('lead_datetime', 'like', "%$current_month%")->where(['forward_to' => $vm->id, 'read_status' => false])->count();
-            $vm['unread_leads_today'] = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where(['forward_to' => $vm->id, 'read_status' => false])->count();
-            $vm['unread_leads_overdue'] = LeadForward::where('read_status', false)->where('lead_datetime', '<', Carbon::today())->where('forward_to', $vm->id)->count();
+            $vm['leads_received_this_month'] = LeadForward::where('lead_datetime', 'like', "%$current_month%")->where('forward_to', $vm->id)->where('source', 'WB|Team')->count();
+            $vm['leads_received_today'] = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where('forward_to', $vm->id)->where('source', 'WB|Team')->count();
+            $vm['unread_leads_this_month'] = LeadForward::where('lead_datetime', 'like', "%$current_month%")->where(['forward_to' => $vm->id, 'read_status' => false])->where('source', 'WB|Team')->count();
+            $vm['unread_leads_today'] = LeadForward::where('lead_datetime', 'like', "%$current_date%")->where(['forward_to' => $vm->id, 'read_status' => false])->where('source', 'WB|Team')->count();
+            $vm['unread_leads_overdue'] = LeadForward::where('read_status', false)->where('lead_datetime', '<', Carbon::today())->where('forward_to', $vm->id)->where('source', 'WB|Team')->count();
 
             $vm['task_schedule_this_month'] = Task::selectRaw('count(distinct(lead_id)) as count')
                 ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
@@ -262,7 +262,15 @@ class PrecomputeDashboardData extends Command
 
             $vm['get_manager'] = $vm->get_manager;
 
-            $vm['bookings_this_month'] = LeadForward::join('bookings', 'bookings.id', 'lead_forwards.booking_id')->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'bookings.deleted_at' => null])->whereBetween('bookings.created_at', [$from, $to])->count();
+            $vm['bookings_this_month'] = LeadForward::join('bookings', 'bookings.lead_id', '=', 'lead_forwards.lead_id')
+            ->where([
+                'lead_forwards.forward_to' => $vm->id,
+                'bookings.created_by' => $vm->id,
+                'lead_forwards.source' => 'WB|Team',
+                'bookings.deleted_at' => null
+            ])
+            ->whereBetween('bookings.created_at', [$from, $to])
+            ->count('bookings.id');
 
             $l = (int) $vm->leads_received_this_month;
             $r = (int) $vm->recce_done_this_month;

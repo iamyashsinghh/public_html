@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Lead;
 use App\Models\LeadForward;
 use App\Models\LeadForwardApproval;
 use App\Models\LeadForwardInfo;
+use App\Models\Task;
+use App\Models\Visit;
 use App\Models\VmEvent;
 use Illuminate\Http\Request;
 
@@ -56,7 +59,31 @@ class ForwardApproval extends Controller
                     return redirect()->back()->with('status', ['success' => false, 'alert_type' => 'error', 'message' => 'This lead is alredy forwarded.']);
                 }
 
-                    
+
+                $vmEvents = VmEvent::where('lead_id', $exist_lead_forward->lead_id)
+                ->where('created_by', $old_vm)
+                ->update([
+                    'created_by' => $vm_id,
+                ]);
+
+            $vmTask = Task::where('lead_id', $exist_lead_forward->lead_id)
+                ->where('created_by', $old_vm)
+                ->update([
+                    'created_by' => $vm_id,
+                ]);
+
+            $vmRecce = Visit::where('lead_id', $exist_lead_forward->lead_id)
+                ->where('created_by', $old_vm)
+                ->update([
+                    'created_by' => $vm_id,
+                ]);
+
+            $vmBooking = Booking::where('lead_id', $exist_lead_forward->lead_id)
+                ->where('created_by', $old_vm)
+                ->update([
+                    'created_by' => $vm_id,
+                ]);
+
 
             $values->is_approved = $status;
             $values->save();
