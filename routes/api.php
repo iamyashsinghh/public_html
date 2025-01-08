@@ -587,6 +587,8 @@ if (!function_exists('get_business_cat')) {
 }
 
 Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
+
+    Log::info($request);
     try {
         $mobile = $request->input('caller_id_number');
         $pattern = "/^\d{10}$/";
