@@ -60,8 +60,9 @@ class TaskController extends Controller
                     ->whereNull('tasks.done_datetime')
                     ->whereNull('tasks.deleted_at');
             });
-
-
+            if($auth_user->role_id == 5){
+                $tasks->join('lead_forwards', 'tasks.lead_id', '=', 'lead_forwards.lead_id')->where([ 'lead_forwards.forward_to' => $auth_user->id]);
+            }
             if($auth_user->role_id == 4){
                 $tasks->where('leads.lead_status', '!=', 'done');
             }
@@ -178,7 +179,7 @@ class TaskController extends Controller
                 ->whereNull('last_forwarded_by')
                 ->update(['lead_color' => '#ffff0050']);
         }
-        
+
         if ($auth_user->role_id == 5) {
             $lead = LeadForward::where(['lead_id' => $request->lead_id, 'forward_to' => $auth_user->id])->first();
         } else {
