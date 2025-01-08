@@ -88,6 +88,10 @@ class GoogleSheetController extends Controller
                         $lead->save();
 
                         $updatedValues[] = [
+                            'range' => "makeup-leads new!S" . ($index + 2),
+                            'values' => [['Processed']]
+                        ];
+                        $updatedValues[] = [
                             'range' => "makeup-leads new!T" . ($index + 2),
                             'values' => [['Processed']]
                         ];
@@ -183,6 +187,10 @@ class GoogleSheetController extends Controller
                         $lead->lead_color = "#0066ff33";
                         $lead->save();
 
+                        $updatedValues[] = [
+                            'range' => "Photoghrapher-Leads!S" . ($index + 2),
+                            'values' => [['Processed']]
+                        ];
                         $updatedValues[] = [
                             'range' => "Photoghrapher-Leads!T" . ($index + 2),
                             'values' => [['Processed']]
