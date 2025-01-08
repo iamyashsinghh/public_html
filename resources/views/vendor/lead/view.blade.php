@@ -62,6 +62,7 @@
                                                 <th class="text-nowrap">Created At</th>
                                                 <th class="">RM Name</th>
                                                 <th class="text-nowrap">Title</th>
+                                                <th class="">Appointment Schedule Datetime</th>
                                                 <th class="">Message</th>
                                                 <th class="">Tentative Budget</th>
                                             </tr>
@@ -75,6 +76,7 @@
                                                         <td>{{ date('d-M-Y h:i a', strtotime($list->created_at)) }}</td>
                                                         <td>{{ $list->get_created_by->name ?? '' }}</td>
                                                         <td>{{ $list->title }}</td>
+                                                        <td>{{ $list->schedule_datetime ?: 'N/A' }}</td>
                                                         <td>
                                                             <button class="btn"
                                                                 onclick="handle_view_message(`{{ $list->message ?: 'N/A' }}`)"><i
