@@ -591,6 +591,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
     Log::info($request);
     try {
         $mobile = $request->input('caller_id_number');
+        $answered_agent = $request->input('answered_agent');
         $pattern = "/^\d{10}$/";
 
         $caller_agent_name = null;
@@ -658,10 +659,15 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
 
                 $lead->recording_url = $recording_url_json;
             }
-            $rmcheck = TeamMember::where(['role_id' => 4, 'id' => $lead->assign_id, 'is_active' => 1, 'status' => 1])->first();
-            if (!$rmcheck) {
+            if($lead->is_called_picked === 2 && $answered_agent != null){
                 $lead->assign_to = $get_rm ? $get_rm->name : null;
                 $lead->assign_id = $get_rm ? $get_rm->id : null;
+            } else {
+                $rmcheck = TeamMember::where(['role_id' => 4, 'id' => $lead->assign_id, 'is_active' => 1, 'status' => 1])->first();
+                if (!$rmcheck) {
+                    $lead->assign_to = $get_rm ? $get_rm->name : null;
+                    $lead->assign_id = $get_rm ? $get_rm->id : null;
+                }
             }
             $lead->enquiry_count += 1;
         } else {
@@ -669,6 +675,11 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
             $lead->name = $request->input('name');
             $lead->email = $request->input('email');
             $lead->mobile = $mobile;
+            if($answered_agent == null){
+                $lead->is_called_picked = 2;
+            }else{
+                $lead->is_called_picked = 1;
+            }
             $lead->assign_to = $get_rm ? $get_rm->name : null;
             $lead->assign_id = $get_rm ? $get_rm->id : null;
 
