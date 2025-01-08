@@ -56,6 +56,7 @@ class ForwardApproval extends Controller
                     return redirect()->back()->with('status', ['success' => false, 'alert_type' => 'error', 'message' => 'This lead is alredy forwarded.']);
                 }
 
+                    
 
             $values->is_approved = $status;
             $values->save();

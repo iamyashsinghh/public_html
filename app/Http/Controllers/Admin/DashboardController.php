@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\DashboardStatistics;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;    
 
 class DashboardController extends Controller
 {

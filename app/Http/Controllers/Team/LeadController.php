@@ -939,14 +939,10 @@ class LeadController extends Controller
                 $vm_events->save();
             }
 
-            //update or insert lead_forward_info table;
-            // $lead_forward_info = LeadForwardInfo::where(['lead_id' => $lead->lead_id, 'forward_from' => $auth_user->id, 'forward_to' => $vm_id])->first();
-            // if (!$lead_forward_info) {
             $lead_forward_info = new LeadForwardInfo();
             $lead_forward_info->lead_id = $lead->lead_id;
             $lead_forward_info->forward_from = $auth_user->id;
             $lead_forward_info->forward_to = $vm_id;
-            // }
             $lead_forward_info->updated_at = $this->current_timestamp;
             $lead_forward_info->save();
         }
