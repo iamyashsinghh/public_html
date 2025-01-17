@@ -134,7 +134,7 @@ class DashboardController extends Controller
             }
             $r2c = number_format($r2c, 1);
 
-            $unfollowed_leads = LeadForward::join('tasks', ['tasks.id' => 'lead_forwards.task_id'])->where(['lead_forwards.forward_to' => $auth_user->id, 'tasks.deleted_at' => null])->where('lead_forwards.lead_status', '!=', 'Done')->whereNotNull('tasks.done_datetime')
+            $unfollowed_leads = LeadForward::join('tasks', ['tasks.id' => 'lead_forwards.task_id'])->where(['lead_forwards.forward_to' => $auth_user->id, 'tasks.deleted_at' => null])->where('lead_forwards.lead_status', '!=', 'Done')->where('lead_forwards.lead_status', '!=', 'Booked')->whereNotNull('tasks.done_datetime')
                 ->whereNotExists(function ($query) {
                     $query->select(DB::raw(1))
                         ->from('bookings')
