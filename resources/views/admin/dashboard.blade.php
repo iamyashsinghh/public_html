@@ -1171,35 +1171,50 @@ new Chart("nv_chart_years", {
 
 
 
-        document.getElementById('month-selector').addEventListener('change', function() {
-            const selectedMonth = this.value.split(' ')[0];
-            const selectedYear = this.value.split(' ')[1];
-            if (selectedMonth == 'Current' && selectedYear == 'Month') {
+document.getElementById('month-selector').addEventListener('change', function () {
+    const selectedMonth = this.value.split(' ')[0];
+    const selectedYear = this.value.split(' ')[1];
+
+    if (selectedMonth == 'Current' && selectedYear == 'Month') {
         location.reload();
         return;
     }
-            // document.getElementById('selected-month').innerText = `${selectedMonth}`;
 
-            fetch(`{{ route('admin.dashboard.data') }}?month=${selectedMonth}&year=${selectedYear}`)
-                .then(response => response.json())
-                .then(data => {
-                    const chart = Chart.getChart("venue_chart_months");
-                    chart.data.datasets[0].data = data.venue_leads.split(",");
-                    chart.data.datasets[1].data = data.call_leads.split(",");
-                    chart.data.datasets[2].data = data.form_leads.split(",");
-                    chart.data.datasets[3].data = data.whatsapp_leads.split(",");
-                    chart.data.datasets[4].data = data.ads_leads.split(",");
-                    chart.data.datasets[5].data = data.organic_leads.split(",");
+    // Fetch data for the selected month and year
+    fetch(`{{ route('admin.dashboard.data') }}?month=${selectedMonth}&year=${selectedYear}`)
+        .then(response => response.json())
+        .then(data => {
+            const chart = Chart.getChart("venue_chart_months");
 
-                    const venueLeads = data.venue_leads.split(",").map(Number);
+            // Update chart datasets with new data
+            chart.data.datasets[0].data = data.venue_leads.split(",");
+            chart.data.datasets[1].data = data.call_leads.split(",");
+            chart.data.datasets[2].data = data.form_leads.split(",");
+            chart.data.datasets[3].data = data.whatsapp_leads.split(",");
+            chart.data.datasets[4].data = data.ads_leads.split(",");
+            chart.data.datasets[5].data = data.organic_leads.split(",");
+
+            // Calculate the days in the selected month
+            const monthIndex = new Date(`${selectedMonth} 1, ${selectedYear}`).getMonth(); // 0-based index
+            const daysInMonth = new Date(selectedYear, monthIndex + 1, 0).getDate(); // Get last day of month
+
+            const monthShortForm = new Date(`${selectedMonth} 1, ${selectedYear}`).toLocaleString('en-US', { month: 'short' });
+const daysArray = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}-${monthShortForm}`);
+            chart.data.labels = daysArray;
+
+            // Update average leads
+            const venueLeads = data.venue_leads.split(",").map(Number);
             const count = venueLeads.length;
             const sum = venueLeads.reduce((acc, val) => acc + val, 0);
             const average = parseFloat((sum / count).toFixed(2));
             document.getElementById('avarageLeadId').innerText = `${average}`;
-                    chart.update();
-                })
-                .catch(err => console.error('Error fetching chart data:', err));
-        });
+
+            // Update the chart
+            chart.update();
+        })
+        .catch(err => console.error('Error fetching chart data:', err));
+});
+
 </script>
 @endsection
 
