@@ -530,7 +530,7 @@ class LeadController extends Controller
                         ->leftJoin('team_members as tm', 'tm.id', 'leads.created_by')->where(['fwd_info.forward_from' => $auth_user->id])->groupBy('fwd_info.lead_id');
                     $leads->whereBetween('fwd_info.updated_at', [$from, $to]);
                 } elseif ($request->dashboard_filters == "unfollowed_leads") {
-                    $leads->join('tasks', ['tasks.id' => 'leads.task_id'])->where('leads.lead_status', '!=', 'Done')->whereNotNull('tasks.done_datetime')->whereNull('tasks.deleted_at')
+                    $leads->join('tasks', ['tasks.id' => 'leads.task_id'])->where('leads.lead_status', '!=', 'Done')->where('leads.lead_status', '!=', 'Booked')->whereNotNull('tasks.done_datetime')->whereNull('tasks.deleted_at')
                         ->whereNotExists(function ($query) {
                             $query->select(DB::raw(1))
                                 ->from('bookings')
