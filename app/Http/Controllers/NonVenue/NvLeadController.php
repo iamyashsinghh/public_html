@@ -661,7 +661,7 @@ class NvLeadController extends Controller
                         "parameters" => [
                             [
                                 "type" => "TEXT",
-                                "text" => "$vendor->business_name \n"
+                                "text" => "$vendor->business_name"
                             ],
                             [
                                 "type" => "TEXT",
