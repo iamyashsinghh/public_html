@@ -159,7 +159,7 @@
                                     <div class="form-group">
                                         <label for="parent_member_select">Parent Member <i>(Vendor Manager)</i></label>
                                         <select class="form-control" id="parent_member_select" name="parent_id">
-                                            <option value="" disabled selected>Select Parent Member</option>
+                                            <option value="">Select Parent Member</option>
                                             @foreach ($team_members as $list)
                                                 <option value="{{ $list->id }}">{{ $list->name }}</option>
                                             @endforeach
