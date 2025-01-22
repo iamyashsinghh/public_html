@@ -273,7 +273,6 @@ class NvLeadController extends Controller
             $lead->delete();
             nvrmLeadForward::where('lead_id', $lead_id)->delete();
             nvLeadForward::where('lead_id', $lead_id)->delete();
-
             session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Lead deleted successfully."]);
         } else {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => "Lead not found."]);
