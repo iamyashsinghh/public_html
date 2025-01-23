@@ -277,7 +277,6 @@ class NvLeadController extends Controller
         } else {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => "Lead not found."]);
         }
-
         return redirect()->back();
     }
 

@@ -914,6 +914,22 @@ Route::post('handle_calling_request', function (Request $request) {
     }
 });
 
+
+Route::post('call-logs', function (Request $request) {
+    Log::info('Incoming Request Data:', $request->all());
+
+    $validatedData = $request->validate([
+        'recordings.*.file' => 'required|file|mimes:mp3',
+    ]);
+    foreach ($request->file('recordings', []) as $recording) {
+        $filePath = $recording->store('recordings', 'public');
+        Log::info('Recording saved at:', ['file_path' => $filePath]);
+    }
+
+    return response()->json(['message' => 'Recordings saved and request logged successfully.']);
+
+});
+
 Route::get('get_random_rm', function () {
     $teamMember = TeamMember::where(['role_id' => 4, 'status' => 1, 'is_active' => 1])
         ->inRandomOrder()
