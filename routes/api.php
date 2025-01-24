@@ -91,6 +91,19 @@ if (!function_exists('getRmName')) {
         return $rm_name;
     }
 }
+if (!function_exists('getWaRmName')) {
+    function getWaRmName($textMsg)
+    {
+        $words = explode(' ', $textMsg);
+        $rm_name = TeamMember::where(['role_id' => 4, 'status' => 1])
+            ->whereIn('name', $words)
+            ->first();
+        if (!$rm_name) {
+            $rm_name = getAssigningRm();
+        }
+        return $rm_name;
+    }
+}
 
 if (!function_exists('getAssigningBdm')) {
     function getAssigningBdm()
@@ -472,7 +485,7 @@ Route::post('/save_wa', function (Request $request) {
         $lead->virtual_number = null;
         $lead->is_whatsapp_msg = 1;
         $lead->whatsapp_msg_time = $current_timestamp;
-        $get_rm = getAssigningRm();
+        $get_rm = getWaRmName($textMsg);
         $lead->assign_to = $get_rm->name;
         $lead->assign_id = $get_rm->id;
         $lead->save();
@@ -588,7 +601,6 @@ if (!function_exists('get_business_cat')) {
 
 Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Request $request) {
 
-    Log::info($request);
     try {
         $mobile = $request->input('caller_id_number');
         $answered_agent = $request->input('answered_agent');
