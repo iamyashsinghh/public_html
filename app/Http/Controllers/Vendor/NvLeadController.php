@@ -130,10 +130,12 @@ class NvLeadController extends Controller {
 
     public function view($lead_id) {
         $auth_user = Auth::guard('vendor')->user();
-        $lead_forward = nvLeadForward::where(['forward_to' => $auth_user->id, 'lead_id' => $lead_id])->first();;
+        $lead_forward = nvLeadForward::where(['forward_to' => $auth_user->id, 'lead_id' => $lead_id])->first();
         if (!$lead_forward) {
             abort(404);
         }
+        $lead_forward->read_status = true;
+        $lead_forward->save();
         return view('vendor.lead.view', compact('lead_forward'));
     }
 
