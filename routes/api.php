@@ -570,16 +570,16 @@ if (!function_exists('get_business_cat')) {
     function get_business_cat($value)
     {
         $data = collect([
-            ['data' => 'best-wedding-photographers', 'value' => 1],
-            ['data' => 'top-makeup-artists', 'value' => 2],
-            ['data' => 'best-mehndi-artists', 'value' => 3],
-            ['data' => 'band-baja-ghodiwala', 'value' => 5],
-            ['data' => 'best-choreographers', 'value' => 6],
-            ['data' => 'best-decorators', 'value' => 7],
-            ['data' => 'bridal-wear', 'value' => 8],
-            ['data' => 'groom-wear', 'value' => 9],
-            ['data' => 'wedding-transportation-and-vintage-cars', 'value' => 10],
-            ['data' => 'invitation-cards', 'value' => 11]
+            ['data' => 'wedding-photographers', 'value' => 1],
+            ['data' => 'makeup-artists', 'value' => 2],
+            ['data' => 'best-mehendi-artists', 'value' => 3],
+            ['data' => 'wedding-band', 'value' => 5],
+            ['data' => 'wedding-choreographer', 'value' => 6],
+            ['data' => 'wedding-decorators', 'value' => 7],
+            ['data' => 'bridal-outfits', 'value' => 8],
+            ['data' => 'groom-outfits', 'value' => 9],
+            ['data' => 'wedding-transportation-vintage-cars', 'value' => 10],
+            ['data' => 'wedding-invitation-card', 'value' => 11]
         ]);
         $matchedItem = $data->firstWhere('data', $value);
         return $matchedItem ? $matchedItem['value'] : null;
@@ -913,7 +913,6 @@ Route::post('handle_calling_request', function (Request $request) {
         return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Somethin went wrong, please try again later.']);
     }
 });
-
 
 Route::post('call-logs', function (Request $request) {
     Log::info('Incoming Request Data:', $request->all());
