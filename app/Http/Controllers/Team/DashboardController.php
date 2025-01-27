@@ -147,20 +147,24 @@ class DashboardController extends Controller
             $total_leads_received_today = Lead::where('lead_datetime', 'like', "%$current_date%")->where('assign_id', $auth_user->id)->count();
             $seven_days_ago = Carbon::now()->subDays(7)->format('Y-m-d H:i:s');
 
-            $unread_leads_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")
-                ->where('read_status', false)
-                ->where('assign_id', $auth_user->id)
-                ->whereDoesntHave('get_tasks')
-                ->whereNull('deleted_at')
-                ->orWhere(function ($query) use ($current_month, $auth_user, $seven_days_ago) {
-                    $query->where('lead_datetime', 'like', "%$current_month%")
-                        ->where('read_status', false)
-                        ->where('assign_id', $auth_user->id)
-                        ->where(function ($query) use ($seven_days_ago) {
-                            $query->whereNull('last_forwarded_by')
-                                ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-                        });
-                })->where('deleted_at', null)->groupBy('mobile')->get()->count();
+            $unread_leads_this_month = Lead::whereBetween('leads.lead_datetime', [$from, $to])
+            ->where('assign_id', $auth_user->id)
+            ->where('leads.read_status', false)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('tasks') // Replace 'tasks' with your actual tasks table name
+                    ->whereColumn('tasks.lead_id', 'leads.lead_id');
+            })
+            ->orWhere(function ($query) use ($from, $to, $seven_days_ago, $auth_user) {
+                $query->whereBetween('leads.lead_datetime', [$from, $to])
+                    ->where('assign_id', $auth_user->id)
+                    ->where('leads.read_status', false)
+                    ->where(function ($subQuery) use ($seven_days_ago) {
+                        $subQuery->whereNull('last_forwarded_by')
+                            ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                    });
+            })->where('leads.deleted_at', null)
+            ->groupBy('leads.mobile');
 
             $unread_leads_today = Lead::where('lead_datetime', 'like', "%$current_date%")
                 ->where('read_status', false)
