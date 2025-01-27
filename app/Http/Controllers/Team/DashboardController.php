@@ -151,6 +151,7 @@ class DashboardController extends Controller
                 ->where('read_status', false)
                 ->where('assign_id', $auth_user->id)
                 ->whereDoesntHave('get_tasks')
+                ->whereNull('deleted_at')
                 ->orWhere(function ($query) use ($current_month, $auth_user, $seven_days_ago) {
                     $query->where('lead_datetime', 'like', "%$current_month%")
                         ->where('read_status', false)
