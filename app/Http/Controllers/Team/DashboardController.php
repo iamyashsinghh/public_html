@@ -159,7 +159,7 @@ class DashboardController extends Controller
                             $query->whereNull('last_forwarded_by')
                                 ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
                         });
-                })->where('leads.deleted_at', null)->groupBy('lead_id')->get()->count();
+                })->where('deleted_at', null)->groupBy('lead_id')->get()->count();
 
             $unread_leads_today = Lead::where('lead_datetime', 'like', "%$current_date%")
                 ->where('read_status', false)
