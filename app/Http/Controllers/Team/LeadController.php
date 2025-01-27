@@ -381,6 +381,12 @@ class LeadController extends Controller
                             $query->whereNull('last_forwarded_by')
                                 ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
                         });
+                } elseif ($request->dashboard_filters == "total_unread_leads_this_month") {
+                    $from = Carbon::today()->startOfMonth();
+                    $to = Carbon::today()->endOfMonth();
+                    $leads->whereBetween('leads.lead_datetime', [$from, $to])
+                        ->where('assign_id', $auth_user->id)
+                        ->where('leads.read_status', false);
                 } elseif ($request->dashboard_filters == "unread_leads_today") {
                     $from = Carbon::today()->startOfDay();
                     $to = Carbon::today()->endOfDay();
