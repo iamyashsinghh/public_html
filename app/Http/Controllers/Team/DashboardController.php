@@ -152,7 +152,7 @@ class DashboardController extends Controller
             ->where('leads.read_status', false)
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
-                    ->from('tasks') // Replace 'tasks' with your actual tasks table name
+                    ->from('tasks')
                     ->whereColumn('tasks.lead_id', 'leads.lead_id');
             })
             ->orWhere(function ($query) use ($from, $to, $seven_days_ago, $auth_user) {
