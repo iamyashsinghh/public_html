@@ -374,13 +374,29 @@ class LeadController extends Controller
                 } elseif ($request->dashboard_filters == "unread_leads_this_month") {
                     $from = Carbon::today()->startOfMonth();
                     $to = Carbon::today()->endOfMonth();
+                    $current_month = date('Y-m');
                     $leads->whereBetween('leads.lead_datetime', [$from, $to])
-                        ->where('assign_id', $auth_user->id)
-                        ->where('leads.read_status', false)
-                        ->where(function ($query) use ($seven_days_ago) {
-                            $query->whereNull('last_forwarded_by')
-                                ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-                        });
+        ->where('assign_id', $auth_user->id)
+        ->where('leads.read_status', false)
+        ->where(function ($query) use ($seven_days_ago) {
+            $query->whereNull('last_forwarded_by')
+                ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+        })
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('tasks') // Replace 'tasks' with your actual tasks table name
+                ->whereColumn('tasks.lead_id', 'leads.lead_id');
+        })
+        ->orWhere(function ($query) use ($from, $to, $seven_days_ago, $auth_user) {
+            $query->whereBetween('leads.lead_datetime', [$from, $to])
+                ->where('assign_id', $auth_user->id)
+                ->where('leads.read_status', false)
+                ->where(function ($subQuery) use ($seven_days_ago) {
+                    $subQuery->whereNull('last_forwarded_by')
+                        ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                });
+        })
+        ->groupBy('leads.lead_id');
                 } elseif ($request->dashboard_filters == "unread_leads_today") {
                     $from = Carbon::today()->startOfDay();
                     $to = Carbon::today()->endOfDay();
@@ -626,8 +642,8 @@ class LeadController extends Controller
         $lead->whatsapp_msg_time = $this->current_timestamp;
         $lead->lead_color = "#0066ff33";
         if ($auth_user->role_id == 4) {
-        $lead->assign_to = $auth_user->name;
-        $lead->assign_id = $auth_user->id;
+            $lead->assign_to = $auth_user->name;
+            $lead->assign_id = $auth_user->id;
         }
         $lead->save();
 
@@ -776,7 +792,7 @@ class LeadController extends Controller
             }
         }
 
-        return view('team.venueCrm.lead.view', compact('lead', 'total_rm_msg','current_lead_having_vm_members', 'total_events_count', 'commonVenue', 'uncommonVenue'));
+        return view('team.venueCrm.lead.view', compact('lead', 'total_rm_msg', 'current_lead_having_vm_members', 'total_events_count', 'commonVenue', 'uncommonVenue'));
     }
 
     public function get_forward_info($lead_id = 0)
@@ -860,8 +876,7 @@ class LeadController extends Controller
             $lead->lead_status = "Booked";
             $lead->read_status = true;
             $lead->save();
-        }
-        else {
+        } else {
             $validate = Validator::make($request->all(), [
                 'done_title' => 'required|string',
             ]);

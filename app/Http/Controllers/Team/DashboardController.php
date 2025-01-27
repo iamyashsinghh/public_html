@@ -153,8 +153,16 @@ class DashboardController extends Controller
                 ->where(function ($query) use ($seven_days_ago) {
                     $query->whereNull('last_forwarded_by')
                         ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-                })
-                ->count();
+                })->whereDoesntHave('get_tasks')
+                ->orWhere(function ($query) use ($current_month, $auth_user, $seven_days_ago) {
+                    $query->where('lead_datetime', 'like', "%$current_month%")
+                        ->where('read_status', false)
+                        ->where('assign_id', $auth_user->id)
+                        ->where(function ($query) use ($seven_days_ago) {
+                            $query->whereNull('last_forwarded_by')
+                                ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                        });
+                })->groupBy('lead_id')->get()->count();
 
             $unread_leads_today = Lead::where('lead_datetime', 'like', "%$current_date%")
                 ->where('read_status', false)
@@ -185,7 +193,6 @@ class DashboardController extends Controller
 
             $startDate = Carbon::createFromDate(2024, 8, 1);
             $current_date = Carbon::now()->toDateString();
-
             $vm_recce_today = Lead::select('leads.lead_id')
                 ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
                 ->leftJoin('rm_messages', 'rm_messages.lead_id', '=', 'leads.lead_id')
