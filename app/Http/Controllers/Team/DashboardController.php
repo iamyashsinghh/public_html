@@ -42,8 +42,7 @@ class DashboardController extends Controller
             WHERE tasks.deleted_at IS NULL
             AND tasks.created_by = $auth_user->id
             GROUP BY tasks.lead_id
-            HAVING COUNT(CASE WHEN tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks
-        "), 'completed_tasks.lead_id', '=', 'leads.lead_id')
+            HAVING COUNT(CASE WHEN tasks.done_datetime IS NULL THEN 1 END) = 0) as completed_tasks"), 'completed_tasks.lead_id', '=', 'leads.lead_id')
             ->whereNotNull('completed_tasks.lead_id')
             ->where('leads.lead_status', '!=', 'Done')
             ->where('leads.assign_id',  $auth_user->id)
@@ -67,7 +66,7 @@ class DashboardController extends Controller
             ->where('tasks.created_by', $auth_user->id)->groupBy('leads.lead_id')
             ->get()->count();
         $rm_month_task_leads = Lead::join('tasks', 'leads.lead_id', '=', 'tasks.lead_id')
-        ->where('leads.lead_status', '!=', 'Done')
+            ->where('leads.lead_status', '!=', 'Done')
             ->whereBetween('tasks.task_schedule_datetime', [$currentMonthStart, $currentMonthEnd])
             ->whereNull('leads.deleted_at')
             ->whereNull('tasks.deleted_at')
@@ -141,7 +140,7 @@ class DashboardController extends Controller
                         ->whereRaw('bookings.id = lead_forwards.booking_id');
                 })->get()->count();
 
-            $forward_leads_this_month = $forward_leads_today = $not_contacted_lead = $vm_recce_overdue = $vm_recce_today = $total_unread_leads_this_month = 0;
+            $forward_leads_this_month = $forward_leads_today = $not_contacted_lead = $vm_recce_overdue = $vm_recce_today = 0;
         } else {
 
             $total_leads_received_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")->where('assign_id', $auth_user->id)->count();
@@ -155,11 +154,6 @@ class DashboardController extends Controller
                     $query->whereNull('last_forwarded_by')
                         ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
                 })
-                ->count();
-
-            $total_unread_leads_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")
-                ->where('read_status', false)
-                ->where('assign_id', $auth_user->id)
                 ->count();
 
             $unread_leads_today = Lead::where('lead_datetime', 'like', "%$current_date%")
@@ -243,7 +237,6 @@ class DashboardController extends Controller
             'total_leads_received_this_month',
             'total_leads_received_today',
             'unread_leads_this_month',
-            'total_unread_leads_this_month',
             'unread_leads_today',
             'total_unread_leads_overdue',
             'forward_leads_this_month',
