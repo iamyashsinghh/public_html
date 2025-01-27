@@ -378,10 +378,6 @@ class LeadController extends Controller
                     $leads->whereBetween('leads.lead_datetime', [$from, $to])
         ->where('assign_id', $auth_user->id)
         ->where('leads.read_status', false)
-        ->where(function ($query) use ($seven_days_ago) {
-            $query->whereNull('last_forwarded_by')
-                ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-        })
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('tasks') // Replace 'tasks' with your actual tasks table name

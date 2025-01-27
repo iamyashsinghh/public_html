@@ -150,10 +150,7 @@ class DashboardController extends Controller
             $unread_leads_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")
                 ->where('read_status', false)
                 ->where('assign_id', $auth_user->id)
-                ->where(function ($query) use ($seven_days_ago) {
-                    $query->whereNull('last_forwarded_by')
-                        ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-                })->whereDoesntHave('get_tasks')
+                ->whereDoesntHave('get_tasks')
                 ->orWhere(function ($query) use ($current_month, $auth_user, $seven_days_ago) {
                     $query->where('lead_datetime', 'like', "%$current_month%")
                         ->where('read_status', false)
