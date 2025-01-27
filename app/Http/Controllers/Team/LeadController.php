@@ -392,7 +392,7 @@ class LeadController extends Controller
                         ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
                 });
         })
-        ->groupBy('leads.lead_id');
+        ->groupBy('leads.mobile');
                 } elseif ($request->dashboard_filters == "unread_leads_today") {
                     $from = Carbon::today()->startOfDay();
                     $to = Carbon::today()->endOfDay();
