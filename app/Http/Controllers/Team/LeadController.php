@@ -376,23 +376,23 @@ class LeadController extends Controller
                     $to = Carbon::today()->endOfMonth();
                     $current_month = date('Y-m');
                     $leads->whereBetween('leads.lead_datetime', [$from, $to])
-        ->where('assign_id', $auth_user->id)
-        ->where('leads.read_status', false)
-        ->whereNotExists(function ($query) {
-            $query->select(DB::raw(1))
-                ->from('tasks') // Replace 'tasks' with your actual tasks table name
-                ->whereColumn('tasks.lead_id', 'leads.lead_id');
-        })
-        ->orWhere(function ($query) use ($from, $to, $seven_days_ago, $auth_user) {
-            $query->whereBetween('leads.lead_datetime', [$from, $to])
-                ->where('assign_id', $auth_user->id)
-                ->where('leads.read_status', false)
-                ->where(function ($subQuery) use ($seven_days_ago) {
-                    $subQuery->whereNull('last_forwarded_by')
-                        ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
-                });
-        })
-        ->groupBy('leads.mobile');
+                        ->where('assign_id', $auth_user->id)
+                        ->where('leads.read_status', false)
+                        ->whereNotExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                ->from('tasks') // Replace 'tasks' with your actual tasks table name
+                                ->whereColumn('tasks.lead_id', 'leads.lead_id');
+                        })
+                        ->orWhere(function ($query) use ($from, $to, $seven_days_ago, $auth_user) {
+                            $query->whereBetween('leads.lead_datetime', [$from, $to])
+                                ->where('assign_id', $auth_user->id)
+                                ->where('leads.read_status', false)
+                                ->where(function ($subQuery) use ($seven_days_ago) {
+                                    $subQuery->whereNull('last_forwarded_by')
+                                        ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
+                                });
+                        })->where('leads.deleted_at', null)
+                        ->groupBy('leads.mobile');
                 } elseif ($request->dashboard_filters == "unread_leads_today") {
                     $from = Carbon::today()->startOfDay();
                     $to = Carbon::today()->endOfDay();
