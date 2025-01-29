@@ -48,9 +48,10 @@ class DashboardController extends Controller
             ->whereIn('visits.created_by', $vm_members_ids)
             ->where([
                 'lead_forwards.source' => 'WB|Team',
-                'visits.deleted_at' => null
+                'visits.deleted_at' => null,
+                'visits.clh_status' => null,
             ])
-            ->where('visits.visit_schedule_datetime',  'like', "%$current_month%")
+            ->whereBetween('visits.visit_schedule_datetime', [$from, $to])
             ->whereDate('visits.created_at', '>', '2025-01-15')
             ->distinct('visits.id')
             ->count();

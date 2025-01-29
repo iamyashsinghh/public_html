@@ -76,6 +76,8 @@ class VisitsController extends Controller
 
         $current_date = date('Y-m-d');
         $current_month = date('Y-m');
+        $from =  Carbon::today()->startOfMonth();
+        $to =  Carbon::today()->endOfMonth();
         if ($request->visit_status == "Upcoming") {
             $visits->where('visits.visit_schedule_datetime', '>', Carbon::today()->endOfDay())->whereNull('visits.done_datetime');
         } elseif ($request->visit_status == "Today") {
@@ -131,7 +133,7 @@ class VisitsController extends Controller
                 $visits->where([
                     'lead_forwards.source' => 'WB|Team',
                 ])
-                ->where('visits.visit_schedule_datetime',  'like', "%$current_month%")
+                ->whereBetween('visits.visit_schedule_datetime', [$from, $to])
                 ->whereDate('visits.created_at', '>', '2025-01-15');
             } elseif ($request->dashboard_filters == "recce_schedule_today") {
                 $visits->where([
