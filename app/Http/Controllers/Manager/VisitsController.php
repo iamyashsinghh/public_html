@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\LeadForward;
 use App\Models\TeamMember;
+use App\Models\Visit;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class VisitsController extends Controller
 {
@@ -67,12 +69,13 @@ class VisitsController extends Controller
             'visits.done_datetime as visit_done_datetime',
             'visits.event_name as event_name',
             'ne.pax as pax',
-        )->join('visits', ['lead_forwards.visit_id' => 'visits.id'])
+        )->join('visits', ['lead_forwards.lead_id' => 'visits.lead_id'])
         ->leftJoin('vm_events as ne', 'ne.lead_id', '=', 'lead_forwards.lead_id')
         ->join('team_members', 'team_members.id', 'lead_forwards.forward_to')
         ->where(['visits.deleted_at' => null])->whereIn('lead_forwards.forward_to', $vms_id)->groupBy('lead_forwards.lead_id');
 
         $current_date = date('Y-m-d');
+        $current_month = date('Y-m');
         if ($request->visit_status == "Upcoming") {
             $visits->where('visits.visit_schedule_datetime', '>', Carbon::today()->endOfDay())->whereNull('visits.done_datetime');
         } elseif ($request->visit_status == "Today") {
@@ -125,22 +128,52 @@ class VisitsController extends Controller
             $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
         } elseif ($request->dashboard_filters != null) {
             if ($request->dashboard_filters == "recce_schedule_this_month") {
-                $from =  Carbon::today()->startOfMonth();
-                $to =  Carbon::today()->endOfMonth();
-                $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
+                $visits->where([
+                    'lead_forwards.source' => 'WB|Team',
+                ])
+                ->where('visits.visit_schedule_datetime',  'like', "%$current_month%")
+                ->whereDate('visits.created_at', '>', '2025-01-1');
             } elseif ($request->dashboard_filters == "recce_schedule_today") {
-                $from =  Carbon::today()->startOfDay();
-                $to =  Carbon::today()->endOfDay();
-                $visits->whereBetween('visits.visit_schedule_datetime', [$from, $to])->whereNull('visits.done_datetime');
-            } elseif ($request->dashboard_filters == "total_recce_overdue") {
-                $visits->where('visits.visit_schedule_datetime', '<', Carbon::today())->whereNull('visits.done_datetime');
-            } elseif ($request->dashboard_filters == "recce_done_this_month") {
-                $from =  Carbon::today()->startOfMonth();
-                $to =  Carbon::today()->endOfMonth();
-                $visits->whereBetween('visits.done_datetime', [$from, $to]);
-            }
+                $visits->where([
+                    'visits.clh_status' => null,
+                    'lead_forwards.source' => 'WB|Team',
+                ])
+                ->whereDate('visits.visit_schedule_datetime', $current_date)
+                ->whereDate('visits.created_at', '>', '2025-01-1');
+            } elseif ($request->dashboard_filters == "recce_overdue") {
+                $visits->where([
+                    'lead_forwards.source' => 'WB|Team',
+                    'visits.clh_status' => null
+                ])
+                ->whereDate('visits.visit_schedule_datetime', '<', $current_date)
+                ->whereDate('visits.created_at', '>', '2025-01-1');
+                }
         }
         $visits = $visits->get();
         return datatables($visits)->toJson();
+    }
+
+    public function update(Request $request){
+        $auth_user = Auth::guard('manager')->user();
+        $exist_visit = Visit::where(['id' => $request->visit_id])->first();
+        if (!$exist_visit) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Invalid Visit.']);
+            return redirect()->back();
+        }
+
+        $exist_visit->clh_status = $request->clh_status;
+        $exist_visit->clh_follow_up_date = $request->clh_follow_up_date;
+        $exist_visit->clh_dropped_reason = $request->clh_dropped_reason;
+        $exist_visit->clh_action_step_taken = $request->clh_action_step_taken;
+        $exist_visit->clh_action_step_taken_by = $auth_user->id;
+
+        Log::info($request);
+        if($exist_visit->save()){
+            session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Visit created successfully.']);
+            return redirect()->back();
+        }else{
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Internal Server Error.']);
+            return redirect()->back();
+        }
     }
 }

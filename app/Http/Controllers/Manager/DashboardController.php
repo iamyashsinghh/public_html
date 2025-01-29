@@ -16,16 +16,58 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-class DashboardController extends Controller {
-    public function index() {
+class DashboardController extends Controller
+{
+    public function index()
+    {
         $auth_user = Auth::guard('manager')->user();
 
         $vm_members = TeamMember::select('id', 'name', 'venue_name')->where(['parent_id' => $auth_user->id, 'role_id' => 5])->orderBy('venue_name', 'asc')->get(); //role id: 5 is VM;
+
         $current_month = date('Y-m');
         $current_date = date('Y-m-d');
 
         $from =  Carbon::today()->startOfMonth();
         $to =  Carbon::today()->endOfMonth();
+
+        $vm_members_ids = TeamMember::select('id', 'name', 'venue_name')->where(['parent_id' => $auth_user->id, 'role_id' => 5])->orderBy('venue_name', 'asc')->pluck('id');
+
+        $recce_schedule_today = Visit::join('lead_forwards', ['lead_forwards.lead_id' => 'visits.lead_id'])
+            ->whereIn('visits.created_by', $vm_members_ids)
+            ->where([
+                'lead_forwards.source' => 'WB|Team',
+                'visits.clh_status' => null,
+                'visits.deleted_at' => null
+            ])
+            ->whereDate('visits.visit_schedule_datetime', $current_date)
+            ->distinct('visits.id')
+            ->count();
+
+        $recce_schedule_this_month = Visit::join('lead_forwards', ['lead_forwards.lead_id' => 'visits.lead_id'])
+            ->whereIn('visits.created_by', $vm_members_ids)
+            ->where([
+                'lead_forwards.source' => 'WB|Team',
+                'visits.deleted_at' => null
+            ])
+            ->where('visits.visit_schedule_datetime',  'like', "%$current_month%")
+            ->whereDate('visits.created_at', '>', '2025-01-1')
+            ->distinct('visits.id')
+            ->count();
+
+        $recce_overdue = Visit::join('lead_forwards', ['lead_forwards.lead_id' => 'visits.lead_id'])
+            ->whereIn('visits.created_by', $vm_members_ids)
+            ->where([
+                'lead_forwards.source' => 'WB|Team',
+                'visits.clh_status' => null,
+                'visits.deleted_at' => null
+            ])
+            ->whereDate('visits.visit_schedule_datetime', '<', $current_date)
+            ->whereDate('visits.created_at', '>', '2025-01-1')
+            ->distinct('visits.id')
+            ->count();
+
+
+        $recce_done_this_month = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $auth_user->id, 'lead_forwards.source' => 'WB|Team', 'visits.deleted_at' => null])->whereBetween('visits.done_datetime', [$from, $to])->count();
 
         foreach ($vm_members as $vm) {
             $vm['leads_received_this_month'] = LeadForward::where(['forward_to' => $vm->id])->where('lead_datetime', 'like', "%$current_month%")->count();
@@ -71,10 +113,11 @@ class DashboardController extends Controller {
         }
 
         $total_leads_received = LeadForward::whereIn('forward_to', $vms_id)->count();
-        return view('manager.dashboard', compact('vm_members', 'total_leads_received'));
+        return view('manager.dashboard', compact('vm_members', 'total_leads_received', 'recce_schedule_today', 'recce_schedule_this_month', 'recce_overdue'));
     }
 
-    public function update_profile_image(Request $request) {
+    public function update_profile_image(Request $request)
+    {
         $auth_user = Auth::guard('manager')->user();
 
         $validate = Validator::make($request->all(), [

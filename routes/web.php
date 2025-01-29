@@ -335,6 +335,7 @@ Route::middleware('verify_token')->group(function () {
             // visits route
             Route::match(['get', 'post'], '/visits/list/{dashboard_filters?}', [Controllers\Manager\VisitsController::class, 'list'])->name('manager.visit.list');
             Route::get('/visits/ajax_list', [Controllers\Manager\VisitsController::class, 'ajax_list'])->name('manager.visit.list.ajax');
+            Route::post('/visits/update', [Controllers\Manager\VisitsController::class, 'update'])->name('manager.visit.update');
         });
     });
 

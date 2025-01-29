@@ -20,6 +20,14 @@
     overflow-x: visible !important;
 }
 
+.card-body .table-responsive{
+    overflow-x: auto !important;
+}
+.card-body .card{
+    box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+    margin-bottom: 1rem;
+}
+
 .table-responsive #serverTable thead{
     position: sticky !important;
     top: 0;

@@ -42,8 +42,49 @@
                         </div>
                     </a>
                 </div>
+                <div class="col-lg-2 col-6">
+                    <a target="_blank" href="{{route('manager.visit.list', 'recce_schedule_this_month')}}" class="text-light">
+                        <div class="small-box text-sm bg-success">
+                            <div class="inner">
+                                <h3>{{$recce_schedule_this_month}}</h3>
+                                <p>Recce this Month</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                            <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <a target="_blank" href="{{route('manager.visit.list', 'recce_schedule_today')}}" class="text-light">
+                        <div class="small-box text-sm bg-info">
+                            <div class="inner">
+                                <h3>{{$recce_schedule_today}}</h3>
+                                <p>Recce Today</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                            <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <a target="_blank" href="{{route('manager.visit.list', 'recce_overdue')}}" class="text-light">
+                        <div class="small-box text-sm bg-secondary">
+                            <div class="inner">
+                                <h3>{{$recce_overdue}}</h3>
+                                <p>Recce Overdue</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                            <div class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></div>
+                        </div>
+                    </a>
+                </div>
             </div>
-
             <div class="vm-statics my-2">
                 <h2>VM Statics</h2>
                 @foreach ($vm_members as $vm)
