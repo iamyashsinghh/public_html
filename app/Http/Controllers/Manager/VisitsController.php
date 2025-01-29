@@ -132,22 +132,22 @@ class VisitsController extends Controller
                     'lead_forwards.source' => 'WB|Team',
                 ])
                 ->where('visits.visit_schedule_datetime',  'like', "%$current_month%")
-                ->whereDate('visits.created_at', '>', '2025-01-1');
+                ->whereDate('visits.created_at', '>', '2025-01-15');
             } elseif ($request->dashboard_filters == "recce_schedule_today") {
                 $visits->where([
                     'visits.clh_status' => null,
                     'lead_forwards.source' => 'WB|Team',
                 ])
                 ->whereDate('visits.visit_schedule_datetime', $current_date)
-                ->whereDate('visits.created_at', '>', '2025-01-1');
+                ->whereDate('visits.created_at', '>', '2025-01-15');
             } elseif ($request->dashboard_filters == "recce_overdue") {
                 $visits->where([
                     'lead_forwards.source' => 'WB|Team',
                     'visits.clh_status' => null
                 ])
                 ->whereDate('visits.visit_schedule_datetime', '<', $current_date)
-                ->whereDate('visits.created_at', '>', '2025-01-1');
-                }
+                ->whereDate('visits.created_at', '>', '2025-01-15');
+            }
         }
         $visits = $visits->get();
         return datatables($visits)->toJson();

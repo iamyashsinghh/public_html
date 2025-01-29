@@ -40,6 +40,7 @@ class DashboardController extends Controller
                 'visits.deleted_at' => null
             ])
             ->whereDate('visits.visit_schedule_datetime', $current_date)
+            ->whereDate('visits.created_at', '>', '2025-01-15')
             ->distinct('visits.id')
             ->count();
 
@@ -50,7 +51,7 @@ class DashboardController extends Controller
                 'visits.deleted_at' => null
             ])
             ->where('visits.visit_schedule_datetime',  'like', "%$current_month%")
-            ->whereDate('visits.created_at', '>', '2025-01-1')
+            ->whereDate('visits.created_at', '>', '2025-01-15')
             ->distinct('visits.id')
             ->count();
 
@@ -62,7 +63,7 @@ class DashboardController extends Controller
                 'visits.deleted_at' => null
             ])
             ->whereDate('visits.visit_schedule_datetime', '<', $current_date)
-            ->whereDate('visits.created_at', '>', '2025-01-1')
+            ->whereDate('visits.created_at', '>', '2025-01-15')
             ->distinct('visits.id')
             ->count();
 
