@@ -4,7 +4,6 @@
     <link rel="stylesheet" href="//cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
 @endsection
 @section('title', $page_heading . ' | Venue CRM')
-@if (!isset($filter_params['dashboard_filters']))
     @section('navbar-right-links')
         <li class="nav-item">
             <a class="nav-link" title="Filters" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#"
@@ -13,7 +12,6 @@
             </a>
         </li>
     @endsection
-@endif
 @section('main')
     @php
         $filter_start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
