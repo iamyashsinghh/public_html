@@ -39,6 +39,7 @@ class NvNotesController extends Controller
         ->select(
             'nv_notes.*',
             'nvrm_lead_forwards.lead_id',
+            'nvrm_lead_forwards.name', 'nvrm_lead_forwards.mobile', 'nvrm_lead_forwards.event_datetime as event_date',
             'nvrm_lead_forwards.lead_status',
             'vendors.name as created_by_name',
             'vendor_categories.name as category_name',

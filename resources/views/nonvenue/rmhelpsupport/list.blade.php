@@ -22,6 +22,9 @@
                             <tr>
                                 <th class="text-nowrap">ID</th>
                                 <th class="text-nowrap">Lead Id</th>
+                                <th class="text-nowrap">Name</th>
+                                <th class="text-nowrap">Mobile</th>
+                                <th class="text-nowrap">Event Date</th>
                                 <th class="text-nowrap">Lead Status</th>
                                 <th class="text-nowrap">Created At</th>
                                 <th class="text-nowrap">Created By</th>
@@ -74,6 +77,22 @@
                         data: "lead_id"
                     },
                     {
+                        name: "name",
+                        data: "name"
+                    },
+                    {
+                        name: "mobile",
+                        data: "mobile"
+                    },
+                    {
+                        name: "event_date",
+                        data: "event_date",
+                                                render: function(data, type, row) {
+                            return moment(data).format('YYYY-MM-DD');
+                        }
+
+                    },
+                    {
                         name: "lead_status",
                         data: "lead_status"
                     },
@@ -118,7 +137,7 @@
                 ],
                 rowCallback: function(row, data, index) {
                     const td_elements = row.querySelectorAll('td');
-                    td_elements[4].innerText = `${data.created_by_name} -- ${data.category_name}`;
+                    td_elements[7].innerText = `${data.created_by_name} -- ${data.category_name}`;
                     for (let i = 1; i < 7; i++) {
                         td_elements[i].style.cursor = "pointer";
                         td_elements[i].setAttribute('onclick',
