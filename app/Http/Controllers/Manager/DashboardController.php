@@ -49,7 +49,7 @@ class DashboardController extends Controller
             ->where([
                 'lead_forwards.source' => 'WB|Team',
                 'visits.deleted_at' => null,
-                'visits.clh_status' => null,
+                // 'visits.clh_status' => null, 
             ])
             ->whereBetween('visits.visit_schedule_datetime', [$from, $to])
             ->whereDate('visits.created_at', '>', '2025-01-15')

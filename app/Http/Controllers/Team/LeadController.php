@@ -412,6 +412,13 @@ class LeadController extends Controller
                             $query->whereNull('last_forwarded_by')
                                 ->orWhere('last_forwarded_by', '<=', $seven_days_ago);
                         });
+                } elseif ($request->dashboard_filters == "lead_not_forwaded") {
+                    $startDate = Carbon::createFromDate(2024, 8, 1);
+                    $leads->join('rm_messages as rm_msg', 'rm_msg.lead_id', '=', 'leads.lead_id')
+                        ->where('leads.lead_status', '!=', 'Done')
+                        ->where('leads.assign_id', '=', $auth_user->id)
+                        ->whereDate('leads.lead_datetime', '>', $startDate)
+                        ->whereRaw("NOT EXISTS (SELECT 1 FROM lead_forward_infos WHERE lead_forward_infos.lead_id = leads.lead_id)");
                 } elseif ($request->dashboard_filters == "not_contacted_lead") {
                     $leads->where('leads.service_status', 0)
                         ->where('leads.lead_id', '>', '54262')

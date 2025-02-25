@@ -140,7 +140,7 @@ class DashboardController extends Controller
                         ->whereRaw('bookings.id = lead_forwards.booking_id');
                 })->get()->count();
 
-            $forward_leads_this_month = $forward_leads_today = $not_contacted_lead = $vm_recce_overdue = $vm_recce_today = 0;
+            $forward_leads_this_month = $forward_leads_today = $not_contacted_lead = $vm_recce_overdue = $vm_recce_today = $lead_not_forwaded = 0;
         } else {
 
             $total_leads_received_this_month = Lead::where('lead_datetime', 'like', "%$current_month%")->where('assign_id', $auth_user->id)->count();
@@ -190,10 +190,18 @@ class DashboardController extends Controller
                 ->where('assign_id', $auth_user->id)
                 ->count();
 
+            $startDate = Carbon::createFromDate(2024, 8, 1);
+            $lead_not_forwaded = Lead::join('rm_messages as rm_msg', 'rm_msg.lead_id', '=', 'leads.lead_id')
+            ->where('leads.lead_status', '!=', 'Done')
+            ->where('leads.assign_id', '=', $auth_user->id)
+            ->whereDate('leads.lead_datetime', '>', $startDate)
+            ->whereRaw("NOT EXISTS (SELECT 1 FROM lead_forward_infos WHERE lead_forward_infos.lead_id = leads.lead_id)")
+            ->distinct()
+            ->count('leads.lead_id');
+
             $forward_leads_this_month = LeadForwardInfo::whereBetween('updated_at', [$from, $to])->where('forward_from', $auth_user->id)->groupBy('lead_id')->get()->count();
             $forward_leads_today = LeadForwardInfo::where('updated_at', 'like', "%$current_date%")->where('forward_from', $auth_user->id)->groupBy('lead_id')->get()->count();
 
-            $startDate = Carbon::createFromDate(2024, 8, 1);
             $current_date = Carbon::now()->toDateString();
             $vm_recce_today = Lead::select('leads.lead_id')
                 ->join('visits', 'visits.lead_id', '=', 'leads.lead_id')
@@ -268,6 +276,7 @@ class DashboardController extends Controller
             'bookings_this_month',
             'r2c',
             'not_contacted_lead',
+            'lead_not_forwaded',
         );
 
         return view('team.dashboard', $response_data);

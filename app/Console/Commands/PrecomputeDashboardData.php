@@ -250,10 +250,10 @@ class PrecomputeDashboardData extends Command
                 ->where(['tasks.created_by' => $vm->id])
                 ->whereNull('tasks.done_datetime')->count();
             $vm['task_overdue'] = Task::selectRaw('count(distinct(lead_id)) as count')
-                ->join('leads', 'tasks.lead_id', '=', 'leads.lead_id')
-                ->where('task_schedule_datetime', '<', Carbon::today())
-                ->where(['tasks.created_by' => $vm->id])
-                ->whereNull('tasks.done_datetime')->count();
+            ->join('lead_forwards', 'tasks.lead_id', '=', 'lead_forwards.lead_id')
+            ->where('task_schedule_datetime', '<', Carbon::today())
+            ->where(['tasks.created_by' => $vm->id,  'lead_forwards.forward_to' => $vm->id])
+            ->whereNull('tasks.done_datetime')->count();
 
             $vm['recce_schedule_this_month'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.done_datetime' => null, 'visits.deleted_at' => null])->whereBetween('visits.visit_schedule_datetime', [$from, $to])->count();
             $vm['recce_schedule_today'] = LeadForward::join('visits', ['visits.id' => 'lead_forwards.visit_id'])->where(['lead_forwards.forward_to' => $vm->id, 'lead_forwards.source' => 'WB|Team', 'visits.done_datetime' => null, 'visits.deleted_at' => null])->where('visits.visit_schedule_datetime', 'like', "%$current_date%")->count();
@@ -290,12 +290,12 @@ class PrecomputeDashboardData extends Command
             }
             $vm['r2c'] = number_format($r2c);
 
-            $vm['unfollowed_leads'] = LeadForward::join('tasks', ['tasks.id' => 'lead_forwards.task_id'])->where(['lead_forwards.forward_to' => $vm->id, 'tasks.deleted_at' => null])->where('lead_forwards.lead_status', '!=', 'Done')->whereNotNull('tasks.done_datetime')
-                ->whereNotExists(function ($query) {
-                    $query->select(DB::raw(1))
-                        ->from('bookings')
-                        ->whereRaw('bookings.id = lead_forwards.booking_id');
-                })->get()->count();
+            $vm['unfollowed_leads'] = LeadForward::join('tasks', ['tasks.id' => 'lead_forwards.task_id'])->where(['lead_forwards.forward_to' => $vm->id, 'tasks.deleted_at' => null])->where('lead_forwards.lead_status', '!=', 'Done')->where('lead_forwards.lead_status', '!=', 'Booked')->whereNotNull('tasks.done_datetime')
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('bookings')
+                    ->whereRaw('bookings.id = lead_forwards.booking_id');
+            })->get()->count();
 
             $vm['wb_recce_target'] = VmProductivity::where('team_id', $vm->id)->where('date', 'like', "%$current_month%")->first()->wb_recce_target ?? 0;
 
