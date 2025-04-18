@@ -754,7 +754,7 @@ Route::post('/new_lead', function (Request $request) {
         try {
             $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
             $is_email_valid = $request->post('email') != null ? "required|email" : "";
-            $is_preference_valid = $request->post('preference') != null ? "required|string|max:255" : "";
+            $is_preference_valid = $request->post('preference') != null ? "required|string" : "";
             $mobile = $request->post('mobile');
 
             Log::info('Validation parameters', [
