@@ -736,7 +736,7 @@ Route::post('/leads_get_tata_ive_call_from_post_method_hidden_url', function (Re
 });
 
 Route::post('/new_lead', function (Request $request) {
-    Log::info($request);
+    Log::info('New lead request received', ['data' => $request->all()]);
     $startSubstring = "-546674";
     $endSubstring = "@";
     $encoded = $request->post('token');
@@ -748,12 +748,22 @@ Route::post('/new_lead', function (Request $request) {
     $randompassvalue = DB::connection('mysql')->table('randomnes')->where('id', 1)->value('random_pass');
     $outvalue = md5(sha1(md5($randompassvalue)));
 
+    Log::info('Token validation check', ['finalValue' => $finalValue, 'outvalue' => $outvalue, 'matches' => ($finalValue == $outvalue)]);
+
     if ($finalValue == $outvalue) {
         try {
             $is_name_valid = $request->post('name') != null ? "required|string|max:255" : "";
             $is_email_valid = $request->post('email') != null ? "required|email" : "";
             $is_preference_valid = $request->post('preference') != null ? "required|string|max:255" : "";
             $mobile = $request->post('mobile');
+
+            Log::info('Validation parameters', [
+                'name_rule' => $is_name_valid,
+                'email_rule' => $is_email_valid,
+                'preference_rule' => $is_preference_valid,
+                'mobile' => $mobile
+            ]);
+
             $validate = Validator::make($request->all(), [
                 'name' => $is_name_valid,
                 'email' => $is_email_valid,
@@ -761,103 +771,216 @@ Route::post('/new_lead', function (Request $request) {
             ]);
             $lead_from = '';
             if ($validate->fails()) {
+                Log::error('Validation failed', ['errors' => $validate->errors()->toArray()]);
                 return response()->json(['status' => false, 'msg' => $validate->errors()->first()]);
             }
             $mobile = $request->post('mobile') ?: $request->post('caller_id_number');
             $pattern = "/^\d{10}$/";
+
+            Log::info('Mobile validation check', ['mobile' => $mobile, 'pattern_match' => preg_match($pattern, $mobile)]);
+
             if (!preg_match($pattern, $mobile)) {
+                Log::error('Invalid mobile number format', ['mobile' => $mobile]);
                 return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
             } elseif ($mobile <= 6000000000) {
+                Log::error('Invalid mobile number value', ['mobile' => $mobile]);
                 return response()->json(['status' => false, 'msg' => "Invalid mobile number."]);
             }
             $current_timestamp = date('Y-m-d H:i:s');
+
+            // Determine lead source and preference
             if ($request->post('call_to_number')) {
                 $call_to_wb_api_virtual_number = $request->post('call_to_number');
                 $lead_source = "WB|Call";
-                $crm_meta = CrmMeta::find(1);
-                $preference = $crm_meta->meta_value;
-                $lead_from = $crm_meta->lead_from;
+                try {
+                    $crm_meta = CrmMeta::find(1);
+                    $preference = $crm_meta->meta_value;
+                    $lead_from = $crm_meta->lead_from;
+                    Log::info('Using call number as source', [
+                        'call_number' => $call_to_wb_api_virtual_number,
+                        'preference' => $preference,
+                        'lead_from' => $lead_from
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to retrieve CrmMeta', ['error' => $e->getMessage()]);
+                    $preference = null;
+                    $lead_from = null;
+                }
             } else {
                 $call_to_wb_api_virtual_number = null;
                 $lead_source = "WB|Form";
                 $preference = $request->post('preference');
                 $lead_from = $request->post('lead_from');
+                Log::info('Using form as source', [
+                    'preference' => $preference,
+                    'lead_from' => $lead_from
+                ]);
             }
 
-            $url_components = parse_url($preference);
-            if (isset($url_components['query'])) {
-                parse_str($url_components['query'], $query_params);
-                $cleaned_query_params = array_filter($query_params, function ($value) {
-                    return !empty($value);
-                });
-                $cleaned_query_string = http_build_query($cleaned_query_params);
-                $cleaned_url = $url_components['path'] . ($cleaned_query_string ? '?' . $cleaned_query_string : '');
-                $preference = $cleaned_url;
+            // Clean URL if needed
+            if (!empty($preference)) {
+                $url_components = parse_url($preference);
+                if (isset($url_components['query'])) {
+                    parse_str($url_components['query'], $query_params);
+                    $cleaned_query_params = array_filter($query_params, function ($value) {
+                        return !empty($value);
+                    });
+                    $cleaned_query_string = http_build_query($cleaned_query_params);
+                    $cleaned_url = $url_components['path'] . ($cleaned_query_string ? '?' . $cleaned_query_string : '');
+                    $preference = $cleaned_url;
+                    Log::info('Cleaned preference URL', ['original' => $url_components, 'cleaned' => $preference]);
+                }
+            } else {
+                Log::warning('Preference is empty');
             }
 
             $lead_cat_data = "Venue";
             $listing_data = null;
 
-            $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
-            if (!$listing_data) {
-                $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
-                if ($listing_data && isset($listing_data->vendor_category_id)) {
-                    $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
-                    if ($cat_data_cms && isset($cat_data_cms->name)) {
-                        $lead_cat_data = $cat_data_cms->name;
+            try {
+                $listing_data = DB::connection('mysql2')->table('venues')->where('slug', $preference)->first();
+                if (!$listing_data) {
+                    $listing_data = DB::connection('mysql2')->table('vendors')->where('slug', $preference)->first();
+                    if ($listing_data && isset($listing_data->vendor_category_id)) {
+                        $cat_data_cms = DB::connection('mysql2')->table('vendor_categories')->where('id', $listing_data->vendor_category_id)->first();
+                        if ($cat_data_cms && isset($cat_data_cms->name)) {
+                            $lead_cat_data = $cat_data_cms->name;
+                        }
                     }
                 }
+                Log::info('Listing data fetch result', [
+                    'preference' => $preference,
+                    'found_listing' => !is_null($listing_data),
+                    'lead_category' => $lead_cat_data
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to retrieve listing data', ['error' => $e->getMessage()]);
             }
+
             $locality = null;
-            if ($listing_data && isset($listing_data->location_id)) {
-                $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data->location_id)->first();
-            } else {
-                $lead_cat_data = "Phone Nav";
+            try {
+                if ($listing_data && isset($listing_data->location_id)) {
+                    $locality = DB::connection('mysql2')->table('locations')->where('id', $listing_data->location_id)->first();
+                    Log::info('Retrieved locality', ['locality' => $locality ? $locality->name : null]);
+                } else {
+                    $lead_cat_data = "Phone Nav";
+                    Log::info('Setting lead category to Phone Nav due to missing listing data or location_id');
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to retrieve locality data', ['error' => $e->getMessage()]);
             }
 
-            $lead = Lead::where('mobile', $mobile)->first();
-            if ($lead) {
-                $lead->enquiry_count = $lead->enquiry_count + 1;
-                if ($lead->assign_id) {
-                    $rmcheck = TeamMember::where(['role_id' => 4, 'id' => $lead->assign_id, 'is_active' => 1, 'status' => 1])->first();
-                    if (!$rmcheck) {
+            // Check for existing lead
+            try {
+                $lead = Lead::where('mobile', $mobile)->first();
+                Log::info('Existing lead check', ['mobile' => $mobile, 'lead_exists' => !is_null($lead)]);
+
+                if ($lead) {
+                    Log::info('Updating existing lead', ['lead_id' => $lead->id, 'current_count' => $lead->enquiry_count]);
+                    $lead->enquiry_count = $lead->enquiry_count + 1;
+
+                    if ($lead->assign_id) {
+                        try {
+                            $rmcheck = TeamMember::where(['role_id' => 4, 'id' => $lead->assign_id, 'is_active' => 1, 'status' => 1])->first();
+                            if (!$rmcheck) {
+                                Log::warning('Assigned RM is not valid, reassigning', ['current_rm_id' => $lead->assign_id]);
+                                $get_rm = getAssigningRm();
+                                if ($get_rm) {
+                                    $lead->assign_to = $get_rm->name;
+                                    $lead->assign_id = $get_rm->id;
+                                    Log::info('New RM assigned', ['new_rm_id' => $get_rm->id, 'new_rm_name' => $get_rm->name]);
+                                } else {
+                                    Log::error('Failed to get a new RM for assignment');
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            Log::error('Error checking RM status', ['error' => $e->getMessage()]);
+                        }
+                    }
+                } else {
+                    // Create new lead
+                    $lead = new Lead();
+                    $lead->name = $request->post('name');
+                    $lead->email = $request->post('email');
+                    $lead->mobile = $mobile;
+
+                    Log::info('Creating new lead', [
+                        'name' => $lead->name,
+                        'email' => $lead->email,
+                        'mobile' => $lead->mobile
+                    ]);
+
+                    try {
                         $get_rm = getAssigningRm();
-                        $lead->assign_to = $get_rm->name;
-                        $lead->assign_id = $get_rm->id;
+                        if ($get_rm) {
+                            $lead->assign_to = $get_rm->name;
+                            $lead->assign_id = $get_rm->id;
+                            Log::info('RM assigned to new lead', ['rm_id' => $get_rm->id, 'rm_name' => $get_rm->name]);
+                        } else {
+                            Log::error('Failed to get RM for new lead assignment');
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Error assigning RM to new lead', ['error' => $e->getMessage()]);
                     }
                 }
-            } else {
-                $lead = new Lead();
-                $lead->name = $request->post('name');
-                $lead->email = $request->post('email');
-                $lead->mobile = $mobile;
 
-                $get_rm = getAssigningRm();
-                $lead->assign_to = $get_rm->name;
-                $lead->assign_id = $get_rm->id;
+                // Set common lead properties
+                $lead->lead_from = $lead_from;
+                $lead->lead_datetime = $current_timestamp;
+                $lead->source = $lead_source;
+                $lead->lead_catagory = $lead_cat_data;
+                $lead->preference = $preference;
+                $lead->is_ad = $request->post('is_ad');
+                $lead->locality = $locality ? $locality->name : null;
+                $lead->lead_status = "Super Hot Lead";
+                $lead->read_status = false;
+                $lead->service_status = false;
+                $lead->done_title = null;
+                $lead->done_message = null;
+                $lead->whatsapp_msg_time = $current_timestamp;
+                $lead->lead_color = "#4bff0033"; //green color
+                $lead->virtual_number = $call_to_wb_api_virtual_number;
+                $lead->user_ip = $request->post('user_ip');
+
+                Log::info('Lead properties set, preparing to save', [
+                    'mobile' => $lead->mobile,
+                    'source' => $lead->source,
+                    'lead_from' => $lead->lead_from,
+                    'category' => $lead->lead_catagory,
+                    'preference' => $lead->preference
+                ]);
+
+                try {
+                    $result = $lead->save();
+                    Log::info('Lead save result', ['success' => $result, 'lead_id' => $lead->id ?? null]);
+
+                    if (!$result) {
+                        Log::error('Lead failed to save but didn\'t throw exception');
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Exception while saving lead', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    throw $e;
+                }
+
+                return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
+            } catch (\Exception $e) {
+                Log::error('Error during lead processing', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+                throw $e;
             }
-            $lead->lead_from = $lead_from;
-            $lead->lead_datetime = $current_timestamp;
-            $lead->source = $lead_source;
-            $lead->lead_catagory = $lead_cat_data;
-            $lead->preference = $preference;
-            $lead->is_ad = $request->post('is_ad');
-            $lead->locality = $locality ? $locality->name : null;
-            $lead->lead_status = "Super Hot Lead";
-            $lead->read_status = false;
-            $lead->service_status = false;
-            $lead->done_title = null;
-            $lead->done_message = null;
-            $lead->whatsapp_msg_time = $current_timestamp;
-            $lead->lead_color = "#4bff0033"; //green color
-            $lead->virtual_number = $call_to_wb_api_virtual_number;
-            $lead->user_ip = $request->post('user_ip');
-            $lead->save();
-            return response()->json(['status' => true, 'msg' => 'Thank you for contacting us. Our team will reach you soon with best price..!']);
         } catch (\Throwable $th) {
+            Log::error('Unhandled exception in new_lead', [
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+                'trace' => $th->getTraceAsString()
+            ]);
             return response()->json(['status' => false, 'msg' => 'Something went wrong.', 'err' => $th->getMessage()], 500);
         }
     } else {
+        Log::error('Token validation failed', ['token' => $encoded]);
         return response()->json(['status' => false, 'msg' => 'Something went wrong.'], 500);
     }
 });
