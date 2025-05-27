@@ -54,8 +54,8 @@ class PartyAreaController extends Controller {
             return redirect()->back();
         }
 
-        // Delete all related availabilities using the relationship
-        $party_area->availabilities()->delete();
+        // Delete all related availabilities first
+        Availability::where('party_area_id', $area_id)->delete();
 
         // Now delete the party area
         $party_area->delete();
