@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\partyArea;
+use App\Models\Availability;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -47,7 +48,18 @@ class PartyAreaController extends Controller {
 
     public function delete($area_id) {
         $party_area = partyArea::find($area_id);
+
+        if (!$party_area) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Party area not found.']);
+            return redirect()->back();
+        }
+
+        // Delete all related availabilities using the relationship
+        $party_area->availabilities()->delete();
+
+        // Now delete the party area
         $party_area->delete();
+
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Party area deleted.']);
         return redirect()->back();
     }
