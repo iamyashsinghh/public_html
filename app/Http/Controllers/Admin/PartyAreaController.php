@@ -55,7 +55,7 @@ class PartyAreaController extends Controller {
         }
 
         // Delete all related availabilities first
-        Availability::where('party_area_id', $area_id)->delete();
+        Availability::where('party_area_id', $area_id)->forceDelete();
 
         // Now delete the party area
         $party_area->delete();
