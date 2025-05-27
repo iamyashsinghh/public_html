@@ -55,9 +55,9 @@ class PartyAreaController extends Controller {
         }
 
         // Delete all related availabilities first
-        Availability::where('party_area_id', $area_id)->forceDelete();
+        Availability::withTrashed()->where('party_area_id', $area_id)->forceDelete();
 
-        // Now delete the party area
+        // Now force delete the party area
         $party_area->delete();
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Party area deleted.']);
