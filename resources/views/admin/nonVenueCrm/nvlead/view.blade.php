@@ -58,7 +58,7 @@
                                                         </td>
                                                         <td>
                                                             <button class="btn btn-sm btn-primary"
-                                                                onclick="handleEditNvrmMessage( '{{ $list->id }}', '{{ $list->title }}', '{{ $list->message }}' , '{{ $list->budget }}')"><i
+                                                                onclick="handleEditNvrmMessage({{ json_encode($list->id) }}, {{ json_encode($list->title) }}, {{ json_encode($list->message) }}, {{ json_encode($list->budget) }})"><i
                                                                     class="fa fa-edit"></i> Edit</button>
                                                             @php
                                                                 $filteredVendors = $lead
